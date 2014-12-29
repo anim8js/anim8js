@@ -1,0 +1,91 @@
+<html>
+
+  <head></head>
+
+  <body>
+    
+    <div id="box" style="background-color:red"></div>
+    
+    
+    <script src="src/anim8js-core.js" data-prop="$" data-access="property"></script>
+    <script src="src/anim8js-easing-types.js"></script>
+    <script src="src/anim8js-easings.js"></script>
+    <script src="src/anim8js-paths.js"></script>    
+    <script src="src/anim8js-color.js"></script> 
+    <script src="src/anim8js-calculators.js"></script>
+    <script src="src/anim8js-plugin-dom.js"></script>    
+      
+      <!--
+
+      delta         = a value typically between 0 (for beginning) and 1 (for end)
+      easing        = takes a delta value and generates a new delta value
+      easing-type   = passes a delta value to an easing function
+      calculator    = performs math for a specific data type
+      path          = returns a value along an array of values given a delta
+      property      = a value on the objects passed into m8 that can be set and get
+      attribute     = a value that can be animated and mapped to a property
+      event         = animate a property along a path over a duration, with a delay, with iterations, and with pauses
+      timeline      = the series of events that are executed
+      animator      = plays all current timelines until they're over
+      
+      m8(e).tween('x', ...)
+      m8(e).x.tween(...)
+        
+      path = [true, 0.0, {x:3,y:4}, m8(e), ]
+      
+      -->
+      
+    <script>
+    
+    // TODO
+    // [ ] convert arguments into options 
+    // [ ] parse parameters to determine whether it's dynamic
+    // [X] if value in parameters is === true, it's the current value of the property
+    // [ ] add queue of animations per property on anim8js
+    // [X] add get & set functions on anim8js
+    // [ ] add anchor, size, rotation, scale, etc
+    // [X] color parsing
+    // [ ] number parsing (relative, percents, etc)
+    
+      var e = document.getElementById('box');
+      var $e = m8(e);
+
+      $e.x = 300;
+      $e.y = 200;
+      $e.w = 20;
+      $e.h = 20;
+      $e.bgcolor = 'blue';
+      
+      console.log($e.x, $e.y, $e.rotation);
+      
+      $e.tween('x', [true, 0], 1000, 'cubic');
+      $e.linear('y', [true, 0, 500], 2000, 'quad');
+      
+      $e.linear(['w','h'], [true, {w:40, h:40}, 0], 3000, 'cubic');
+      
+      $e.linear('rotation', [45, 2700], 3000);
+      
+      var options = {
+        duration: 3000,
+        delay: 0,
+        iterations: 1,
+        pause: 100,
+        easingType: null,
+        easing: null,
+        finished: function() {},
+        animating: function() {},
+
+        params: null,     
+        property: null,
+                
+        time: 0,
+        anim8js: null,
+        object: null,
+        dynamic: false
+      };
+      
+    </script>
+    
+  </body>
+
+</html>
