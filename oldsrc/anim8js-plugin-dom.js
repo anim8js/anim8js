@@ -14,7 +14,6 @@ m8.init = function(e, anim8js) {
   anim8js.ay = new Attribute('ay');
   anim8js.anchor = new Attribute2d(anim8js.ax, anim8js.ay);
   
-  
   */
 };
 
