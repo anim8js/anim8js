@@ -1,7 +1,14 @@
 
-m8 = m8 || {};
+m8 = typeof m8 !== 'undefined' ? m8 : {};
 
-m8.color = {};
+m8.color = function(r, g, b, a) {
+  return {
+    r: r || 255,
+    g: g || 255,
+    b: b || 255,
+    a: a || 1.0
+  };
+};
 
 m8.color.parsers = 
 [
@@ -265,7 +272,7 @@ m8.color.parsers =
 ];
 
 // the color to return when input is invalid
-m8.color.invalidColor = 
+m8.color.invalidColor = m8.color.defaultValue =
 {
   r: 255,
   g: 255,

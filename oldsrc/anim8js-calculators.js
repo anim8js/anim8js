@@ -1,3 +1,6 @@
+/*********************************************************************
+ * A calculator for number primitives.
+ *********************************************************************/
 m8.defineCalculator('number', {
   copy: function(out, copy) {
     return copy;
@@ -32,6 +35,9 @@ m8.defineCalculator('number', {
   }
 });
 
+/*********************************************************************
+ * A calculator for objects with an x and y component (number)
+ *********************************************************************/
 m8.defineCalculator('2d', {
   copy: function(out, copy) {
     out.x = copy.x;
@@ -75,6 +81,9 @@ m8.defineCalculator('2d', {
   }
 });
 
+/*********************************************************************
+ * A calculator for objects with r, g, & b components (numbers 0 -> 255)
+ *********************************************************************/
 m8.defineCalculator('rgb', {
   copy: function(out, copy) {
     out.r = copy.r;
@@ -127,6 +136,10 @@ m8.defineCalculator('rgb', {
   }
 });
 
+/*********************************************************************
+ * A calculator for objects with r, g, & b components 
+ * (numbers 0 -> 255) and an a (alpha) component (0.0 -> 1.0).
+ *********************************************************************/
 m8.defineCalculator('rgba', {
   copy: function(out, copy) {
     out.r = copy.r;

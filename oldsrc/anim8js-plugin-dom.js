@@ -4,7 +4,7 @@ m8.init = function(e, anim8js) {
   /*
   anim8js.x = new Attribute('x');
   anim8js.y = new Attribute('y');
-  anim8js.position = new Attribute2d(anim8js.x, anim8js.y);
+  anim8js.pos = new Attribute2d(anim8js.x, anim8js.y);
   
   anim8js.sx = new Attribute('sx');
   anim8js.sy = new Attribute('sy');
@@ -94,12 +94,12 @@ m8.defineProperty('angle', {
 });
 
 m8.defineProperty('bgcolor', {
-  calculator: 'rgb',  
+  calculator: 'rgb',
   get: function(e) {
     return m8.color.parse(e.style.backgroundColor);
   },
   set: function(e, value) {
-    e.style.backgroundColor = m8.color.parse(value);
+    e.style.backgroundColor = m8.color.format(value);
   }
 });
 
@@ -117,7 +117,7 @@ m8.defineProperty('rotation', {
             var matches = regex.exec(stringValue);
             if (matches instanceof Array) {
               var value = parseFloat(matches[1]);
-              if (isNaN(value)) {
+              if (!isNaN(value)) {
                 return converter(value, matches);
               } 
             }
@@ -175,7 +175,7 @@ m8.defineProperty('rotation', {
         this._setter = format('filter', this.formatter.filter);
       }
       else if (_isDefined(e.style.MsFilter)) {
-        this._setter = format('MsFilter', this.formatter.filter);
+        this._setter = format('MsFilter', this.formatter.msfilter);
       }
     }
    
@@ -208,7 +208,10 @@ m8.defineProperty('rotation', {
     filter: function(x) {
       var cos = Math.cos(x);
       var sin = Math.sin(x);
-      return "progid:DXImageTransform.Microsoft.Matrix(sizingMethod='auto expand', M11="+cos+", M12="+(-sin)+", M21="+sin+", M22="+cos+")";
+      return "progid:DXImageTransform.Microsoft.Matrix(SizingMethod='auto expand', M11="+cos+", M12="+(-sin)+", M21="+sin+", M22="+cos+")";
+    }
+    msfilter: function(x) {
+      return '"' + this.filter(x) + '"';
     }
   }
 });

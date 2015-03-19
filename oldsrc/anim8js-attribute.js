@@ -1,6 +1,7 @@
 function Attribute(prop)
 {
-  if (_isDefined(prop)) {
+  if (_isDefined(prop)) 
+  {
     this.prop = prop;
     this.calculator = m8.calculators[m8.properties[prop].calculator];
     this.value = this.calculator.create();
