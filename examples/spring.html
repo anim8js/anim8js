@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #F0F;
+      position: absolute;
+      background-color: #F6F;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1"></div>
+    <div id="box2"></div>
+  
+    <script src="../build/anim8js-dom.min.js"></script>
+    
+    <script>
+    
+      var spring1 = m8( window.box1 ).spring(
+      {
+        type: 'linear',
+        attribute: 'translate',
+        rest: {x: 100, y:100},
+        position: {x: 100, y: 100},
+        damping: 2.5,
+        stiffness: -30
+      });
+      
+      var spring2 = m8( window.box2 ).spring(
+      {
+        type: 'distance',
+        attribute: 'translate',
+        rest: {x: 100, y:100},
+        position: {x: 100, y: 100},
+        distance: 100,
+        damping: 2.5,
+        stiffness: -30
+      });
+      
+      window.onclick = window.ontouchstart = function(e)
+      {
+        spring1[0].rest.x = e.pageX || e.changedTouches[0].pageX;
+        spring1[0].rest.y = e.pageY || e.changedTouches[0].pageY;
+        
+        spring2[0].rest.x = e.pageX || e.changedTouches[0].pageX;
+        spring2[0].rest.y = e.pageY || e.changedTouches[0].pageY;
+      };
+      
+    </script>
+    
+  </body>
+</html>
+  

@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    
-    <!-- 
-      DOM create styles to apply, then apply them all at the same time
-      don't apply styles if they're impercivable (convert value to pixels of applicable)
-      cache unit conversions across siblings (px to %/em)
-
-    -->
-    
+  <head>    
     <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
     #container {
       width: 90%;
       height: 300px;

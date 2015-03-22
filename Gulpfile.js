@@ -8,6 +8,7 @@ var core = [
   './lib/anim8js-core.js',
   './lib/anim8js-easing.js',
   './lib/anim8js-path.js',
+  './lib/anim8js-spring.js',
   './lib/anim8js-event.js',
   './lib/anim8js-animation.js',
   './lib/anim8js-animator.js',
