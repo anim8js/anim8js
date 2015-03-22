@@ -128,20 +128,7 @@
       -->
     </div>
 			
-    <script src="lib/anim8js-core.js"></script>
-    <script src="lib/anim8js-easing.js"></script>
-    <script src="lib/anim8js-color.js"></script>
-    <script src="lib/anim8js-path.js"></script>
-    <script src="lib/anim8js-calculator.js"></script>
-    <script src="lib/anim8js-animation.js"></script>
-    <script src="lib/anim8js-animator.js"></script>
-    <script src="lib/anim8js-event.js"></script>
-    <script src="lib/anim8js-parser-keyframe.js"></script>
-    <script src="lib/anim8js-parser-deltavalues.js"></script>
-    <script src="lib/anim8js-parser-initial.js"></script>
-    <script src="lib/anim8js-parser-final.js"></script>
-    <script src="lib/anim8js-dom.js"></script>
-    <script src="lib/anim8js-animate.css.js"></script>
+    <script src="../build/anim8js-animate.css.js"></script>
 		
     <script>
       	
@@ -164,18 +151,18 @@
         repeat: 4
       });
     	
-      anim8.play(window.box2, 'bounceRotate');      
-      anim8.play(window.box5, 'bounce');
-      anim8.play(window.box6, 'rubberBand');
+      anim8(window.box2).play('bounceRotate');      
+      anim8(window.box5).play('bounce');
+      anim8(window.box6).play('rubberBand');
 			
-			anim8.play(window.box7, {
+			anim8(window.box7).play({
 				deltas: [0.0, 0.8, 1.0],
 				values: {
 					rotate: [0, 360, 0]
 				}
 			});
 			
-      anim8.play(window.img1, {
+      anim8(window.img1).play({
 				keyframe: {
 	        '0.0,1.0': {
 	          grayscale: 0
