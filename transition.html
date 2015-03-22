@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    #box {
+      width: 40px;
+      height: 40px;
+      left: 100px;
+      top: 200px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box"></div>
+
+    <script src="lib/anim8js-core.js"></script>
+    <script src="lib/anim8js-easing.js"></script>
+    <script src="lib/anim8js-color.js"></script>
+    <script src="lib/anim8js-path.js"></script>
+    <script src="lib/anim8js-calculator.js"></script>
+    <script src="lib/anim8js-animation.js"></script>
+    <script src="lib/anim8js-animator.js"></script>
+    <script src="lib/anim8js-event.js"></script>
+    <script src="lib/anim8js-parser-keyframe.js"></script>
+    <script src="lib/anim8js-parser-deltavalues.js"></script>
+    <script src="lib/anim8js-parser-initial.js"></script>
+    <script src="lib/anim8js-parser-final.js"></script>
+    <script src="lib/anim8js-dom.js"></script>
+    <script src="lib/anim8js-animate.css.js"></script>
+		
+    <script>
+      
+      var anim8or = m8( window.box );
+      
+      anim8or.play({
+        keyframe: {
+          from: getCurrentPoint(),
+          to: getRandomPoint()
+        }
+      });
+      
+      setInterval( function()
+      {        
+        if ( !anim8or.isAnimating() )
+        {
+          anim8or.play({
+            keyframe: {
+              from: anim8or[0].frame,
+              to: getRandomPoint()
+            }
+          });
+        }
+        
+      }, 2000);
+      
+      window.onclick = function(e)
+      {
+        if (anim8or.isAnimating())
+        {
+          anim8or.transition( 1000, 0.3, 'ease', {
+            keyframe: {
+              from: {
+                'left': e.x,
+                'top': e.y
+              },
+              to: getRandomPoint()
+            }
+          }); 
+        }
+      };
+      
+      function getCurrentPoint()
+      {
+        return {
+          'left': true,
+          'top': true
+        };
+      }
+      
+      function getRandomPoint()
+      {
+        return {
+          'left': Math.random() * (window.innerWidth - 100) + 50,
+          'top': Math.random() * (window.innerHeight - 100) + 50
+        };
+      }
+            
+    </script>
+    
+  </body>
+</html>
+  
