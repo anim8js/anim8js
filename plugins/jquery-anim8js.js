@@ -112,6 +112,23 @@
     return this;
   };
   
+  $.fn.get = function(attributes)
+  {
+    return this.animators().get( attributes );
+  };
+  
+  $.fn.spring = function(spring)
+  {
+    return this.animators().spring( spring );
+  };
+  
+  $.fn.unspring = function(springs)
+  {
+    this.animators().unspring( springs );
+    
+    return this;
+  };
+  
   $.fn.isAnimating = function(attributes)
   {
     return this.animators().isAnimating();
