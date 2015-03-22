@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    #box {
+      width: 40px;
+      height: 40px;
+      left: 100px;
+      top: 200px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box" data-intro="zoomInRight 2s" data-emphasis="pulse 2s x3 quad-out" data-outro="hinge"></div>
+    
+		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="../build/jquery-anim8js.min.js"></script>
+    
+    <script>
+      
+      $('#box').dataPlay('intro').dataQueue('emphasis').dataQueue('outro').queue('zoomInLeft');
+      
+    </script>
+    
+  </body>
+</html>
+  
