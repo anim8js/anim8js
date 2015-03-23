@@ -19,3 +19,4 @@ An animation library for javascript objects.
 13. Correct anim8.isFunction
 14. Add gravity to springs
 15. Allow reference values in path (they don't get copied - they point to an attribute in another Animator) - add Animator.ref(attribute)
+16. Add sequence to anim8 which has a delay between animations, an easing, the animation, and the list of animators. anim8.sequence(delay, easing, animation[, options])
