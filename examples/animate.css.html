@@ -9,6 +9,29 @@
   <link href="//fonts.googleapis.com/css?family=Roboto:400,100,400italic,700italic,700" rel="stylesheet" type="text/css">
 
   <link rel="stylesheet" href="http://daneden.github.io/animate.css/style.css">
+  
+  <style>
+    #custom .input--dropdown {
+      margin-left: 0px;
+      margin-right: 0px;
+      border-radius: 0px;
+      float: left;
+      background: none;
+      text-align: center;
+      border-left-width: 0px;
+      border-right-width: 0px;
+    }
+    #custom .input--dropdown:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+      border-left-width: 1px;
+    }
+    #custom .input--dropdown.last {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border-right-width: 1px;
+    }
+  </style>
 <style type="text/css"></style></head>
 <body>
 <header class="site__header island">
@@ -138,10 +161,43 @@
           <option value="rollIn">rollIn</option>
           <option value="rollOut">rollOut</option>
         </optgroup>
+
+        <optgroup label="anim8js">
+          <option value="blurIn">blurIn</option>
+          <option value="blurOut">blurOut</option>
+        </optgroup>
       </select>
 
-      <button class="butt js--triggerAnimation">Animate it</button>
+      <button class="butt js--triggerAnimation" type="button">Animate it</button>
     </form>
+    
+    <form id="custom">
+      <select class="input input--dropdown js--action">
+        <option value="slide">slide</option>
+        <option value="fade">fade</option>
+        <option value="zoom">zoom</option>
+      </select>
+      <select class="input input--dropdown js--direction">
+        <option value="In">In</option>
+        <option value="Out">Out</option>
+      </select>
+      <select class="input input--dropdown js--y">
+        <option value="Up">Up</option>
+        <option value="Down">Down</option>
+      </select>
+      <select class="input input--dropdown js--x">
+        <option value="Left">Left</option>
+        <option value="Right">Right</option>
+      </select>
+      <select class="input input--dropdown js--size last">
+        <option value="">Normal</option>
+        <option value="x2">x 2</option>
+        <option value="Big">Big</option>
+      </select>
+
+      <button class="butt js--triggerCustom" type="button">Custom Animate</button>
+    </form>
+    
     <hr>
     <p class="meta"><a href="https://raw.github.com/daneden/animate.css/master/animate.css" download="animate.css">Download Animate.css.js</a> or <a href="//github.com/daneden/animate.css">View on GitHub</a></p>
   </div>
@@ -163,11 +219,24 @@
       
     return false;
   }
+  
+  function playCustom()
+  {
+    m8( window.animationSandbox )
+      .play( $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
+      .on( 'finished', function(animator) {
+        animator.restore();
+      });
+    
+    return false;
+  }
 
   $(function()
   {
     $('.js--triggerAnimation').click( playAnimation );
     $('.js--animations').change( playAnimation );
+
+    $('.js--triggerCustom').click( playCustom );
   });
 
 </script>

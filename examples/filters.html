@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="//fonts.googleapis.com/css?family=Roboto:400,100,400italic,700italic,700" rel="stylesheet" type="text/css">
+    <style>
+    body, html {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+    body {
+      text-align: center;
+    }
+    html {
+      font: 100%/1.5 "Roboto", Verdana, sans-serif;
+    }
+    #text {
+      font-size: 80px;
+      margin-top: -40px;
+      top: 50%;
+      position: relative;
+      -webkit-text-fill-color: transparent;
+      -webkit-background-clip: text;
+      background-image: -webkit-linear-gradient(92deg,#f35626,#feab3a);
+    }
+    
+    </style>
+  </head>
+  <body>
+    
+    <div id="text">
+      anim8js filters
+    </div>
+  
+    <script src="../build/anim8js-dom.min.js"></script>
+    
+    <script>
+    
+      m8( window.text ).play({
+        keyframe: {
+          from: {
+            hueRotate: 0,
+          },
+          to: {
+            hueRotate: -360
+          }
+        }
+      }, {
+        duration: 20000,
+        repeat: 1000
+      });
+      
+      m8( window.text ).play({
+        keyframe: {
+          '0': {
+            blur: 0
+          },
+          '50': {
+            blur: 5,
+            opacity: 1
+          },
+          '100': {
+            opacity: 0
+          }
+        }
+      }, {
+        delay: 3000,
+        duration: 2000,
+        sleep: 3000,
+        teasing: 'quad-pong',
+        repeat: 1000
+      });
+      
+    </script>
+    
+  </body>
+</html>
+  
