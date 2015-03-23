@@ -105,14 +105,14 @@
     return this;
   };
   
-  $.fn.set = function(attributes)
+  $.fn.setAttributes = function(attributes)
   {
     this.animators().set( attributes );
     
     return this;
   };
   
-  $.fn.get = function(attributes)
+  $.fn.getAttributes = function(attributes)
   {
     return this.animators().get( attributes );
   };

@@ -43,6 +43,8 @@
               from: anim8or[0].frame,
               to: getRandomPoint()
             }
+          }, {
+            duration: 3000
           });
         }
         
@@ -52,7 +54,7 @@
       {
         if (anim8or.isAnimating())
         {
-          anim8or.transition( 1000, 0.3, 'ease', {
+          anim8or.transition( 2000, 0.3, 'ease', {
             keyframe: {
               from: {
                 'left': e.x,
