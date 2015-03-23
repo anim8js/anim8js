@@ -24,8 +24,21 @@
   };
   
   $.fn.dataPlay = function(animationAttribute, all)
-  {
-    return this.play( this.data( animationAttribute ), all );
+  {	
+	return this.each(function()
+  	{
+		var animationText = $(this).data( animationAttribute );
+		
+		if ( animationText )
+		{
+	    	var anim = parseAnimation( animationText );
+		
+			if ( anim !== false )
+			{
+		  		m8(this).play( anim.animation, anim.options, all );
+			}
+		}
+  	});
   };
   
   $.fn.queue = function(animationText)
@@ -42,7 +55,20 @@
   
   $.fn.dataQueue = function(animationAttribute)
   {
-    return this.queue( this.data( animationAttribute ) );
+  	return this.each(function()
+    {
+  		var animationText = $(this).data( animationAttribute );
+		
+  		if ( animationText )
+  		{
+  	    	var anim = parseAnimation( animationText );
+		
+			if ( anim !== false )
+			{
+	  	  		m8(this).queue( anim.animation, anim.options );		
+			}
+  		}
+    });
   };
 
   $.fn.transition = function(animationText, transitionText)
@@ -60,7 +86,22 @@
   
   $.fn.dataTransition = function(animationAttribute, transitionAttribute)
   {
-    return this.play( this.data( animationAttribute ), this.data( transitionAttribute ) );
+	return this.each(function()
+	{
+		var animationText = $(this).data( animationAttribute );
+		var transitionText = $(this).data( transitionAttribute );
+		
+		if ( animationText && transitionText )
+		{
+	    	var anim = parseAnimation( animationText );
+			var tran = parseTransition( transitionText );
+
+			if ( anim !== false )
+			{
+		  		m8(this).transition( tran.time, tran.delta, tran.easing, anim.animation, anim.options );
+			}
+		}
+	});
   };
   
   $.fn.pause = function()
