@@ -5,13 +5,13 @@
     DELAY: '~',
     SLEEP: 'z'
   };
-    
+  	
   $.fn.animators = function()
   {
-    return m8( this.get() );
+		return m8( this.get() );		
   };
   
-  $.fn.play = function(animationText, all)
+  $.fn.play = function( animationText, all )
   {
     var anim = parseAnimation( animationText );
     
@@ -23,25 +23,29 @@
     return this; 
   };
   
-  $.fn.dataPlay = function(animationAttribute, all)
-  {	
-	return this.each(function()
-  	{
-		var animationText = $(this).data( animationAttribute );
+  $.fn.dataPlay = function( animationAttribute, all )
+  {
+		return this.filter(function()
+	  {
+			var animationText = $(this).data( animationAttribute );
 		
-		if ( animationText )
-		{
-	    	var anim = parseAnimation( animationText );
-		
-			if ( anim !== false )
+			if ( animationText )
 			{
-		  		m8(this).play( anim.animation, anim.options, all );
+		    var anim = parseAnimation( animationText );
+		
+				if ( anim !== false )
+				{				
+			  	m8( this ).play( anim.animation, anim.options, all );
+					
+					return true;
+				}
 			}
-		}
+			
+			return false;
   	});
   };
   
-  $.fn.queue = function(animationText)
+  $.fn.queueAnimation = function( animationText )
   {
     var anim = parseAnimation( animationText );
     
@@ -53,25 +57,29 @@
     return this; 
   };
   
-  $.fn.dataQueue = function(animationAttribute)
-  {
-  	return this.each(function()
+  $.fn.dataQueue = function( animationAttribute )
+  {	
+  	return this.filter(function()
     {
   		var animationText = $(this).data( animationAttribute );
 		
   		if ( animationText )
   		{
-  	    	var anim = parseAnimation( animationText );
+  	    var anim = parseAnimation( animationText );
 		
-			if ( anim !== false )
-			{
-	  	  		m8(this).queue( anim.animation, anim.options );		
-			}
+				if ( anim !== false )
+				{
+		   		m8( this ).queue( anim.animation, anim.options );		
+					
+					return true;
+				}
   		}
+			
+			return false;
     });
   };
 
-  $.fn.transition = function(animationText, transitionText)
+  $.fn.transition = function( animationText, transitionText )
   {
     var anim = parseAnimation( animationText );
     var tran = parseTransition( transitionText );
@@ -84,24 +92,28 @@
     return this; 
   };
   
-  $.fn.dataTransition = function(animationAttribute, transitionAttribute)
-  {
-	return this.each(function()
-	{
-		var animationText = $(this).data( animationAttribute );
-		var transitionText = $(this).data( transitionAttribute );
-		
-		if ( animationText && transitionText )
+  $.fn.dataTransition = function( animationAttribute, transitionAttribute )
+  {	
+		return this.filter(function()
 		{
-	    	var anim = parseAnimation( animationText );
-			var tran = parseTransition( transitionText );
-
-			if ( anim !== false )
+			var animationText = $(this).data( animationAttribute );
+			var transitionText = $(this).data( transitionAttribute );
+		
+			if ( animationText && transitionText )
 			{
-		  		m8(this).transition( tran.time, tran.delta, tran.easing, anim.animation, anim.options );
+		    var anim = parseAnimation( animationText );
+				var tran = parseTransition( transitionText );
+
+				if ( anim !== false )
+				{
+			  	m8( this ).transition( tran.time, tran.delta, tran.easing, anim.animation, anim.options );
+					
+					return true;
+				}
 			}
-		}
-	});
+			
+			return false;
+		});
   };
   
   $.fn.pause = function()
@@ -125,63 +137,89 @@
     return this;
   };
   
-  $.fn.stop = function()
+  $.fn.stopIt = function()
   {
     this.animators().stop();
     
     return this;
   };
   
-  $.fn.finish = function()
+  $.fn.finishIt = function()
   {
     this.animators().finish();
     
     return this;
   };
   
-  $.fn.eventsFor = function(attributes, callback)
+  $.fn.endIt = function()
   {
-    this.animators().eventsFor( attributes, callback );
+    this.animators().end();
     
     return this;
   };
   
-  $.fn.setAttributes = function(attributes)
+  $.fn.eventsFor = function( attributes, callback, context )
+  {
+    this.animators().eventsFor( attributes, callback, context );
+    
+    return this;
+  };
+  
+  $.fn.springsFor = function( attributes, callback, context )
+  {
+    this.animators().springsFor( attributes, callback, context );
+    
+    return this;
+  };
+  
+  $.fn.setAttributes = function( attributes )
   {
     this.animators().set( attributes );
     
     return this;
   };
   
-  $.fn.getAttributes = function(attributes)
+  $.fn.getAttributes = function( attributes )
   {
     return this.animators().get( attributes );
   };
   
-  $.fn.spring = function(spring)
+  $.fn.spring = function( spring  )
   {
     return this.animators().spring( spring );
   };
   
-  $.fn.unspring = function(springs)
+  $.fn.unspring = function( springs )
   {
     this.animators().unspring( springs );
     
     return this;
   };
   
-  $.fn.isAnimating = function(attributes)
+  $.fn.applyInitialState = function( attributes )
+  {
+    this.animators().applyInitialState( attributes );
+	 	 
+	  return this;
+  };
+  
+  $.fn.isAnimating = function( attributes )
   {
     return this.animators().isAnimating();
   };
   
-  $.fn.hasEvents = function(attributes)
+  $.fn.hasEvents = function( attributes )
   {
     return this.animators().hasEvents();
   };
   
-  var parseAnimation = function(text)
+  var parseAnimation = function( text )
   {
+		if ( !anim8.isString( text ) )
+		{
+			return false;
+		}
+		
     var parts = text.split(' ');
     var options = {};
     var animation = null;
@@ -247,8 +285,13 @@
     };
   };
 
-  var parseTransition = function(text)
+  var parseTransition = function( text )
   {
+		if ( !anim8.isString( text ) )
+		{
+			return false;
+		}
+		
     var transition = 
     {
       time: 500,

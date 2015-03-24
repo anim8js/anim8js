@@ -3,6 +3,7 @@
 var gulp = require('gulp');
 var sourcemaps = require('gulp-sourcemaps');
 var plugins = require('gulp-load-plugins')();
+var gutil = require('gulp-util');
 
 var core = 
 [
@@ -69,7 +70,7 @@ gulp.task('js:objects', function()
 		.src( builds.objects.include )
 		.pipe( sourcemaps.init() )
 			.pipe( plugins.concat( builds.objects.filename ) )
-			.pipe( plugins.uglify() )
+			.pipe( plugins.uglify().on('error', gutil.log) )
 		.pipe( sourcemaps.write('.') )
 		.pipe( gulp.dest( builds.objects.output ) )
   ;
@@ -81,7 +82,7 @@ gulp.task('js:dom', function()
 		.src( builds.dom.include )
 		.pipe( sourcemaps.init() )
 			.pipe( plugins.concat( builds.dom.filename ) )
-			.pipe( plugins.uglify() )
+			.pipe( plugins.uglify().on('error', gutil.log) )
 		.pipe( sourcemaps.write('.') )
 		.pipe( gulp.dest( builds.dom.output ) )
   ;
@@ -94,7 +95,7 @@ gulp.task('js:animatecss', function()
 		.pipe( sourcemaps.init() )
 			.pipe( plugins.concat( builds.animatecss.filename ) )
 			.pipe( plugins.uglify() )
-		.pipe( sourcemaps.write('.') )
+		.pipe( sourcemaps.write('.').on('error', gutil.log) )
 		.pipe( gulp.dest( builds.animatecss.output ) )
   ;
 });
@@ -106,7 +107,7 @@ gulp.task('js:jquery', function ()
 		.pipe( sourcemaps.init() )
 			.pipe( plugins.concat( builds.jquery.filename ) )
 			.pipe( plugins.uglify() )
-		.pipe( sourcemaps.write('.') )
+		.pipe( sourcemaps.write('.').on('error', gutil.log) )
 		.pipe( gulp.dest( builds.jquery.output ) )
   ;
 });
