@@ -4,9 +4,6 @@ An animation library for javascript objects.
 **TODO:**
 
 1. Attach units to events instead of the Animator
-2. Add `follow(path[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-3. Add `tweenTo(end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-4. Add `tween(start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
 5. Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
 6. Add option merging to Parser
 7. Make anim8.Parser class

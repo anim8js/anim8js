@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #0F0;
+      position: absolute;
+      background-color: #6F6;
+    }
+    #center {
+      width: 12px;
+      height: 12px;
+      margin-left: -6px;
+      margin-top: -6px;
+      border-radius: 6px;
+      top: 50%;
+      left: 50%;
+      background-color: red;
+      position: absolute;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1"></div>
+    <div id="box2"></div>
+    <div id="center"></div>
+  
+    <script src="../build/anim8js-dom.min.js"></script>
+    
+    <script>
+    
+      var sprite1 = m8( window.box1 ).first();
+      var sprite2 = m8( window.box2 ).first();
+      
+      sprite1.play({
+        keyframe: {
+          '0': {
+            angle: 0,
+            rotate: 0,
+            distance: 100,
+            easing: 'linear'
+          },
+          '100': {
+            angle: 360,
+            rotate: -720,
+            distance: 100,
+            easing: 'linear'
+          },
+          '10,30,50,70,90': {
+            distance: 150,
+            easing: 'quad-inout'
+          },
+          '20,40,60,80': {
+            distance: 100,
+            easing: 'quad-inout'
+          }
+        }
+      }, {
+        duration: 3000,
+        repeat: 100
+      });
+      
+      sprite2.spring(
+      {
+        type: 'distance',
+        attribute: 'center',
+        rest: sprite1.ref( 'center' ),
+        position: {x: 100, y: 100},
+        distance: 100,
+        damping: 2.5,
+        stiffness: -30,
+        gravity: {x: 0, y:1000}
+      });
+      
+    </script>
+    
+  </body>
+</html>
+  
