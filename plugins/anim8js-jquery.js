@@ -36,7 +36,7 @@
 		    var anim = parseAnimation( animationText );
 		
 				if ( anim !== false )
-				{				
+				{					
 			  	m8( this ).play( anim.animation, anim.options, all );
 					
 					return true;
