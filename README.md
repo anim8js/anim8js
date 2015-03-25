@@ -33,4 +33,5 @@ An animation library for javascript objects.
 28. [ ] Add queue to anim8.Sequence
 29. [ ] Add transition to anim8.Sequence
 30. [ ] Add anim8.Movie?
-31. [ ] Fix bug where one Animator partially plays another animators events
+31. [X] Fix bug where one Animator partially plays another animators events
+32. [ ] Final parser events shouldn't be called on applyInitialState
