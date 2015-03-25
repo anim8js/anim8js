@@ -25,11 +25,12 @@ An animation library for javascript objects.
 20. [X] Allow reference values in spring.
 21. [ ] Add automatic rest & position determination to Springs which defaults to current Animator values.
 22. [ ] Complete Event.seek
-23. [ ] Styles are generated in DomAnimator.update and applied & cleared in DomAnimator.apply
-24. [ ] Add live mode (RAF constantly executes)
+23. [X] Styles are generated in DomAnimator.update and applied & cleared in DomAnimator.apply
+24. [X] Add live mode (RAF constantly executes)
 25. [ ] If transition is called and not playing anything, treat as play
 26. [ ] If transition and partial play, delay new attributes by transitionTime
 27. [ ] Test true values
 28. [ ] Add queue to anim8.Sequence
 29. [ ] Add transition to anim8.Sequence
 30. [ ] Add anim8.Movie?
+31. [ ] Fix bug where one Animator partially plays another animators events
