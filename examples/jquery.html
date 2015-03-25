@@ -22,11 +22,11 @@
     <div id="box" data-intro="zoomInRight 2s" data-emphasis="pulse 2s x3 quad-out" data-outro="hinge"></div>
     
 		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="../build/jquery-anim8js.min.js"></script>
+    <script src="../build/anim8js-jquery.min.js"></script>
     
     <script>
       
-      $('#box').dataPlay('intro').dataQueue('emphasis').dataQueue('outro').queue('zoomInLeft');
+      $('#box').dataPlay('intro').dataQueue('emphasis').dataQueue('outro').queueAnimation('zoomInLeft');
       
     </script>
     

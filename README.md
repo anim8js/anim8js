@@ -3,7 +3,7 @@ An animation library for javascript objects.
 
 **TODO:**
 
-1. [ ] Attach units to events instead of the Animator
+1. [X] Attach units to events instead of the Animator
 2. [X] Add `follow(attribute, path[, duration][, delay][, easing][, repeat][, sleep])` to Animator
 3. [ ] Add `tweenTo(attribute, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
 4. [ ] Add `tween(attribute, start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
@@ -24,12 +24,12 @@ An animation library for javascript objects.
 19. [ ] Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
 20. [X] Allow reference values in spring.
 21. [ ] Add automatic rest & position determination to Springs which defaults to current Animator values.
-22. [ ] Complete Event.seek
+22. [X] Complete Event.seek
 23. [X] Styles are generated in DomAnimator.update and applied & cleared in DomAnimator.apply
 24. [X] Add live mode (RAF constantly executes)
-25. [ ] If transition is called and not playing anything, treat as play
-26. [ ] If transition and partial play, delay new attributes by transitionTime
-27. [ ] Test true values
+25. [X] If transition is called and not playing anything, treat as play
+26. [X] If transition and partial play, delay new attributes by transitionTime
+27. [X] Test true values
 28. [ ] Add queue to anim8.Sequence
 29. [ ] Add transition to anim8.Sequence
 30. [ ] Add anim8.Movie?

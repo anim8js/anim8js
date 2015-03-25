@@ -1,11 +1,13 @@
 (function($, m8)
 {
-  var SYMBOL = {
+  var SYMBOL = 
+  {
     REPEAT: 'x',
     DELAY: '~',
-    SLEEP: 'z'
+    SLEEP: 'z',
+    INFINITY: 'infinite'
   };
-  	
+  
   $.fn.animators = function()
   {
 		return m8( this.get() );		
@@ -262,6 +264,10 @@
         {
           options.delay = delays;
         }
+      }
+      else if ( p === SYMBOL.INFINITY )
+      {
+        options.repeat = Number.POSITIVE_INFINITY;
       }
       else
       {
