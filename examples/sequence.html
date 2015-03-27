@@ -170,6 +170,7 @@
       </select>
 
       <button class="butt js--triggerAnimation" type="button">Animate it</button>
+      <button class="butt js--nextAnimation" type="button">&#8608;</button>
     </form>
     
     <form id="custom">
@@ -242,6 +243,8 @@
     function playAnimation()
     {
       sequenceable
+        .stop()
+        .restore()
         .sequence( 50, 'linear', $('.js--animations').val() )
         .play()
       ;
@@ -252,6 +255,8 @@
     function playCustom()
     {
       sequenceable
+        .stop()
+        .restore()
         .sequence( 50, 'linear', $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
         .play()
       ;
@@ -265,6 +270,20 @@
       $('.js--animations').change( playAnimation );
 
       $('.js--triggerCustom').click( playCustom );
+    
+      $('.js--nextAnimation').click( function() 
+      {
+        var options = $('.js--animations option');
+      
+        var i = options.index(options.filter(":selected"));
+      
+        if (i >= 0 && i < options.length - 1) 
+        {
+          options.eq( i + 1 ).prop( "selected", true );
+        }
+      
+        options.parent().change();
+      });
     });
 
   </script>

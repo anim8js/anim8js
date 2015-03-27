@@ -8,8 +8,8 @@ An animation library for javascript objects.
 3. [ ] Add `tweenTo(attribute, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
 4. [ ] Add `tween(attribute, start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
 5. [ ] Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
-6. [ ] Add option merging to Parser
-7. [ ] Make anim8.Parser class
+6. [X] Add option merging to Parser
+7. [X] Make anim8.Parser class
 8. [ ] Make anim8.Calculator class
 9. [ ] Move all dom functions to anim8.dom namespace
 10. [ ] Figure out how to separate attributes for one animatable type to the next
@@ -34,4 +34,5 @@ An animation library for javascript objects.
 29. [ ] Add transition to anim8.Sequence
 30. [ ] Add anim8.Movie?
 31. [X] Fix bug where one Animator partially plays another animators events
-32. [ ] Final parser events shouldn't be called on applyInitialState
+32. [X] Final parser events shouldn't be called on applyInitialState
+33. [ ] Add tween parser
