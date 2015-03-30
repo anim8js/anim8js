@@ -1,56 +1,52 @@
 
 /**
- * The core object of the framework. It extends Array and the method can be used 
- * to construct an array of animators from subjects.
- * 
- * @param {array} subjects
+ * Converts a subject into an animator and returns it. If the subject 
+ * is already an animator it's returned immediately.
+ *
+ * @param {any} subject
  */
-m8 = anim8 = function(subjects) 
+m8 = anim8 = function(subject) 
 {
-  if ( this === window ) 
+  if ( subject instanceof anim8.Animator )
   {
-		var args = Array.prototype.slice.call( arguments );
-		
-		if ( !anim8.isArray( subjects ) )
-		{
-			subjects = [];
-			
-			for (var i = 0; i < args.length; i++)
-			{
-				subjects.push( args[i] );
-			}
-		}
-		
-    var animators = [];
-    
-    for (var i = 0; i < subjects.length; i++) 
-    {
-      var arg = subjects[ i ];
-      
-      if ( arg instanceof anim8.Animator ) 
-      {
-        animators.push( arg );
-      } 
-      else
-      {
-				var factory = anim8.factories( arg );
-				
-				if (factory !== false)
-				{
-          factory.parseAnimators( arg, animators );
-				}
-      }
-    }
-		
-		return new anim8( animators );
-  } 
-  else 
+    return subject;
+  }
+
+  var factory = anim8.factories( subject );
+
+  if ( factory === false )
   {
-    for (var i = 0; i < subjects.length; i++) 
+    return false;
+  }
+
+  return factory.parseAnimator( subject );
+};
+
+/**
+ * Converts an array of subjects into an array of Animators.
+ *
+ * @param {any} subject
+ */
+m8s = anim8s = function(subjects)
+{
+  if ( !anim8.isArray( subjects ) )
+  {
+    subjects = [];
+  }
+
+  var animators = [];
+
+  for (var i = 0; i < subjects.length; i++)
+  {
+    var animator = anim8( subjects[i] );
+
+    if ( animator !== false )
     {
-      this.push( subjects[ i ] );
+      animators.push( animator );
     }
   }
+
+  return new anim8.Animators( animators );
 };
 
 /*****************************************************************
@@ -214,6 +210,21 @@ anim8.delegate = function(functionName, returning)
     {
       return this.length === 0 ? undefined : this[0][functionName].apply( this[0], arguments );
     };
+
+  case anim8.delegate.RETURN_TRUE:
+    return function()
+    {
+      for (var i = 0; i < this.length; i++)
+      {
+        if ( this[i][functionName].apply( this[i], arguments ) )
+        {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
   }
   
   return anim8.noop;
@@ -233,6 +244,11 @@ anim8.delegate.RETURN_RESULTS = 'results';
  * The result of the first element.
  */
 anim8.delegate.RETURN_FIRST = 'first';
+
+/**
+ * True if any of the methods return true, otherwise false.
+ */
+anim8.delegate.RETURN_TRUE = 'true';
 
 
 /**
@@ -474,262 +490,6 @@ anim8.defaults =
   repeat: 1
 };
 
-
-/*****************************************************************
-  ANIM8 DEFINITION
-******************************************************************/
-
-/**
- * anim8 is an instance of Array. All array methods are supported.
- */
-anim8.prototype = new Array();
-
-/**
- * Invokes a callback for each element in the array.
- * 
- * @param {function} iterator
- */
-anim8.prototype.each = function(iterator, context) 
-{
-  for (var i = 0; i < this.length; i++) 
-  {
-    if ( iterator.call( context || this[i], this[i], i ) === false ) 
-    {
-      break;
-    }
-  }
-	
-	return this;
-};
-
-/**
- * Invokes a callback for each element in the array and if true is returned that element is removed from the array.
- *
- * @param {function} filterer
- */
-anim8.prototype.filter = function(filterer)
-{	
-	var alive = 0;
-	
-	for (var i = 0; i < this.length; i++)
-	{
-		var remove = filterer( this[i] );
-		
-		if ( !remove )
-		{
-			this[alive++] = this[i];
-		}
-	}
-	
-	this.length = alive;
-	
-	return this;
-};
-
-/**
- * Returns true if any of the animators in the array are animating.
- */
-anim8.prototype.isAnimating = function() 
-{
-  for (var i = 0; i < this.length; i++)
-  {
-    if ( this[i].isAnimating() )
-    {
-      return true;
-    }
-  }
-  
-  return false;
-};
-
-/**
- * Returns the first animator in the array.
- */
-anim8.prototype.first = function()
-{
-  return this[0];
-};
-
-/**
- * Plays a sequence of events separated by a delay given an animation to play on all Animators.
- */
-anim8.prototype.sequence = function(delay, easing, animation, options)
-{
-  return new anim8.Sequence( this, delay, easing, animation, options );
-};
-
-/**
- * Adds the following methods to anim8 to make an array of Animators appear like a single Animator.
- */
-anim8.prototype.pause 			= anim8.delegate( 'pause', anim8.delegate.RETURN_THIS );
-anim8.prototype.transition 	= anim8.delegate( 'transition', anim8.delegate.RETURN_THIS );
-anim8.prototype.play 				= anim8.delegate( 'play', anim8.delegate.RETURN_THIS );
-anim8.prototype.resume 			= anim8.delegate( 'resume', anim8.delegate.RETURN_THIS );
-anim8.prototype.stop 				= anim8.delegate( 'stop', anim8.delegate.RETURN_THIS );
-anim8.prototype.finish 			= anim8.delegate( 'finish', anim8.delegate.RETURN_THIS );
-anim8.prototype.end   			= anim8.delegate( 'end', anim8.delegate.RETURN_THIS );
-anim8.prototype.queue 			= anim8.delegate( 'queue', anim8.delegate.RETURN_THIS );
-anim8.prototype.restore			= anim8.delegate( 'restore', anim8.delegate.RETURN_THIS );
-anim8.prototype.eventsFor   = anim8.delegate( 'eventsFor', anim8.delegate.RETURN_RESULTS );
-anim8.prototype.set         = anim8.delegate( 'set', anim8.delegate.RETURN_THIS );
-anim8.prototype.get         = anim8.delegate( 'get', anim8.delegate.RETURN_FIRST );
-anim8.prototype.spring 			= anim8.delegate( 'spring', anim8.delegate.RETURN_RESULTS );
-anim8.prototype.unspring 		= anim8.delegate( 'unspring', anim8.delegate.RETURN_THIS );
-anim8.prototype.springsFor 	= anim8.delegate( 'springsFor', anim8.delegate.RETURN_RESULTS );
-anim8.prototype.tweenTo   	= anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS );
-anim8.prototype.applyInitialState = anim8.delegate( 'applyInitialState', anim8.delegate.RETURN_THIS );
-
-anim8.prototype.on			    = anim8.delegate( 'on', anim8.delegate.RETURN_THIS );
-anim8.prototype.once		    = anim8.delegate( 'once', anim8.delegate.RETURN_THIS );
-anim8.prototype.off			    = anim8.delegate( 'off', anim8.delegate.RETURN_THIS );
-anim8.prototype.trigger     = anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS );
-
-/*****************************************************************
-  ANIM8 ANIMATION LOOP
-******************************************************************/
-
-/**
- * Whether the animation cycle is currently running. This is true
- * when where are active animators and anim8.run is being called
- * and false otherwise.
- */
-anim8.running = false;
-
-/**
- * Live Mode keeps the animation cycles running even when there aren't
- * Animators. For highly interactive applications enabling this may
- * take up more resources but it will result in smoother animations. When
- * the animation cycle goes from stopped to running it takes a few frames
- * to smooth out when this is false.
- */
-anim8.live = false;
-
-/**
- * The anim8 instance for all active animators.
- */
-anim8.animating = anim8();
-
-/**
- * The function to call if animations need to be done.
- *
- * @param {function} callback
- */
-anim8.requestRun = (function() 
-{  
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
-  var requestor = window.requestAnimationFrame;
-  
-  for (var x = 0; x < vendors.length && !requestor; ++x) 
-  {
-    requestor = window[ vendors[x] + 'RequestAnimationFrame' ];
-  }
-  
-  if (!requestor)
-  {
-    var lastTime = 0;
-    
-    return function(callback)
-    {
-      var now = anim8.now();
-      var timeToCall = Math.max( 0, 16 - (currTime - lastTime) );
-      var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
-      lastTime = currTime + timeToCall;
-      return id;
-    };
-  }
-  
-  return function(callback)
-  {
-    requestor( callback );
-  };
-  
-})();
-
-/**
- * Adds an animator to the list if animating if it isn't there already. If the animation
- * loop isn't currently running it's started.
- * 
- * @param {anim8.Animator} animator
- */
-anim8.add = function(animator)
-{
-  if ( !animator.active )
-  {
-    anim8.animating.push( animator );
-    
-    animator.active = true;
-  }
-  
-  if ( !anim8.running )
-  {
-    anim8.running = true;
-		anim8.trigger('starting');
-		anim8.requestRun( anim8.run );
-  }
-}
-
-/**
- * Executes an animation cycle which consists of four operations:
- *   1. Call preupdate on all Animators
- *   2. Call update on all Animators
- *   3. Call apply on all Animators
- *   4. Remove finished Animators
- * When there are no more animating the cycle is stopped.
- */
-anim8.run = function() 
-{
-	anim8.trigger('begin');
-	
-  var now = anim8.now();
-  
-  // notify animators that we're about to update
-  anim8.animating.each(function(animator)
-  {
-    animator.preupdate();
-  });
-  
-  // update animating based on the current time
-  anim8.animating.each(function(animator)
-  {
-    animator.update( now );
-  });
-  
-  // apply the attributes calculated
-  anim8.animating.each(function(animator)
-  {
-    animator.apply();
-  });
-  
-  // if the animator is done remove it
-  anim8.animating.filter(function(animator)
-  {
-    if ( animator.finished )
-    {
-			animator.deactivate();
-      animator.active = false;
-    }
-    
-    return animator.finished;
-  });
-	
-	anim8.trigger('end');
-  
-  // if there are animators still remaining call me again!
-  if ( anim8.animating.length || anim8.live )
-  {
-		anim8.requestRun( anim8.run );
-  } 
-  else 
-  {
-    anim8.running = false;
-		anim8.trigger('finished');
-  }
-};
-
-/**
- * Add events to the animation cycle: begin, end, finished, starting
- */
-anim8.eventize( anim8 );
 anim8.Defer = function(factory, methods)
 {
 	this.$factory = factory;
@@ -3256,6 +3016,23 @@ anim8.animation = function(animation, options)
 };
 
 /**
+ * Saves an animation under the given name. It can be played, queued, and transitioned into
+ * at a later time providing the name and optionally options to override with.
+ *
+ * @param {string} name
+ * @param {object} animation
+ * @param [object] options
+ */
+anim8.save = function(name, animation, options)
+{
+  var animation = anim8.animation( animation, options );
+  
+  animation.name = name;
+  
+  anim8.animation[name] = animation;
+};
+
+/**
  * Instantiates a new Animation given it's name, the input & options passed, and the events that
  * were generated from the input & options. If the name is false this is an anonymous animation.
  * Input & Options are used by parsers to generate events, options allow for an animations
@@ -3300,23 +3077,6 @@ anim8.Animation.prototype =
     
     return e;
   }
-};
-
-/**
- * Saves an animation under the given name. It can be played, queued, and transitioned into
- * at a later time providing the name and optionally options to override with.
- *
- * @param {string} name
- * @param {object} animation
- * @param [object] options
- */
-anim8.save = function(name, animation, options)
-{
-  var animation = anim8.animation( animation, options );
-  
-  animation.name = name;
-  
-	anim8.animation[name] = animation;
 };
 
 /**
@@ -3713,9 +3473,9 @@ anim8.Animator.prototype =
 	},
   
   /**
-   * Transitions from the currently playing events into a new animation. The transition is made
-   * by constructing a quadratic curve from the current value to a point further on the current
-   * path to the starting point of the new animation.
+   * Transitions from the currently playing events into the beginning of a new animation. 
+   * The transition is made by constructing a quadratic curve from the current value to a 
+   * point further on the current path to the starting point of the new animation.
    *
    * @param {number} transitionTime 
    * @param {number} transitionDelta
@@ -3724,8 +3484,8 @@ anim8.Animator.prototype =
    * @param [object] options
    * @param [boolean] all
    */
-	transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all)
-	{
+  transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all)
+  {
     var events = this.createEvents( animation, options );
     
     if ( events === false )
@@ -3758,7 +3518,7 @@ anim8.Animator.prototype =
           var calc = path.calculator;
           var e2 = this.events[attr];
         
-          var p0 = calc.copy( calc.create(), this.frame[attr] );
+          var p0 = calc.clone( this.frame[attr] );
           var p1 = e2.getFuture( transitionDelta );
           var p2 = e1.getPoint( 0 );
         
@@ -3788,61 +3548,191 @@ anim8.Animator.prototype =
     
     anim8.add( this );
     
-		return this;
-	},
-	
-	/**
-	 * Tweens a single attribute or a map of attributes to target values.
-	 *
-	 * .tweenTo( attributeName, targetValue, duration, delay, easing, repeat, sleep )
-	 * .tweenTo( attributeMap, duration, delay, easing, repeat sleep )
-	 *
-	 * @param {object|string}
-	 * @param [any]
-	 * @param 
-	 */
-	tweenTo: function(input, a, b, c, d, e, f)
-	{
-		if ( anim8.isString( input ) )
-		{
-			var attr = anim8.attribute( input );
-			var calc = anim8.calculator( attr.calculator );
-			var target = calc.parse( a, attr.defaultValue );
-			var duration = anim8.coalesce( b, anim8.defaults.duration );
-			var delay = anim8.coalesce( c, anim8.defaults.delay );
-			var easing = anim8.easing( d );
-			var repeat = anim8.coalesce( e, anim8.defaults.repeat );
-			var sleep = anim8.coalesce( f, anim8.defaults.sleep );
-			
-			var path = new anim8.Tween( input, calc, this.frame[ input ], target );
-			var event = new anim8.Event( input, path, duration, easing, delay, sleep, repeat );
-			
-			this.placeEvent( event.newInstance() );
-		}
-		else if ( anim8.isObject( input ) )
-		{
-			for ( var attribute in input )
-			{
-				var attr = anim8.attribute( input );
-				var calc = anim8.calculator( attr.calculator );
-				var target = calc.parse( input[ attribute ], attr.defaultValue );
-				var duration = anim8.coalesce( a, anim8.defaults.duration );
-				var delay = anim8.coalesce( b, anim8.defaults.delay );
-				var easing = anim8.easing( c );
-				var repeat = anim8.coalesce( d, anim8.defaults.repeat );
-				var sleep = anim8.coalesce( e, anim8.defaults.sleep );
-				
-				var path = new anim8.Tween( input, calc, this.frame[ input ], target );
-				var event = new anim8.Event( input, path, duration, easing, delay, sleep, repeat );
-				
-				this.placeEvent( event.newInstance() );
-			}
-		}
-		
-		anim8.add( this );
-		
-		return this;
-	},
+    return this;
+  },
+  
+  /**
+   * Transitions from the currently playing events into a new animation. The transition is made
+   * by constructing a cubic curve from the current value to a point further on the current
+   * path to the starting point of the new animation.
+   *
+   * @param {number} transitionTime 
+   * @param {number} transitionFromDelta
+   * @param {number} transitionIntoDelta
+   * @param {string|function|array} transitionEasing
+   * @param {string|object|anim8.Animation} animation
+   * @param [object] options
+   * @param [boolean] all
+   */
+  transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all)
+  {
+    var events = this.createEvents( animation, options );
+    
+    if ( events === false )
+    {
+      return false;
+    }
+    
+    // Check if we even need to transition
+    var transition = false;
+    
+    for (var i = 0; i < events.length && !transition; i++)
+    {      
+      if ( events[i].attribute in this.events )
+      {
+        transition = true;
+      }
+    }
+    
+    // Only transition if we need to
+    if ( transition )
+    {
+      for (var i = 0; i < events.length; i++)
+      {
+        var e1 = events[i];
+        var attr = e1.attribute;
+      
+        if ( attr in this.events )
+        {
+          var path = e1.path;
+          var calc = path.calculator;
+          var e2 = this.events[attr];
+        
+          var p0 = calc.clone( this.frame[attr] );
+          var p1 = e2.getFuture( transitionFromDelta );
+          var p2 = e1.getPoint( 0 );
+          var p3 = e1.getPoint( transitionIntoDelta );
+          
+          var transitionPath = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
+          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1, true ).newInstance();
+        
+          transitionEvent.next = e1;
+        
+          this.placeEvent( transitionEvent );
+        }
+        else
+        {
+          e1.delay += transitionTime;
+     
+          this.placeEvent( e1 );
+        }
+      }
+    }
+    // We don't need to transition, just play the events
+    else
+    {
+      for (var i = 0; i < events.length; i++)
+      { 
+        this.placeEvent( events[i] );
+      }
+    }
+    
+    anim8.add( this );
+    
+    return this;
+  },
+  
+  /**
+   * Tweens a single attribute or a map of attributes to target values.
+   *
+   * .tweenTo( attributeName, targetValue, duration, delay, easing, repeat, sleep )
+   * .tweenTo( attributeMap, duration, delay, easing, repeat sleep )
+   */
+  tweenTo: function(input, a, b, c, d, e, f)
+  {
+    if ( anim8.isString( input ) )
+    {
+      var attr = anim8.attribute( input );
+      var calc = anim8.calculator( attr.calculator );
+      var target = calc.parse( a, attr.defaultValue );
+      var duration = anim8.coalesce( b, anim8.defaults.duration );
+      var delay = anim8.coalesce( c, anim8.defaults.delay );
+      var easing = anim8.easing( d );
+      var repeat = anim8.coalesce( e, anim8.defaults.repeat );
+      var sleep = anim8.coalesce( f, anim8.defaults.sleep );
+      var start = input in this.frame ? calc.clone( this.frame[ input ] ) : true;
+
+      var path = new anim8.Tween( input, calc, start, target );
+      var event = new anim8.Event( input, path, duration, easing, delay, sleep, repeat );
+      
+      this.placeEvent( event.newInstance() );
+    }
+    else if ( anim8.isObject( input ) )
+    {
+      for ( var attribute in input )
+      {
+        var attr = anim8.attribute( input );
+        var calc = anim8.calculator( attr.calculator );
+        var target = calc.parse( input[ attribute ], attr.defaultValue );
+        var duration = anim8.coalesce( a, anim8.defaults.duration );
+        var delay = anim8.coalesce( b, anim8.defaults.delay );
+        var easing = anim8.easing( c );
+        var repeat = anim8.coalesce( d, anim8.defaults.repeat );
+        var sleep = anim8.coalesce( e, anim8.defaults.sleep );
+        var start = attribute in this.frame ? calc.clone( this.frame[ attribute ] ) : true;
+        
+        var path = new anim8.Tween( attribute, calc, start, target );
+        var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat );
+        
+        this.placeEvent( event.newInstance() );
+      }
+    }
+    
+    anim8.add( this );
+    
+    return this;
+  },
+  
+  /**
+   * Tweens a single attribute or a map of attributes to target values.
+   *
+   * .tween( attributeName, startValue, targetValue, duration, delay, easing, repeat, sleep )
+   * .tween( startMap, endMap, duration, delay, easing, repeat sleep )
+   */
+  tween: function(input, a, b, c, d, e, f, g)
+  {
+    if ( anim8.isString( input ) )
+    {
+      var attr = anim8.attribute( input );
+      var calc = anim8.calculator( attr.calculator );
+      var start = calc.parse( a, attr.defaultValue );
+      var target = calc.parse( b, attr.defaultValue );
+      var duration = anim8.coalesce( c, anim8.defaults.duration );
+      var delay = anim8.coalesce( d, anim8.defaults.delay );
+      var easing = anim8.easing( e );
+      var repeat = anim8.coalesce( f, anim8.defaults.repeat );
+      var sleep = anim8.coalesce( g, anim8.defaults.sleep );
+
+      var path = new anim8.Tween( input, calc, start, target );
+      var event = new anim8.Event( input, path, duration, easing, delay, sleep, repeat );
+      
+      this.placeEvent( event.newInstance() );
+    }
+    else if ( anim8.isObject( input ) )
+    {
+      for ( var attribute in input )
+      {
+        var attr = anim8.attribute( input );
+        var calc = anim8.calculator( attr.calculator );
+        var start = calc.parse( input[ attribute ], attr.defaultValue );
+        var target = calc.parse( a[ attribute ], attr.defaultValue );
+        var duration = anim8.coalesce( b, anim8.defaults.duration );
+        var delay = anim8.coalesce( c, anim8.defaults.delay );
+        var easing = anim8.easing( d );
+        var repeat = anim8.coalesce( e, anim8.defaults.repeat );
+        var sleep = anim8.coalesce( f, anim8.defaults.sleep );
+        
+        var path = new anim8.Tween( attribute, calc, start, target );
+        var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat );
+        
+        this.placeEvent( event.newInstance() );
+      }
+    }
+    
+    anim8.add( this );
+    
+    return this;
+  },
 	
 	/**
 	 * Applies the initial state of all unstarted current events for the specified attributes immediately. 
@@ -3949,7 +3839,6 @@ anim8.Animator.prototype =
 		}
     
     var resulting = !anim8.isFunction( callback );
-    var objectCount = 0;
     var results = [];
     
 		if ( anim8.isArray( attributes ) )
@@ -3966,9 +3855,7 @@ anim8.Animator.prototype =
           }
           else
           {
-            callback.call( this, objects[attr], attr ); 
-            
-            objectCount++;
+            callback.call( this, objects[attr], attr );
           }
         }
       }
@@ -3983,14 +3870,12 @@ anim8.Animator.prototype =
         }
         else
         {
-          callback.call( this, objects[attr], attr ); 
-          
-          objectCount++;
+          callback.call( this, objects[attr], attr );
         }
       }
     }
     
-		return resulting ? results : objectCount;
+		return resulting ? results : this;
   },
   
   /**
@@ -4204,12 +4089,288 @@ anim8.DeferAnimator = function(animator, previous, eventType, event)
 /**
  * Creates the Defer prototype for the following Animator methods.
  */
-anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator, [
+anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator, 
+[
   'play', 'queue', 'transition', 'restore', 'set', 'resume', 'pause', 
   'finish', 'end', 'stop', 'follow', 'applyInitialState', 'tweenTo', 
   'spring', 'unspring', 'apply', 'placeSpring', 'placeEvent'
 ]);
 
+
+/*****************************************************************
+  ANIMATORS DEFINITION
+******************************************************************/
+
+anim8.Animators = function(input)
+{
+  if ( anim8.isArray( input ) )
+  {
+    this.fill( input );
+  }
+};
+
+/**
+ * Animators is an instance of Array. All array methods are supported.
+ */
+anim8.Animators.prototype = new Array();
+
+/**
+ * Invokes a callback for each element in the array.
+ * 
+ * @param {function} iterator
+ */
+anim8.Animators.prototype.each = function(iterator, context) 
+{
+  for (var i = 0; i < this.length; i++) 
+  {
+    if ( iterator.call( context || this[i], this[i], i ) === false ) 
+    {
+      break;
+    }
+  }
+	
+	return this;
+};
+
+/**
+ * Appends the array of animators given to the end of this array.
+ *
+ * @param {array} animators
+ */
+anim8.Animators.prototype.fill = function(animators)
+{
+  for (var i = 0; i < animators.length; i++)
+  {
+    this.push( animators[i] );
+  }
+
+  return this;
+};
+
+/**
+ * Invokes a callback for each element in the array and if true is returned that element is removed from the array.
+ *
+ * @param {function} filterer
+ */
+anim8.Animators.prototype.filter = function(filterer)
+{	
+	var alive = 0;
+	
+	for (var i = 0; i < this.length; i++)
+	{
+		var remove = filterer( this[i] );
+		
+		if ( !remove )
+		{
+			this[alive++] = this[i];
+		}
+	}
+	
+	this.length = alive;
+	
+	return this;
+};
+
+/**
+ * Returns the first animator in the array.
+ */
+anim8.Animators.prototype.first = function()
+{
+  return this[0];
+};
+
+/**
+ * Plays a sequence of events separated by a delay given an animation to play on all Animators.
+ */
+anim8.Animators.prototype.sequence = function(delay, easing, animation, options)
+{
+  return new anim8.Sequence( this, delay, easing, animation, options );
+};
+
+/**
+ * Adds the following methods to make an array of Animators appear like a single Animator.
+ */
+anim8.Animators.prototype.restore           = anim8.delegate( 'restore', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.placeSpring       = anim8.delegate( 'placeSpring', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.placeEvent        = anim8.delegate( 'placeEvent', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.preupdate         = anim8.delegate( 'preupdate', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.update            = anim8.delegate( 'update', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.apply             = anim8.delegate( 'apply', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.trimEvents        = anim8.delegate( 'trimEvents', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.deactivate        = anim8.delegate( 'deactivate', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.destroy           = anim8.delegate( 'destroy', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.spring            = anim8.delegate( 'spring', anim8.delegate.RETURN_RESULTS );
+anim8.Animators.prototype.unspring          = anim8.delegate( 'unspring', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.play              = anim8.delegate( 'play', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.queue             = anim8.delegate( 'queue', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.transition        = anim8.delegate( 'transition', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.tweenTo           = anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.applyInitialState = anim8.delegate( 'applyInitialState', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.follow            = anim8.delegate( 'follow', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.eventsFor         = anim8.delegate( 'eventsFor', anim8.delegate.RETURN_RESULTS );
+anim8.Animators.prototype.springsFor        = anim8.delegate( 'springsFor', anim8.delegate.RETURN_RESULTS );
+anim8.Animators.prototype.stop              = anim8.delegate( 'stop', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.end               = anim8.delegate( 'end', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.finish            = anim8.delegate( 'finish', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.pause 			      = anim8.delegate( 'pause', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.resume 			      = anim8.delegate( 'resume', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.set               = anim8.delegate( 'set', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.get               = anim8.delegate( 'get', anim8.delegate.RETURN_FIRST );
+anim8.Animators.prototype.isAnimating       = anim8.delegate( 'isAnimating', anim8.delegate.RETURN_TRUE );
+anim8.Animators.prototype.hasEvents         = anim8.delegate( 'hasEvents', anim8.delegate.RETURN_TRUE );
+anim8.Animators.prototype.hasSprings        = anim8.delegate( 'hasSprings', anim8.delegate.RETURN_TRUE );
+anim8.Animators.prototype.on			          = anim8.delegate( 'on', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.once		          = anim8.delegate( 'once', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.off			          = anim8.delegate( 'off', anim8.delegate.RETURN_THIS );
+anim8.Animators.prototype.trigger           = anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS );
+
+
+/*****************************************************************
+  ANIM8 ANIMATION LOOP
+******************************************************************/
+
+/**
+ * Whether the animation cycle is currently running. This is true
+ * when where are active animators and anim8.run is being called
+ * and false otherwise.
+ */
+anim8.running = false;
+
+/**
+ * Live Mode keeps the animation cycles running even when there aren't
+ * Animators. For highly interactive applications enabling this may
+ * take up more resources but it will result in smoother animations. When
+ * the animation cycle goes from stopped to running it takes a few frames
+ * to smooth out when this is false.
+ */
+anim8.live = false;
+
+/**
+ * The anim8 instance for all active animators.
+ */
+anim8.animating = new anim8.Animators();
+
+/**
+ * The function to call if animations need to be done.
+ *
+ * @param {function} callback
+ */
+anim8.requestRun = (function() 
+{  
+  var vendors = ['ms', 'moz', 'webkit', 'o'];
+  var requestor = window.requestAnimationFrame;
+  
+  for (var x = 0; x < vendors.length && !requestor; ++x) 
+  {
+    requestor = window[ vendors[x] + 'RequestAnimationFrame' ];
+  }
+  
+  if (!requestor)
+  {
+    var lastTime = 0;
+    
+    return function(callback)
+    {
+      var now = anim8.now();
+      var timeToCall = Math.max( 0, 16 - (currTime - lastTime) );
+      var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
+      lastTime = currTime + timeToCall;
+      return id;
+    };
+  }
+  
+  return function(callback)
+  {
+    requestor( callback );
+  };
+  
+})();
+
+/**
+ * Adds an animator to the list if animating if it isn't there already. If the animation
+ * loop isn't currently running it's started.
+ * 
+ * @param {anim8.Animator} animator
+ */
+anim8.add = function(animator)
+{
+  if ( !animator.active )
+  {
+    anim8.animating.push( animator );
+    
+    animator.active = true;
+  }
+  
+  if ( !anim8.running )
+  {
+    anim8.running = true;
+    anim8.trigger('starting');
+    anim8.requestRun( anim8.run );
+  }
+}
+
+/**
+ * Executes an animation cycle which consists of four operations:
+ *   1. Call preupdate on all Animators
+ *   2. Call update on all Animators
+ *   3. Call apply on all Animators
+ *   4. Remove finished Animators
+ * When there are no more animating the cycle is stopped.
+ */
+anim8.run = function() 
+{
+  anim8.trigger('begin');
+  
+  var now = anim8.now();
+  
+  // notify animators that we're about to update
+  anim8.animating.each(function(animator)
+  {
+    animator.preupdate();
+  });
+  
+  // update animating based on the current time
+  anim8.animating.each(function(animator)
+  {
+    animator.update( now );
+  });
+  
+  // apply the attributes calculated
+  anim8.animating.each(function(animator)
+  {
+    animator.apply();
+  });
+  
+  // if the animator is done remove it
+  anim8.animating.filter(function(animator)
+  {
+    if ( animator.finished )
+    {
+      animator.deactivate();
+      animator.active = false;
+    }
+    
+    return animator.finished;
+  });
+  
+  anim8.trigger('end');
+  
+  // if there are animators still remaining call me again!
+  if ( anim8.animating.length || anim8.live )
+  {
+    anim8.requestRun( anim8.run );
+  } 
+  else 
+  {
+    anim8.running = false;
+    anim8.trigger('finished');
+  }
+};
+
+/**
+ * Add events to the animation cycle: begin, end, finished, starting
+ */
+anim8.eventize( anim8 );
 anim8.Sequence = function(animators, delay, easing, animation, options)
 {
   this.animators = animators;
@@ -4369,7 +4530,7 @@ anim8.Parser.prototype =
 };
 
 /**
- * Instantiates a new parser for the 'deltas' & 'values animation type.
+ * Instantiates a new parser for the 'deltas' & 'values' animation type.
  */
 anim8.ParserDeltas = function()
 {
@@ -4841,6 +5002,70 @@ anim8.ParserKeyframe.prototype.parse = function( animation, options, events )
 anim8.parser.keyframe = new anim8.ParserKeyframe();
 
 /**
+ * Instantiates a new parser for the 'tweenTo' animation type.
+ */
+anim8.ParserTween = function()
+{
+  
+};
+
+// ParserTween extends anim8.Parser()
+anim8.ParserTween.prototype = new anim8.Parser();
+  
+/**
+ * Parses the animation object (and optionally an option object) and pushes
+ * all generated events to the given array.
+ * 
+ * @param {object} animation
+ * @param {object} options
+ * @param {Array} events
+ */
+anim8.ParserTween.prototype.parse = function( animation, options, events )
+{
+  // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
+
+  var tweenTo = animation.tweenTo;
+
+  var durations = animation.durations || {};
+  var easings = animation.easings || {};
+  var delays = animation.delays || {};
+  var sleeps = animation.sleeps || {};
+  var repeats = animation.repeats || {};
+
+	for (var attr in tweenTo)
+	{
+    var calculator = null;
+		var defaultValue = false;
+		
+    if ( attr in anim8.attribute )
+    {
+      calculator = anim8.calculator( anim8.attribute[attr].calculator );
+			defaultValue = anim8.attribute[attr].defaultValue;
+    }
+    else
+    {
+      calculator = anim8.calculator.default;
+			defaultValue= calculator.create();
+    }
+		
+    var value    = calculator.parse( tweenTo[attr], defaultValue );
+    var duration = anim8.coalesce( durations[attr], options.duration, anim8.defaults.duration );
+    var easing   = anim8.coalesce( easings[attr], options.easing, anim8.defaults.easing );
+    var delay    = anim8.coalesce( delays[attr], options.delay, anim8.defaults.delay );
+    var sleep    = anim8.coalesce( sleeps[attr], options.sleep, anim8.defaults.sleep );
+    var repeat   = anim8.coalesce( repeats[attr], options.repeat, anim8.defaults.repeat );
+
+    var path     = new anim8.Tween( attr, calculator, true, value );
+    var event    = new anim8.Event( attr, path, duration, anim8.easing( easing ), delay, sleep, repeat, true, this );
+    
+    events.push( event );
+	}
+};
+
+// Add the parser to the object of possible parsers
+anim8.parser.tweenTo = new anim8.ParserTween();
+
+/**
  * The factory for Plain-Old-Javascript-Objects.
  */
 anim8.factories.object = 
@@ -4849,9 +5074,9 @@ anim8.factories.object =
 	{
     return anim8.isObject( subject ) && !anim8.isElement( subject );
   },
-  
-  parseAnimators: function(from, animators) 
-	{
+
+  parseAnimator: function(from)
+  {
     var animator = from.$animator;
     
     if ( !animator )
@@ -4861,7 +5086,12 @@ anim8.factories.object =
       
       from.$animator = animator;
     }
-    
-    animators.push( animator );
+
+    return animator;
+  },
+  
+  parseAnimators: function(from, animators) 
+	{
+    animators.push( this.parseAnimator( from ) );
   }
 };

@@ -17,12 +17,15 @@ var core =
   './lib/anim8js-event.js',
   './lib/anim8js-animation.js',
   './lib/anim8js-animator.js',
+  './lib/anim8js-animators.js',
+  './lib/anim8js-loop.js',
   './lib/anim8js-sequence.js',
   './lib/anim8js-parser.js',
   './lib/anim8js-parser-deltavalues.js',
   './lib/anim8js-parser-final.js',
   './lib/anim8js-parser-initial.js',
   './lib/anim8js-parser-keyframe.js',
+  './lib/anim8js-parser-tween.js',
   './lib/anim8js-object.js'
 ];
 

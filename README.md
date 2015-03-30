@@ -5,15 +5,15 @@ An animation library for javascript objects.
 
 1. [X] Attach units to events instead of the Animator
 2. [X] Add `follow(attribute, path[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-3. [ ] Add `tweenTo(attribute, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-4. [ ] Add `tween(attribute, start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-5. [ ] Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
+3. [X] Add `tweenTo(attribute, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
+4. [X] Add `tween(attribute, start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
+5. [X] Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
 6. [X] Add option merging to Parser
 7. [X] Make anim8.Parser class
 8. [ ] Make anim8.Calculator class
 9. [ ] Move all dom functions to anim8.dom namespace
-10. [ ] Figure out how to separate attributes for one animatable type to the next
-11. [ ] Finish Document 
+10. [ ] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
+11. [ ] Finish Document
 12. [ ] Create an animated splash page showcasing library
 13. [X] Change Animator.eventsFor to return an array if a function was not provided
 14. [X] Correct `anim8.isFunction`
@@ -35,4 +35,8 @@ An animation library for javascript objects.
 30. [ ] Add anim8.Movie?
 31. [X] Fix bug where one Animator partially plays another animators events
 32. [X] Final parser events shouldn't be called on applyInitialState
-33. [ ] Add tween parser
+33. [X] Add tween parser
+34. [ ] Add anim8.Factory
+35. [ ] Add factory to Animator
+36. [ ] Register springs with animator & factory (uses attributes to determine defaultValue and calculator)
+37. [ ] Add animation string parsing to anim8.animation. You can specify multiple with commas, which queues up the events
