@@ -205,7 +205,8 @@
 </main><!-- /.site__content -->
 
   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-		
+	
+  <script src="../build/anim8js-dom.min.js"></script>
   <script src="../build/anim8js-animate.css.min.js"></script>
 
 <script>
@@ -216,9 +217,10 @@
       .stop()
       .restore()
       .play( $('.js--animations').val() )
-      .on( 'finished', function(animator) {
-        animator.restore();
-      });
+      .defer( 'once', 'finished' )
+        .restore()
+      .undefer()
+    ;
       
     return false;
   }
@@ -229,9 +231,10 @@
       .stop()
       .restore()
       .play( $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
-      .on( 'finished', function(animator) {
-        animator.restore();
-      });
+      .defer( 'once', 'finished' )
+        .restore()
+      .undefer()
+    ;
     
     return false;
   }

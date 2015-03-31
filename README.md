@@ -36,7 +36,9 @@ An animation library for javascript objects.
 31. [X] Fix bug where one Animator partially plays another animators events
 32. [X] Final parser events shouldn't be called on applyInitialState
 33. [X] Add tween parser
-34. [ ] Add anim8.Factory
-35. [ ] Add factory to Animator
+34. [X] Add anim8.Factory
+35. [X] Add factory to Animator
 36. [ ] Register springs with animator & factory (uses attributes to determine defaultValue and calculator)
 37. [ ] Add animation string parsing to anim8.animation. You can specify multiple with commas, which queues up the events
+38. [X] Add time parsing in animation parsers for delay, duration, & sleep (and add default duration unit)
+39. [X] Add anim8.fn/m8.fn and anim8s.fn/m8s.fn so users can add their own functions

@@ -26,6 +26,7 @@ var core =
   './lib/anim8js-parser-initial.js',
   './lib/anim8js-parser-keyframe.js',
   './lib/anim8js-parser-tween.js',
+  './lib/anim8js-factory.js',
   './lib/anim8js-object.js'
 ];
 
@@ -44,6 +45,7 @@ var animatecss =
 
 var jquery =
 [
+  './lib/anim8js-jquery.js',
   './plugins/anim8js-jquery.js'
 ];
 
@@ -68,7 +70,7 @@ var builds =
     filename: 'anim8js-animate.css.js',
     minified: 'anim8js-animate.css.min.js',
     output: './build/',
-    include: core.concat( dom, animatecss )
+    include: animatecss
   },
   jquery:
   {

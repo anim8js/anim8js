@@ -206,8 +206,9 @@
 </main><!-- /.site__content -->
 
   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-		
+	
   <script src="../build/anim8js-jquery.min.js"></script>
+  <script src="../build/anim8js-animate.css.min.js"></script>
 
   <style>
     #letters div {
@@ -247,11 +248,14 @@
         .restore()
         .sequence( 50, 'linear', $('.js--animations').val() )
         .play()
+        /*.reverse()
+        .queue()
+        .reverse()*/
       ;
       
       return false;
     }
-  
+    
     function playCustom()
     {
       sequenceable
@@ -259,6 +263,9 @@
         .restore()
         .sequence( 50, 'linear', $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
         .play()
+        /*.reverse()
+        .queue()
+        .reverse()*/
       ;
     
       return false;
