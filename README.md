@@ -45,12 +45,12 @@ There are tons of different ways of playing animations.
 
 ### Animation Modifiers
 
-- `duration`: a number in the string that doesn't start with a special character, ex: *2s*.
-- `repeat`: a string or number starting with an x, ex: *x4*, *infinite*, *twice*.
-- `sleep`: a string starting with a z, ex: *z4.5s*.
-- `delay`: a string starting with a ~, ex: *~750ms*.
-- `easing`: a string specifying an easing function, ex: *linear*, *ease-out*, *sqrt-yoyo*
-- `scale`: a string starting with !, ex: *!1.2*.
+- `duration`: a number in the string that doesn't start with a special character, ex: `2s`.
+- `repeat`: a string or number starting with an x, ex: `x4`, `infinite`, `twice`.
+- `sleep`: a string starting with a z, ex: `z4.5s`.
+- `delay`: a string starting with a ~, ex: `~750ms`.
+- `easing`: a string specifying an easing function, ex: `linear`, `ease-out`, `sqrt-yoyo`.
+- `scale`: a string starting with !, ex: `!1.2`.
 
 ### Animation Definitions
 
@@ -168,4 +168,5 @@ transitionEasing, cache
 - `Parser`: anim8.parser.myCustomParser = *instance of anim8.Parser*;
 - `Animation`: anim8.save( 'myAnimationName', *animation definition* );
 - `Calculator`: anim8.calculator.create( 'myCustomCalculator', *calculator methods* );
+
 
