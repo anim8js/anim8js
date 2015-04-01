@@ -249,6 +249,33 @@ anim8.copy = function(x)
 };
 
 /**
+ * Extends the given object by merging the following objects into it, avoiding overriding any existing properties.
+ * 
+ * @param  {object} out
+ * @return {object}
+ */
+anim8.extend = function(out)
+{
+  for (var i = 1; i < arguments.length; i++)
+  {
+    var o = arguments[ i ];
+
+    if ( anim8.isObject( o ) )
+    {
+      for (var prop in o)
+      {
+        if ( !(prop in out) )
+        {
+          out[prop] = o[prop];
+        }
+      }
+    }
+  }
+
+  return out;
+};
+
+/**
  * Returns the first defined variable of a possible 4 variables.
  */
 anim8.coalesce = function(a, b, c, d) 
@@ -257,6 +284,185 @@ anim8.coalesce = function(a, b, c, d)
   if (anim8.isDefined(b)) return b;
   if (anim8.isDefined(c)) return c;
   return d;
+};
+
+/**
+ * Parses milliseconds from a string or number. If a number is given it's assumed to be milliseconds
+ * and is returned immediately.
+ *
+ * @param {string|number} time
+ * @param [any] returnOnInvalid
+ */
+anim8.time = (function()
+{
+  var regex = /^(-?\d*(\.\d+)|-?\d+)(ms|s|c|cs|third|jiffy|sec|m|min|h|hr)?$/;
+  
+  var conversions = {
+    ms:     1,
+    c:      100,
+    cs:     100,
+    jiffy:  1000 / 60,
+    third:  1000 / 60,
+    s:      1000,
+    sec:    1000,
+    m:      1000 * 60,
+    min:    1000 * 60,
+    h:      1000 * 60 * 60,
+    hr:     1000 * 60 * 60
+  };
+  
+  return function(time, returnOnInvalid) 
+  {  
+    if ( anim8.isNumber( time ) )
+    {
+      // raw numbers are considered milliseconds
+      return Math.floor( time );
+    }
+    if ( anim8.isString( time ) )
+    {
+      var parsed = regex.exec( time );
+      
+      if ( parsed )
+      {
+        var time = parseFloat( parsed[1] );
+        var unit = parsed[3];
+        
+        if ( unit in conversions )
+        {
+          time *= conversions[ unit ];
+        }
+        
+        return Math.floor( time );
+      }
+    }
+    
+    return anim8.coalesce( returnOnInvalid, 0 );
+  };
+  
+})();
+
+/**
+ * Parses delay from a string or number.
+ *
+ * @param {string|number}
+ * @see anim8.time
+ */ 
+anim8.delay = function(time)
+{
+  return anim8.time( time, anim8.defaults.delay );
+};
+
+/**
+ * Parses sleep from a string or number.
+ *
+ * @param {string|number}
+ * @see anim8.time
+ */ 
+anim8.sleep = function(time)
+{
+  return anim8.time( time, anim8.defaults.sleep );
+};
+
+/**
+ * Parses duration from a string or number.
+ *
+ * @param {string|number}
+ * @see anim8.time
+ */ 
+anim8.duration = function(time)
+{
+  return anim8.time( time, anim8.defaults.duration );
+};
+
+/**
+ * Parses repeats from a string or number.
+ *
+ * @param {string|number}
+ * @param [any] returnOnInvalid
+ */
+anim8.repeat = (function() 
+{
+  var conversions = {
+    inf:        Number.POSITIVE_INFINITY,
+    infinity:   Number.POSITIVE_INFINITY,
+    infinite:   Number.POSITIVE_INFINITY,
+    once:       1,
+    twice:      2,
+    thrice:     3,
+    dozen:      12,
+    random:     4 // chosen by fair dice roll. guaranteed to be random.
+  };
+
+  return function(repeat, returnOnInvalid)
+  {
+    if ( anim8.isNumber( repeat ) )
+    {
+      return repeat;
+    }
+    if ( anim8.isString( repeat ) )
+    {
+      repeat = repeat.toLowerCase();
+
+      if ( repeat in conversions )
+      {
+        return conversions[ repeat ];
+      }
+      else
+      {
+        var parsed = parseInt( repeat );
+
+        if ( !isNaN(parsed) )
+        {
+          return parsed;
+        }
+      }
+    }
+
+    return anim8.coalesce( returnOnInvalid, anim8.defaults.repeat );
+  };
+
+})();
+
+/**
+ * Parses scale from a string or number.
+ * 
+ * @param  {string|number}
+ * @return {number}
+ */
+anim8.scale = function(scale, returnOnInvalid)
+{
+  if ( anim8.isNumber( scale ) )
+  {
+    return scale;
+  }
+
+  return anim8.coalesce( returnOnInvalid, anim8.defaults.scale );
+};
+
+/**
+ * Provides a way to wrap a variable so calculators don't try copying it on parse.
+ *
+ * @param {any} variable
+ */
+anim8.constant = function(variable)
+{
+  return function() 
+  {
+    return variable;
+  };
+};
+
+/**
+ * Returns a value between the given minimum and maximum.
+ * 
+ * @param  {number} v
+ * @param  {number} min
+ * @param  {number} max
+ * @return {number}
+ */
+anim8.clamp = function(v, min, max)
+{
+  return (v < min) ? min : (v > max ? max : v);
 };
 
 /**
@@ -437,160 +643,6 @@ anim8.eventize = function(object)
   };
 };
 
-/**
- * Parses milliseconds from a string or number. If a number is given it's assumed to be milliseconds
- * and is returned immediately.
- *
- * @param {string|number} time
- * @param [any] returnOnInvalid
- */
-anim8.time = (function()
-{
-  var regex = /^(-?\d*(\.\d+)|-?\d+)(ms|s|c|cs|third|jiffy|sec|m|min|h|hr)?$/;
-  
-  var conversions = {
-    ms:     1,
-    c:      100,
-    cs:     100,
-    jiffy:  1000 / 60,
-    third:  1000 / 60,
-    s:      1000,
-    sec:    1000,
-    m:      1000 * 60,
-    min:    1000 * 60,
-    h:      1000 * 60 * 60,
-    hr:     1000 * 60 * 60
-  };
-  
-  return function(time, returnOnInvalid) 
-  {  
-    if ( anim8.isNumber( time ) )
-    {
-      // raw numbers are considered milliseconds
-      return Math.floor( time );
-    }
-    if ( anim8.isString( time ) )
-    {
-      var parsed = regex.exec( time );
-      
-      if ( parsed )
-      {
-        var time = parseFloat( parsed[1] );
-        var unit = parsed[3];
-        
-        if ( unit in conversions )
-        {
-          time *= conversions[ unit ];
-        }
-        
-        return Math.floor( time );
-      }
-    }
-    
-    return anim8.coalesce( returnOnInvalid, 0 );
-  };
-  
-})();
-
-/**
- * Parses repeats from a string or number.
- *
- * @param {string|number}
- * @param [any] returnOnInvalid
- */
-anim8.repeat = (function() 
-{
-  var conversions = {
-    inf:        Number.POSITIVE_INFINITY,
-    infinity:   Number.POSITIVE_INFINITY,
-    infinite:   Number.POSITIVE_INFINITY,
-    once:       1,
-    twice:      2,
-    thrice:     3,
-    dozen:      12,
-    random:     4 // chosen by fair dice roll. guaranteed to be random.
-  };
-
-  return function(repeat, returnOnInvalid)
-  {
-    if ( anim8.isNumber( repeat ) )
-    {
-      return repeat;
-    }
-    if ( anim8.isString( repeat ) )
-    {
-      repeat = repeat.toLowerCase();
-
-      if ( repeat in conversions )
-      {
-        return conversions[ repeat ];
-      }
-      else
-      {
-        var parsed = parseInt( repeat );
-
-        if ( !isNaN(parsed) )
-        {
-          return parsed;
-        }
-      }
-    }
-
-    return anim8.coalesce( returnOnInvalid, anim8.defaults.repeat );
-  };
-
-})();
-
-/**
- * Parses delay from a string or number.
- *
- * @param {string|number}
- * @param [any] returnOnInvalid
- * @see anim8.time
- */ 
-anim8.delay = function(time)
-{
-  return anim8.time( time, anim8.defaults.delay );
-};
-
-/**
- * Parses sleep from a string or number.
- *
- * @param {string|number}
- * @param [any] returnOnInvalid
- * @see anim8.time
- */ 
-anim8.sleep = function(time)
-{
-  return anim8.time( time, anim8.defaults.sleep );
-};
-
-/**
- * Parses duration from a string or number.
- *
- * @param {string|number}
- * @param [any] returnOnInvalid
- * @see anim8.time
- */ 
-anim8.duration = function(time)
-{
-  return anim8.time( time, anim8.defaults.duration );
-};
-
-
-/**
- * Provides a way to wrap a variable so calculators don't try copying it on parse.
- *
- * @param {any} variable
- */
-anim8.constant = function(variable)
-{
-  return function() 
-  {
-    return variable;
-  };
-};
-
 
 /*****************************************************************
   REGISTRIES
@@ -642,34 +694,90 @@ anim8.defaults =
 
   /**
    * The default animation duration in milliseconds.
+   * 
+   * @type {number}
    */
   duration: 1000,
 
   /**
-   * The default easing
+   * The default easing.
+   * 
+   * @type {string|function}
    */
   easing: 'ease',
 
   /**
    * The default "total easing" which is the overall easing
    * for an animation which actually has easing values per frame.
+   * 
+   * @type {string|function}
    */
   teasing: 'linear',
 
   /**
    * The default animation delay in milliseconds.
+   * 
+   * @type {number}
    */
   delay: 0,
 
   /**
    * The default animation sleep in milliseconds.
+   * 
+   * @type {number}
    */
   sleep: 0,
 
   /**
    * The default number of repeats for an animation.
+   * 
+   * @type {number}
    */
-  repeat: 1
+  repeat: 1,
+
+  /**
+   * The default scale for an animation.
+   * 
+   * @type {number}
+   */
+  scale: 1.0,
+
+  /**
+   * The default transition time in milliseconds.
+   * 
+   * @type {number}
+   */
+  transitionTime: 500,
+
+  /**
+   * The default transition delta.
+   * 
+   * @type {number}
+   */
+  transitionDelta: 0.2,
+
+  /**
+   * The default transition into delta.
+   * 
+   * @type {number}
+   */
+  transitionIntoDelta: 0.2,
+
+  /**
+   * The default transition into delta.
+   * 
+   * @type {string|function}
+   */
+  transitionEasing: 'linear',
+
+  /**
+   * Whether animtions are cached whenever possible. Animations that can be
+   * cached are strings with options specified in the string and without an
+   * option object given. For example 'tada ~1s 3s x3' is cacheable.
+   * 
+   * @type {boolean}
+   */
+  cache: false
 
 };
 
@@ -893,6 +1001,9 @@ anim8.easingType.pong = function(easing)
 	};
 };
 
+// yoyo is an alias for pong
+anim8.easingType.yoyo = anim8.easingType.pong;
+
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJ4IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTAuMTkyNTAwMDAwMDAwMDAwMjUiLCIxLjQzMjQ5OTk5OTk5OTk5OTkiLCIwLjAxNzQ5OTk5OTk5OTk5OTg3NyIsIjEuMDE3NDk5OTk5OTk5OTk5OCJdfV0-
 anim8.easing.linear = function(x) 
 {
@@ -1029,7 +1140,7 @@ anim8.easing.sqrtf = function(x)
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIobG9nKHgpKzIuMCkqMC41IiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTAuMTkyNTAwMDAwMDAwMDAwMjUiLCIxLjQzMjQ5OTk5OTk5OTk5OTkiLCIwLjAxNzQ5OTk5OTk5OTk5OTg3NyIsIjEuMDE3NDk5OTk5OTk5OTk5OCJdfV0-
 anim8.easing.log10 = function(x)
 {
-  return (Math.log10(x) + 2.0) * 0.5;
+  return (Math.log10(x + 0.01) + 2.0) * 0.5 / 1.0021606868913213;
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoeDwwLjc_KHgqLTAuMzU3KTooKCh4LTAuNykqKHgtMC43KSoyNy41LTAuNSkqMC41KSkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItMC4xOTI1MDAwMDAwMDAwMDAyNSIsIjEuNDMyNDk5OTk5OTk5OTk5OSIsIjAuMDE3NDk5OTk5OTk5OTk5ODc3IiwiMS4wMTc0OTk5OTk5OTk5OTk4Il19XQ--
@@ -1058,7 +1169,6 @@ anim8.easing.gentle = function(x)
 anim8.easing.bezier = function(mX1, mY1, mX2, mY2) 
 {
   // https://gist.githubusercontent.com/gre/1926947/raw/KeySpline.js
-  
   function A(aA1, aA2) { return 1.0 - 3.0 * aA2 + 3.0 * aA1; }
   function B(aA1, aA2) { return 3.0 * aA2 - 6.0 * aA1; }
   function C(aA1)      { return 3.0 * aA1; }
@@ -1406,13 +1516,13 @@ anim8.color.parse = function(input)
  */
 anim8.color.format = function(color)
 {
-  var ca = anim8.coalesce( color.a, 1.0 );
-  var cr = anim8.coalesce( color.r, 255 );
-  var cg = anim8.coalesce( color.g, 255 );
-  var cb = anim8.coalesce( color.b, 255 );
+  var ca = anim8.clamp( anim8.coalesce( color.a, 1.0 ), 0, 1 );
+  var cr = Math.floor( anim8.clamp( anim8.coalesce( color.r, 255 ), 0, 255 ) );
+  var cg = Math.floor( anim8.clamp( anim8.coalesce( color.g, 255 ), 0, 255 ) );
+  var cb = Math.floor( anim8.clamp( anim8.coalesce( color.b, 255 ), 0, 255 ) );
   
   if (ca === 1.0)
-  {
+  { 
     var r = cr.toString( 16 );
     var g = cg.toString( 16 );
     var b = cb.toString( 16 );
@@ -2019,23 +2129,23 @@ anim8.calculator.create('rgb',
  */
 anim8.calculator.create('rgba', 
 {
-	parse: function(a, defaultValue)
+	parse: function(x, defaultValue)
 	{
     if ( this.isPristine( x ) )
     {
       return x;
     }
-		if ( anim8.isNumber( a ) )
+		if ( anim8.isNumber( x ) )
 		{
 			return {
-				r: a,
-				g: a,
-				b: a,
+				r: x,
+				g: x,
+				b: x,
 				a: 1.0
 			};
 		}
 		
-		return anim8.color.parse( a );
+		return anim8.color.parse( x );
 	},
   copy: function(out, copy) 
 	{
@@ -2847,7 +2957,7 @@ anim8.EventState =
   FINISHED: 16
 };
 
-anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, hasInitialState, parser) 
+anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase, hasInitialState, parser, next) 
 {
   this.attribute 	      = attribute;
   this.path 			      = path;
@@ -2856,8 +2966,11 @@ anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, 
   this.duration 	      = anim8.duration( duration );
   this.sleep 			      = anim8.sleep( sleep );
   this.repeat 		      = anim8.repeat( repeat );
-  this.hasInitialState  = hasInitialState;
+  this.scale            = anim8.scale( scale );
+  this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.create() );
+  this.hasInitialState  = anim8.coalesce( hasInitialState, true );
   this.parser           = parser;
+  this.next             = next;
 };
 
 anim8.Event.prototype = 
@@ -2872,11 +2985,42 @@ anim8.Event.prototype =
   },
   clone: function()
   {
-    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.repeat, this.hasInitialState, this.parser );
+    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null );
   },
   getParser: function()
   {
     return this.parser;
+  },
+  isInfinite: function()
+  {
+    return (this.repeat === Number.POSITIVE_INFINITY);
+  },
+  timeRemaining: function() 
+  {    
+    return this.totalTime();
+  },
+  timeRemainingInChain: function()
+  {
+    return this.timeRemaining() + (this.next ? this.next.timeRemainingInChain() : 0);
+  },
+  finiteTimeRemaining: function()
+  {
+    return this.isInfinite() ? 0 : this.timeRemaining();
+  },
+  finiteTimeRemainingInChain: function()
+  {
+    return this.isInfinite() ? 0 : this.timeRemaining() + (this.next ? this.next.finiteTimeRemainingInChain() : 0);
+  },
+  queue: function(e)
+  {
+    if ( this.next )
+    {
+      this.next.queue( e );
+    }
+    else
+    {
+      this.next = e;
+    }
   }
 };
 
@@ -2890,6 +3034,8 @@ anim8.EventInstance = function(event)
 	this.delay 			      = event.delay;
 	this.sleep 			      = event.sleep;
 	this.repeat 		      = event.repeat;
+  this.scale            = event.scale;
+  this.scaleBase        = event.scaleBase;
   this.state 			      = anim8.EventState.CREATED;
   this.time 			      = 0;
   this.pauseTime 	      = 0;
@@ -2940,88 +3086,51 @@ anim8.EventInstance.prototype =
     
     return updated;
   },
-  hasInitialState: function()
-  {
-    return this.event.hasInitialState;
-  },
-  getParser: function()
-  {
-    return this.event.parser;
-  },
-  getPoint: function(delta)
-  {
-    return this.path.compute( this.path.calculator.create(), this.easing( delta ) );
-  },
-  getFuture: function(fdelta)
-  {
-    return this.getPoint( Math.min( 1.0, this.getDelta() + fdelta ) );
-  },
-  getDelta: function()
-  {
-    return this.isAnimating() ? Math.min( 1.0, (anim8.now() - this.time) / this.duration ) : 0.0;
-  },
-  getStart: function()
-  {
-    return this.getPoint( 0 );
-  },
-  getEnd: function() 
-	{
-    return this.getPoint( 1 );
-  },
-  applyValue: function(frame, baseValue, delta)
-  {
-    var value = this.path.compute( baseValue, this.easing( delta ) );
-        
-    if ( value !== false )
-    {
-      frame[this.attribute] = value;
-    }
-  },
   catchup: function(now)
-	{
+  {
     if ( this.isPaused() )
     {
       return;
     }
     
     if ( this.state === anim8.EventState.CREATED )
-		{
+    {
       this.time = now;
-			
+      
       if ( this.delay )
-			{
+      {
         this.state = anim8.EventState.DELAYED;
         
         this.trigger('delaying', this);
       } 
-			else
-			{
+      else
+      {
         this.state = anim8.EventState.ANIMATING;
       }
     }
     
-		var elapsed = now - this.time;
+    var elapsed = now - this.time;
     
     if ( this.isDelayed() )
-		{
+    {
       if ( elapsed > this.delay ) 
-			{
+      {
         this.trigger('delayed', this);
         
         elapsed = this.progress( elapsed, this.delay, anim8.EventState.ANIMATING );
       }
     }
-		
+    
     if ( this.isSleeping() )
-		{
+    {
       if ( elapsed > this.sleep )
-			{
+      {
         this.trigger('slept', this);
         
         elapsed = this.progress( elapsed, this.sleep, anim8.EventState.ANIMATING );
       }
     }
-		
+    
     if ( this.isAnimating() && this.duration )
     {
       var cycle = this.duration + this.sleep;
@@ -3050,23 +3159,75 @@ anim8.EventInstance.prototype =
         this.trigger('sleeping', this);
       }
     }
-		
-		return elapsed;
+    
+    return elapsed;
+  },
+  computeValue: function(baseValue, delta)
+  {
+    var value = this.path.compute( baseValue, this.easing( delta ) );
+
+    if ( value !== false && this.scale !== 1.0 )
+    {
+      var calc = this.path.calculator;
+      var baseValue = calc.clone( this.scaleBase );
+      var distance = calc.sub( baseValue, value );
+
+      value = calc.adds( value, distance, -this.scale );
+    }
+
+    return value;
   },
   progress: function(elapsed, time, newState) 
-	{
+  {
     this.time += time;
-		this.elapsed += time;
+    this.elapsed += time;
     this.state = newState;
-		
+    
     return elapsed - time;
   },
   finish: function(frame) 
-	{
+  {
     this.applyValue( frame, this.path.calculator.create(), 1.0 );
     this.state = anim8.EventState.FINISHED;
     
     this.trigger('finish', this);
+  },
+  applyValue: function(frame, baseValue, delta)
+  {
+    var value = this.computeValue( baseValue, delta );
+    
+    if ( value !== false )
+    {
+      frame[this.attribute] = value;
+    }
+  },
+  hasInitialState: function()
+  {
+    return this.event.hasInitialState;
+  },
+  getParser: function()
+  {
+    return this.event.parser;
+  },
+  getPoint: function(delta)
+  {
+    return this.computeValue( this.path.calculator.create(), delta );
+  },
+  getFuture: function(fdelta)
+  {
+    return this.getPoint( Math.min( 1.0, this.getDelta() + fdelta ) );
+  },
+  getDelta: function()
+  {
+    return this.isAnimating() ? Math.min( 1.0, (anim8.now() - this.time) / this.duration ) : 0.0;
+  },
+  getStart: function()
+  {
+    return this.getPoint( 0 );
+  },
+  getEnd: function() 
+	{
+    return this.getPoint( 1 );
   },
 	totalTime: function()
 	{
@@ -3178,8 +3339,9 @@ anim8.eventize( anim8.EventInstance.prototype );
  * 
  * @param {anim8.Animation|string|object} animation
  * @param [object] options
+ * @param [boolean] cache
  */
-anim8.animation = function(animation, options)
+anim8.animation = function(animation, options, cache)
 {
   if ( animation instanceof anim8.Animation )
   {
@@ -3187,29 +3349,47 @@ anim8.animation = function(animation, options)
   }
 	if ( anim8.isString( animation ) )
 	{
-    if ( animation in anim8.animation )
+    var key = animation.toLowerCase();
+
+    if ( key in anim8.animation )
     {
-      return anim8.animation[ animation ];      
+      return anim8.animation[ key ];
     }
 
-    var animations = animation.split(',');
-    var queue = [];
+    var animationStrings = animation.split(',');
+    var anim = false;
+    var last = false;
 
-    for (var k = 0; k < animations.length; k++)
+    for (var k = 0; k < animationStrings.length; k++)
     {
-      var parsed = anim8.parseAnimationString( animations[ k ] );
+      var parsed = anim8.parseAnimationString( animationStrings[ k ] );
 
-      if ( parsed !== false )
+      if ( parsed.animation !== false )
       {
-        queue.push( anim8.animation( parsed.animation, parsed.options ) );
+        if ( anim === false )
+        {
+          last = anim = parsed.animation.extend( parsed.options, true );
+        }
+        else
+        {
+          last = last.next = parsed.animation.extend( parsed.options, true );
+        }
       }
     }
+
+    if ( anim8.coalesce( cache, anim8.defaults.cache ) && anim8.isEmpty( options ) )
+    {
+      anim.name = animation;
+
+      anim8.animation[ key ] = anim;
+    }
+
+    return anim;
 	}
 	if ( anim8.isObject( animation ) )
 	{
 		var events = [];
-		
-		options = options || {};
+		var options = options || {};
 		
 		for (var parserName in animation)
 		{
@@ -3241,10 +3421,11 @@ anim8.animation = function(animation, options)
 anim8.save = function(name, animation, options)
 {
   var animation = anim8.animation( animation, options );
-  
+  var key = name.toLowerCase();
+
   animation.name = name;
   
-  anim8.animation[name] = animation;
+  anim8.animation[ key ] = animation;
 };
 
 /**
@@ -3256,59 +3437,72 @@ anim8.save = function(name, animation, options)
  */
 anim8.parseAnimationString = function(animation)
 {
-  var split = animation.split(' ');
-  var animation = false;
-  var options = {};
+  var split = animation.toLowerCase().split(' ');
+  var result = {
+    animation: false,
+    options: {}
+  };
 
   for (var i = 0; i < split.length; i++)
   {
-    var part = split[i].toLowerCase();
+    var part = split[i];
 
-    if ( part in anim8.animation && !animation )
+    if ( part in anim8.animation && !result.animation )
     {
-      animation = anim8.animation[ part ];
+      result.animation = anim8.animation[ part ];
     }
     else
     {
-      if ( part[0] === 'x' )
+      var first = part.charAt( 0 );
+
+      if ( first === 'x' )
       {
         var repeat = anim8.repeat( part.substring(1), false );
 
         if ( repeat !== false )
         {
-          options.repeat = repeat;
+          result.options.repeat = repeat;
         }
       }
-      if ( part[0] === 'z' )
+      if ( first === 'z' )
       {
-        var sleep = anim8.sleep( part.substring(1), false );
+        var sleep = anim8.time( part.substring(1), false );
 
         if ( sleep !== false )
         {
-          options.sleep = sleep;
+          result.options.sleep = sleep;
         }
       }
-      if ( part[0] === '~' )
+      if ( first === '~' )
       {
-        var delay = anim8.delay( part.substring(1), false );
+        var delay = anim8.time( part.substring(1), false );
 
         if ( delay !== false )
         {
-          options.delay = delay;
+          result.options.delay = delay;
+        }
+      }
+      if ( first === '!' )
+      {
+        var scale = parseFloat( part.substring(1) );
+
+        if ( !isNaN(scale) )
+        {
+          result.options.scale = scale;
         }
       }
       var easing = anim8.easing( part, false );
 
       if ( easing !== false )
       {
-        options.easing = easing;
+        result.options.easing = easing;
       }
 
-      var duration = anim8.duration( part, false );
+      var duration = anim8.time( part, false );
 
       if ( duration !== false )
       {
-        options.duration = duration;
+        result.options.duration = duration;
       }
       else
       {
@@ -3316,21 +3510,13 @@ anim8.parseAnimationString = function(animation)
 
         if ( repeat !== false )
         {
-          options.repeat = repeat;
+          result.options.repeat = repeat;
         }
       }
     }
   }
 
-  if ( animation === false )
-  {
-    return false;
-  }
-
-  return {
-    animation: animation,
-    options: options
-  };
+  return result;
 };
 
 /**
@@ -3350,6 +3536,7 @@ anim8.Animation = function(name, input, options, events)
 	this.input = input;
 	this.options = options;
 	this.events = events;
+  this.next = null;
 };
 
 anim8.Animation.prototype = 
@@ -3424,9 +3611,9 @@ anim8.Animation.prototype =
    *
    * @param {object} options
    */
-  extend: function(options)
+  extend: function(options, force)
   {
-    if ( anim8.isEmpty( options ) )
+    if ( anim8.isEmpty( options ) && !force )
     {
       return this;
     }
@@ -3435,9 +3622,11 @@ anim8.Animation.prototype =
 
     this.merge( options, events );
 
-    return new anim8.Animation( this.name, this.input, options, events );
+    anim8.extend( options, this.options );
+
+    return new anim8.Animation( false, this.input, options, events );
   }
-  
+
 };
 
 /**
@@ -3673,11 +3862,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param {anim8.Animation|string|object} animation
    * @param [object] options
    */
-  createEvents: function(animation, options)
+  createEvents: function(animation, options, cache)
   {
-    options = options || {};
-    
-    var animation = anim8.animation( animation, options );
+    var options = options || {};    
+    var animation = anim8.animation( animation, options, cache );
   
     if (animation === false)
     {
@@ -3686,21 +3874,63 @@ anim8.fn = anim8.Animator.prototype =
     
     var events = animation.newEvents();
     
-    if ( animation.isSaved() )
-    {
-      for (var parserName in animation.input)
-      {
-        var parser = anim8.parser( parserName );
-        
-        if ( parser !== false )
-        {
-          parser.merge( animation.input, options, animation.options, events );
-        }
-      }
+    if ( animation.isSaved() && !anim8.isEmpty( options ) )
+    { 
+      animation.merge( options, events );
     }
     
     this.onAnimation( animation, options, events );
-    
+
+    if ( animation.next !== null )
+    {
+      var eventMap = {};
+
+      for (var i = 0; i < events.length; i++)
+      {
+        var e = events[i];
+
+        eventMap[ e.attribute ] = e;
+      }
+
+      while ( animation.next !== null )
+      {
+        animation = animation.next;
+
+        var queueEvents = animation.newEvents();
+        var maxRemaining = 0;
+
+        for (var i = 0; i < events.length; i++)
+        {
+          var e = events[i];
+
+          if ( !e.isInfinite() )
+          {
+            maxRemaining = Math.max( maxRemaining, e.finiteTimeRemainingInChain() );  
+          }
+        }
+
+        for (var i = 0; i < queueEvents.length; i++)
+        {
+          var e = queueEvents[ i ];
+          var existing = eventMap[ e.attribute ];
+
+          if ( existing && !existing.isInfinite() )
+          {
+            e.delay += (maxRemaining - existing.finiteTimeRemainingInChain());
+            eventMap[ e.attribute ].queue( e );
+          }
+          else
+          {
+            e.delay += maxRemaining;
+            eventMap[ e.attribute ] = e;
+            events.push( e );
+          }
+        }
+
+        this.onAnimation( animation, options, queueEvents );
+      }      
+    }
+
     return events;
   },
   
@@ -3760,10 +3990,11 @@ anim8.fn = anim8.Animator.prototype =
    * @param {string|object|anim8.Animation} animation
    * @param [object] options
    * @param [boolean] all 
+   * @param [boolean] cache
    */
-	play: function(animation, options, all)
+	play: function(animation, options, all, cache)
 	{
-    var events = this.createEvents( animation, options );
+    var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
     {
@@ -3816,9 +4047,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param {string|object|anim8.Animation} animation
    * @param [object] options
    */
-	queue: function(animation, options)
+	queue: function(animation, options, cache)
 	{
-    var events = this.createEvents( animation, options );
+    var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
     {
@@ -3876,9 +4107,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param [object] options
    * @param [boolean] all
    */
-  transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all)
+  transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all, cache)
   {
-    var events = this.createEvents( animation, options );
+    var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
     {
@@ -3914,6 +4145,11 @@ anim8.fn = anim8.Animator.prototype =
         transition = true;
       }
     }
+
+    // Parse given variables
+    var transitionTime = anim8.time( transitionTime, anim8.defaults.transitionTime );
+    var transitionDelta = anim8.coalesce( transitionDelta, anim8.defaults.transitionDelta );
+    var transitionEasing = anim8.easing( transitionEasing, anim8.defaults.transitionEasing );
     
     // Only transition if we need to
     if ( transition )
@@ -3934,7 +4170,7 @@ anim8.fn = anim8.Animator.prototype =
           var p2 = e1.getPoint( 0 );
         
           var transitionPath = new anim8.QuadraticPath( attr, calc, p0, p1, p2 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1, true ).newInstance();
+          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1 ).newInstance();
         
           transitionEvent.next = e1;
         
@@ -3973,9 +4209,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param [object] options
    * @param [boolean] all
    */
-  transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all)
+  transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all, cache)
   {
-    var events = this.createEvents( animation, options );
+    var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
     {
@@ -4012,6 +4248,12 @@ anim8.fn = anim8.Animator.prototype =
         transition = true;
       }
     }
+
+    // Parse given variables
+    var transitionTime = anim8.time( transitionTime, anim8.defaults.transitionTime );
+    var transitionFromDelta = anim8.coalesce( transitionFromDelta, anim8.defaults.transitionDelta );
+    var transitionIntoDelta = anim8.coalesce( transitionIntoDelta, anim8.defaults.transitionIntoDelta );
+    var transitionEasing = anim8.easing( transitionEasing, anim8.defaults.transitionEasing );
     
     // Only transition if we need to
     if ( transition )
@@ -4033,7 +4275,7 @@ anim8.fn = anim8.Animator.prototype =
           var p3 = e1.getPoint( transitionIntoDelta );
           
           var transitionPath = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1, true ).newInstance();
+          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1 ).newInstance();
         
           transitionEvent.next = e1;
         
@@ -4069,8 +4311,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param [string|function] easing
    * @param [string|number] repeat
    * @param [string|number] sleep
+   * @param [number] scale
+   * @param [any] scaleBase
    */
-  tweenTo: function(attribute, target, duration, delay, easing, repeat, sleep)
+  tweenTo: function(attribute, target, duration, delay, easing, repeat, sleep, scale, scaleBase)
   {
     var attr = anim8.attribute( attribute );
     var calc = anim8.calculator( attr.calculator );
@@ -4078,7 +4322,7 @@ anim8.fn = anim8.Animator.prototype =
     var end = calc.parse( target, attr.defaultValue );
 
     var path = new anim8.Tween( attribute, calc, start, end );
-    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, true );
+    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
     
     this.placeEvent( event.newInstance() );
     
@@ -4094,8 +4338,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param [string|function] easing
    * @param [string|number] repeat
    * @param [string|number] sleep
+   * @param [number] scale
+   * @param [any] scaleBase
    */
-  tweenManyTo: function(targets, duration, delay, easing, repeat, sleep)
+  tweenManyTo: function(targets, duration, delay, easing, repeat, sleep, scale, scaleBase)
   {
     for ( var attribute in targets )
     {
@@ -4105,7 +4351,7 @@ anim8.fn = anim8.Animator.prototype =
       var end = calc.parse( targets[ attribute ], attr.defaultValue );      
       
       var path = new anim8.Tween( attribute, calc, start, end );
-      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, true );
+      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
       
       this.placeEvent( event.newInstance() );
     }
@@ -4124,8 +4370,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param [string|function] easing
    * @param [string|number] repeat
    * @param [string|number] sleep
+   * @param [number] scale
+   * @param [any] scaleBase
    */
-  tween: function(attribute, starts, ends, duration, delay, easing, repeat, sleep)
+  tween: function(attribute, starts, ends, duration, delay, easing, repeat, sleep, scale, scaleBase)
   {
     var attr = anim8.attribute( attribute );
     var calc = anim8.calculator( attr.calculator );
@@ -4133,7 +4381,7 @@ anim8.fn = anim8.Animator.prototype =
     var end = calc.parse( ends, attr.defaultValue );
 
     var path = new anim8.Tween( attribute, calc, start, end );
-    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, true );
+    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
     
     this.placeEvent( event.newInstance() );
 
@@ -4150,8 +4398,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param [string|function] easing
    * @param [string|number] repeat
    * @param [string|number] sleep
+   * @param [number] scale
+   * @param [any] scaleBase
    */
-  tweenMany: function(starts, ends, duration, delay, easing, repeat, sleep)
+  tweenMany: function(starts, ends, duration, delay, easing, repeat, sleep, scale, scaleBase)
   {
     for ( var attribute in starts )
     {
@@ -4161,7 +4411,7 @@ anim8.fn = anim8.Animator.prototype =
       var end = calc.parse( ends[ attribute ], attr.defaultValue );
       
       var path = new anim8.Tween( attribute, calc, start, end );
-      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, true );
+      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
       
       this.placeEvent( event.newInstance() );
     }
@@ -4251,13 +4501,14 @@ anim8.fn = anim8.Animator.prototype =
    * 
    * @param {string} attribute
    * @param {anim8.Path|object|string} path
-   * @param [number] duration
-   * @param [number] delay
+   * @param [number|string] duration
+   * @param [number|string] delay
    * @param [function|string] easing
-   * @param [number] repeat
-   * @param [number] sleep  
+   * @param [number|string] repeat
+   * @param [number|string] sleep  
+   * @param [number] scale
    */
-  follow: function(attribute, path, duration, delay, easing, repeat, sleep)
+  follow: function(attribute, path, duration, delay, easing, repeat, sleep, scale, scaleBase)
   {
     var path = anim8.path( path );
     
@@ -4265,12 +4516,13 @@ anim8.fn = anim8.Animator.prototype =
     var event = new anim8.Event( 
       attribute, 
       path, 
-      anim8.coalesce( duration, anim8.defaults.duration ),
-      anim8.easing( easing ),
-      anim8.coalesce( delay, anim8.defaults.delay ),
-      anim8.coalesce( sleep, anim8.defaults.sleep ),
-      anim8.coalesce( repeat, anim8.defaults.repeat ),
-      true
+      duration,
+      easing,
+      delay, 
+      sleep,
+      repeat,
+      scale,
+      scaleBase
     );
     
     this.placeEvent( event.newInstance() );
@@ -4520,7 +4772,7 @@ anim8.fn = anim8.Animator.prototype =
    *
    * @param [function] wrapper
    */
-  subject: function(wrapper)
+  getSubject: function(wrapper)
   {
     var subject = this.subject;
 
@@ -4565,7 +4817,7 @@ anim8.DeferAnimator = function(animator, previous, eventType, event)
  */
 anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator, 
 [
-  'play', 'queue', 'transition', 'restore', 'set', 'resume', 'pause', 
+  'play', 'queue', 'transition', 'transitionInt', 'restore', 'set', 'resume', 'pause', 
   'finish', 'end', 'stop', 'follow', 'applyInitialState', 'tweenTo', 
   'tween', 'tweenMany', 'tweenManyTo', 'spring', 'unspring', 'apply', 
   'placeSpring', 'placeEvent'
@@ -4652,13 +4904,13 @@ anim8s.fn.filter = function(filterer)
  *
  * @param [function] wrapper
  */
-anim8s.fn.subjects = function(wrapper)
+anim8s.fn.getSubjects = function(wrapper)
 {
   var subjects = [];
 
   for (var i = 0; i < this.length; i++)
   {
-    subjects.push( this[i] );
+    subjects.push( this[i].subject );
   }
 
   if ( anim8.isFunction( wrapper ) )
@@ -5096,11 +5348,14 @@ anim8.Parser.prototype =
     var delays    = animation.delays || {};
     var sleeps    = animation.sleeps || {};
     var repeats   = animation.repeats || {};
+    var scales    = animation.scales || {};
+    var scaleBases= animation.scaleBases || {};
     
     for (var i = 0; i < events.length; i++)
     {
       var e = events[i];
       var attr = e.attribute;
+      var calc = e.path.calculator;
       
       if ( e.getParser() !== this )
       {
@@ -5112,6 +5367,8 @@ anim8.Parser.prototype =
       e.delay     = anim8.time(   anim8.coalesce( delays[attr],    newOptions.delay,    oldOptions.delay    ), e.delay );
       e.sleep     = anim8.time(   anim8.coalesce( sleeps[attr],    newOptions.sleep,    oldOptions.sleep    ), e.sleep );
       e.duration  = anim8.time(   anim8.coalesce( durations[attr], newOptions.duration, oldOptions.duration ), e.duration );
+      e.scale     =               anim8.coalesce( scales[attr],    newOptions.scale,    oldOptions.scale     , e.scale );
+      e.scaleBase = calc.parse(   anim8.coalesce( scaleBases[attr],newOptions.scaleBase,oldOptions.scaleBase), e.scaleBase );
     }
   }
 };
@@ -5177,6 +5434,8 @@ anim8.ParserDeltas.prototype.parse = function( animation, options, events )
   var delays = animation.delays || {};
   var sleeps = animation.sleeps || {};
   var repeats = animation.repeats || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   
 	for (var attr in values)
 	{
@@ -5200,14 +5459,16 @@ anim8.ParserDeltas.prototype.parse = function( animation, options, events )
 			value[k] = calculator.parse( value[k], defaultValue );
 		}
 		
-    var duration = anim8.coalesce( durations[attr], options.duration, anim8.defaults.duration );
-    var easing   = anim8.coalesce( easings[attr], options.easing, anim8.defaults.easing );
-    var delay    = anim8.coalesce( delays[attr], options.delay, anim8.defaults.delay );
-    var sleep    = anim8.coalesce( sleeps[attr], options.sleep, anim8.defaults.sleep );
-    var repeat   = anim8.coalesce( repeats[attr], options.repeat, anim8.defaults.repeat );
+    var duration = anim8.coalesce( durations[attr], options.duration );
+    var easing   = anim8.coalesce( easings[attr], options.easing );
+    var delay    = anim8.coalesce( delays[attr], options.delay );
+    var sleep    = anim8.coalesce( sleeps[attr], options.sleep );
+    var repeat   = anim8.coalesce( repeats[attr], options.repeat );
+    var scale    = anim8.coalesce( scales[attr], options.scale );
+    var scaleBase= anim8.coalesce( scaleBase[attr], options.scaleBase );
 
     var path     = new anim8.DeltaPath( attr, calculator, values[attr], deltas[attr] );
-    var event    = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, true, this );
+    var event    = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
     
     events.push( event );
 	}
@@ -5243,6 +5504,8 @@ anim8.ParserFinal.prototype.parse = function( animation, options, events )
 	
   var delays = animation.delays || {};
   var durations = animation.durations || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   var calculators = {};
 	var defaults = {};
   
@@ -5267,9 +5530,11 @@ anim8.ParserFinal.prototype.parse = function( animation, options, events )
 		
     var delay    = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
     var duration = anim8.duration( anim8.coalesce( durations[attr], options.duration ) );
-    
+    var scale    = anim8.coalesce( scales[attr], options.scale );
+    var scaleBase= anim8.coalesce( scaleBases[attr], options.scaleBase );
+
     var path     = new anim8.PointPath( attr, calculator, value );
-    var event    = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, false, this );
+    var event    = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, scale, scaleBase, false, this );
     
     events.push( event );
 	}
@@ -5293,11 +5558,14 @@ anim8.ParserFinal.prototype.merge = function( animation, newOptions, oldOptions,
 {
   var durations = animation.durations || {};
   var delays    = animation.delays || {};
+  var scales    = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   
   for (var i = 0; i < events.length; i++)
   {
     var e = events[i];
     var attr = e.attribute;
+    var calc = e.path.calculator;
       
     if ( e.getParser() !== this )
     {
@@ -5308,6 +5576,8 @@ anim8.ParserFinal.prototype.merge = function( animation, newOptions, oldOptions,
     var duration = anim8.coalesce( durations[attr], newOptions.duration, oldOptions.duration );
 
     e.delay = anim8.delay( delay ) + anim8.duration( duration );
+    e.scale = anim8.coalesce( scales[attr], newOptions.scale, oldOptions.scale, e.scale );
+    e.scaleBase = calc.parse( anim8.coalesce( scaleBases[attr], newOptions.scaleBase, oldOptions.scaleBase ), e.scaleBase );
   }
 };
 
@@ -5340,6 +5610,8 @@ anim8.ParserInitial.prototype.parse = function( animation, options, events )
 	var values = animation.initial;
 	
   var delays = animation.delays || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   var calculators = {};
 	var defaults = {};
   
@@ -5363,9 +5635,11 @@ anim8.ParserInitial.prototype.parse = function( animation, options, events )
     value = calculator.parse( value, defaultValue ); 
 		
     var delay    = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
+    var scale    = anim8.coalesce( scales[attr], options.scale );
+    var scaleBase= anim8.coalesce( scaleBases[attr], options.scaleBase );
     
     var path     = new anim8.PointPath( attr, calculator, value );
-    var event    = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, true, this );
+    var event    = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, scale, scaleBase, true, this );
     
     events.push( event );
 	}
@@ -5389,11 +5663,14 @@ anim8.ParserInitial.prototype.merge = function( animation, newOptions, oldOption
 {
   var durations = animation.durations || {};
   var delays    = animation.delays || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   
   for (var i = 0; i < events.length; i++)
   {
     var e = events[i];
     var attr = e.attribute;
+    var calc = e.path.calculator;
       
     if ( e.getParser() !== this )
     {
@@ -5401,6 +5678,8 @@ anim8.ParserInitial.prototype.merge = function( animation, newOptions, oldOption
     }
     
     e.delay = anim8.time( anim8.coalesce( delays[attr], newOptions.delay, oldOptions.delay ), e.delay );
+    e.scale = anim8.coalesce( scales[attr], newOptions.scale, oldOptions.scale, e.scale );
+    e.scaleBase = calc.parse( anim8.coalesce( scaleBases[attr], newOptions.scaleBase, oldOptions.scaleBase ), e.scaleBase );
   }
 };
 
@@ -5442,6 +5721,8 @@ anim8.ParserKeyframe.prototype.parse = function( animation, options, events )
   var delays = animation.delays || {};
   var sleeps = animation.sleeps || {};
   var repeats = animation.repeats || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBases || {};
   
   var teasing = anim8.easing( anim8.coalesce( options.teasing, anim8.defaults.teasing ) );
   
@@ -5578,9 +5859,11 @@ anim8.ParserKeyframe.prototype.parse = function( animation, options, events )
     var delay    = anim8.coalesce( delays[attr], options.delay );
     var sleep    = anim8.coalesce( sleeps[attr], options.sleep );
     var repeat   = anim8.coalesce( repeats[attr], options.repeat );
+    var scale    = anim8.coalesce( scales[attr], options.scale );
+    var scaleBase= anim8.coalesce( scaleBases[attr], options.scaleBase );
     
     var path     = new anim8.KeyframePath( attr, calculators[attr], values[attr], deltas[attr], pathEasings[attr] );
-    var event    = new anim8.Event( attr, path, duration, teasing, delay, sleep, repeat, true, this );
+    var event    = new anim8.Event( attr, path, duration, teasing, delay, sleep, repeat, scale, scaleBase, true, this );
     
     events.push( event );
   }
@@ -5619,6 +5902,8 @@ anim8.ParserTween.prototype.parse = function( animation, options, events )
   var delays = animation.delays || {};
   var sleeps = animation.sleeps || {};
   var repeats = animation.repeats || {};
+  var scales = animation.scales || {};
+  var scaleBases = animation.scaleBase || {};
 
 	for (var attr in tweenTo)
 	{
@@ -5642,9 +5927,11 @@ anim8.ParserTween.prototype.parse = function( animation, options, events )
     var delay    = anim8.coalesce( delays[attr], options.delay );
     var sleep    = anim8.coalesce( sleeps[attr], options.sleep );
     var repeat   = anim8.coalesce( repeats[attr], options.repeat );
+    var scale    = anim8.coalesce( scales[attr], options.scale );
+    var scaleBase= anim8.coalesce( scaleBases[attr], options.scaleBase );
     
     var path     = new anim8.Tween( attr, calculator, true, value );
-    var event    = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, true, this );
+    var event    = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
     
     events.push( event );
 	}
@@ -6697,7 +6984,7 @@ anim8.property.opacity = (function()
     },
     set: function(e, anim) 
     {
-      anim.styles[ css ] = anim.frame.opacity;
+      anim.styles[ css ] = anim8.clamp( anim.frame.opacity, 0, 1 );
     },
     unset: function(e, anim)
     {
@@ -7019,7 +7306,7 @@ anim8.attribute.translateY              = {defaultValue: 0, property: 'transform
 anim8.attribute.translateZ              = {defaultValue: 0, property: 'transform', defaultUnit: 'px'};
 anim8.attribute.translate3d             = {defaultValue: {x:0, y:0, z:0}, property: 'transform', calculator: '3d', defaultUnit: 'px'};
 
-anim8.attribute.scale                   = {defaultValue: {x: 0, y:0}, property: 'transform', calculator: '2d'};
+anim8.attribute.scale                   = {defaultValue: {x:1, y:1}, property: 'transform', calculator: '2d'};
 anim8.attribute.scaleX	                = {defaultValue: 1, property: 'transform'};
 anim8.attribute.scaleY  	              = {defaultValue: 1, property: 'transform'};
 anim8.attribute.scaleZ  	              = {defaultValue: 1, property: 'transform'};
@@ -7563,7 +7850,10 @@ anim8.save('rubberBand', {
     '75': {
       scale3d: {x:1.05, y:0.95}
     }
-	}
+	},
+  scaleBases: {
+    scale3d: 1
+  }
 });
 
 anim8.save('flash', {
@@ -7574,6 +7864,9 @@ anim8.save('flash', {
     '25,75': {
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7582,14 +7875,17 @@ anim8.save('flash', {
 anim8.save('pulse', {
   keyframe: {
     '0': {
-      scale3d: 1.0
+      scale3d: 1
     },
     '50': {
       scale3d: 1.05
     },
     '100': {
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1
   }
 });
 
@@ -7628,6 +7924,9 @@ anim8.save('swing', {
       rotate: 0
     }
   },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'center top'
   }
@@ -7651,6 +7950,9 @@ anim8.save('tada', {
       scale3d: 1.1,
       rotate: -3
     }
+  },
+  scaleBases: {
+    scale3d: 1
   }
 });
 
@@ -7709,8 +8011,12 @@ anim8.save('bounceIn', {
     },
     '100': {
       opacity: 1.0,
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   easing: [0.215, 0.610, 0.355, 1.000]
@@ -7735,6 +8041,9 @@ anim8.save('bounceInDown', {
     '100': {
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -7760,6 +8069,9 @@ anim8.save('bounceInLeft', {
     '100': {
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -7786,6 +8098,9 @@ anim8.save('bounceInRight', {
     '100': {
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -7811,6 +8126,9 @@ anim8.save('bounceInUp', {
     '100': {
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 1000,
@@ -7820,7 +8138,7 @@ anim8.save('bounceInUp', {
 anim8.save('bounceOut', {
   keyframe: {
     '0': {
-      scale3d: 1.0
+      scale3d: 1
     },
     '20': {
       scale3d: 0.9
@@ -7833,6 +8151,10 @@ anim8.save('bounceOut', {
       opacity: 0,
       scale3d: 0.3
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   duration: 750
@@ -7854,6 +8176,9 @@ anim8.save('bounceOutDown', {
       opacity: 0,
       translateY: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7870,6 +8195,9 @@ anim8.save('bounceOutLeft', {
       opacity: 0,
       translateX: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7886,6 +8214,9 @@ anim8.save('bounceOutRight', {
       opacity: 0,
       translateX: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7905,6 +8236,9 @@ anim8.save('bounceOutUp', {
       opacity: 0,
       translateY: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7916,6 +8250,9 @@ anim8.save('fadeIn', {
     '100': {
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7929,6 +8266,9 @@ anim8.save('fadeInDown', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -7945,6 +8285,9 @@ anim8.save('fadeInDownBig', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7958,6 +8301,9 @@ anim8.save('fadeInLeft', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -7974,6 +8320,9 @@ anim8.save('fadeInLeftBig', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -7987,6 +8336,9 @@ anim8.save('fadeInRight', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -8003,6 +8355,9 @@ anim8.save('fadeInRightBig', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8016,6 +8371,9 @@ anim8.save('fadeInUp', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }, 
   units: {
     translateY: '%'
@@ -8032,6 +8390,9 @@ anim8.save('fadeInUpBig', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8043,6 +8404,9 @@ anim8.save('fadeOut', {
     '100': {
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8056,6 +8420,9 @@ anim8.save('fadeOutDown', {
       opacity: 0,
       translateY: 100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -8072,6 +8439,9 @@ anim8.save('fadeOutDownBig', {
       opacity: 0,
       translateY: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8085,6 +8455,9 @@ anim8.save('fadeOutLeft', {
       opacity: 0,
       translateX: -100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -8101,6 +8474,9 @@ anim8.save('fadeOutLeftBig', {
       opacity: 0,
       translateX: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8114,6 +8490,9 @@ anim8.save('fadeOutRight', {
       opacity: 0,
       translateX: 100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -8130,6 +8509,9 @@ anim8.save('fadeOutRightBig', {
       opacity: 0,
       translateX: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8143,6 +8525,9 @@ anim8.save('fadeOutUp', {
       opacity: 0,
       translateY: -100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -8159,6 +8544,9 @@ anim8.save('fadeOutUpBig', {
       opacity: 0,
       translateY: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8167,7 +8555,7 @@ anim8.save('flip', {
     '0': {
       translateZ: 0,
       rotate3d: {x:0, y:1, z:0, angle:-360},
-      scale3d: 1.0,
+      scale3d: 1,
       easing: 'cssEaseOut'
     },
     '40': {
@@ -8187,8 +8575,11 @@ anim8.save('flip', {
       easing: 'cssEaseIn'
     },
     '100': {
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1
   },
   initial: {
     backface: 1.0
@@ -8220,6 +8611,9 @@ anim8.save('flipInX', {
       rotate3d: {x:1, y:0, z:0, angle:0}
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   initial: {
     backface: 1.0
   },
@@ -8250,6 +8644,9 @@ anim8.save('flipInY', {
       rotate3d: {x:0, y:1, z:0, angle:0}
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   initial: {
     backface: 1.0
   },
@@ -8271,6 +8668,9 @@ anim8.save('flipOutX', {
       opacity: 0,
       rotate3d: {x:1, y:0, z:0, angle:90}
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   initial: {
     backface: 1.0
@@ -8295,6 +8695,9 @@ anim8.save('flipOutY', {
       opacity: 0,
       rotate3d: {x:0, y:1, z:0, angle:90}
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   initial: {
     backface: 1.0
@@ -8325,6 +8728,9 @@ anim8.save('lightSpeedIn', {
       skewX: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -8345,6 +8751,9 @@ anim8.save('lightSpeedOut', {
       skewX: 30
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -8363,6 +8772,12 @@ anim8.save('rotateIn', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'center'
   }
@@ -8378,6 +8793,12 @@ anim8.save('rotateInDownLeft', {
       rotate: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   },
   initial: {
     origin: 'left bottom'
@@ -8395,6 +8816,12 @@ anim8.save('rotateInDownRight', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'right bottom'
   }
@@ -8410,6 +8837,12 @@ anim8.save('rotateInUpLeft', {
       rotate: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   },
   initial: {
     origin: 'left bottom'
@@ -8427,6 +8860,12 @@ anim8.save('rotateInUpRight', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'right bottom'
   }
@@ -8442,6 +8881,12 @@ anim8.save('rotateOut', {
       opacity: 0,
       rotate: 200
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'center'
@@ -8459,6 +8904,12 @@ anim8.save('rotateOutDownLeft', {
       rotate: 45
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'left bottom'
   }
@@ -8474,6 +8925,12 @@ anim8.save('rotateOutDownRight', {
       opacity: 0,
       rotate: -45
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'right bottom'
@@ -8491,6 +8948,12 @@ anim8.save('rotateOutUpLeft', {
       rotate: -45
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'left bottom'
   }
@@ -8506,6 +8969,12 @@ anim8.save('rotateOutUpRight', {
       opacity: 0,
       rotate: 90
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'right bottom'
@@ -8534,6 +9003,12 @@ anim8.save('hinge', {
       opacity: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'top left'
   }
@@ -8557,6 +9032,9 @@ anim8.save('rollIn', {
       rotate: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -8577,6 +9055,9 @@ anim8.save('rollOut', {
       rotate: 120
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -8594,6 +9075,10 @@ anim8.save('zoomIn', {
     '100': {
       scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -8615,6 +9100,10 @@ anim8.save('zoomInDown', {
       scale3d: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -8636,6 +9125,10 @@ anim8.save('zoomInLeft', {
       scale3d: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -8657,6 +9150,10 @@ anim8.save('zoomInRight', {
       scale3d: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -8678,6 +9175,10 @@ anim8.save('zoomInUp', {
       scale3d: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -8691,6 +9192,10 @@ anim8.save('zoomOut', {
       opacity: 0,
       scale3d: 0.3
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   duration: '500ms'
@@ -8699,7 +9204,7 @@ anim8.save('zoomOut', {
 anim8.save('zoomOutDown', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateY: 0,
       origin: 'center'
     },
@@ -8715,13 +9220,20 @@ anim8.save('zoomOutDown', {
       translateY: 2000,
       origin: 'center bottom'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutLeft', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateX: 0,
       origin: 'center'
     },
@@ -8737,13 +9249,20 @@ anim8.save('zoomOutLeft', {
       translateX: -2000,
       origin: 'left center'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutRight', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateX: 0,
       origin: 'center'
     },
@@ -8759,13 +9278,20 @@ anim8.save('zoomOutRight', {
       translateX: 2000,
       origin: 'right center'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutUp', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateY: 0,
       origin: 'center'
     },
@@ -8781,6 +9307,13 @@ anim8.save('zoomOutUp', {
       translateY: -2000,
       origin: 'center bottom'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
@@ -8924,6 +9457,9 @@ anim8.save('blurOut', {
       blur: 5,
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -8941,6 +9477,9 @@ anim8.save('blurIn', {
       blur: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -9107,340 +9646,177 @@ anim8.jQueryFactory.prototype.destroy = function(animator)
  */
 anim8.factory.jquery = new anim8.jQueryFactory();
 
-(function($, m8)
+/**
+ * Adds useful anim8js functions to jQuery.
+ * 
+ * @param  {jQuery}
+ * @param  {anim8}
+ * @param  {anim8s}
+ * @return {function}
+ */
+(function($, m8, m8s)
 {
-  var SYMBOL = 
+
+  /**
+   * Adds the m8, anim8, and animator functions to jQuery. An instance of anim8.Animator will be returned.
+   * 
+   * @return {anim8.Animator}
+   */
+  $.fn.m8 = $.fn.anim8 = $.fn.animator = function()
   {
-    REPEAT: 'x',
-    DELAY: '~',
-    SLEEP: 'z',
-    INFINITY: 'infinite'
+    return m8( this[0] );
+  };
+
+  /**
+   * Adds the m8s, anim8s, animators functions to jQuery. An instance of anim8.Animators will be returned.
+   * 
+   * @return {anim8.Animators}
+   */
+  $.fn.m8s = $.fn.anim8s = $.fn.animators = function()
+  {
+    return m8s( this.get() );
   };
   
-  $.fn.animators = function()
+  /**
+   * Plays the animation specified in the given data attribute.
+   *
+   * The returned jQuery object is reduced to the elements that had a valid animation attribute.
+   * 
+   * @param  {string} animationAttribute
+   * @param  [boolean] all
+   * @param  [boolean] cache
+   * @return {this}
+   * @see anim8.Animator.play
+   */
+  $.fn.dataPlay = function( animationAttribute, all, cache )
   {
-		return m8( this.get() );		
-  };
-  
-  $.fn.play = function( animationText, all )
-  {
-    var anim = parseAnimation( animationText );
-    
-    if ( anim !== false )
-    {
-      this.animators().play( anim.animation, anim.options, all );
-    }
-    
-    return this; 
-  };
-  
-  $.fn.dataPlay = function( animationAttribute, all )
-  {
+    var options = {};
+
 		return this.filter(function()
 	  {
 			var animationText = $(this).data( animationAttribute );
 		
 			if ( animationText )
 			{
-		    var anim = parseAnimation( animationText );
-		
-				if ( anim !== false )
-				{					
-			  	m8( this ).play( anim.animation, anim.options, all );
-					
-					return true;
-				}
+        var animation = anim8.animation( animationText, options, cache );
+
+        if ( animation !== false )
+        {
+          m8( this ).play( animation ); 
+
+          return true;
+        }
 			}
 			
 			return false;
   	});
   };
   
-  $.fn.queueAnimation = function( animationText )
-  {
-    var anim = parseAnimation( animationText );
-    
-    if ( anim !== false )
-    {
-      this.animators().queue( anim.animation, anim.options );
-    }
-    
-    return this; 
-  };
-  
-  $.fn.dataQueue = function( animationAttribute )
+  /**
+   * Queues the animation specified in the given data attribute.
+   *
+   * The returned jQuery object is reduced to the elements that had a valid animation attribute.
+   * 
+   * @param  {string} animationAttribute
+   * @param  [boolean] cache
+   * @return {this}
+   * @see anim8.Animator.queue
+   */
+  $.fn.dataQueue = function( animationAttribute, cache )
   {	
+    var options = {};
+
   	return this.filter(function()
     {
   		var animationText = $(this).data( animationAttribute );
 		
   		if ( animationText )
   		{
-  	    var anim = parseAnimation( animationText );
-		
-				if ( anim !== false )
-				{
-		   		m8( this ).queue( anim.animation, anim.options );		
-					
-					return true;
-				}
+        var animation = anim8.animation( animationText, options, cache );
+
+        if ( animation !== false )
+        {
+          m8( this ).queue( animation );
+
+          return true;
+        }
   		}
 			
 			return false;
     });
   };
 
-  $.fn.transition = function( animationText, transitionText )
-  {
-    var anim = parseAnimation( animationText );
-    var tran = parseTransition( transitionText );
-    
-    if ( anim !== false )
-    {
-      this.animators().transition( tran.time, tran.delta, tran.easing, anim.animation, anim.options );
-    }
-    
-    return this; 
-  };
-  
-  $.fn.dataTransition = function( animationAttribute, transitionAttribute )
-  {	
-		return this.filter(function()
-		{
-			var animationText = $(this).data( animationAttribute );
-			var transitionText = $(this).data( transitionAttribute );
-		
-			if ( animationText && transitionText )
-			{
-		    var anim = parseAnimation( animationText );
-				var tran = parseTransition( transitionText );
-
-				if ( anim !== false )
-				{
-			  	m8( this ).transition( tran.time, tran.delta, tran.easing, anim.animation, anim.options );
-					
-					return true;
-				}
-			}
-			
-			return false;
-		});
-  };
-  
-  $.fn.pause = function()
-  {
-    this.animators().pause();
-    
-    return this;
-  };
-  
-  $.fn.resume = function()
-  {
-    this.animators().resume();
-    
-    return this;
-  };
-  
-  $.fn.restore = function()
-  {
-    this.animators().restore();
-    
-    return this;
-  };
-  
-  $.fn.stopIt = function()
-  {
-    this.animators().stop();
-    
-    return this;
-  };
-  
-  $.fn.finishIt = function()
-  {
-    this.animators().finish();
-    
-    return this;
-  };
-  
-  $.fn.endIt = function()
-  {
-    this.animators().end();
-    
-    return this;
-  };
-  
-  $.fn.eventsFor = function( attributes, callback, context )
-  {
-    this.animators().eventsFor( attributes, callback, context );
-    
-    return this;
-  };
-  
-  $.fn.springsFor = function( attributes, callback, context )
-  {
-    this.animators().springsFor( attributes, callback, context );
-    
-    return this;
-  };
-  
-  $.fn.setAttributes = function( attributes )
-  {
-    this.animators().set( attributes );
-    
-    return this;
-  };
-  
-  $.fn.getAttributes = function( attributes )
-  {
-    return this.animators().get( attributes );
-  };
-  
-  $.fn.spring = function( spring  )
-  {
-    return this.animators().spring( spring );
-  };
-  
-  $.fn.unspring = function( springs )
-  {
-    this.animators().unspring( springs );
-    
-    return this;
-  };
-  
-  $.fn.applyInitialState = function( attributes )
-  {
-    this.animators().applyInitialState( attributes );
-	 	 
-	  return this;
-  };
-  
-  $.fn.isAnimating = function( attributes )
-  {
-    return this.animators().isAnimating();
-  };
-  
-  $.fn.hasEvents = function( attributes )
-  {
-    return this.animators().hasEvents();
-  };
-  
-  var parseAnimation = function( text )
-  {
-		if ( !anim8.isString( text ) )
-		{
-			return false;
-		}
-		
-    var parts = text.split(' ');
+  /**
+   * Transitions into the animation specified in the given data attribute.
+   *
+   * The returned jQuery object is reduced to the elements that had a valid animation attribute.
+   * 
+   * @param  {string} animationAttribute
+   * @param  {number} transitionTime
+   * @param  {number} transitionDelta
+   * @param  {string|function} transitionEasing
+   * @param  {boolean} cache
+   * @return {this}
+   */
+  $.fn.dataTransition = function( animationAttribute, transitionTime, transitionDelta, transitionEasing, cache )
+  { 
     var options = {};
-    var animation = null;
-    
-    for (var i = 0; i < parts.length; i++)
+
+    return this.filter(function()
     {
-      var p = parts[i];
-            
-      if ( p in m8.animation )
-      {
-        animation = p;
-      }
-      else if ( m8.isEasingName( p ) )
-      {
-        options.easing = p;
-      }
-      else if ( p.charAt(0) === SYMBOL.REPEAT )
-      {
-        var repeats = parseInt( p.substring(1) );
-        
-        if (!isNaN(repeats)) 
-        {
-          options.repeat = repeats;
-        }
-      }
-      else if ( p.charAt(0) === SYMBOL.SLEEP )
-      {
-        var sleeps = m8.time( p.substring(1) );
-        
-        if ( sleeps !== false )
-        {
-          options.sleep = sleeps;
-        }
-      }
-      else if ( p.charAt(0) === SYMBOL.DELAY )
-      {
-        var delays = m8.time( p.substring(1) );
-        
-        if ( delays !== false )
-        {
-          options.delay = delays;
-        }
-      }
-      else if ( p === SYMBOL.INFINITY )
-      {
-        options.repeat = Number.POSITIVE_INFINITY;
-      }
-      else
-      {
-        var duration = m8.time( p );
-        
-        if ( duration !== false )
-        {
-          options.duration = duration;
-        }
-      }
-    }
+      var animationText = $(this).data( animationAttribute );
     
-    if ( animation === null )
-    {
+      if ( animationText )
+      {
+        var animation = anim8.animation( animationText, options, cache );
+ 
+        if ( animation !== false )
+        {
+          m8( this ).transition( transitionTime, transitionDelta, transitionEasing, animation );
+          
+          return true;
+        }
+      }
+      
       return false;
-    }
-    
-    return {
-      animation: animation,
-      options: options
-    };
+    });
   };
 
-  var parseTransition = function( text )
-  {
-		if ( !anim8.isString( text ) )
-		{
-			return false;
-		}
-		
-    var transition = 
+  /**
+   * Transitions into the animation specified in the given data attribute.
+   *
+   * The returned jQuery object is reduced to the elements that had a valid animation attribute.
+   * 
+   * @param  {string} animationAttribute
+   * @param  {number} transitionTime
+   * @param  {number} transitionFromDelta
+   * @param  {number} transitionIntoDelta
+   * @param  {string|function} transitionEasing
+   * @param  {boolean} cache
+   * @return {this}
+   */
+  $.fn.dataTransitionInto = function( animationAttribute, transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, cache )
+  { 
+    var options = {};
+
+    return this.filter(function()
     {
-      time: 500,
-      delta: 0.2,
-      easing: 'ease'
-    };
+      var animationText = $(this).data( animationAttribute );
     
-    var parts = text.split(' ');
-    
-    for (var i = 0; i < parts.length; i++)
-    {
-      var p = parts[i];
-      var num = parseFloat(p);
-      
-      if ( m8.isEasingName( p ) )
+      if ( animationText )
       {
-        transition.easing = p;
-      }
-      else if ( !isNaN(num) && num >= 0.0 && num <= 1.0 )
-      {
-        transition.delta = num;
-      }
-      else
-      {
-        var times = m8.time( p );
-        
-        if ( times !== false )
+        var animation = anim8.animation( animationText, options, cache );
+ 
+        if ( animation !== false )
         {
-          transition.time = times;
+          m8( this ).transitionInto( transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation );
+          
+          return true;
         }
       }
-    }
-    
-    return transition;
+      
+      return false;
+    });
   };
   
-})(jQuery, anim8);
+})(jQuery, anim8, anim8s);

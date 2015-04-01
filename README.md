@@ -1,44 +1,68 @@
 # anim8js
-An animation library for javascript objects. 
+The ultimate javascript animation library. Animate everything - from objects to HTML elements.
 
-**TODO:**
+It's as easy as `anim8( button ).play('tada ~0.5s 1.5s x4 z100ms ease-inout')` - which plays the `tada` animation
+in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between using the easing function `ease-inout`.
 
-1. [X] Attach units to events instead of the Animator
-2. [X] Add `follow(attribute, path[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-3. [X] Add `tweenTo(attribute, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-4. [X] Add `tween(attribute, start, end[, duration][, delay][, easing][, repeat][, sleep])` to Animator
-5. [X] Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
-6. [X] Add option merging to Parser
-7. [X] Make anim8.Parser class
-8. [ ] Make anim8.Calculator class
-9. [ ] Move all dom functions to anim8.dom namespace
-10. [ ] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
-11. [ ] Finish Document
-12. [ ] Create an animated splash page showcasing library
-13. [X] Change Animator.eventsFor to return an array if a function was not provided
-14. [X] Correct `anim8.isFunction`
-15. [X] Add gravity to springs
-16. [X] Allow reference values in path (they don't get copied - they point to an attribute in another Animator) - add `Animator.ref(attribute)`
-17. [X] Add sequence to anim8 which has a delay between animations, an easing, the animation, and the list of animators. `anim8.sequence(delay, easing, animation[, options])`
-18. [X] Remove anim8.parseValue
-19. [ ] Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
-20. [X] Allow reference values in spring.
-21. [ ] Add automatic rest & position determination to Springs which defaults to current Animator values.
-22. [X] Complete Event.seek
-23. [X] Styles are generated in DomAnimator.update and applied & cleared in DomAnimator.apply
-24. [X] Add live mode (RAF constantly executes)
-25. [X] If transition is called and not playing anything, treat as play
-26. [X] If transition and partial play, delay new attributes by transitionTime
-27. [X] Test true values
-28. [ ] Add queue to anim8.Sequence
-29. [ ] Add transition to anim8.Sequence
-30. [ ] Add anim8.Movie?
-31. [X] Fix bug where one Animator partially plays another animators events
-32. [X] Final parser events shouldn't be called on applyInitialState
-33. [X] Add tween parser
-34. [X] Add anim8.Factory
-35. [X] Add factory to Animator
-36. [ ] Register springs with animator & factory (uses attributes to determine defaultValue and calculator)
-37. [ ] Add animation string parsing to anim8.animation. You can specify multiple with commas, which queues up the events
-38. [X] Add time parsing in animation parsers for delay, duration, & sleep (and add default duration unit)
-39. [X] Add anim8.fn/m8.fn and anim8s.fn/m8s.fn so users can add their own functions
+### Features  
+1. Play animations by name, name & modifiers, or by custom definition.
+2. Queue animations.
+3. Transition into a new animation smoothly.
+4. Play multiple animations at once over different attributes.
+5. Springs.
+6. Animation sequences.
+7. Defer commands until an event occurs.
+8. Save animations to be used later.
+
+### Concepts  
+- `Subject` = The thing being animated (an object, HTML element, etc).
+- `Attribute` = an animatable property on a subject.
+- `Calculator` = performs math operations for a data type (number, color, 2d/3d points, etc).
+- `Easing` = a function which controls the velocity of the animation over time.
+- `Path` = a set of points and an algorithm which computes a value at a given time.
+- `Event` = animates a single value along a path with a delay, duration, # of repeats, a pause in between repititions, an easing, and a scale.
+- `Spring` = a force which animates an attribute to a resting value.
+- `Animation` = a set of events which can be played on an Animator.
+- `Defer` = defers calling functions on an object until a certain event occurs.
+- `Animator` = enables you to: play animations, queue animations, transition animations, tween attributes, add springs, and follow paths. 
+- `Animators` = a set of animators that can be used as it were a single Animator.
+- `Sequence` = animators where animations can be played at a delay between each animator creating a sequence of animations.
+- `Parser` = takes an animation definition and generates an Animation that can be played.
+- `Factory` = builds an Animator for a specific data type.
+
+### Playing animations
+
+There are tons of different ways of playing animations.
+- `animator.play( 'tada' )` = plays the tada animation on the animator.
+- `animator.play( 'tada', {delay:500, duration:'1.5s'} )` = plays the tada animation with a delay of 500 milliseconds and duration of 1.5 seconds.
+- `animator.play( 'tada ~500ms 1.5s' )` = same as above.
+- `animator.play( 'tada ~500ms 1.5s', {duration:200} )` = same as above excepts overrides duration to 200 milliseconds.
+- `animator.play( *animationDefinition* )` = plays a custom animation - see *Animation Definition*.
+
+### Animation Definitions
+
+### FAQ  
+> What are valid animation durations, delays, & sleeps?
+A number of milliseconds or a string with a number followed by any of the following units: ms, s, c, cs, third, jiffy, sec, m, min, h, hr
+
+> What are valid animation repeats?
+A number or any of the following strings: inf, infinity, infinite, once, twice, thrice, dozen, random
+
+> What are valid easings?
+- A function which accepts a delta value and returns a new delta value.
+- A string which is the name of an existing easing in `anim8.easing`.
+- A string in the format of `easing-easingType` where easing is an existing easing in `anim8.easing` and easingType is an existing type in `anim8.easingType` like *in*, *out*, *inout*, or *pong*. An example is 'sqrt-inout'.
+- An array of 4 values which represent control points for a bezier curve.
+
+> How do I override any default values?
+You can find the following defaults in `anim8.defaults`:  
+duration, easing, teasing, delay, sleep, repeat, scale, transitionTime, transitionDelta, transitionIntoDelta, 
+transitionEasing, cache
+
+> How do I add my own ____
+- `Easing`: anim8.easing.myCustomEasing = function(x) { ... };
+- `Path`: anim8.path.myCustomPath = function(pathDefinition) { ... return *instance of anim8.Path* ... };
+- `Parser`: anim8.parser.myCustomParser = *instance of anim8.Parser*;
+- `Animation`: anim8.save( 'myAnimationName', *animation definition* );
+- `Calculator`: anim8.calculator.create( 'myCustomCalculator', *calculator methods* );
+

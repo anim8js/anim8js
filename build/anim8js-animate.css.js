@@ -44,7 +44,10 @@ anim8.save('rubberBand', {
     '75': {
       scale3d: {x:1.05, y:0.95}
     }
-	}
+	},
+  scaleBases: {
+    scale3d: 1
+  }
 });
 
 anim8.save('flash', {
@@ -55,6 +58,9 @@ anim8.save('flash', {
     '25,75': {
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -63,14 +69,17 @@ anim8.save('flash', {
 anim8.save('pulse', {
   keyframe: {
     '0': {
-      scale3d: 1.0
+      scale3d: 1
     },
     '50': {
       scale3d: 1.05
     },
     '100': {
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1
   }
 });
 
@@ -109,6 +118,9 @@ anim8.save('swing', {
       rotate: 0
     }
   },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'center top'
   }
@@ -132,6 +144,9 @@ anim8.save('tada', {
       scale3d: 1.1,
       rotate: -3
     }
+  },
+  scaleBases: {
+    scale3d: 1
   }
 });
 
@@ -190,8 +205,12 @@ anim8.save('bounceIn', {
     },
     '100': {
       opacity: 1.0,
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   easing: [0.215, 0.610, 0.355, 1.000]
@@ -216,6 +235,9 @@ anim8.save('bounceInDown', {
     '100': {
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -241,6 +263,9 @@ anim8.save('bounceInLeft', {
     '100': {
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -267,6 +292,9 @@ anim8.save('bounceInRight', {
     '100': {
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 2000,
@@ -292,6 +320,9 @@ anim8.save('bounceInUp', {
     '100': {
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 }, {
   duration: 1000,
@@ -301,7 +332,7 @@ anim8.save('bounceInUp', {
 anim8.save('bounceOut', {
   keyframe: {
     '0': {
-      scale3d: 1.0
+      scale3d: 1
     },
     '20': {
       scale3d: 0.9
@@ -314,6 +345,10 @@ anim8.save('bounceOut', {
       opacity: 0,
       scale3d: 0.3
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   duration: 750
@@ -335,6 +370,9 @@ anim8.save('bounceOutDown', {
       opacity: 0,
       translateY: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -351,6 +389,9 @@ anim8.save('bounceOutLeft', {
       opacity: 0,
       translateX: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -367,6 +408,9 @@ anim8.save('bounceOutRight', {
       opacity: 0,
       translateX: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -386,6 +430,9 @@ anim8.save('bounceOutUp', {
       opacity: 0,
       translateY: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -397,6 +444,9 @@ anim8.save('fadeIn', {
     '100': {
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -410,6 +460,9 @@ anim8.save('fadeInDown', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -426,6 +479,9 @@ anim8.save('fadeInDownBig', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -439,6 +495,9 @@ anim8.save('fadeInLeft', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -455,6 +514,9 @@ anim8.save('fadeInLeftBig', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -468,6 +530,9 @@ anim8.save('fadeInRight', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -484,6 +549,9 @@ anim8.save('fadeInRightBig', {
       opacity: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -497,6 +565,9 @@ anim8.save('fadeInUp', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }, 
   units: {
     translateY: '%'
@@ -513,6 +584,9 @@ anim8.save('fadeInUpBig', {
       opacity: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -524,6 +598,9 @@ anim8.save('fadeOut', {
     '100': {
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -537,6 +614,9 @@ anim8.save('fadeOutDown', {
       opacity: 0,
       translateY: 100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -553,6 +633,9 @@ anim8.save('fadeOutDownBig', {
       opacity: 0,
       translateY: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -566,6 +649,9 @@ anim8.save('fadeOutLeft', {
       opacity: 0,
       translateX: -100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -582,6 +668,9 @@ anim8.save('fadeOutLeftBig', {
       opacity: 0,
       translateX: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -595,6 +684,9 @@ anim8.save('fadeOutRight', {
       opacity: 0,
       translateX: 100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateX: '%'
@@ -611,6 +703,9 @@ anim8.save('fadeOutRightBig', {
       opacity: 0,
       translateX: 2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -624,6 +719,9 @@ anim8.save('fadeOutUp', {
       opacity: 0,
       translateY: -100
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   units: {
     translateY: '%'
@@ -640,6 +738,9 @@ anim8.save('fadeOutUpBig', {
       opacity: 0,
       translateY: -2000
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -648,7 +749,7 @@ anim8.save('flip', {
     '0': {
       translateZ: 0,
       rotate3d: {x:0, y:1, z:0, angle:-360},
-      scale3d: 1.0,
+      scale3d: 1,
       easing: 'cssEaseOut'
     },
     '40': {
@@ -668,8 +769,11 @@ anim8.save('flip', {
       easing: 'cssEaseIn'
     },
     '100': {
-      scale3d: 1.0
+      scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1
   },
   initial: {
     backface: 1.0
@@ -701,6 +805,9 @@ anim8.save('flipInX', {
       rotate3d: {x:1, y:0, z:0, angle:0}
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   initial: {
     backface: 1.0
   },
@@ -731,6 +838,9 @@ anim8.save('flipInY', {
       rotate3d: {x:0, y:1, z:0, angle:0}
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   initial: {
     backface: 1.0
   },
@@ -752,6 +862,9 @@ anim8.save('flipOutX', {
       opacity: 0,
       rotate3d: {x:1, y:0, z:0, angle:90}
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   initial: {
     backface: 1.0
@@ -776,6 +889,9 @@ anim8.save('flipOutY', {
       opacity: 0,
       rotate3d: {x:0, y:1, z:0, angle:90}
     }
+  },
+  scaleBases: {
+    opacity: 1
   },
   initial: {
     backface: 1.0
@@ -806,6 +922,9 @@ anim8.save('lightSpeedIn', {
       skewX: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -826,6 +945,9 @@ anim8.save('lightSpeedOut', {
       skewX: 30
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -844,6 +966,12 @@ anim8.save('rotateIn', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'center'
   }
@@ -859,6 +987,12 @@ anim8.save('rotateInDownLeft', {
       rotate: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   },
   initial: {
     origin: 'left bottom'
@@ -876,6 +1010,12 @@ anim8.save('rotateInDownRight', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'right bottom'
   }
@@ -891,6 +1031,12 @@ anim8.save('rotateInUpLeft', {
       rotate: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   },
   initial: {
     origin: 'left bottom'
@@ -908,6 +1054,12 @@ anim8.save('rotateInUpRight', {
       opacity: 1
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1
+  },
   initial: {
     origin: 'right bottom'
   }
@@ -923,6 +1075,12 @@ anim8.save('rotateOut', {
       opacity: 0,
       rotate: 200
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'center'
@@ -940,6 +1098,12 @@ anim8.save('rotateOutDownLeft', {
       rotate: 45
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'left bottom'
   }
@@ -955,6 +1119,12 @@ anim8.save('rotateOutDownRight', {
       opacity: 0,
       rotate: -45
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'right bottom'
@@ -972,6 +1142,12 @@ anim8.save('rotateOutUpLeft', {
       rotate: -45
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'left bottom'
   }
@@ -987,6 +1163,12 @@ anim8.save('rotateOutUpRight', {
       opacity: 0,
       rotate: 90
     }
+  },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
   },
   initial: {
     origin: 'right bottom'
@@ -1015,6 +1197,12 @@ anim8.save('hinge', {
       opacity: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
+  scales: {
+    origin: 1.0
+  },
   initial: {
     origin: 'top left'
   }
@@ -1038,6 +1226,9 @@ anim8.save('rollIn', {
       rotate: 0
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -1058,6 +1249,9 @@ anim8.save('rollOut', {
       rotate: 120
     }
   },
+  scaleBases: {
+    opacity: 1
+  },
   units: {
     translateX: '%'
   }
@@ -1075,6 +1269,10 @@ anim8.save('zoomIn', {
     '100': {
       scale3d: 1
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -1096,6 +1294,10 @@ anim8.save('zoomInDown', {
       scale3d: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -1117,6 +1319,10 @@ anim8.save('zoomInLeft', {
       scale3d: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -1138,6 +1344,10 @@ anim8.save('zoomInRight', {
       scale3d: 1,
       translateX: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -1159,6 +1369,10 @@ anim8.save('zoomInUp', {
       scale3d: 1,
       translateY: 0
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 });
 
@@ -1172,6 +1386,10 @@ anim8.save('zoomOut', {
       opacity: 0,
       scale3d: 0.3
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
   }
 }, {
   duration: '500ms'
@@ -1180,7 +1398,7 @@ anim8.save('zoomOut', {
 anim8.save('zoomOutDown', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateY: 0,
       origin: 'center'
     },
@@ -1196,13 +1414,20 @@ anim8.save('zoomOutDown', {
       translateY: 2000,
       origin: 'center bottom'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutLeft', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateX: 0,
       origin: 'center'
     },
@@ -1218,13 +1443,20 @@ anim8.save('zoomOutLeft', {
       translateX: -2000,
       origin: 'left center'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutRight', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateX: 0,
       origin: 'center'
     },
@@ -1240,13 +1472,20 @@ anim8.save('zoomOutRight', {
       translateX: 2000,
       origin: 'right center'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
 anim8.save('zoomOutUp', {
   keyframe: {
     '0': {
-      scale3d: 1.0,
+      scale3d: 1,
       translateY: 0,
       origin: 'center'
     },
@@ -1262,6 +1501,13 @@ anim8.save('zoomOutUp', {
       translateY: -2000,
       origin: 'center bottom'
     }
+  },
+  scaleBases: {
+    scale3d: 1,
+    opacity: 1
+  },
+  scales: {
+    origin: 1
   }
 });
 
@@ -1405,6 +1651,9 @@ anim8.save('blurOut', {
       blur: 5,
       opacity: 0
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
@@ -1422,6 +1671,9 @@ anim8.save('blurIn', {
       blur: 0,
       opacity: 1
     }
+  },
+  scaleBases: {
+    opacity: 1
   }
 });
 
