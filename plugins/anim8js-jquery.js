@@ -10,6 +10,20 @@
 {
 
   /**
+   * Extend the clone function to remove the attribute which stores the animator ID so clones get new animators.
+   * 
+   * @return {jQuery}
+   */
+  var cloner = $.fn.clone;
+  
+  $.fn.clone = function()
+  {
+    this.removeAttr( anim8.factory.dom.attribute );
+
+    return cloner.apply( this, arguments );
+  };
+
+  /**
    * Adds the m8, anim8, and animator functions to jQuery. An instance of anim8.Animator will be returned.
    * 
    * @return {anim8.Animator}
@@ -169,6 +183,102 @@
       
       return false;
     });
+  };
+
+  /**
+   * Wraps every character with a span and the class sequenced and returns a jquery
+   * element containing all wrapped characters.
+   * 
+   * @return {jQuery}
+   */
+  $.fn.sequence = function()
+  {
+    this.each(function()
+    {
+      $(this).html( $(this).wrapCharacters('div', 'class="sequenced"') );
+    });
+
+    return this.find('.sequenced');
+  };
+
+  /**
+   * Wraps every character in ever element in the jQuery object with a tag.
+   * If an element already only has one character it remains untouched.
+   * 
+   * @param  {string} tagName
+   * @param  {string} attributes
+   * @return {string} attributes
+   */
+  $.fn.wrapCharacters = function(tagName, attributes)
+  {
+    var tagBegin = '<' + tagName + (typeof attributes === 'string' ? ' ' + attributes : '') + '>';
+    var tagEnd = '</' + tagName + '>';
+    var html = '';
+
+    $(this).contents().each(function()
+    {
+      // Is this a text node?
+      if (this.nodeType === 3)
+      {
+        // Break up node wrapping each character
+        var text = this.wholeText;
+
+        if (text.length > 1)
+        {
+          // Collapse whitespaces
+          var previousSpace = false;
+          for (var i = 0; i < text.length; i++)
+          {
+            var space = text[i] <= ' ';
+            if (!space || !previousSpace)
+            {
+              html += tagBegin + text[i] + tagEnd;
+            }
+            previousSpace = space;
+          }
+        }
+        else
+        {
+          html += text;
+        }
+      }
+      else
+      {
+        // Not a text node!
+        var outer = this.outerHTML;
+        // If there are children, we need to recursively break them down
+        if (this.firstChild)
+        {
+          // Grab the element tag and attributes manually.
+          var start = 0;
+          var quotes = false;
+          while (start < outer.length)
+          {
+            var c = outer[start++];
+            if (c === '"' || c === "'")
+            {
+              quotes = !quotes;
+            }
+            else if (c === '\\')
+            {
+              start++;
+            }
+            else if (c === '>' && !quotes)
+            {
+              break;
+            }
+          }
+          html += outer.substring(0, start) + $(this).wrapCharacters(tagName) + '</' + this.tagName.toLowerCase() + '>';
+        }
+        // No child nodes, just append outer HTML.
+        else
+        {
+          html += outer;
+        }
+      }
+    });
+
+    return html;
   };
   
 })(jQuery, anim8, anim8s);

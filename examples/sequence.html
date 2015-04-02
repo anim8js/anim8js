@@ -211,7 +211,7 @@
   <script src="../build/anim8js-animate.css.min.js"></script>
 
   <style>
-    #letters div {
+    #letters div.sequenced {
       position: relative;
       display: inline-block;
     }
@@ -219,26 +219,13 @@
 
   <script>
     
-    function generateText(parent, text)
-    {        
-      for (var i = 0; i < text.length; i++)
-      {
-        parent.append( $('\<div>').html( text[i].replace(' ', '&nbsp;') ).addClass('site__title') );
-      }
-    }
-    
-    var letters = $('#letters');
-    var chars = letters.html();
-        
-    generateText( letters.html( '' ), chars )
-    
-    var sequenceable = anim8s( $('#letters').children().get() );
-    
+    var sequenceable = $('#letters').sequence().addClass('site__title').animators();
+
     anim8.on('finished', function() 
     {
       sequenceable.restore();
     });
-    
+
     anim8.defaults.duration = 2000;
     
     function playAnimation()
