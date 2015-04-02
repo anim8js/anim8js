@@ -41,3 +41,4 @@
 39. [X] Add anim8.fn/m8.fn and anim8s.fn/m8s.fn so users can add their own functions
 40. [ ] Refactor all arrays of events & Animator.events to new anim8.EventMap
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
+42. [X] Add priority to factory
