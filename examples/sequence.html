@@ -207,8 +207,8 @@
 
   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	
-  <script src="../build/anim8js-jquery.min.js"></script>
-  <script src="../build/anim8js-animate.css.min.js"></script>
+  <script src="../build/anim8js-jquery.js"></script>
+  <script src="../build/anim8js-animate.css.js"></script>
 
   <style>
     #letters div.sequenced {
@@ -233,10 +233,10 @@
       sequenceable
         .stop()
         .restore()
-        .sequence( 50, 'linear', $('.js--animations').val() )
-        .play()
+        .sequence( 50, 'linear' )
+        .play( $('.js--animations').val() )
         /*.reverse()
-        .queue()
+        .queue( 'fadeIn 0.5s' )
         .reverse()*/
       ;
       
@@ -248,8 +248,8 @@
       sequenceable
         .stop()
         .restore()
-        .sequence( 50, 'linear', $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
-        .play()
+        .sequence( 50, 'linear' )
+        .play( $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
         /*.reverse()
         .queue()
         .reverse()*/

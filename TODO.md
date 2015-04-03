@@ -7,8 +7,8 @@
 5. [X] Add `transitionInto(transitionDuration, transitionOutDelta, transitionInDelta, transitionEasing, animation[, options][, all])` to Animator
 6. [X] Add option merging to Parser
 7. [X] Make anim8.Parser class
-8. [ ] Make anim8.Calculator class
-9. [ ] Move all dom functions to anim8.dom namespace
+8. [X] Make anim8.Calculator class
+9. [X] Move all dom functions to anim8.dom namespace
 10. [ ] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
 11. [ ] Finish Document
 12. [ ] Create an animated splash page showcasing library
@@ -27,8 +27,8 @@
 25. [X] If transition is called and not playing anything, treat as play
 26. [X] If transition and partial play, delay new attributes by transitionTime
 27. [X] Test true values
-28. [ ] Add queue to anim8.Sequence
-29. [ ] Add transition to anim8.Sequence
+28. [X] Add queue to anim8.Sequence
+29. [X] Add transition to anim8.Sequence
 30. [ ] Add anim8.Movie?
 31. [X] Fix bug where one Animator partially plays another animators events
 32. [X] Final parser events shouldn't be called on applyInitialState
@@ -42,3 +42,7 @@
 40. [ ] Refactor all arrays of events & Animator.events to new anim8.EventMap
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
 42. [X] Add priority to factory
+43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent
+44. [ ] Add anim8.options which parses options, remove anim8.parseAnimationString
+45. [ ] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
+46. [ ] Add relative value parsing (similar to true) which adds/subtracts a value
