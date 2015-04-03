@@ -208,6 +208,10 @@
   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	
   <script src="../build/anim8js-jquery.js"></script>
+  <script>
+    anim8.defaults.duration = 2000;
+    anim8.log = anim8.isDefined( console ) ? console.log : false;
+  </script>
   <script src="../build/anim8js-animate.css.js"></script>
 
   <style>
@@ -225,8 +229,6 @@
     {
       sequenceable.restore();
     });
-
-    anim8.defaults.duration = 2000;
     
     function playAnimation()
     {

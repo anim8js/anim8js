@@ -12,6 +12,8 @@
       border: 2px solid #00F;
       position: absolute;
       background-color: #66F;
+      left: 100px;
+      right: 100px;
     }
     #box2 {
       width: 40px;
@@ -19,6 +21,8 @@
       border: 2px solid #F0F;
       position: absolute;
       background-color: #F6F;
+      left: 100px;
+      right: 100px;
     }
     #dot {
       width: 12px;
@@ -43,8 +47,6 @@
       {
         type: 'linear',
         attribute: 'center',
-        rest: {x: 100, y:100},
-        position: {x: 100, y: 100},
         damping: 2.5,
         stiffness: -30
       });
@@ -53,8 +55,6 @@
       {
         type: 'distance',
         attribute: 'center',
-        rest: {x: 100, y:100},
-        position: {x: 100, y: 100},
         distance: 100,
         damping: 2.5,
         stiffness: -30,

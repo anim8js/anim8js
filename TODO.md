@@ -9,7 +9,7 @@
 7. [X] Make anim8.Parser class
 8. [X] Make anim8.Calculator class
 9. [X] Move all dom functions to anim8.dom namespace
-10. [ ] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
+10. [X] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
 11. [ ] Finish Document
 12. [ ] Create an animated splash page showcasing library
 13. [X] Change Animator.eventsFor to return an array if a function was not provided
@@ -20,7 +20,7 @@
 18. [X] Remove anim8.parseValue
 19. [ ] Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
 20. [X] Allow reference values in spring.
-21. [ ] Add automatic rest & position determination to Springs which defaults to current Animator values.
+21. [X] Add automatic rest & position determination to Springs which defaults to current Animator values.
 22. [X] Complete Event.seek
 23. [X] Styles are generated in DomAnimator.update and applied & cleared in DomAnimator.apply
 24. [X] Add live mode (RAF constantly executes)
@@ -35,7 +35,7 @@
 33. [X] Add tween parser
 34. [X] Add anim8.Factory
 35. [X] Add factory to Animator
-36. [ ] Register springs with animator & factory (uses attributes to determine defaultValue and calculator)
+36. [X] Register springs with animator & factory (uses attributes to determine defaultValue and calculator)
 37. [X] Add animation string parsing to anim8.animation. You can specify multiple with commas, which queues up the events
 38. [X] Add time parsing in animation parsers for delay, duration, & sleep (and add default duration unit)
 39. [X] Add anim8.fn/m8.fn and anim8s.fn/m8s.fn so users can add their own functions

@@ -12,7 +12,7 @@ m8 = anim8 = function(subject)
     return subject;
   }
 
-  var factory = anim8.factory( subject, true );
+  var factory = anim8.factoryFor( subject, true );
 
   if ( factory === false )
   {
@@ -29,7 +29,7 @@ m8 = anim8 = function(subject)
  */
 m8s = anim8s = function(subjects)
 {
-  var factory = anim8.factory( subjects, true );
+  var factory = anim8.factoryFor( subjects, true );
   var animators = [];
 
   if ( factory !== false )
@@ -666,49 +666,6 @@ anim8.eventize = function(object)
     triggerListeners( this.$once, event, argument, true );
   };
 };
-
-
-/*****************************************************************
-  REGISTRIES
-******************************************************************/
-
-/* Attributes are the animatable properties of a subject
-
-  anim8.attribute[name] = {
-    // the default value for an attribute if none exists on the subject
-    defaultValue: 0,
-    // the name of the calculator this attribute requires for mathematical operations. default value: anim8.calculator.default
-    calculator: calculatorName,
-    // other values can be specified here that the respective factory might use
-    "factory specific attributes"
-  }
-*/
-
-/**
- * Returns an attribute based on the given input. If the input is an object it's assumed to be an attribute and it's
- * returned immediately. If the input is a string the attribute with the given name is returned. Otherwise
- * the default attribute is returned.
- *
- * @param {object|string} attr
- */
-anim8.attribute = function(attr) 
-{
-  if ( anim8.isObject(attr) && anim8.isDefined(attr.defaultValue) ) 
-	{
-    return attr;
-  }
-  if ( anim8.isString(attr) && attr in anim8.attribute ) 
-	{
-    return anim8.attribute[ attr ];
-  }
-	
-  return anim8.attribute.default;
-};
-
-/**
- * The default attribute.
- */
-anim8.attribute.default = {defaultValue: 0};
 
 /**
  * The default values for event properties.
@@ -1597,8 +1554,8 @@ anim8.computed = {};
 anim8.computed.current = function(event, animator)
 {
   var attr = event.attribute;
-  var attribute = animator.attributes[ attr ];
-  var calc = anim8.calculator( attribute.calculator );
+  var attribute = animator.getAttribute( attr );
+  var calc = animator.getCalculator( attr );
 
   if ( attr in animator.frame )
   {
@@ -1624,8 +1581,8 @@ anim8.computed.relative = function(relativeAmount)
   var relativeFunction = function(event, animator)
   { 
     var attr = event.attribute;
-    var attribute = animator.attributes[ attr ];
-    var calc = anim8.calculator( attribute.calculator );
+    var attribute = animator.getAttribute( attr );
+    var calc = animator.getCalculator( attr );
     var current = null;
 
     if ( attr in animator.frame )
@@ -3535,17 +3492,54 @@ anim8.Spring.prototype =
    * @param {any} position
    */
   reset: function(attribute, calculator, rest, position, gravity)
-  {
-    var calc = anim8.calculator( calculator );
-    var a = anim8.attribute( attribute );
-    
+  { 
     this.attribute    = attribute;
-    this.calculator   = calc;
-    this.rest         = calc.parse( rest, a.defaultValue );
-    this.position     = calc.parse( position, a.defaultValue );
-    this.gravity      = calc.parse( gravity, calc.create() );
-    this.velocity     = calc.create();
+    this.calculator   = calculator;
+    this.rest         = rest;
+    this.position     = position;
+    this.gravity      = gravity;
+    this.velocity     = null;
     this.time         = 0;
+  },
+
+  /**
+   * Called the first time preupdate is called on an Animator to prepare the
+   * spring to be updated.
+   * 
+   * @return {[type]}
+   */
+  preupdate: function(animator)
+  {
+    var attr = animator.getAttribute( this.attribute );
+    var calc = anim8.calculator( anim8.coalesce( this.calculator, attr.calculator ) );
+
+    this.calculator = calc;
+    this.rest       = this.parseValue( animator, this.rest, attr.defaultValue );
+    this.position   = this.parseValue( animator, this.position, attr.defaultValue );
+    this.gravity    = this.parseValue( animator, this.gravity, calc.create() );
+    this.velocity   = calc.create();
+  },
+
+  /**
+   * [parseValue description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseValue: function(animator, value, defaultValue)
+  {
+    var parsed = this.calculator.parse( value, defaultValue );
+
+    if ( anim8.isFunction( parsed ) )
+    {
+      if ( parsed.computed )
+      {
+        parsed = parsed( this, animator );
+      }
+    }
+
+    return parsed;
   },
   
   /**
@@ -3632,18 +3626,29 @@ anim8.Spring.EPSILON = 0.0001;
  */
 anim8.LinearSpring = function(attribute, calculator, position, rest, damping, stiffness, gravity)
 {
-  var a = anim8.attribute( attribute );
-  
   this.reset( attribute, calculator, rest, position, gravity );
   
-  this.damping      = this.calculator.parse( damping, a.defaultValue );
-  this.stiffness    = this.calculator.parse( stiffness, a.defaultValue );
-  this.temp0        = this.calculator.create();
-  this.temp1        = this.calculator.create();
+  this.damping      = damping;
+  this.stiffness    = stiffness;
+  this.temp0        = null;
+  this.temp1        = null;
 };
 
 anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(), 
 {
+  preupdate: function(animator)
+  {
+    anim8.Spring.prototype.preupdate.apply( this, arguments );
+
+    var attr = animator.getAttribute( this.attribute );
+    var calc = this.calculator;
+
+    this.damping      = this.parseValue( animator, this.damping, attr.defaultValue );
+    this.stiffness    = this.parseValue( animator, this.stiffness, attr.defaultValue );
+    this.temp0        = calc.create();
+    this.temp1        = calc.create();
+  },
+
   updateVelocity: function(dt)
   {
     // velocity += ((stiffness * (position - rest)) - (damping * velocity)) * elapsed.seconds;
@@ -3673,9 +3678,9 @@ anim8.spring.linear = function(spring)
 { 
   return new anim8.LinearSpring(
     spring.attribute,
-    anim8.calculator( anim8.attribute( spring.attribute ).calculator ),
-    spring.position,
-    spring.rest,
+    spring.calculator,
+    anim8.coalesce( spring.position, true ),
+    anim8.coalesce( spring.rest, true ),
     spring.damping,
     spring.stiffness,
     spring.gravity
@@ -3700,11 +3705,18 @@ anim8.DistanceSpring = function(attribute, calculator, position, rest, distance,
   this.distance   = distance;
   this.damping    = damping;
   this.stiffness  = stiffness;
-  this.temp       = this.calculator.create();
+  this.temp       = null;
 };
 
 anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(), 
 {
+  preupdate: function(animator)
+  {
+    anim8.Spring.prototype.preupdate.apply( this, arguments );
+    
+    this.temp = this.calculator.create();
+  },
+
   updateVelocity: function(dt)
   {
     // d = DISTANCE( position, rest )
@@ -3741,9 +3753,9 @@ anim8.spring.distance = function(spring)
 { 
   return new anim8.DistanceSpring(
     spring.attribute,
-    anim8.calculator( anim8.attribute( spring.attribute ).calculator ),
-    spring.position,
-    spring.rest,
+    spring.calculator,
+    anim8.coalesce( spring.position, true ),
+    anim8.coalesce( spring.rest, true ),
     spring.distance,
     spring.damping,
     spring.stiffness,
@@ -4683,18 +4695,55 @@ anim8.fn = anim8.Animator.prototype =
 	{
 	  this.subject = subject;
 	  this.events = {};
+    this.eventsAdded = [];
+    this.eventsComputed = [];
     this.springs = {};
+    this.springsAdded = [];
 	  this.attributes = {};
+    this.calculators = {};
 	  this.frame = {};
     this.updated = {};
 	  this.finished = false;
 		this.factory = null;
     this.active = false;
-    this.computed = {};
-    this.computedUpdated = false;
     
     return this;
 	},
+
+  /**
+   * Returns the attribute descriptor
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  getAttribute: function(attr)
+  {
+    var attribute = this.attributes[ attr ];
+
+    if ( !attribute )
+    {
+      attribute = this.attributes[ attr ] = this.factory.attribute( attr );
+    }
+
+    return attribute;
+  },
+
+  /**
+   * Returns the calculator for the given attribtue.
+   * 
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  getCalculator: function(attr)
+  {
+    var calculator = this.calculators[ attr ];
+
+    if ( !calculator )
+    {
+      calculator = this.calculators[ attr ] = anim8.calculator( this.getAttribute( attr ).calculator );
+    }
+
+    return calculator;
+  },
   
   /**
    * Restores any temporary state that may exist on this Animator that
@@ -4715,36 +4764,67 @@ anim8.fn = anim8.Animator.prototype =
     // that has computed values we need to replace the path on the event with
     // a copy containing the computed values. This is where current value & 
     // relative values are injected from the animator into the even'ts path.
-    if ( this.computedUpdated )
+    var ce = this.eventsComputed;
+    if ( ce.length )
     {
-      for (var attr in this.computed)
+      for (var i = 0; i < ce.length; i++)
       {
-        var e = this.computed[ attr ];
+        var e = ce[ i ];
 
-        e.path = e.path.replaceComputed( e, this );
-        
-        delete this.computed[ attr ];
+        e.path = e.path.replaceComputed( e, this );        
       }
-      
-      this.computedUpdated = false;
+
+      ce.length = 0;
     }
     
     // If there isn't a value in frame for any of the events on the animator,
     // place the default value.
-    for (var attr in this.events)
+    var ea = this.eventsAdded;
+    if ( ea.length )
     {
-      if ( !(attr in this.frame) )
+      for (var i = 0; i < ea.length; i++)
       {
-        var attribute = this.attributes[ attr ];
-        var calc = anim8.calculator( attribute.calculator );
-
-        this.frame[ attr ] = calc.clone( attribute.defaultValue );
+        this.setDefault( ea[ i].attribute );
       }
+
+      ea.length = 0;
+    }
+
+    // Call pre update on any new springs.
+    var sa = this.springsAdded;
+    if ( sa.length )
+    {
+      for (var i = 0; i < sa.length; i++)
+      {
+        var s = sa[i];
+
+        this.setDefault( s.attribute );
+
+        s.preupdate( this );
+      }
+
+      sa.length = 0;
     }
 
     this.trigger('preupdate');
     
     return this;
+  },
+
+  /**
+   * Sets the default value for the given attribute in the frame of this Animator if there's no value there.
+   * 
+   * @param {[type]}
+   */
+  setDefault: function(attr)
+  {
+    if ( !(attr in this.frame) )
+    {
+      var attribute = this.getAttribute( attr );
+      var calc = this.getCalculator( attr );
+
+      this.frame[ attr ] = calc.clone( attribute.defaultValue );
+    }
   },
   
   /**
@@ -4793,11 +4873,7 @@ anim8.fn = anim8.Animator.prototype =
     var attr = s.attribute;
     
     this.springs[ attr ] = s;
-    
-    if ( !(attr in this.frame) )
-    {
-      this.frame[ attr ] = anim8.attribute( attr ).defaultValue;
-    }
+    this.springsAdded.push( s );
 		
 		this.finished = false;
   },
@@ -4812,17 +4888,12 @@ anim8.fn = anim8.Animator.prototype =
   {
     var attr = e.attribute;
 
-    if ( !(attr in this.attributes) )
-    {
-      this.attributes[ attr ] = anim8.attribute( attr ); 
-    }
-
     this.events[ attr ] = e;
+    this.eventsAdded.push( e );
     
     if ( e.hasComputed() )
     {
-       this.computed[ attr ] = e;
-       this.computedUpdated = true;
+       this.eventsComputed.push( e );
     }
 		
 		this.finished = false;
@@ -5389,8 +5460,8 @@ anim8.fn = anim8.Animator.prototype =
   tweenTo: function(attribute, target, options)
   {
     var options = anim8.options( options );
-    var attr = anim8.attribute( attribute );
-    var calc = anim8.calculator( attr.calculator );
+    var attr = this.getAttribute( attribute );
+    var calc = this.getCalculator( attribute );
     var start = calc.parse( true );
     var end = calc.parse( target, attr.defaultValue );
 
@@ -5420,8 +5491,8 @@ anim8.fn = anim8.Animator.prototype =
 
     for ( var attribute in targets )
     {
-      var attr = anim8.attribute( attribute );
-      var calc = anim8.calculator( attr.calculator );
+      var attr = this.getAttribute( attribute );
+      var calc = this.getCalculator( attribute );
       var start = calc.parse( true );
       var end = calc.parse( targets[ attribute ], attr.defaultValue );      
       
@@ -5451,8 +5522,8 @@ anim8.fn = anim8.Animator.prototype =
   tween: function(attribute, starts, ends, options)
   {
     var options = anim8.options( options );
-    var attr = anim8.attribute( attribute );
-    var calc = anim8.calculator( attr.calculator );
+    var attr = this.getAttribute( attribute );
+    var calc = this.getCalculator( attribute );
     var start = calc.parse( starts, attr.defaultValue );
     var end = calc.parse( ends, attr.defaultValue );
 
@@ -5483,8 +5554,8 @@ anim8.fn = anim8.Animator.prototype =
 
     for ( var attribute in starts )
     {
-      var attr = anim8.attribute( input );
-      var calc = anim8.calculator( attr.calculator );
+      var attr = this.getAttribute( input );
+      var calc = this.getCalculator( attr.calculator );
       var start = calc.parse( starts[ attribute ], attr.defaultValue );
       var end = calc.parse( ends[ attribute ], attr.defaultValue );
       
@@ -5510,6 +5581,8 @@ anim8.fn = anim8.Animator.prototype =
 		{
 			if ( !event.hasStarted() && event.hasInitialState )
 			{
+        this.setDefault( attr );
+
 				event.applyValue( this.frame, this.frame[ attr ], 0.0 );
 				
 				this.updated[ attr ] = true;
@@ -5570,7 +5643,7 @@ anim8.fn = anim8.Animator.prototype =
         return current[ attribute ];
       }
       
-      return anim8.attribute( attribute ).defaultValue;
+      return animator.getAttribute( attribute ).defaultValue;
     };
   },
   
@@ -6600,6 +6673,7 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
     // 2. If deltas was an array, expand out into an object where the keys are attributes and the value is the delta array
     // 3. Generate the events
     
+    var factory = anim8.factory( animation.factory );
   	var deltas = animation.deltas;
   	var values = animation.values;
 
@@ -6641,20 +6715,10 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
     
   	for (var attr in values)
   	{
-  		var value = values[attr];
-      var calculator = false;
-  		var defaultValue = false;
-  		
-      if ( attr in anim8.attribute )
-      {
-        calculator = anim8.calculator( anim8.attribute[attr].calculator );
-  			defaultValue = anim8.attribute[attr].defaultValue;
-      }
-      else
-      {
-        calculator = anim8.calculator.default;
-  			defaultValue = calculator.create();
-      }
+  		var value = values[ attr ];
+      var attribute = factory.attribute( attr );
+      var calculator = anim8.calculator( attribute );
+  		var defaultValue = attributes.defaultValue;
   		
   		for (var k = 0; k < value.length; k++)
   		{
@@ -6707,6 +6771,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
   {
     // 1. Generate the events, only caring about the delays and durations
     
+    var factory = anim8.factory( animation.factory );
   	var values = animation.final;
   	
     var delays = animation.delays || {};
@@ -6718,21 +6783,11 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
     
   	for (var attr in values)
   	{
-  		var value = values[attr];
-      var calculator = false;
-  		var defaultValue = false;
+  		var value = values[ attr ];
+      var attribute = factory.attribute( attr );
+      var calculator = anim8.calculator( attribute );
+  		var defaultValue = attribute.defaultValue;
   		
-      if ( attr in anim8.attribute )
-      {
-        calculator = anim8.calculator( anim8.attribute[attr].calculator );
-  			defaultValue = anim8.attribute[attr].defaultValue;
-      }
-      else
-      {
-        calculator = anim8.calculator.default;
-  			defaultValue = calculator.create();
-      }
-
       value = calculator.parse( value, defaultValue ); 
   		
       var delay    = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
@@ -6821,6 +6876,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
   {
     // 1. Generate the events, only caring about the delays
     
+    var factory = anim8.factory( animation.factory );
   	var values = animation.initial;
   	
     var delays = animation.delays || {};
@@ -6831,21 +6887,11 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
     
   	for (var attr in values)
   	{
-  		var value = values[attr];
-      var calculator = false;
-  		var defaultValue = false;
+  		var value = values[ attr ];
+      var attribute = factory.attribute( attr );
+      var calculator = anim8.calculator( attribute.calculator );
+  		var defaultValue = attribute.defaultValue;
   		
-      if ( attr in anim8.attribute )
-      {
-        calculator = anim8.calculator( anim8.attribute[attr].calculator );
-  			defaultValue = anim8.attribute[attr].defaultValue;
-      }
-      else
-      {
-        calculator = anim8.calculator.default;
-  			defaultValue = calculator.create();
-      }
-      
       value = calculator.parse( value, defaultValue ); 
   		
       var delay    = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
@@ -6932,6 +6978,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
     // 5. Expand frames to generate delta arrays, value arrays, and easing arrays
     // 6. Generate the events
     
+    var factory = anim8.factory( animation.factory );
     var kframes = animation.keyframe;
     
     var durations = animation.durations || {};
@@ -7048,20 +7095,13 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
       {
         if ( !(attr in deltas) )
         {
+          var attribute = factory.attribute( attr );
+
           deltas[attr] = [];
           values[attr] = [];
           pathEasings[attr] = [];
-          
-          if (attr in anim8.attribute)
-          {
-            calculators[attr] = anim8.calculator( anim8.attribute[attr].calculator );
-  					defaults[attr] = anim8.attribute[attr].defaultValue;
-          }
-          else
-          {
-            calculators[attr] = anim8.calculator.default;
-  					defaults[attr] = calculators[attr].create();
-          }
+          calculators[attr] = anim8.calculator( attribute.calculator );
+  			  defaults[attr] = attribute.defaultValue;
         }
   			
         deltas[attr].push( frame.order / maxTime );
@@ -7118,6 +7158,7 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
+    var factory = anim8.factory( animation.factory );
     var tweenTo = animation.tweenTo;
 
     var durations = animation.durations || {};
@@ -7130,19 +7171,9 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
 
   	for (var attr in tweenTo)
   	{
-      var calculator = null;
-  		var defaultValue = false;
-  		
-      if ( attr in anim8.attribute )
-      {
-        calculator = anim8.calculator( anim8.attribute[attr].calculator );
-  			defaultValue = anim8.attribute[attr].defaultValue;
-      }
-      else
-      {
-        calculator = anim8.calculator.default;
-  			defaultValue= calculator.create();
-      }
+      var attribute = factory.attribute( attr );
+      var calculator = anim8.calculator( attribute.calculator );
+  		var defaultValue = attribute.defaultValue;
   		
       var value    = calculator.parse( tweenTo[attr], defaultValue );
       var duration = anim8.coalesce( durations[attr], options.duration );
@@ -7173,7 +7204,7 @@ anim8.parser.tweenTo = new anim8.ParserTween();
  *
  * @param {any} subject
  */
-anim8.factory = function(subject, optional) 
+anim8.factoryFor = function(subject, optional) 
 {
   var highestPriorityFactory = false;
 
@@ -7201,6 +7232,26 @@ anim8.factory = function(subject, optional)
 };
 
 /**
+ * Returns a factory given the input and returns the default if none is found.
+ * 
+ * @param  [string|anim8.Factory]
+ * @return {anim8.Factory}
+ */
+anim8.factory = function(factory)
+{
+  if ( factory instanceof anim8.Factory )
+  {
+    return factory;
+  }
+  if ( anim8.isString( factory ) && factory in anim8.factory )
+  {
+    return anim8.factory[ factory ];
+  }
+
+  return anim8.factory.default;
+};
+
+/**
  * A factory creates Animator instances for subjects.
  */
 anim8.Factory = function()
@@ -7219,7 +7270,7 @@ anim8.Factory.prototype =
    */
   is: function(subject)
   {
-    return false;
+    throw 'Factory.is not implemented';
   },
 
   /**
@@ -7230,7 +7281,7 @@ anim8.Factory.prototype =
    */
   animatorFor: function(subject)
   {
-    return false;
+    throw 'Factory.animatorFor not implemented';
   },
 
   /**
@@ -7254,6 +7305,17 @@ anim8.Factory.prototype =
   destroy: function(animator)
   {
 
+  },
+
+  /**
+   * Returns the attribute descriptor for the given attribute.
+   * 
+   * @param  {string} attr
+   * @return {object}
+   */
+  attribute: function(attr)
+  {
+    throw 'Factory.attribute not implemented';
   }
 
 };
@@ -7310,6 +7372,17 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
   destroy: function(animator)
   {
     delete animator.subject.$animator;
+  },
+
+  /**
+   * Returns the attribute descriptor for the given attribute.
+   * 
+   * @param  {string} attr
+   * @return {object}
+   */
+  attribute: function(attr)
+  {
+    return anim8.object.attribute( attr );
   }
 
 });
@@ -7318,3 +7391,37 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
  * Registers the object factory.
  */
 anim8.factory.object = new anim8.ObjectFactory();
+anim8.factory.default = anim8.factory.object;
+
+/**
+ * The Object namespace.
+ * 
+ * @type {Object}
+ */
+anim8.object = {};
+
+/**
+ * Returns an attribute based on the given input. If the input is an object it's assumed to be an attribute and it's
+ * returned immediately. If the input is a string the attribute with the given name is returned. Otherwise
+ * the default attribute is returned.
+ *
+ * @param {object|string} attr
+ */
+anim8.object.attribute = function(attr) 
+{
+  if ( anim8.isObject( attr ) && anim8.isDefined( attr.defaultValue ) ) 
+  {
+    return attr;
+  }
+  if ( anim8.isString( attr ) && attr in anim8.dom.attribute ) 
+  {
+    return anim8.object.attribute[ attr ];
+  }
+  
+  return anim8.object.attribute.default;
+};
+
+/**
+ * The default attribute.
+ */
+anim8.object.attribute.default                 = {defaultValue: 0};
