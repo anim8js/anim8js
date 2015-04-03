@@ -1547,7 +1547,7 @@ anim8.color.parse = function(input)
     }
   }
   
-  return this.invalidColor;
+  return false;
 };
 
 /**
@@ -1580,15 +1580,70 @@ anim8.color.format = function(color)
   }
 };
 
+
 /**
- * The color to return when input is invalid.
+ * [computed description]
+ * @type {Object}
  */
-anim8.color.invalidColor = anim8.color.defaultValue =
+anim8.computed = {};
+
+/**
+ * Calculates the current value for an animator.
+ * 
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
+anim8.computed.current = function(event, animator)
 {
-  r: 255,
-  g: 255,
-  b: 255,
-  a: 1.0
+  var attr = event.attribute;
+  var attribute = animator.attributes[ attr ];
+  var calc = anim8.calculator( attribute.calculator );
+
+  if ( attr in animator.frame )
+  {
+    return calc.clone( animator.frame[ attr ] );
+  }
+  else
+  {
+    return calc.clone( attribute.defaultValue );
+  }
+};
+
+// Marks the function as computed which is a signal to paths & events.
+anim8.computed.current.computed = true;
+
+/**
+ * Calculates a value relative to the attribute value currenrtly in the animator.
+ * 
+ * @param  {[type]}
+ * @return {[type]}
+ */
+anim8.computed.relative = function(relativeAmount)
+{
+  var relativeFunction = function(event, animator)
+  { 
+    var attr = event.attribute;
+    var attribute = animator.attributes[ attr ];
+    var calc = anim8.calculator( attribute.calculator );
+    var current = null;
+
+    if ( attr in animator.frame )
+    {
+      current = calc.clone( animator.frame[ attr ] );
+    }
+    else
+    {
+      current = calc.clone( attribute.defaultValue );
+    }
+
+    return calc.add( current, relativeAmount );
+  };
+
+  // Marks the function as computed which is a signal to paths & events.
+  relativeFunction.computed = true;
+
+  return relativeFunction;
 };
 /**
  * Calculators perform math and basic operations for a specific data structure.
@@ -1749,16 +1804,6 @@ anim8.Calculator.prototype =
   },
 
   /**
-   * [isPristine description]
-   * @param  {[type]}
-   * @return {Boolean}
-   */
-  isPristine: function(x)
-  {
-    return ( x === true || anim8.isFunction( x ) );
-  },
-
-  /**
    * [distanceSq description]
    * @param  {[type]}
    * @param  {[type]}
@@ -1810,8 +1855,30 @@ anim8.Calculator.prototype =
   isEqual: function(a, b, epsilon)
   {
     throw 'Calculator.isEqual not implemented';
+  },
+
+  /**
+   * [isRelative description]
+   * @param  {[type]}
+   * @return {Boolean}
+   */
+  isRelative: function(x)
+  {
+    return anim8.isString( x ) && ( x[0] === '-' || x[0] === '+' );
+  },
+
+  /**
+   * [relativeAmount description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  getRelativeAmount: function(x)
+  {
+    var z = parseFloat( x );
+
+    return isNaN(z) ? false : z;
   }
-  
+
 };
 
 
@@ -1833,21 +1900,36 @@ anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(),
    */
   parse: function(x, defaultValue)
   {
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // A raw number
     if ( anim8.isNumber( x ) )
     {
       return x;
     }
+    // A number in a string or a relative number.
     if ( anim8.isString( x ) )
     {
-      x = parseFloat( x );
+      var amount = this.getRelativeAmount( x );
       
-      if (!isNaN(x))
+      if ( amount !== false )
       {
-        return x;
+        if ( this.isRelative( x ) )
+        {
+          return anim8.computed.relative( amount );
+        }
+        else
+        {
+          return amount;
+        }
       }
     }
     
@@ -1921,10 +2003,17 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
    */
 	parse: function(x, defaultValue)
 	{
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When a number is given a uniform point is returned.
 		if ( anim8.isNumber( x ) )
 		{
 			return {
@@ -1932,15 +2021,40 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
 				y: x
 			};
 		}
+    // When an object is given, check for relative values.
 		if ( anim8.isObject( x ) )
 		{
-			return {
-				x: anim8.coalesce( x.x, defaultValue.x ),
-				y: anim8.coalesce( x.y, defaultValue.y )
-			};
+      var cx = anim8.coalesce( x.x, defaultValue.x );
+      var cy = anim8.coalesce( x.y, defaultValue.y );
+      var rx = this.getRelativeAmount( cx );
+      var ry = this.getRelativeAmount( cy );
+
+      if ( rx !== false && ry !== false )
+      {
+        var parsed = { x: rx, y: ry };
+
+        if ( this.isRelative( cx ) || this.isRelative( cy ) )
+        {
+          return anim8.computed.relative( parsed );
+        }
+
+        return parsed;
+      }
 		}
+    // Relative values & left/right/middle/center/top/bottom aliases.
     if ( anim8.isString( x ) )
     {
+      // If only a relative value is given it will modify the X & Y components evenly.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return anim8.computed.relative( { x: rx, y: rx } ); 
+        }
+      }
+
       var aliases = {
         'left':   0,
         'right':  100,
@@ -1978,6 +2092,7 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
       }
     }
     
+    // If no value was given but the default value was given, clone it.
     if ( anim8.isDefined( defaultValue ) )
     {
       return this.clone( defaultValue );      
@@ -2057,10 +2172,17 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
 {
 	parse: function(x, defaultValue)
 	{
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When a number is given a uniform point is returned.
 		if ( anim8.isNumber( x ) )
 		{
 			return {
@@ -2069,15 +2191,40 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
 				z: x
 			};
 		}
+    // When an object is given, check for relative values.
 		if ( anim8.isObject( x ) )
-		{	
-			return {
-				x: anim8.coalesce( x.x, defaultValue.x ),
-				y: anim8.coalesce( x.y, defaultValue.y ),
-				z: anim8.coalesce( x.z, defaultValue.z )
-			};
+		{
+      var cx = anim8.coalesce( x.x, defaultValue.x );
+      var cy = anim8.coalesce( x.y, defaultValue.y );
+      var cz = anim8.coalesce( x.z, defaultValue.z );
+      var rx = this.getRelativeAmount( cx );
+      var ry = this.getRelativeAmount( cy );
+      var rz = this.getRelativeAmount( cz );
+
+      if ( rx !== false && ry !== false && rz !== false )
+      {
+        var parsed = { x: rx, y: ry, z: rz };
+
+        if ( this.isRelative( cx ) || this.isRelative( cy ) || this.isRelative( cz ) )
+        {
+          return anim8.computed.relative( parsed );
+        }
+
+        return parsed;
+      }
 		}
+    // If only a relative value is given it will modify the X, Y, & Z components evenly.
+    if ( this.isRelative( x ) )
+    {
+      var rx = this.getRelativeAmount( x );
+
+      if ( rx !== false )
+      {
+        return anim8.computed.relative( { x: rx, y: rx, z: rx } ); 
+      }
+    }
     
+    // If no value was given but the default value was given, clone it.
     if ( anim8.isDefined( defaultValue ) )
     {
       return this.clone( defaultValue );      
@@ -2169,10 +2316,17 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
    */
 	parse: function(x, defaultValue)
 	{
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When only a number is given assume it's an angle around the Z-axis.
 		if ( anim8.isNumber( x ) )
 		{
 			return {
@@ -2182,16 +2336,42 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 				angle: x
 			};
 		}
+    // When an object is given, check for relative values.
 		if ( anim8.isObject( x ) )
 		{
-			return {
-				x: anim8.coalesce( x.x, defaultValue.x ),
-				y: anim8.coalesce( x.y, defaultValue.y ),
-				z: anim8.coalesce( x.z, defaultValue.z ),
-				angle: anim8.coalesce( x.angle, defaultValue.angle )
-			};
+      var cx = anim8.coalesce( x.x, defaultValue.x );
+      var cy = anim8.coalesce( x.y, defaultValue.y );
+      var cz = anim8.coalesce( x.z, defaultValue.z );
+      var ca = anim8.coalesce( x.angle, defaultValue.angle );
+      var rx = this.getRelativeAmount( cx );
+      var ry = this.getRelativeAmount( cy );
+      var rz = this.getRelativeAmount( cz );
+      var ra = this.getRelativeAmount( ca );
+
+      if ( rx !== false && ry !== false && rz !== false && ra !== false )
+      {
+        var parsed = { x: rx, y: ry, z: rz, angle: ra };
+
+        if ( this.isRelative( cx ) || this.isRelative( cy ) || this.isRelative( cz ) || this.isRelative( ca ) )
+        {
+          return anim8.computed.relative( parsed );
+        }
+
+        return parsed;
+      }
 		}
+    // When a relative value is given, assume it's for an angle around the Z-axis.
+    if ( this.isRelative( x ) )
+    {
+      var rx = this.getRelativeAmount( x );
+
+      if ( rx !== false )
+      {
+        return anim8.computed.relative( { x:0, y:0, z:1, angle: rx } );
+      }
+    }
     
+    // If no value was given but the default value was given, clone it.
     if ( anim8.isDefined( defaultValue ) )
     {
       return this.clone( defaultValue );      
@@ -2292,10 +2472,17 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
    */
 	parse: function(x, defaultValue)
 	{
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When a number is given a grayscale color is returned.
 		if ( anim8.isNumber( x ) )
 		{
 			return {
@@ -2304,8 +2491,54 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
 				b: x
 			};
 		}
+    // When an object is given, check for relative values.
+    if ( anim8.isObject( x ) )
+    {
+      var cr = anim8.coalesce( x.r, defaultValue.r );
+      var cg = anim8.coalesce( x.g, defaultValue.g );
+      var cb = anim8.coalesce( x.b, defaultValue.b );
+      var rr = this.getRelativeAmount( cr );
+      var rg = this.getRelativeAmount( cg );
+      var rb = this.getRelativeAmount( cb );
+
+      if ( rr !== false && rg !== false && rb !== false )
+      {
+        var parsed = { r: rr, g: rg, b: rb };
+
+        if ( this.isRelative( cr ) || this.isRelative( cg ) || this.isRelative( cb ) )
+        {
+          return anim8.computed.relative( parsed );
+        }
+
+        return parsed;
+      }
+    }
+    // If only a relative value is given it will modify the R, G, & B components.
+    if ( this.isRelative( x ) )
+    {
+      var rx = this.getRelativeAmount( x );
+
+      if ( rx !== false )
+      {
+        return anim8.computed.relative( { r: rx, g: rx, b: rx } ); 
+      }
+    }
 		
-		return anim8.color.parse( x );
+    // Try to parse the color.
+		var parsed = anim8.color.parse( x );
+
+    if ( parsed !== false )
+    {
+      return parsed;
+    }
+    
+    // If no value was given but the default value was given, clone it.
+    if ( anim8.isDefined( defaultValue ) )
+    {
+      return this.clone( defaultValue );      
+    }
+    
+    return false;    
 	},
   copy: function(out, copy) 
 	{
@@ -2386,12 +2619,25 @@ anim8.RGBACalculator = function()
 
 anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(), 
 {
+  /**
+   * [parse description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
 	parse: function(x, defaultValue)
 	{
-    if ( this.isPristine( x ) )
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
     {
       return x;
     }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When a number is given an opaque grayscale color is returned.
 		if ( anim8.isNumber( x ) )
 		{
 			return {
@@ -2401,8 +2647,56 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
 				a: 1.0
 			};
 		}
-		
-		return anim8.color.parse( x );
+    // When an object is given, check for relative values.
+    if ( anim8.isObject( x ) )
+    {
+      var cr = anim8.coalesce( x.r, defaultValue.r );
+      var cg = anim8.coalesce( x.g, defaultValue.g );
+      var cb = anim8.coalesce( x.b, defaultValue.b );
+      var ca = anim8.coalesce( x.a, defaultValue.a );
+      var rr = this.getRelativeAmount( cr );
+      var rg = this.getRelativeAmount( cg );
+      var rb = this.getRelativeAmount( cb );
+      var ra = this.getRelativeAmount( ca );
+
+      if ( rr !== false && rg !== false && rb !== false && ra !== false )
+      {
+        var parsed = { r: rr, g: rg, b: rb, a: ra };
+
+        if ( this.isRelative( cr ) || this.isRelative( cg ) || this.isRelative( cb ) || this.isRelative( ca ) )
+        {
+          return anim8.computed.relative( parsed );
+        }
+
+        return parsed;
+      }
+    }
+    // If only a relative value is given it will modify the R, G, & B components.
+    if ( this.isRelative( x ) )
+    {
+      var rx = this.getRelativeAmount( x );
+
+      if ( rx !== false )
+      {
+        return anim8.computed.relative( { r: rx, g: rx, b: rx, a: 0 } ); 
+      }
+    }
+    
+    // Try to parse the color.
+    var parsed = anim8.color.parse( x );
+
+    if ( parsed !== false )
+    {
+      return parsed;
+    }
+    
+    // If no value was given but the default value was given, clone it.
+    if ( anim8.isDefined( defaultValue ) )
+    {
+      return this.clone( defaultValue );      
+    }
+    
+    return false;  
 	},
   copy: function(out, copy) 
 	{
@@ -2522,7 +2816,7 @@ anim8.Path.prototype =
     this.name = name;
     this.calculator = anim8.calculator( calculator );
     this.points = points;
-    this.trues = this.hasTrue();
+    this.computed = this.hasComputed();
   },
 
   /**
@@ -2540,19 +2834,28 @@ anim8.Path.prototype =
    * [hasTrue description]
    * @return {Boolean}
    */
-  hasTrue: function() 
+  hasComputed: function() 
 	{
     var ps = this.points;
     
     for (var i = 0; i < ps.length; i++) 
     {
-      if (ps[i] === true) 
+      if ( this.isComputedValue( ps[i] ) )
       {
         return true;
       }
     }
 
     return false;
+  },
+
+  /**
+   * [isComputedValue description]
+   * @return {Boolean}
+   */
+  isComputedValue: function(x)
+  {
+    return anim8.isFunction( x ) && x.computed;
   },
 
   /**
@@ -2593,19 +2896,19 @@ anim8.Path.prototype =
   },
 
   /**
-   * [replaceTrue description]
+   * [replaceComputed description]
    * @return {[type]}
    */
-  replaceTrue: function(replaceWith)
+  replaceComputed: function(event, animator)
   {
     var clone = this.copy();
     var ps = clone.points;
 
     for (var i = 0; i < ps.length; i++)
     {
-      if ( ps[i] === true )
+      if ( this.isComputedValue( ps[i] ) )
       {
-        ps[i] = replaceWith;
+        ps[i] = ps[i]( event, animator );
       }
     }
     
@@ -2641,7 +2944,7 @@ anim8.Path.prototype =
  */
 anim8.Tween = function(name, calculator, start, end)
 {
-  this.reset( name, calculator, [start, end] );
+  this.reset( name, calculator, [ start, end ] );
 };
 
 anim8.override( anim8.Tween.prototype = new anim8.Path(),
@@ -2676,12 +2979,13 @@ anim8.override( anim8.Tween.prototype = new anim8.Path(),
 anim8.path.tween = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.create();
   
   return new anim8.Tween(
     path.name, 
     calc,
-    calc.parse( path.start ),
-    calc.parse( path.end )
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.end, defaultValue )
   );
 };
 
@@ -3316,8 +3620,16 @@ anim8.Spring.EPSILON = 0.0001;
 
 
 
-
-
+/**
+ * [LinearSpring description]
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ */
 anim8.LinearSpring = function(attribute, calculator, position, rest, damping, stiffness, gravity)
 {
   var a = anim8.attribute( attribute );
@@ -3370,9 +3682,17 @@ anim8.spring.linear = function(spring)
   );
 };
 
-
-
-
+/**
+ * [DistanceSpring description]
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ */
 anim8.DistanceSpring = function(attribute, calculator, position, rest, distance, damping, stiffness, gravity)
 {
   this.reset( attribute, calculator, rest, position, gravity );
@@ -3575,9 +3895,9 @@ anim8.Event.prototype =
    * [hasTrue description]
    * @return {Boolean}
    */
-  hasTrue: function()
+  hasComputed: function()
   {
-    return this.path.trues;
+    return this.path.computed;
   },
 
   /**
@@ -4061,17 +4381,19 @@ anim8.animation = function(animation, options, cache)
 
     for (var k = 0; k < animationStrings.length; k++)
     {
-      var parsed = anim8.parseAnimationString( animationStrings[ k ] );
+      var split = animationStrings[ k ].toLowerCase().split(' ');
+      var parsedAnimation = anim8.animation[ split[ 0 ] ];
+      var parsedOptions = anim8.options( split.slice( 1 ) );
 
-      if ( parsed.animation !== false )
+      if ( parsedAnimation )
       {
         if ( anim === false )
         {
-          last = anim = parsed.animation.extend( parsed.options, true );
+          last = anim = parsedAnimation.extend( parsedOptions, true );
         }
         else
         {
-          last = last.next = parsed.animation.extend( parsed.options, true );
+          last = last.next = parsedAnimation.extend( parsedOptions, true );
         }
       }
     }
@@ -4128,94 +4450,106 @@ anim8.save = function(name, animation, options)
 };
 
 /**
- * Parses a string for an animation in the format of:
+ * Parses a value into an options object. If the given input is a string it's 
+ * expected to be in a similar format to:
  *
- * animationName [duration] x[repeat] z[sleep] ~[delay] [easing]
+ * [duration] x[repeat] z[sleep] ~[delay] ![scale] [easing[-easingType]]
  * 
- * @param {string} animation
+ * @param  {object|string} options
+ * @return {object}
  */
-anim8.parseAnimationString = function(animation)
+anim8.options = function(options)
 {
-  var split = animation.toLowerCase().split(' ');
-  var result = {
-    animation: false,
-    options: {}
-  };
-
-  for (var i = 0; i < split.length; i++)
+  if ( anim8.isString( options ) )
   {
-    var part = split[i];
+    options = options.toLowerCase().split(' ');
+  }
 
-    if ( part in anim8.animation && !result.animation )
+  if ( anim8.isArray( options ) )
+  {
+    var parsed = {};
+
+    for (var i = 0; i < options.length; i++)
     {
-      result.animation = anim8.animation[ part ];
-    }
-    else
-    {
+      var part = options[i];
       var first = part.charAt( 0 );
 
+      // Repeats
       if ( first === 'x' )
       {
         var repeat = anim8.repeat( part.substring(1), false );
 
         if ( repeat !== false )
         {
-          result.options.repeat = repeat;
+          parsed.repeat = repeat;
         }
       }
+      // Sleeping
       if ( first === 'z' )
       {
         var sleep = anim8.time( part.substring(1), false );
 
         if ( sleep !== false )
         {
-          result.options.sleep = sleep;
+          parsed.sleep = sleep;
         }
       }
+      // Delay
       if ( first === '~' )
       {
         var delay = anim8.time( part.substring(1), false );
 
         if ( delay !== false )
         {
-          result.options.delay = delay;
+          parsed.delay = delay;
         }
       }
+      // Scaling
       if ( first === '!' )
       {
         var scale = parseFloat( part.substring(1) );
 
         if ( !isNaN(scale) )
         {
-          result.options.scale = scale;
+          parsed.scale = scale;
         }
       }
+      // Easing?
       var easing = anim8.easing( part, false );
 
       if ( easing !== false )
       {
-        result.options.easing = easing;
+        parsed.easing = easing;
       }
 
+      // Duration?
       var duration = anim8.time( part, false );
 
       if ( duration !== false )
       {
-        result.options.duration = duration;
+        parsed.duration = duration;
       }
       else
       {
+        // If not a duration, might be an alternative repeat? (doesn't start with x)
         var repeat = anim8.repeat( part, false );
 
         if ( repeat !== false )
         {
-          result.options.repeat = repeat;
+          parsed.repeat = repeat;
         }
       }
     }
+
+    return parsed; 
   }
 
-  return result;
+  if ( anim8.isObject( options ) )
+  {
+    return options;
+  }
+
+  return {};
 };
 
 /**
@@ -4356,8 +4690,8 @@ anim8.fn = anim8.Animator.prototype =
 	  this.finished = false;
 		this.factory = null;
     this.active = false;
-    this.trues = {};
-    this.truesUpdated = false;
+    this.computed = {};
+    this.computedUpdated = false;
     
     return this;
 	},
@@ -4377,22 +4711,35 @@ anim8.fn = anim8.Animator.prototype =
    */
   preupdate: function()
   {
-    if ( this.truesUpdated )
+    // If there are events placed on the animator since the last preupdate
+    // that has computed values we need to replace the path on the event with
+    // a copy containing the computed values. This is where current value & 
+    // relative values are injected from the animator into the even'ts path.
+    if ( this.computedUpdated )
     {
-      for (var attr in this.trues)
+      for (var attr in this.computed)
       {
-        if ( attr in this.frame )
-        {
-          var e = this.trues[ attr ];
-          var calc = anim8.calculator( this.attributes[ attr ].calculator );
+        var e = this.computed[ attr ];
 
-          e.path = e.path.replaceTrue( calc.clone( this.frame[ attr ] ) );
-        }
-      
-        delete this.trues[ attr ];
+        e.path = e.path.replaceComputed( e, this );
+        
+        delete this.computed[ attr ];
       }
       
-      this.truesUpdated = false;
+      this.computedUpdated = false;
+    }
+    
+    // If there isn't a value in frame for any of the events on the animator,
+    // place the default value.
+    for (var attr in this.events)
+    {
+      if ( !(attr in this.frame) )
+      {
+        var attribute = this.attributes[ attr ];
+        var calc = anim8.calculator( attribute.calculator );
+
+        this.frame[ attr ] = calc.clone( attribute.defaultValue );
+      }
     }
 
     this.trigger('preupdate');
@@ -4464,44 +4811,18 @@ anim8.fn = anim8.Animator.prototype =
   placeEvent: function(e)
   {
     var attr = e.attribute;
-    var exists = attr in this.frame;
-    var lastEvent = this.events[ attr ];
-    var attribute = this.attributes[ attr ];
 
-    if ( !attribute )
+    if ( !(attr in this.attributes) )
     {
-      attribute = this.attributes[ attr ] = anim8.attribute( attr ); 
+      this.attributes[ attr ] = anim8.attribute( attr ); 
     }
 
     this.events[ attr ] = e;
     
-    if ( e.hasTrue() )
+    if ( e.hasComputed() )
     {
-      if ( exists )
-      {
-        if ( lastEvent )
-        {
-          e.path = e.path.replaceTrue( lastEvent.getEnd() );
-        }
-        else
-        {
-          var calc = anim8.calculator( attribute.calculator );
-
-          e.path = e.path.replaceTrue( calc.clone( this.frame[ attr ] ) );
-        }
-      }
-      else
-      {
-        this.trues[ attr ] = e;
-        this.truesUpdated = true;  
-      }
-    }
-
-    if ( !exists )
-    {
-      var calc = anim8.calculator( attribute.calculator );
-
-      this.frame[ attr ] = calc.clone( attribute.defaultValue );
+       this.computed[ attr ] = e;
+       this.computedUpdated = true;
     }
 		
 		this.finished = false;
@@ -4614,7 +4935,7 @@ anim8.fn = anim8.Animator.prototype =
    */
   createEvents: function(animation, options, cache)
   {
-    var options = options || {};    
+    var options = anim8.options( options );    
     var animation = anim8.animation( animation, options, cache );
   
     if (animation === false)
@@ -5065,15 +5386,16 @@ anim8.fn = anim8.Animator.prototype =
    * @param [number] scale
    * @param [any] scaleBase
    */
-  tweenTo: function(attribute, target, duration, delay, easing, repeat, sleep, scale, scaleBase)
+  tweenTo: function(attribute, target, options)
   {
+    var options = anim8.options( options );
     var attr = anim8.attribute( attribute );
     var calc = anim8.calculator( attr.calculator );
-    var start = attribute in this.frame ? calc.clone( this.frame[ attribute ] ) : true;
+    var start = calc.parse( true );
     var end = calc.parse( target, attr.defaultValue );
 
     var path = new anim8.Tween( attribute, calc, start, end );
-    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
+    var event = new anim8.Event( attribute, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
     this.placeEvent( event.newInstance() );
     
@@ -5092,17 +5414,19 @@ anim8.fn = anim8.Animator.prototype =
    * @param [number] scale
    * @param [any] scaleBase
    */
-  tweenManyTo: function(targets, duration, delay, easing, repeat, sleep, scale, scaleBase)
+  tweenManyTo: function(targets, options)
   {
+    var options = anim8.options( options );
+
     for ( var attribute in targets )
     {
       var attr = anim8.attribute( attribute );
       var calc = anim8.calculator( attr.calculator );
-      var start = attribute in this.frame ? calc.clone( this.frame[ attribute ] ) : true;
+      var start = calc.parse( true );
       var end = calc.parse( targets[ attribute ], attr.defaultValue );      
       
       var path = new anim8.Tween( attribute, calc, start, end );
-      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
+      var event = new anim8.Event( attribute, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
       this.placeEvent( event.newInstance() );
     }
@@ -5124,15 +5448,16 @@ anim8.fn = anim8.Animator.prototype =
    * @param [number] scale
    * @param [any] scaleBase
    */
-  tween: function(attribute, starts, ends, duration, delay, easing, repeat, sleep, scale, scaleBase)
+  tween: function(attribute, starts, ends, options)
   {
+    var options = anim8.options( options );
     var attr = anim8.attribute( attribute );
     var calc = anim8.calculator( attr.calculator );
     var start = calc.parse( starts, attr.defaultValue );
     var end = calc.parse( ends, attr.defaultValue );
 
     var path = new anim8.Tween( attribute, calc, start, end );
-    var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
+    var event = new anim8.Event( attribute, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
     this.placeEvent( event.newInstance() );
 
@@ -5152,8 +5477,10 @@ anim8.fn = anim8.Animator.prototype =
    * @param [number] scale
    * @param [any] scaleBase
    */
-  tweenMany: function(starts, ends, duration, delay, easing, repeat, sleep, scale, scaleBase)
+  tweenMany: function(starts, ends, options)
   {
+    var options = anim8.options( options );
+
     for ( var attribute in starts )
     {
       var attr = anim8.attribute( input );
@@ -5162,7 +5489,7 @@ anim8.fn = anim8.Animator.prototype =
       var end = calc.parse( ends[ attribute ], attr.defaultValue );
       
       var path = new anim8.Tween( attribute, calc, start, end );
-      var event = new anim8.Event( attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase );
+      var event = new anim8.Event( attribute, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
       this.placeEvent( event.newInstance() );
     }
@@ -5259,21 +5586,21 @@ anim8.fn = anim8.Animator.prototype =
    * @param [number|string] sleep  
    * @param [number] scale
    */
-  follow: function(attribute, path, duration, delay, easing, repeat, sleep, scale, scaleBase)
+  follow: function(attribute, path, options)
   {
+    var options = anim8.options( options );
     var path = anim8.path( path );
     
-    // attribute, path, duration, easing, delay, sleep, repeat) 
     var event = new anim8.Event( 
       attribute, 
       path, 
-      duration,
-      easing,
-      delay, 
-      sleep,
-      repeat,
-      scale,
-      scaleBase
+      options.duration,
+      options.easing,
+      options.delay, 
+      options.sleep,
+      options.repeat,
+      options.scale,
+      options.scaleBase
     );
     
     this.placeEvent( event.newInstance() );
@@ -5534,6 +5861,22 @@ anim8.fn = anim8.Animator.prototype =
 
     return subject;
   },
+
+  /**
+   * Invokes a function with the given context or the context of this Animator if none is given. This is particularly
+   * useful for having a function be called on deferred statements.
+   * 
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  invoke: function(func, context, arguments)
+  {
+    if ( anim8.isFunction( func ) )
+    {
+      func.apply( context || this, arguments || [] );
+    }
+  },
 	
 	/**
 	 * Defers the method calls following this one to when the given event type (on or once) and event.
@@ -5571,7 +5914,7 @@ anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator,
   'play', 'queue', 'transition', 'transitionInto', 'restore', 'set', 'resume', 'pause', 
   'finish', 'end', 'stop', 'follow', 'applyInitialState', 'tweenTo', 
   'tween', 'tweenMany', 'tweenManyTo', 'spring', 'unspring', 'apply', 
-  'placeSpring', 'placeEvent'
+  'placeSpring', 'placeEvent', 'invoke'
 ]);
 
 
@@ -5935,6 +6278,13 @@ anim8.run = function()
  */
 anim8.eventize( anim8 );
 
+
+/**
+ * [Sequence description]
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ */
 anim8.Sequence = function(animators, delay, easing)
 {
   this.animators = animators;
@@ -5944,12 +6294,23 @@ anim8.Sequence = function(animators, delay, easing)
 
 anim8.Sequence.prototype =
 {
+  /**
+   * [maxDelay description]
+   * @return {[type]}
+   */
   maxDelay: function()
   {
     return this.delay * (this.animators.length - 1);
   },
   
-  createEvents: function(animation, i)
+  /**
+   * [createEvents description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  createEvents: function(animation, options, i)
   {
     var events = animation.newEvents();
     var delta = i / (this.animators.length - 1);
@@ -5959,10 +6320,16 @@ anim8.Sequence.prototype =
     {
       events[k].delay += delayOffset;
     }
+
+    animation.merge( options, events );
     
     return events;
   },
 
+  /**
+   * [reverse description]
+   * @return {[type]}
+   */
   reverse: function()
   {
     this.animators.reverse();
@@ -5970,8 +6337,17 @@ anim8.Sequence.prototype =
     return this;
   },
   
+  /**
+   * [play description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
   play: function(animation, options, all, cache)
   {
+    var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
     if ( anim === false )
@@ -5983,14 +6359,22 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.playEvents( sequence.createEvents( anim, i ), all );       
+      animator.playEvents( sequence.createEvents( anim, options, i ), all );       
     });
     
     return this.add();
   },
   
+  /**
+   * [queue description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
   queue: function(animation, options, cache)
   {
+    var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
     if ( anim === false )
@@ -6011,7 +6395,7 @@ anim8.Sequence.prototype =
     this.animators.each(function(animator, i)
     {
       var delayOffset = maxRemaining - remaining[i];
-      var events = sequence.createEvents( anim, i );
+      var events = sequence.createEvents( anim, options, i );
       
       for (var i = 0; i < events.length; i++)
       {
@@ -6024,8 +6408,20 @@ anim8.Sequence.prototype =
     return this.add();
   },
 
+  /**
+   * [transition description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
   transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all, cache)
   {
+    var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
     if ( anim === false )
@@ -6037,14 +6433,27 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionEvents( transitionTime, transitionDelta, transitionEasing, sequence.createEvents( anim, i ), all );
+      animator.transitionEvents( transitionTime, transitionDelta, transitionEasing, sequence.createEvents( anim, options, i ), all );
     });
     
     return this.add();
   },
 
+  /**
+   * [transitionInto description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
   transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all, cache)
   {
+    var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
     if ( anim === false )
@@ -6056,12 +6465,15 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionIntoEvents( transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, sequence.createEvents( anim, i ), all );
+      animator.transitionIntoEvents( transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, sequence.createEvents( anim, options, i ), all );
     });
     
     return this.add();
   },
   
+  /**
+   * [add description]
+   */
   add: function()
   {
     this.animators.activate();
@@ -6741,7 +7153,7 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
       var scale    = anim8.coalesce( scales[attr], options.scale );
       var scaleBase= anim8.coalesce( scaleBases[attr], options.scaleBase );
       
-      var path     = new anim8.Tween( attr, calculator, true, value );
+      var path     = new anim8.Tween( attr, calculator, calculator.parse( true ), value );
       var event    = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
       events.push( event );
@@ -7405,7 +7817,7 @@ anim8.dom.property.factoryColor = function(nm)
       {
         var parsed = anim8.color.parse( e.style[nm] );
         
-        if (parsed !== anim8.color.invalidColor) 
+        if (parsed !== false) 
         {
           anim.frame[nm] = parsed;
           anim.animating[nm] = true;
@@ -7696,7 +8108,7 @@ anim8.dom.property.transform = (function()
         if ( anim.animating[ attr ] === false && attr in regex ) 
         {
           var parsed = regex[ attr ].exec( style );
-          
+
           if ( parsed ) 
           {
             if ( attr in d4 ) 
@@ -8181,15 +8593,20 @@ anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
    */
   preupdate: function()
   {
-    if ( this.truesUpdated )
-    {    
+    // If there are events with paths that contain computed values we should
+    // populate the frame directly from the HTML element.
+    if ( this.computedUpdated )
+    {
       var properties = {};
     
-      for (var attr in this.trues)
+      for (var attr in this.computed)
       {
-        properties[ this.attributeToProperty[ attr ] ] = true;
-        
-        this.animating[ attr ] = false;
+        if ( !(attr in this.frame) )
+        {
+          properties[ this.attributeToProperty[ attr ] ] = true;
+      
+          this.animating[ attr ] = false; 
+        }
       }
       
       for (var prop in properties)
@@ -8198,6 +8615,8 @@ anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
       }
     }
 
+    // If a property currently being animated requires some heads up before it
+    // gets or sets a value, notify it. TODO removed dead properties.
     for (var prop in this.properties)
     {
       var property = this.properties[ prop ];
@@ -8208,6 +8627,7 @@ anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
       }
     }
 
+    // Finish updating computed events, filling in the frame, and triggering.
     anim8.Animator.prototype.preupdate.apply( this, arguments );
 
     return this;

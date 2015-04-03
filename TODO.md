@@ -43,6 +43,6 @@
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
 42. [X] Add priority to factory
 43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent
-44. [ ] Add anim8.options which parses options, remove anim8.parseAnimationString
+44. [X] Add anim8.options which parses options, remove anim8.parseAnimationString
 45. [ ] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
-46. [ ] Add relative value parsing (similar to true) which adds/subtracts a value
+46. [X] Add relative value parsing (similar to true) which adds/subtracts a value

@@ -13,6 +13,7 @@ var core =
   './lib/anim8js-easing-type.js',
   './lib/anim8js-easing-css.js',
   './lib/anim8js-color.js',
+  './lib/anim8js-computed.js',
   './lib/anim8js-calculator.js',
   './lib/anim8js-calculator-number.js',
   './lib/anim8js-calculator-2d.js',
