@@ -50,3 +50,15 @@
 48. [X] Factory.attribute returns a resolved version of an attribute where calculator is instanceof anim8.Calculator, defaultValue is parsed, defaultUnit is present, and property is a reference (contains calculatorName, propertyName, name)
 49. [ ] Create super interface called AttributeAnimator which Event & Spring extend (update, isFinished, next, queue, timeRemaining())
 50. [X] Create FastMap which has an array and a map of key to index. Use over object iteration.
+51. [ ] Add Event.setTime
+52. [X] Add reverse & flip easing types
+53. [X] Implement mixing relative and absolute values by passing a mask that's multiplied against the current value before adding the relativeAmount
+54. [X] Add path length calculation given granularity (for curved paths)
+55. [X] Consistently use bracket notation for adding things to registries
+56. [ ] Add anim8.transition parsing function, transitions now take objects or strings
+57. [ ] Option to cache parsed options & transition strings
+58. [ ] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
+59. [ ] Throw cycle start & end events, add functions to listen start/end of last animation added
+60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition
+61. [ ] Add anim8.Physics : anim8.AttributeAnimator
+62. [ ] Replace object iteration with anim8.FastMap

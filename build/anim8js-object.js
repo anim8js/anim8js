@@ -767,7 +767,8 @@ anim8.eventize = function(object)
 
 /**
  * A FastMap has the key-to-value benefits of a map and iteration benefits of an array.
- * This is especially beneficial when most of the time the contents of the structure need to be iterated.
+ * This is especially beneficial when most of the time the contents of the structure need to be iterated and order
+ * doesn't matter (since removal performs a swap which breaks insertion order).
  */
 anim8.FastMap = function()
 {
@@ -1277,44 +1278,118 @@ anim8.easingType = function(easingType, optional)
  * Easing & Easing Type functions
  */
 
+/**
+ * Plays the animation forward normally.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
 anim8.easingType.in = function(easing) 
 {
-	return function(x) {
+	return function(x) 
+	{
 		return easing( x );
 	};
 };
 
+/**
+ * Plays the animation forward by flipping the easings momentum.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
 anim8.easingType.out = function(easing) 
 {
-	return function(x) {
+	return function(x) 
+	{
 		return 1.0 - easing( 1.0 - x );
 	};
 };
 
+/**
+ * Plays the animation forward by flipping the easings momentum halfway.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
 anim8.easingType.inout = function(easing) 
 {
-	return function(x) {
-	  if ( x < 0.5 ) {
+	return function(x) 
+	{
+	  if ( x < 0.5 ) 
+	  {
 	    return easing( 2.0 * x ) * 0.5;
-	  } else {
+	  } 
+	  else 
+	  {
 	    return 1.0 - (easing( 2.0 - 2.0 * x ) * 0.5);
 	  }
 	};
 };
 
-anim8.easingType.pong = function(easing) 
+/**
+ * Plays the aninmation forwards with the given easing, and backwards with the same easing momentum.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
+anim8.easingType.yoyo = function(easing) 
 {
-	return function(x) {
-	  if ( x < 0.5 ) {
+	return function(x) 
+	{
+	  if ( x < 0.5 ) 
+	  {
 	    return easing( 2.0 * x );
-	  } else {
+	  } 
+	  else 
+	  {
 	    return easing( 2.0 - 2.0 * x );
 	  }
 	};
 };
 
-// yoyo is an alias for pong
-anim8.easingType.yoyo = anim8.easingType.pong;
+/**
+ * Plays the animation forwards with the given easing, and backwards reflecting the easing's momentum.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
+anim8.easingType.mirror = function(easing)
+{
+	return function(x)
+	{
+		if ( x < 0.5 )
+		{
+			return easing( 2.0 * x );
+		}
+		else
+		{
+			return 1.0 - easing( 2.0 - 2.0 * x );
+		}
+	};
+};
+
+/**
+ * Plays the animation backwards with using the same easing momentum.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
+anim8.easingType.reverse = function(easing)
+{
+	return easing( 1.0 - x );
+};
+
+/**
+ * Plays the animation backwards by flipping the easing's momentum.
+ * 
+ * @param  {function} easing
+ * @return {function}
+ */
+anim8.easingType.flip = function(easing)
+{
+	return 1.0 - easing( x );
+};
 
 
 anim8.easing.cssEase      = anim8.easing.ease;
@@ -1693,7 +1768,7 @@ anim8.computed.current.computed = true;
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.computed.relative = function(relativeAmount)
+anim8.computed.relative = function(relativeAmount, mask)
 {
   // If the relativeAmount is already a computed value, return it.
   if ( anim8.isComputed( relativeAmount ) )
@@ -1710,16 +1785,27 @@ anim8.computed.relative = function(relativeAmount)
 
     if ( attr in animator.frame )
     {
-      return calc.add( calc.clone( animator.frame[ attr ] ), relativeAmount );
+      current = calc.clone( animator.frame[ attr ] );
     }
     else
     {
-      return calc.add( attribute.cloneDefault(), relativeAmount );
+      current = attribute.cloneDefault();
     }
+
+    if ( mask )
+    {
+      current = calc.mul( current, mask );
+    }
+
+    return calc.add( current, relativeAmount );
   };
 
   // Marks the function as computed which is a signal to paths & events.
   relativeFunction.computed = true;
+
+  // Place the input on the function if the user wants to modify it live
+  relativeFunction.relativeAmount = relativeAmount;
+  relativeFunction.mask = mask;
 
   return relativeFunction;
 };
@@ -2069,8 +2155,7 @@ anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculators.
  */
-anim8.calculator['number']      = new anim8.NumberCalculator();
-anim8.calculator['default']     = anim8.calculator['number'];
+anim8.calculator['default'] = anim8.calculator['number'] = new anim8.NumberCalculator();
 
 
 /*
@@ -2120,10 +2205,17 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
       if ( rx !== false && ry !== false )
       {
         var parsed = { x: rx, y: ry };
+        var ix = this.isRelative( cx );
+        var iy = this.isRelative( cy );
 
-        if ( this.isRelative( cx ) || this.isRelative( cy ) )
+        if ( ix || iy )
         {
-          return anim8.computed.relative( parsed );
+          var mask = {
+            x: ix ? 1 : 0,
+            y: iy ? 1 : 0
+          };
+
+          return anim8.computed.relative( parsed, mask );
         }
 
         return parsed;
@@ -2245,7 +2337,7 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
 /**
  * Register all calculators.
  */
-anim8.calculator['2d']          = new anim8.Point2dCalculator();
+anim8.calculator['2d'] = new anim8.Point2dCalculator();
 
 
 /**
@@ -2292,10 +2384,19 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
       if ( rx !== false && ry !== false && rz !== false )
       {
         var parsed = { x: rx, y: ry, z: rz };
+        var ix = this.isRelative( cx );
+        var iy = this.isRelative( cy );
+        var iz = this.isRelative( cz );
 
-        if ( this.isRelative( cx ) || this.isRelative( cy ) || this.isRelative( cz ) )
-        {
-          return anim8.computed.relative( parsed );
+        if ( ix || iy || iz )
+        { 
+          var mask = {
+            x: ix ? 1 : 0,
+            y: iy ? 1 : 0,
+            z: iz ? 1 : 0
+          };
+
+          return anim8.computed.relative( parsed, mask );
         }
 
         return parsed;
@@ -2383,7 +2484,7 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['3d']          = new anim8.Point3dCalculator();
+anim8.calculator['3d'] = new anim8.Point3dCalculator();
 
 
 /**
@@ -2439,9 +2540,20 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
       if ( rx !== false && ry !== false && rz !== false && ra !== false )
       {
         var parsed = { x: rx, y: ry, z: rz, angle: ra };
+        var ix = this.isRelative( cx );
+        var iy = this.isRelative( cy );
+        var iz = this.isRelative( cz );
+        var ia = this.isRelative( ca );
 
-        if ( this.isRelative( cx ) || this.isRelative( cy ) || this.isRelative( cz ) || this.isRelative( ca ) )
+        if ( ix || iy || iz || ia )
         {
+          var mask = {
+            x: ix ? 1 : 0,
+            y: iy ? 1 : 0,
+            z: iz ? 1 : 0,
+            angle: ia ? 1 : 0
+          };
+
           return anim8.computed.relative( parsed );
         }
 
@@ -2455,7 +2567,7 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 
       if ( rx !== false )
       {
-        return anim8.computed.relative( { x:0, y:0, z:1, angle: rx } );
+        return anim8.computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
       }
     }
     
@@ -2539,7 +2651,7 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['quaternion']  = new anim8.QuaternionCalculator();
+anim8.calculator['quaternion'] = new anim8.QuaternionCalculator();
 
 
 /**
@@ -2592,10 +2704,19 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
       if ( rr !== false && rg !== false && rb !== false )
       {
         var parsed = { r: rr, g: rg, b: rb };
+        var ir = this.isRelative( cr );
+        var ig = this.isRelative( cg );
+        var ib = this.isRelative( cb );
 
-        if ( this.isRelative( cr ) || this.isRelative( cg ) || this.isRelative( cb ) )
+        if ( ir || ig || ib )
         {
-          return anim8.computed.relative( parsed );
+          var mask = {
+            r: ir ? 1 : 0,
+            g: ig ? 1 : 0,
+            b: ib ? 1 : 0
+          };
+
+          return anim8.computed.relative( parsed, mask );
         }
 
         return parsed;
@@ -2692,7 +2813,7 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['rgb']         = new anim8.RGBCalculator();
+anim8.calculator['rgb'] = new anim8.RGBCalculator();
 
 
 
@@ -2750,10 +2871,21 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
       if ( rr !== false && rg !== false && rb !== false && ra !== false )
       {
         var parsed = { r: rr, g: rg, b: rb, a: ra };
+        var ir = this.isRelative( cr );
+        var ig = this.isRelative( cg );
+        var ib = this.isRelative( cb );
+        var ia = this.isRelative( ca );
 
-        if ( this.isRelative( cr ) || this.isRelative( cg ) || this.isRelative( cb ) || this.isRelative( ca ) )
+        if ( ir || ig || ib || ia )
         {
-          return anim8.computed.relative( parsed );
+          var mask = {
+            r: ir ? 1 : 0,
+            g: ig ? 1 : 0,
+            b: ib ? 1 : 0,
+            a: ia ? 1 : 0
+          };
+
+          return anim8.computed.relative( parsed, mask );
         }
 
         return parsed;
@@ -2857,7 +2989,7 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['rgba']        = new anim8.RGBACalculator();
+anim8.calculator['rgba'] = new anim8.RGBACalculator();
 
 
 /**
@@ -3009,6 +3141,62 @@ anim8.Path.prototype =
     }
     
     return p;
+  },
+
+  /**
+   * Returns whether the path is linear. Linear paths go directly from point to
+   * point where curved paths do not. Linear paths can have their length calculated
+   * fairly easily however curves you must compute length with a given granularity.
+   * 
+   * @return {Boolean}
+   */
+  isLinear: function()
+  {
+    return true;
+  },
+
+  /**
+   * Computes the length of the Path with a given granularity. Granularity
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  length: function(granularity)
+  {
+    var distance = 0;
+    var calc = this.calculator;
+
+    if ( this.isLinear() )
+    {
+      var prev = this.resolvePoint( 0 );
+
+      for (var i = 1; i < this.points.length; i++)
+      {
+        var next = this.resolvePoint( i );
+
+        distance += calc.distance( prev, next );
+
+        prev = next;
+      }
+    }
+    else
+    {
+      var deltadelta = 1.0 / granularity;
+      var delta = delta;
+      var prev = calc.clone( this.resolvePoint( 0 ) );
+      var temp = calc.create();
+
+      for (var i = 1; i <= granularity; i++)
+      {
+        var next = this.compute( temp, delta );
+
+        distance += calc.distance( prev, next );
+
+        temp = prev;
+        prev = next;
+      }
+    }
+
+    return distance;
   }
 
 };
@@ -3055,7 +3243,7 @@ anim8.override( anim8.Tween.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.tween = function(path)
+anim8.path['tween'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   var defaultValue = calc.create();
@@ -3116,6 +3304,16 @@ anim8.override( anim8.CubicPath.prototype = new anim8.Path(),
   copy: function() 
   {
     return new anim8.CubicPath( this.name, this.calculator, this.points[0], this.points[1], this.points[2], this.points[3] );
+  },
+
+  /**
+   * CubicPath is not a linear Path.
+   * 
+   * @return {Boolean}
+   */
+  isLinear: function()
+  {
+    return false;
   }
 
 });
@@ -3125,7 +3323,7 @@ anim8.override( anim8.CubicPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.cubic = function(path)
+anim8.path['cubic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3183,6 +3381,16 @@ anim8.override( anim8.QuadraticPath.prototype = new anim8.Path(),
   copy: function() 
   {
     return new anim8.QuadraticPath( this.name, this.calculator, this.points[0], this.points[1], this.points[2] );
+  },
+
+  /**
+   * QuadraticPath is not a linear Path.
+   * 
+   * @return {Boolean}
+   */
+  isLinear: function()
+  {
+    return false;
   }
 
 });
@@ -3192,7 +3400,7 @@ anim8.override( anim8.QuadraticPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.quadratic = function(path)
+anim8.path['quadratic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3258,7 +3466,7 @@ anim8.override( anim8.DeltaPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.delta = function(path)
+anim8.path['delta'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3329,7 +3537,7 @@ anim8.override( anim8.JumpPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.jump = function(path)
+anim8.path['jump'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3398,7 +3606,7 @@ anim8.override( anim8.CompiledPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.compiled = function(path)
+anim8.path['compiled'] = function(path)
 {
   return new anim8.CompiledPath(
     path.name,
@@ -3472,7 +3680,7 @@ anim8.override( anim8.KeyframePath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.keyframe = function(point)
+anim8.path['keyframe'] = function(point)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3558,7 +3766,7 @@ anim8.override( anim8.PointPath.prototype = new anim8.Path(),
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.path.point = function(path)
+anim8.path['point'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
@@ -3796,7 +4004,7 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
  * @param  {object}
  * @return {anim8.LinearSpring}
  */
-anim8.spring.linear = function(spring)
+anim8.spring['linear'] = function(spring)
 { 
   return new anim8.LinearSpring(
     spring.attribute,
@@ -3871,7 +4079,7 @@ anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(),
  * @param  {object}
  * @return {anim8.LinearSpring}
  */
-anim8.spring.distance = function(spring)
+anim8.spring['distance'] = function(spring)
 { 
   return new anim8.DistanceSpring(
     spring.attribute,
@@ -6869,7 +7077,7 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser.values = new anim8.ParserDeltas();
+anim8.parser['values'] = new anim8.ParserDeltas();
 
 
 /**
@@ -6966,7 +7174,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser.final = new anim8.ParserFinal();
+anim8.parser['final'] = new anim8.ParserFinal();
 
 
 
@@ -7056,7 +7264,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser.initial = new anim8.ParserInitial();
+anim8.parser['initial'] = new anim8.ParserInitial();
 
 
 /**
@@ -7235,7 +7443,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
 /**
  * Registers the parser.
  */
-anim8.parser.keyframe = new anim8.ParserKeyframe();
+anim8.parser['keyframe'] = new anim8.ParserKeyframe();
 
 
 /**
@@ -7294,7 +7502,7 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser.tweenTo = new anim8.ParserTween();
+anim8.parser['tweenTo'] = new anim8.ParserTween();
 
 
 /**
@@ -7353,7 +7561,7 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser.move = new anim8.ParserMove();
+anim8.parser['move'] = new anim8.ParserMove();
 
 
 
@@ -7571,8 +7779,7 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
 /**
  * Registers the object factory.
  */
-anim8.factory.object = new anim8.ObjectFactory();
-anim8.factory.default = anim8.factory.object;
+anim8.factory['default'] = anim8.factory['object'] = new anim8.ObjectFactory();
 
 /**
  * The Object namespace.
@@ -7605,4 +7812,4 @@ anim8.object.attribute = function(attr)
 /**
  * The default attribute.
  */
-anim8.object.attribute.default                 = {defaultValue: 0};
+anim8.object.attribute['default']                 = {defaultValue: 0};
