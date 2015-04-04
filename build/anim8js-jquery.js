@@ -128,14 +128,14 @@ anim8.defaults =
    * 
    * @type {number}
    */
-  transitionDelta: 0.2,
+  transitionOutroDelta: 0.1,
 
   /**
    * The default transition into delta.
    * 
    * @type {number}
    */
-  transitionIntoDelta: 0.2,
+  transitionIntoDelta: 0.1,
 
   /**
    * The default transition into delta.
@@ -145,13 +145,56 @@ anim8.defaults =
   transitionEasing: 'linear',
 
   /**
+   * The default transition granularity. This is used for smooth transitions to
+   * provide a smooth transition from the outro velocity to the intro velocity,
+   * the cubic or quadratic path between the two is a curve with unknown length
+   * so the length needs to be calculated using a maximum number of points to
+   * calculate along the path - summing the distances between the consecutive points.
+   * 
+   * @type {Number}
+   */
+  transitionGranularity: 50,
+
+  /**
    * Whether animtions are cached whenever possible. Animations that can be
    * cached are strings with options specified in the string and without an
    * option object given. For example 'tada ~1s 3s x3' is cacheable.
    * 
    * @type {boolean}
+   * @see  anim8.animation
    */
-  cache: false
+  cache: false,
+
+  /**
+   * Whether parsed options are cached whenever possible. Options that can be
+   * cached must be strings.
+   * 
+   * @type {Boolean}
+   * @see  anim8.options
+   */
+  cacheOptions: false,
+
+  /**
+   * Whether parsed transitions are cached whenever possible. Transitions that can be
+   * cached must be strings.
+   * 
+   * @type {Boolean}
+   * @see  anim8.transition
+   */
+  cacheTransitions: false,
+
+  /**
+   * The value to return when options could not be parsed from input.
+   * 
+   * @type {Object}
+   */
+  noOptions: {},
+
+  /**
+   * The value to return when a transition could not be parsed from input.
+   * @type {Object}
+   */
+  noTransition: {}
 
 };
 
@@ -4766,18 +4809,168 @@ anim8.save = function(name, animation, options)
 };
 
 /**
+ * Parses a value into a transition object. If the given input is a string it's
+ * expected to be in a similar format to:
+ *
+ * [time] [outroDelta] +[introDelta] [easing[-easingType]] ^[granularity]
+ *
+ * This is also a registry of transitions, you can add your own transitions that
+ * can be used later with syntax like:
+ *
+ * anim8.transition['myTransition'] = anim8.transition('50ms 0.05 linear');
+ *
+ * So you can use 'myTransition' as the transition input.
+ * 
+ * @param {object|string|array} options
+ * @param {boolean} cache
+ * @return {object}
+ */
+anim8.transition = function(transition, cache)
+{
+  // 1. If it's a string, convert it into an array.
+  // 2. If it's an array, parse it and convert it into an object.
+  // 3. If it's an object, fill in any missing values with the defaults.
+
+  var originalInput = transition;
+
+  if ( anim8.isString( transition ) )
+  {
+    if ( transition in anim8.transition )
+    {
+      return anim8.transition[ transition ];
+    }
+
+    transition = transition.toLowerCase().split(' ');
+  }
+
+  if ( anim8.isArray( transition ) )
+  {
+    var transitionArray = transition;
+
+    transition = {};
+
+    for (var i = 0; i < transitionArray.length; i++)
+    {
+      var part = transitionArray[i];
+      var first = part.charAt( 0 );
+
+      // Introduction Delta (into next event)
+      if ( first === '+' )
+      {
+        var introDelta = parseFloat( part.substring(1) );
+
+        if ( !isNaN( introDelta ) )
+        {
+          transition.introDelta = introDelta;
+        }
+      }
+      // Granularity (for smooth transitions)
+      else if ( first === '^' )
+      {
+        var granularity = parseInt( part.substring(1) );
+
+        if ( !isNaN( granularity ) && granularity > 0 )
+        {
+          transition.granularity = granularity;
+        }
+      }
+      else
+      {
+        // Easing
+        var easing = anim8.easing( part, false );
+
+        if ( easing !== false )
+        {
+          transition.easing = easing;
+        }
+
+        // Outroduction Delta
+        if ( anim8.isDefined( transition.time ) )
+        {
+          var outroDelta = parseFloat( part );
+
+          if ( !isNaN( outroDelta ) && outroDelta >= 0 && outroDelta <= 1 )
+          {
+            transition.outroDelta = outroDelta;
+          }
+        }
+        else
+        {
+          // Time
+          var time = anim8.time( part, false );
+
+          if ( time !== false )
+          {
+            transition.time = time;
+          }
+        }
+
+      }
+    }
+  }
+
+  if ( anim8.isObject( transition ) )
+  {
+    if ( !anim8.isDefined( transition.time ) )
+    {
+      transition.time = anim8.time( anim8.defaults.transitionTime );
+    }
+    if ( !anim8.isDefined( transition.outroDelta ) )
+    {
+      transition.outroDelta = anim8.defaults.transitionOutroDelta;
+    }
+    if ( !anim8.isDefined( transition.introDelta ) )
+    {
+      transition.introDelta = anim8.defaults.transitionIntroDelta;
+    }
+    if ( !anim8.isDefined( transition.easing ) )
+    {
+      transition.easing = anim8.easing( anim8.defaults.transitionEasing );
+    }
+    if ( !anim8.isDefined( transition.granularity ) )
+    {
+      transition.granularity = anim8.defaults.transitionGranularity;
+    }
+
+    if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheTransitions ) )
+    {
+      anim8.transition[ originalInput ] = transition;
+    }
+
+    return transition;
+  }
+
+  return anim8.defaults.noTransition;
+};
+
+/**
  * Parses a value into an options object. If the given input is a string it's 
  * expected to be in a similar format to:
  *
  * [duration] x[repeat] z[sleep] ~[delay] ![scale] [easing[-easingType]]
+ *
+ * This is also a registry of options, you can add your own options that
+ * can be used later with syntax like:
+ *
+ * anim8.option['myOptions'] = anim8.option('1.5s x2 !2');
+ *
+ * So you can use 'myOptions' as the options input.
  * 
- * @param  {object|string} options
+ * @param {object|string|array} options
+ * @param {boolean} cache
  * @return {object}
  */
-anim8.options = function(options)
+anim8.options = function(options, cache)
 {
+  var originalInput = options;
+
   if ( anim8.isString( options ) )
   {
+    if ( options in anim8.options )
+    {
+      return anim8.options[ options ];
+    }
+
     options = options.toLowerCase().split(' ');
   }
 
@@ -4801,7 +4994,7 @@ anim8.options = function(options)
         }
       }
       // Sleeping
-      if ( first === 'z' )
+      else if ( first === 'z' )
       {
         var sleep = anim8.time( part.substring(1), false );
 
@@ -4811,7 +5004,7 @@ anim8.options = function(options)
         }
       }
       // Delay
-      if ( first === '~' )
+      else if ( first === '~' )
       {
         var delay = anim8.time( part.substring(1), false );
 
@@ -4821,7 +5014,7 @@ anim8.options = function(options)
         }
       }
       // Scaling
-      if ( first === '!' )
+      else if ( first === '!' )
       {
         var scale = parseFloat( part.substring(1) );
 
@@ -4830,31 +5023,39 @@ anim8.options = function(options)
           parsed.scale = scale;
         }
       }
-      // Easing?
-      var easing = anim8.easing( part, false );
-
-      if ( easing !== false )
-      {
-        parsed.easing = easing;
-      }
-
-      // Duration?
-      var duration = anim8.time( part, false );
-
-      if ( duration !== false )
-      {
-        parsed.duration = duration;
-      }
       else
       {
-        // If not a duration, might be an alternative repeat? (doesn't start with x)
-        var repeat = anim8.repeat( part, false );
+        // Easing?
+        var easing = anim8.easing( part, false );
 
-        if ( repeat !== false )
+        if ( easing !== false )
         {
-          parsed.repeat = repeat;
+          parsed.easing = easing;
+        }
+
+        // Duration?
+        var duration = anim8.time( part, false );
+
+        if ( duration !== false )
+        {
+          parsed.duration = duration;
+        }
+        else
+        {
+          // If not a duration, might be an alternative repeat? (doesn't start with x)
+          var repeat = anim8.repeat( part, false );
+
+          if ( repeat !== false )
+          {
+            parsed.repeat = repeat;
+          }
         }
       }
+    }
+
+    if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheOptions ) )
+    {
+      anim8.options[ originalInput ] = parsed;
     }
 
     return parsed; 
@@ -4865,7 +5066,7 @@ anim8.options = function(options)
     return options;
   }
 
-  return {};
+  return anim8.defaults.noOptions;
 };
 
 /**
@@ -5562,8 +5763,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param [object] options
    * @param [boolean] all
    */
-  transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all, cache)
+  transition: function(transition, animation, options, all, cache)
   {
+    var transition = anim8.transition( transition );
     var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
@@ -5571,7 +5773,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
 
-    this.transitionEvents( transitionTime, transitionDelta, transitionEasing, events, all );
+    this.transitionEvents( transition, events, all );
 
     return this.activate();
   },
@@ -5588,26 +5790,21 @@ anim8.fn = anim8.Animator.prototype =
    * @param [array] events
    * @param [boolean] all
    */
-  transitionEvents: function(transitionTime, transitionDelta, transitionEasing, events, all)
+  transitionEvents: function(transition, events, all)
   {
     // Check if we even need to transition
-    var transition = false;
+    var transitionRequired = false;
     
-    for (var i = 0; i < events.length && !transition; i++)
+    for (var i = 0; i < events.length && !transitionRequired; i++)
     {      
       if ( events[i].attribute in this.events )
       {
-        transition = true;
+        transitionRequired = true;
       }
     }
-
-    // Parse given variables
-    var transitionTime = anim8.time( transitionTime, anim8.defaults.transitionTime );
-    var transitionDelta = anim8.coalesce( transitionDelta, anim8.defaults.transitionDelta );
-    var transitionEasing = anim8.easing( transitionEasing, anim8.defaults.transitionEasing );
     
     // Only transition if we need to
-    if ( transition )
+    if ( transitionRequired )
     {
       for (var i = 0; i < events.length; i++)
       {
@@ -5621,11 +5818,11 @@ anim8.fn = anim8.Animator.prototype =
           var e2 = this.events[attr];
         
           var p0 = calc.clone( this.frame[attr] );
-          var p1 = e2.getFuture( transitionDelta );
+          var p1 = e2.getFuture( transition.outroDelta );
           var p2 = e1.getPoint( 0 );
         
           var transitionPath = new anim8.QuadraticPath( attr, calc, p0, p1, p2 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1 ).newInstance();
+          var transitionEvent = new anim8.Event( attr, transitionPath, transition.time, transition.easing, 0, 0, 1 ).newInstance();
         
           transitionEvent.next = e1;
         
@@ -5633,7 +5830,7 @@ anim8.fn = anim8.Animator.prototype =
         }
         else
         {
-          e1.delay += transitionTime;
+          e1.delay += transition.time;
      
           this.placeEvent( e1 );
         }
@@ -5664,8 +5861,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param [object] options
    * @param [boolean] all
    */
-  transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all, cache)
+  transitionInto: function(transition, animation, options, all, cache)
   {
+    var transition = anim8.transition( transition );
     var events = this.createEvents( animation, options, cache );
     
     if ( events === false )
@@ -5673,7 +5871,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
     
-    this.transitionIntoEvents( transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, events, all );
+    this.transitionIntoEvents( transition, events, all );
 
     return this.activate();
   },
@@ -5691,27 +5889,21 @@ anim8.fn = anim8.Animator.prototype =
    * @param {array} events
    * @param [boolean] all
    */
-  transitionIntoEvents: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, events, all)
+  transitionIntoEvents: function(transition, events, all)
   {
     // Check if we even need to transition
-    var transition = false;
+    var transitionRequired = false;
     
-    for (var i = 0; i < events.length && !transition; i++)
+    for (var i = 0; i < events.length && !transitionRequired; i++)
     {      
       if ( events[i].attribute in this.events )
       {
-        transition = true;
+        transitionRequired = true;
       }
     }
-
-    // Parse given variables
-    var transitionTime = anim8.time( transitionTime, anim8.defaults.transitionTime );
-    var transitionFromDelta = anim8.coalesce( transitionFromDelta, anim8.defaults.transitionDelta );
-    var transitionIntoDelta = anim8.coalesce( transitionIntoDelta, anim8.defaults.transitionIntoDelta );
-    var transitionEasing = anim8.easing( transitionEasing, anim8.defaults.transitionEasing );
     
     // Only transition if we need to
-    if ( transition )
+    if ( transitionRequired )
     {
       for (var i = 0; i < events.length; i++)
       {
@@ -5725,12 +5917,12 @@ anim8.fn = anim8.Animator.prototype =
           var e2 = this.events[attr];
         
           var p0 = calc.clone( this.frame[attr] );
-          var p1 = e2.getFuture( transitionFromDelta );
+          var p1 = e2.getFuture( transition.outroDelta );
           var p2 = e1.getPoint( 0 );
-          var p3 = e1.getPoint( transitionIntoDelta );
+          var p3 = e1.getPoint( transition.introDelta );
           
           var transitionPath = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transitionTime, transitionEasing, 0, 0, 1 ).newInstance();
+          var transitionEvent = new anim8.Event( attr, transitionPath, transition.time, transition.easing, 0, 0, 1 ).newInstance();
         
           transitionEvent.next = e1;
         
@@ -5738,7 +5930,7 @@ anim8.fn = anim8.Animator.prototype =
         }
         else
         {
-          e1.delay += transitionTime;
+          e1.delay += transition.time;
      
           this.placeEvent( e1 );
         }
@@ -6828,8 +7020,9 @@ anim8.Sequence.prototype =
    * @param  {[type]}
    * @return {[type]}
    */
-  transition: function(transitionTime, transitionDelta, transitionEasing, animation, options, all, cache)
+  transition: function(transition, animation, options, all, cache)
   {
+    var transition = anim8.transition( transition );
     var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
@@ -6842,7 +7035,7 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionEvents( transitionTime, transitionDelta, transitionEasing, sequence.createEvents( anim, options, i ), all );
+      animator.transitionEvents( transition, sequence.createEvents( anim, options, i ), all );
     });
     
     return this.add();
@@ -6860,8 +7053,9 @@ anim8.Sequence.prototype =
    * @param  {[type]}
    * @return {[type]}
    */
-  transitionInto: function(transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, animation, options, all, cache)
+  transitionInto: function(transition, animation, options, all, cache)
   {
+    var transition = anim8.transition( transition );
     var options = anim8.options( options );
     var anim = anim8.animation( animation, options, cache );
 
@@ -6874,7 +7068,7 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionIntoEvents( transitionTime, transitionFromDelta, transitionIntoDelta, transitionEasing, sequence.createEvents( anim, options, i ), all );
+      animator.transitionIntoEvents( transition, sequence.createEvents( anim, options, i ), all );
     });
     
     return this.add();
