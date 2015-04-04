@@ -42,7 +42,11 @@
 40. [ ] Refactor all arrays of events & Animator.events to new anim8.EventMap
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
 42. [X] Add priority to factory
-43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent
+43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent. Once a new animation cycle is hit, all events (checked up to next) are made active - this fixes the issue of infinite events being stopped on queue
 44. [X] Add anim8.options which parses options, remove anim8.parseAnimationString
 45. [ ] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
 46. [X] Add relative value parsing (similar to true) which adds/subtracts a value
+47. [X] Add move parser
+48. [X] Factory.attribute returns a resolved version of an attribute where calculator is instanceof anim8.Calculator, defaultValue is parsed, defaultUnit is present, and property is a reference (contains calculatorName, propertyName, name)
+49. [ ] Create super interface called AttributeAnimator which Event & Spring extend (update, isFinished, next, queue, timeRemaining())
+50. [X] Create FastMap which has an array and a map of key to index. Use over object iteration.

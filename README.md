@@ -16,6 +16,7 @@ in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between 
 7. Defer commands until an event occurs.
 8. Save animations to be used later.
 9. Modify animations with a delay, duration, repeats, sleeping between repeats, scale, and easing.
+10. Relative Values
 
 ### Concepts  
 - `Subject` = The thing being animated (an object, HTML element, etc).

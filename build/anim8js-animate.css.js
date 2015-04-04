@@ -1677,6 +1677,59 @@ anim8.save('blurIn', {
   }
 });
 
+anim8.save('rotateLeft', {
+  move: {
+    rotate: -90
+  }
+});
+
+anim8.save('rotateRight', {
+  move: {
+    rotate: 90
+  }
+});
+
+anim8.save('rotateLeftFull', {
+  move: {
+    rotate: -360
+  }
+});
+
+anim8.save('rotateRightFull', {
+  move: {
+    rotate: 360
+  }
+});
+
+anim8.save('wiggle', {
+  keyframe: {
+    '0.00,100.00': {
+      rotate: 0 
+    },
+    '12.50': {
+      rotate: -45
+    },
+    '37.50': {
+      rotate: 45
+    },
+    '58.33': {
+      rotate: -30
+    },
+    '75.00': {
+      rotate: 30
+    },
+    '87.50': {
+      rotate: -15
+    },
+    '95.83': {
+      rotate: 15
+    }
+  },
+  initial: {
+    origin: 'center'
+  }
+});
+
 /**
  * Generate animations for all permutations of the following concepts:
  *

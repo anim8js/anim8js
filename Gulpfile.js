@@ -8,6 +8,7 @@ var gutil = require('gulp-util');
 var core = 
 [
   './lib/anim8js-core.js',
+  './lib/anim8js-fast-map.js',
   './lib/anim8js-defer.js',
   './lib/anim8js-easing.js',
   './lib/anim8js-easing-type.js',
@@ -46,6 +47,7 @@ var core =
   './lib/anim8js-parser-initial.js',
   './lib/anim8js-parser-keyframe.js',
   './lib/anim8js-parser-tween.js',
+  './lib/anim8js-parser-move.js',
   './lib/anim8js-factory.js',
   './lib/anim8js-object.js'
 ];
