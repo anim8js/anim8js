@@ -21,7 +21,6 @@ anim8.EventInstance = function(event)
   this.time 			      = 0;
   this.pauseTime 	      = 0;
   this.pauseState       = 0;
-	this.elapsed		      = 0;
   this.cycle            = 0;
 };
 
@@ -80,125 +79,103 @@ anim8.override( anim8.EventInstance.prototype = new anim8.Event(),
    */
   update: function(now, frame) 
 	{
+    return this.setTime( now, frame );
+  },
+
+  /**
+   * Sets the current time of the event.
+   * 
+   * @param {Number} now
+   * @param {Object} frame
+   * @return {Boolean} 
+   */
+  setTime: function(now, frame)
+  {
+    if ( this.time === 0 )
+    {
+      this.time = now;
+    }
+
     var updated = false;
-    var elapsed = this.catchup( now );
-    
-    if ( this.isAnimating() ) 
-		{			
-      var delta = elapsed / this.duration;
-      
-      if (delta >= 1 || this.duration === 0)
-			{
-        if (!this.isInfinite() && --this.repeat === 0) 
-				{
-          this.finish(frame);
-					
-          return true;
-        } 
-				else 
-				{
-          if (this.sleep)
-					{
-            elapsed = this.progress( elapsed, this.duration, anim8.EventState.SLEEPING ); 
-            delta = 1;
-            
-            this.trigger('sleeping', this);
-          } 
-					else 
-					{
-            elapsed = this.progress( elapsed, this.duration, anim8.EventState.ANIMATING );
-            delta -= 1;
-          }
+    var elapsed = now - this.time;
+    var delay = this.delay;
+    var duration = this.duration;
+    var sleep = this.sleep;
+    var repeat = this.repeat;
+    var oldState = this.state;
+    var newState = this.state;
+    var delta = 0;
+
+    if ( elapsed >= delay )
+    {
+      elapsed -= delay;
+
+      var cycle = duration + sleep;
+      var iteration = Math.floor( ( elapsed + sleep ) / cycle );
+
+      if (iteration >= repeat)
+      {
+        newState = anim8.EventState.FINISHED;
+        delta = 1;
+      }
+      else
+      {
+        elapsed -= iteration * cycle;
+
+        if ( elapsed > duration )
+        {
+          newState = anim8.EventState.SLEEPING;
+          delta = 1;
+        }
+        else
+        {
+          newState = anim8.EventState.ANIMATING;
+          delta = elapsed / duration;
         }
       }
-      
-      this.applyValue( frame, frame[this.attribute], delta );
+    }
+    else
+    {
+      newState = anim8.EventState.DELAYED;
+    }
+
+    if ( newState === anim8.EventState.ANIMATING || 
+       ( newState !== anim8.EventState.ANIMATING && oldState === anim8.EventState.ANIMATING ) ||
+       ( newState === anim8.EventState.DELAYED && this.hasInitialState ) )
+    {
+      this.applyValue( frame, frame[ this.attribute ], delta );
       updated = true;
     }
-    
+
+    this.state = newState;
+
     return updated;
   },
 
   /**
-   * [catchup description]
-   * @param  {[type]}
-   * @return {[type]}
+   * Computes the value at the given time. The only time when a value won't be
+   * returned is if the time is before the delay and the event doesn't have an
+   * initial state.
+   * 
+   * @param  {Number} time
+   * @param  {any} out
+   * @return {any}
    */
-  catchup: function(now)
+  valueAt: function(time, out)
   {
-    if ( this.isPaused() )
+    if ( time < this.delay && !this.hasInitialState )
     {
-      return;
+      return false;
     }
-    
-    if ( this.state === anim8.EventState.CREATED )
+
+    var delta = 0;
+
+    if ( time >= this.delay )
     {
-      this.time = now;
-      
-      if ( this.delay )
-      {
-        this.state = anim8.EventState.DELAYED;
-        
-        this.trigger('delaying', this);
-      } 
-      else
-      {
-        this.state = anim8.EventState.ANIMATING;
-      }
+      delta = Math.max( 1.0, ((time - this.delay) % (this.duration + this.sleep)) / this.duration );
     }
-    
-    var elapsed = now - this.time;
-    
-    if ( this.isDelayed() )
-    {
-      if ( elapsed > this.delay ) 
-      {
-        this.trigger('delayed', this);
-        
-        elapsed = this.progress( elapsed, this.delay, anim8.EventState.ANIMATING );
-      }
-    }
-    
-    if ( this.isSleeping() )
-    {
-      if ( elapsed > this.sleep )
-      {
-        this.trigger('slept', this);
-        
-        elapsed = this.progress( elapsed, this.sleep, anim8.EventState.ANIMATING );
-      }
-    }
-    
-    if ( this.isAnimating() && this.duration )
-    {
-      var cycle = this.duration + this.sleep;
-      var cycleCount = Math.floor( ( elapsed + this.sleep ) / cycle );
-      var maxCycles = Math.min( this.repeat, cycleCount );
-            
-      elapsed = this.progress( elapsed, maxCycles * cycle, anim8.EventState.ANIMATING );
-      
-      if ( !this.isInfinite() )
-      { 
-        if (maxCycles === this.repeat)
-        {
-          elapsed = this.duration;
-          this.repeat = 1;
-        }
-        else
-        {
-          this.repeat -= cycleCount;
-        }
-      }
-      
-      if ( elapsed > this.duration )
-      {
-        elapsed = this.progress( elapsed, this.duration, anim8.EventState.SLEEPING );
-        
-        this.trigger('sleeping', this);
-      }
-    }
-    
-    return elapsed;
+
+    return this.computeValue( out, delta );
   },
 
   /**
@@ -221,22 +198,6 @@ anim8.override( anim8.EventInstance.prototype = new anim8.Event(),
     }
 
     return value;
-  },
-
-  /**
-   * [progress description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  progress: function(elapsed, time, newState) 
-  {
-    this.time += time;
-    this.elapsed += time;
-    this.state = newState;
-    
-    return elapsed - time;
   },
 
   /**
@@ -265,7 +226,7 @@ anim8.override( anim8.EventInstance.prototype = new anim8.Event(),
     
     if ( value !== false )
     {
-      frame[this.attribute] = value;
+      frame[ this.attribute ] = value;
     }
   },
 

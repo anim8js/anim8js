@@ -39,7 +39,7 @@
 37. [X] Add animation string parsing to anim8.animation. You can specify multiple with commas, which queues up the events
 38. [X] Add time parsing in animation parsers for delay, duration, & sleep (and add default duration unit)
 39. [X] Add anim8.fn/m8.fn and anim8s.fn/m8s.fn so users can add their own functions
-40. [ ] Refactor all arrays of events & Animator.events to new anim8.EventMap
+40. [X] Refactor all arrays of events & Animator.events to new anim8.EventMap
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
 42. [X] Add priority to factory
 43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent. Once a new animation cycle is hit, all events (checked up to next) are made active - this fixes the issue of infinite events being stopped on queue
@@ -48,9 +48,9 @@
 46. [X] Add relative value parsing (similar to true) which adds/subtracts a value
 47. [X] Add move parser
 48. [X] Factory.attribute returns a resolved version of an attribute where calculator is instanceof anim8.Calculator, defaultValue is parsed, defaultUnit is present, and property is a reference (contains calculatorName, propertyName, name)
-49. [ ] Create super interface called AttributeAnimator which Event & Spring extend (update, isFinished, next, queue, timeRemaining())
+49. [X] Create super interface called AttributeAnimator which Event & Spring extend (update, isFinished, next, queue, timeRemaining())
 50. [X] Create FastMap which has an array and a map of key to index. Use over object iteration.
-51. [ ] Add Event.setTime
+51. [X] Add Event.setTime
 52. [X] Add reverse & flip easing types
 53. [X] Implement mixing relative and absolute values by passing a mask that's multiplied against the current value before adding the relativeAmount
 54. [X] Add path length calculation given granularity (for curved paths)
@@ -59,6 +59,12 @@
 57. [X] Option to cache parsed options & transition strings
 58. [ ] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
 59. [ ] Throw cycle start & end events, add functions to listen start/end of last animation added
-60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition
+60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition (req: 63)
 61. [ ] Add anim8.Physics : anim8.AttributeAnimator
-62. [ ] Replace object iteration with anim8.FastMap
+62. [X] Replace object iteration with anim8.FastMap
+63. [ ] Refactor transition into a single method
+64. [X] Replace calc.create() with calc.zero() where possible.
+65. [ ] Add endTime to attrimators
+66. [X] Add tweenFrom parser
+67. [ ] Add physics parser
+68. [ ] Add spring parser

@@ -135,7 +135,7 @@ anim8.defaults =
    * 
    * @type {number}
    */
-  transitionIntoDelta: 0.1,
+  transitionIntroDelta: 0.1,
 
   /**
    * The default transition into delta.
@@ -153,7 +153,7 @@ anim8.defaults =
    * 
    * @type {Number}
    */
-  transitionGranularity: 50,
+  transitionGranularity: 0,
 
   /**
    * Whether animtions are cached whenever possible. Animations that can be
@@ -815,13 +815,26 @@ anim8.eventize = function(object)
  */
 anim8.FastMap = function()
 {
-  this.values = [];
-  this.keys = [];
-  this.indices = {};
+  this.reset();
 };
 
 anim8.FastMap.prototype =
 {
+
+  /**
+   * Resets the map by initializing the values, keys, and indexes.
+   * 
+   * @return {this}
+   */
+  reset: function()
+  {
+    this.values = [];
+    this.keys = [];
+    this.indices = {};
+
+    return this;
+  },
+
   /**
    * Puts the value in the map by the given key.
    * 
@@ -885,19 +898,32 @@ anim8.FastMap.prototype =
   {
     if ( key in this.indices )
     {
-      var index = this.indices[ key ];
-      var lastValue = this.values.pop();
-      var lastKey = this.keys.pop();
-
-      if ( index < this.values.length )
-      {
-        this.values[ index ] = lastValue;
-        this.keys[ index ] = lastKey;
-        this.indices[ lastKey ] = index;
-      }
-
-      delete this.indices[ key ];
+      this.removeAt( this.indices[ key ] );
     }
+
+    return this;
+  },
+
+  /**
+   * Removes the value & key at the given index.
+   * 
+   * @param  {Number}
+   * @return {this}
+   */
+  removeAt: function(index)
+  {
+    var key = this.keys[ index ];
+    var lastValue = this.values.pop();
+    var lastKey = this.keys.pop();
+
+    if ( index < this.values.length )
+    {
+      this.values[ index ] = lastValue;
+      this.keys[ index ] = lastKey;
+      this.indices[ lastKey ] = index;
+    }
+
+    delete this.indices[ key ];
 
     return this;
   },
@@ -914,6 +940,54 @@ anim8.FastMap.prototype =
   },
 
   /**
+   * Returns whether this map has a value for the given key.
+   * 
+   * @param  {string}
+   * @return {Boolean}
+   */
+  has: function(key)
+  {
+    return key in this.indices;
+  },
+
+  /**
+   * Returns whether the given input has overlap with keys in this map.
+   * 
+   * @param  {anim8.FastMap|object}
+   * @return {Boolean}
+   */
+  hasOverlap: function(map)
+  {
+    if ( map instanceof anim8.FastMap )
+    {
+      var keys = this.keys;
+      var indices = map.indices;
+
+      for (var i = 0; i < keys.length; i++)
+      {
+        if ( keys[i] in indices )
+        {
+          return true;
+        }
+      }
+    }
+    else if ( anim8.isObject( map ) )
+    {
+      var indices = this.indices;
+
+      for (var prop in map)
+      {
+        if ( prop in indices )
+        {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  },
+
+  /**
    * Returns the number of elements in the map.
    * 
    * @return {number}
@@ -921,6 +995,20 @@ anim8.FastMap.prototype =
   size: function()
   {
     return this.values.length;
+  },
+
+  /**
+   * Clears all keys & values from the map.
+   * 
+   * @return {this}
+   */
+  clear: function()
+  {
+    this.values.length = 0;
+    this.keys.length = 0;
+    this.indices = {};
+
+    return this;
   }
 
 };
@@ -1787,9 +1875,9 @@ anim8.computed = {};
  * @param  {[type]}
  * @return {[type]}
  */
-anim8.computed.current = function(event, animator)
+anim8.computed.current = function(attrimator, animator)
 {
-  var attr = event.attribute;
+  var attr = attrimator.attribute;
   var attribute = animator.getAttribute( attr );
 
   if ( attr in animator.frame )
@@ -1819,9 +1907,9 @@ anim8.computed.relative = function(relativeAmount, mask)
     return relativeAmount;
   }
 
-  var relativeFunction = function(event, animator)
+  var relativeFunction = function(attrimator, animator)
   { 
-    var attr = event.attribute;
+    var attr = attrimator.attribute;
     var attribute = animator.getAttribute( attr );
     var calc = attribute.calculator;
     var current = null;
@@ -2104,7 +2192,7 @@ anim8.Calculator.prototype =
  */
 anim8.NumberCalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(), 
@@ -2206,7 +2294,7 @@ anim8.calculator['default'] = anim8.calculator['number'] = new anim8.NumberCalcu
  */
 anim8.Point2dCalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(), 
@@ -2388,7 +2476,7 @@ anim8.calculator['2d'] = new anim8.Point2dCalculator();
  */
 anim8.Point3dCalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(), 
@@ -2535,7 +2623,7 @@ anim8.calculator['3d'] = new anim8.Point3dCalculator();
  */
 anim8.QuaternionCalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(), 
@@ -2702,7 +2790,7 @@ anim8.calculator['quaternion'] = new anim8.QuaternionCalculator();
  */
 anim8.RGBCalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(), 
@@ -2866,7 +2954,7 @@ anim8.calculator['rgb'] = new anim8.RGBCalculator();
  */
 anim8.RGBACalculator = function()
 {
-
+  this.createConstants();
 };
 
 anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(), 
@@ -3289,13 +3377,12 @@ anim8.override( anim8.Tween.prototype = new anim8.Path(),
 anim8.path['tween'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
-  var defaultValue = calc.create();
   
   return new anim8.Tween(
     path.name, 
     calc,
-    calc.parse( path.start, defaultValue ),
-    calc.parse( path.end, defaultValue )
+    calc.parse( path.start, calc.zero ),
+    calc.parse( path.end, calc.zero )
   );
 };
 
@@ -3820,6 +3907,651 @@ anim8.path['point'] = function(path)
   );
 };
 
+
+/**
+ * Animates a single attribute over any period of time.
+ */
+anim8.Attrimator = function()
+{
+
+};
+
+anim8.Attrimator.prototype =
+{
+
+  /**
+   * Resets this animator for the given attribute created by the given parser.
+   * 
+   * @param  {attribute} string
+   * @param  {anim8.Parser} parser
+   */
+  reset: function(attribute, parser, next)
+  {
+    this.attribute = attribute;
+    this.parser = parser;
+    this.next = next;
+
+    this.startTime = 0;
+    this.pauseTime = 0;
+    this.paused = false;
+    this.cycle = 0;
+  },
+
+  /**
+   * Prepares this attribute animator for animation on the given subject animator.
+   * This is called once in anim8.Animator.preupdate before the first time this
+   * animator is updated.
+   * 
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  start: function(now, animator)
+  {
+    this.startTime = now;
+  },
+
+  /**
+   * Updates this attribute animator given a time to animate to and the frame to
+   * provide with a new value. This method will return true if the attribute
+   * this is animating has been updated and needs to be applied to the subject.
+   * 
+   * @param  {Number} now
+   * @param  {Object} frame
+   * @return {Boolean}
+   */
+  setTime: function(now, frame)
+  {
+    if ( this.paused )
+    {
+      return false;
+    }
+
+    var value = this.valueAt( now - this.startTime );
+    var updated = value !== false;
+
+    if ( updated )
+    {
+      frame[ this.attribute ] = value;
+    }
+
+    return updated;
+  },
+
+  /**
+   * Returns the amount of time that has elapsed in milliseconds.
+   * 
+   * @return {Number}
+   */
+  getElapsed: function()
+  {
+    return 0;
+  },
+
+  /**
+   * Returns the value at the given time.
+   * 
+   * @param  {Number} time
+   * @return {any}
+   */
+  valueAt: function(time)
+  {
+    return false;
+  },
+
+  /**
+   * The total amount of time this animator will take. This may be an infinite number.
+   * 
+   * @return {Number}
+   */
+  totalTime: function()
+  {
+    return Number.POSITIVE_INFINITY;
+  },
+
+  /**
+   * The time remaining before this animator and any following will be finished.
+   * 
+   * @return {Number}
+   */
+  timeRemaining: function() 
+  {    
+    return this.totalTime() + ( this.next ? this.next.timeRemaining() : 0 );
+  },
+
+  /**
+   * Clones this animator.
+   * 
+   * @return {anim8.AttributeAnimator}
+   */
+  clone: function()
+  {
+    throw 'AttributeAnimator.clone not implemented';
+  },
+
+  /**
+   * Returns whether this animator has computed values which need to be resolved
+   * by the subject animator calling prepare on this attribute animator.
+   * 
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return false;
+  },
+
+  /**
+   * Determines whether this animator will run infinitely.
+   * 
+   * @return {Boolean}
+   */
+  isInfinite: function()
+  {
+    return true;
+  },
+
+  /**
+   * [pause description]
+   * @return {[type]}
+   */
+  pause: function()
+  {
+    if ( !this.paused )
+    {
+      this.pauseTime = anim8.now();
+      this.paused = true;
+    }
+  },
+
+  /**
+   * [resume description]
+   * @return {[type]}
+   */
+  resume: function()
+  {
+    if ( this.paused )
+    {
+      this.startTime += anim8.now() - this.pauseTime;
+      this.paused = false;
+    }
+  },
+
+  /**
+   * [isPaused description]
+   * @return {Boolean}
+   */
+  isPaused: function()
+  {
+    return this.paused;
+  },
+
+  /**
+   * Sets the final state of the animator to the frame if one exists.
+   * 
+   * @param  {Object}
+   * @return {Boolean}
+   */
+  finish: function(frame)
+  {
+    return false;
+  },
+
+  /**
+   * [isFinished description]
+   * @return {Boolean}
+   */
+  isFinished: function()
+  {
+    return false;
+  },
+
+  /**
+   * Returns the parser that created this animator (if any).
+   * 
+   * @return {anim8.Parser}
+   */
+  getParser: function()
+  {
+    return this.parser;
+  },
+
+  /**
+   * 
+   * @param  {Function}
+   * @return {[type]}
+   */
+  queue: function(next)
+  {
+    if ( this.next )
+    {
+      this.next.queue( next );
+    }
+    else
+    {
+      this.next = next;
+    }
+  }
+
+};
+
+/**
+ * [AttributeMap description]
+ */
+anim8.AttrimatorMap = function()
+{
+  this.reset();
+};
+
+anim8.override( anim8.AttrimatorMap.prototype = new anim8.FastMap(),
+{
+
+  /**
+   * [queue description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  queue: function(attrimator)
+  {
+    var attr = attrimator.attribute;
+
+    if ( this.has( attr ) )
+    {
+      this.get( attr ).queue( attrimator );
+    }
+    else
+    {
+      this.put( attr, attrimator );
+    }
+  },
+
+  /**
+   * [queueMap description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  queueMap: function(map, onNewAttribute, context)
+  {
+    var maxRemaining = this.timeRemaining();
+    var attrimators = map.values;
+    
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var existing = this.get( attr );
+
+      if ( existing && !existing.isInfinite() )
+      {
+        attrimator.delay += (maxRemaining - existing.timeRemaining());
+
+        existing.queue( attrimator );
+      }
+      else
+      {
+        attrimator.delay += maxRemaining;
+        
+        this.put( attr, attrimator );
+
+        if ( anim8.isFunction( onNewAttribute ) )
+        {
+          onNewAttribute.call( context || this, attrimator );
+        }
+      }
+    }
+    
+    return this;
+  },
+
+  /**
+   * [unqueue description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  unqueueAt: function(index)
+  {
+    var current = this.values[ index ];
+
+    if ( current.next )
+    {
+      this.values[ index ] = current.next;
+    }
+    else
+    {
+      this.removeAt( index );
+    }
+  },
+
+  /**
+   * [clone description]
+   * @return {[type]}
+   */
+  clone: function()
+  {
+    var values = this.values;
+    var keys = this.keys;
+    var clone = new anim8.AttrimatorMap();
+
+    for (var i = values.length - 1; i >= 0; i--)
+    {
+      clone.values[i] = values[i].clone();
+      clone.keys[i] = keys[i];
+      clone.indices[ keys[i] ] = i;
+    }
+
+    return clone;
+  },
+
+  /**
+   * [timeRemaining description]
+   * @return {[type]}
+   */
+  timeRemaining: function()
+  {
+    var remaining = 0;
+    var values = this.values;
+
+    for (var i = values.length - 1; i >= 0; i--)
+    {
+      var attrimator = values[i];
+
+      if ( !attrimator.isInfinite() )
+      {
+        remaining = Math.max( remaining, attrimator.timeRemaining() );
+      }
+    }
+
+    return remaining;
+  }
+
+});
+
+/**
+ * [EventState description]
+ * @type {[type]}
+ */
+anim8.EventState = 
+{
+  CREATED: 0,
+  DELAYED: 1,
+  ANIMATING: 2,
+  SLEEPING: 4,
+  PAUSED: 8,
+  FINISHED: 16
+};
+
+/**
+ * [Event description]
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ * @param {Boolean}
+ * @param {[type]}
+ * @param {Function}
+ */
+anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase, hasInitialState, parser, next) 
+{
+  this.reset( attribute, parser, next )
+
+  this.path             = path;
+  this.easing           = anim8.easing( easing );
+  this.delay            = anim8.delay( delay );
+  this.duration         = anim8.duration( duration );
+  this.sleep            = anim8.sleep( sleep );
+  this.repeat           = anim8.repeat( repeat );
+  this.scale            = anim8.scale( scale );
+  this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.zero );
+  this.hasInitialState  = anim8.coalesce( hasInitialState, true );
+  this.elapsed          = 0;
+};
+
+anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
+{
+
+  /**
+   * Prepares this attribute animator for animation on the given subject animator.
+   * This is called once in anim8.Animator.preupdate before the first time this
+   * animator is updated.
+   * 
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  start: function(now, animator)
+  {
+    this.startTime = now;
+    this.elapsed = 0;
+    this.state = this.delay ? anim8.EventState.DELAYED : anim8.EventState.ANIMATING;
+
+    if ( this.hasComputed() )
+    {
+      this.path = this.path.replaceComputed( this, animator );
+    }
+  },
+
+  /**
+   * Updates this attribute animator given a time to animate to and the frame to
+   * provide with a new value. This method will return true if the attribute
+   * this is animating has been updated and needs to be applied to the subject.
+   * 
+   * @param  {Number} now
+   * @param  {Object} frame
+   * @return {Boolean}
+   */
+  setTime: function(now, frame)
+  {
+    if ( this.paused )
+    {
+      return false;
+    }
+
+    var updated = false;
+    var elapsed = now - this.startTime;
+    var delay = this.delay;
+    var duration = this.duration;
+    var sleep = this.sleep;
+    var repeat = this.repeat;
+    var oldState = this.state;
+    var newState = this.state;
+    var delta = 0;
+
+    if ( elapsed >= delay )
+    {
+      elapsed -= delay;
+
+      var cycle = duration + sleep;
+      var iteration = Math.floor( ( elapsed + sleep ) / cycle );
+
+      if (iteration >= repeat)
+      {
+        newState = anim8.EventState.FINISHED;
+        delta = 1;
+      }
+      else
+      {
+        elapsed -= iteration * cycle;
+
+        if ( elapsed > duration )
+        {
+          newState = anim8.EventState.SLEEPING;
+          delta = 1;
+        }
+        else
+        {
+          newState = anim8.EventState.ANIMATING;
+          delta = elapsed / duration;
+        }
+      }
+    }
+    else
+    {
+      newState = anim8.EventState.DELAYED;
+    }
+
+    if ( newState === anim8.EventState.ANIMATING || 
+       ( newState !== anim8.EventState.ANIMATING && oldState === anim8.EventState.ANIMATING ) ||
+       ( newState === anim8.EventState.DELAYED && this.hasInitialState ) )
+    {
+      this.applyValue( frame, frame[ this.attribute ], delta );
+      updated = true;
+    }
+
+    this.state = newState;
+    this.elapsed = elapsed;
+
+    return updated;
+  },
+
+  /**
+   * [getElapsed description]
+   * @return {[type]}
+   */
+  getElapsed: function()
+  {
+    return this.elapsed;
+  },
+
+  /**
+   * Computes the value at the given time. The only time when a value won't be
+   * returned is if the time is before the delay and the event doesn't have an
+   * initial state.
+   * 
+   * @param  {Number} time
+   * @param  {any} out
+   * @return {any}
+   */
+  valueAt: function(time, out)
+  {
+    if ( time < this.delay && !this.hasInitialState )
+    {
+      return false;
+    }
+
+    var delta = 0;
+
+    if ( time >= this.delay )
+    {
+      delta = Math.max( 1.0, ((time - this.delay) % (this.duration + this.sleep)) / this.duration );
+    }
+
+    return this.computeValue( out, delta );
+  },
+
+  /**
+   * [computeValue description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  computeValue: function(baseValue, delta)
+  {
+    var value = this.path.compute( baseValue, this.easing( delta ) );
+
+    if ( value !== false && this.scale !== 1.0 )
+    {
+      var calc = this.path.calculator;
+      var baseValue = calc.clone( this.scaleBase );
+      var distance = calc.sub( baseValue, value );
+
+      value = calc.adds( value, distance, -this.scale );
+    }
+
+    return value;
+  },
+
+  /**
+   * [finish description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  finish: function(frame) 
+  {
+    this.applyValue( frame, this.path.calculator.create(), 1.0 );
+    this.state = anim8.EventState.FINISHED;
+  },
+
+  /**
+   * [applyValue description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  applyValue: function(frame, baseValue, delta)
+  {
+    var value = this.computeValue( baseValue, delta );
+    
+    if ( value !== false )
+    {
+      frame[ this.attribute ] = value;
+    }
+  },
+
+  /**
+   * The total amount of time this animator will take. This may be an infinite number.
+   * 
+   * @return {Number}
+   */
+	totalTime: function()
+	{
+		return this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep);
+	},
+
+  /**
+   * The time remaining before this animator and any following will be finished.
+   * 
+   * @return {Number}
+   */
+  timeRemaining: function() 
+  {    
+    return this.totalTime() - this.elapsed + ( this.next ? this.next.timeRemaining() : 0 );
+  },
+
+  /**
+   * [clone description]
+   * @return {[type]}
+   */
+  clone: function()
+  {
+    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null );
+  },
+
+  /**
+   * Returns whether this animator has computed values which need to be resolved
+   * by the subject animator calling prepare on this attribute animator.
+   * 
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return this.path.computed;
+  },
+
+  /**
+   * [isInfinite description]
+   * @return {Boolean}
+   */
+  isInfinite: function()
+  {
+    return (this.repeat === Number.POSITIVE_INFINITY);
+  },
+
+  /**
+   * [isFinished description]
+   * @return {Boolean}
+   */
+  isFinished: function()
+  {
+    return (this.state === anim8.EventState.FINISHED);
+  }
+
+});
+
 /**
  * Returns a spring if the provided argument is a spring, the name of a spring, or
  * an object with a spring type to be created. If none of these conditions are true
@@ -3854,8 +4586,9 @@ anim8.Spring = function()
 {
 };
 
-anim8.Spring.prototype = 
+anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
 {
+
   /**
    * Resets the spring's properties.
    * 
@@ -3864,15 +4597,16 @@ anim8.Spring.prototype =
    * @param {any} rest
    * @param {any} position
    */
-  reset: function(attribute, calculator, rest, position, gravity)
+  set: function(attribute, calculator, rest, position, velocity, gravity, finishOnRest)
   { 
-    this.attribute    = attribute;
+    this.reset( attribute, null, null );
+
     this.calculator   = calculator;
     this.rest         = rest;
     this.position     = position;
     this.gravity      = gravity;
-    this.velocity     = null;
-    this.time         = 0;
+    this.velocity     = velocity;
+    this.finishOnRest = finishOnRest;
   },
 
   /**
@@ -3881,16 +4615,34 @@ anim8.Spring.prototype =
    * 
    * @return {[type]}
    */
-  preupdate: function(animator)
+  start: function(now, animator)
   {
+    this.startTime = now;
+    this.elapsed = 0;
+    this.finished = false;
+
     var attribute = animator.getAttribute( this.attribute );
     var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
 
     this.calculator = calc;
     this.rest       = this.parseValue( animator, this.rest, attribute.defaultValue );
     this.position   = this.parseValue( animator, this.position, attribute.defaultValue );
-    this.gravity    = this.parseValue( animator, this.gravity, calc.create() );
-    this.velocity   = calc.create();
+    this.gravity    = this.parseValue( animator, this.gravity, calc.zero );
+    this.velocity   = this.parseValue( animator, this.velocity, calc.zero );
+  },
+
+  /**
+   * Returns whether this animator has computed values which need to be resolved
+   * by the subject animator calling prepare on this attribute animator.
+   * 
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return anim8.isComputed( this.rest ) || 
+           anim8.isComputed( this.position ) ||
+           anim8.isComputed( this.gravity ) ||
+           anim8.isComputed( this.velocity );
   },
 
   /**
@@ -3922,27 +4674,35 @@ anim8.Spring.prototype =
    * @param {number} now
    * @param {object} frame
    */
-  update: function(now, frame)
+  setTime: function(now, frame)
   {
-    if (this.time === 0)
+    if ( this.paused )
     {
-      this.time = now;
+      return false;
     }
-    
+
+    var elapsed = now - this.startTime;
+
+    if ( elapsed < this.delay )
+    {
+      this.elapsed = elapsed;
+
+      return false;
+    }
+
     var calc = this.calculator;
     
     // the number of elapsed seconds (maxed to avoid crazy behavior with low FPS)
-    var dt = Math.min( (now - this.time) * 0.001, anim8.Spring.MAX_DT );
+    var dt = Math.min( (elapsed - this.elapsed) * 0.001, anim8.Spring.MAX_DT );
     
     // keep track of the starting position to determine whether the position has updated.
-    var starting = calc.copy( {}, this.position );
+    var starting = calc.clone( this.position );
     
     // call the update method which should update the position
     this.updateVelocity( dt );
     this.velocity = calc.adds( this.velocity, this.gravity, dt );
     this.position = calc.adds( this.position, this.velocity, dt );
-    
-    this.time = now;
+    this.elapsed = elapsed;
     
     // track whether the attribute has updated so the animator knows if it needs to apply the attribute to the subject.
     var updated = !calc.isEqual( starting, this.position, anim8.Spring.EPSILON );
@@ -3951,8 +4711,21 @@ anim8.Spring.prototype =
     {
       frame[ this.attribute ] = this.position;
     }
+    else if ( this.finishOnRest && calc.isZero( this.velocity ) )
+    {
+      this.finished = true;
+    }
     
     return updated;
+  },
+
+  /**
+   * [getElapsed description]
+   * @return {[type]}
+   */
+  getElapsed: function()
+  {
+    return this.elapsed;
   },
   
   /**
@@ -3971,8 +4744,31 @@ anim8.Spring.prototype =
   updateVelocity: function(dt)
   {
     throw 'Spring.updateVelocity not implemented';
+  },
+
+  /**
+   * Sets the final state of the animator to the frame if one exists.
+   * 
+   * @param  {Object}
+   * @return {Boolean}
+   */
+  finish: function(frame)
+  {
+    this.finished = true;
+
+    return true;
+  },
+
+  /**
+   * [isFinished description]
+   * @return {Boolean}
+   */
+  isFinished: function()
+  {
+    return this.finished;
   }
-};
+
+});
 
 /**
  * The maximum elapsed time that should be used for the spring simulation. If you allow the elapsed time
@@ -3997,9 +4793,9 @@ anim8.Spring.EPSILON = 0.0001;
  * @param {[type]}
  * @param {[type]}
  */
-anim8.LinearSpring = function(attribute, calculator, position, rest, damping, stiffness, gravity)
+anim8.LinearSpring = function(attribute, calculator, position, rest, damping, stiffness, velocity, gravity, finishOnRest)
 {
-  this.reset( attribute, calculator, rest, position, gravity );
+  this.set( attribute, calculator, rest, position, velocity, gravity, finishOnRest );
   
   this.damping      = damping;
   this.stiffness    = stiffness;
@@ -4009,9 +4805,16 @@ anim8.LinearSpring = function(attribute, calculator, position, rest, damping, st
 
 anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(), 
 {
-  preupdate: function(animator)
+
+  /**
+   * Called the first time preupdate is called on an Animator to prepare the
+   * spring to be updated.
+   * 
+   * @return {[type]}
+   */
+  start: function(now, animator)
   {
-    anim8.Spring.prototype.preupdate.apply( this, arguments );
+    anim8.Spring.prototype.start.apply( this, arguments );
 
     var attribute = animator.getAttribute( this.attribute );
     var calc = this.calculator;
@@ -4020,6 +4823,22 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
     this.stiffness    = this.parseValue( animator, this.stiffness, attribute.defaultValue );
     this.temp0        = calc.create();
     this.temp1        = calc.create();
+  },
+
+  /**
+   * Returns whether this animator has computed values which need to be resolved
+   * by the subject animator calling prepare on this attribute animator.
+   * 
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return anim8.isComputed( this.rest ) || 
+           anim8.isComputed( this.position ) ||
+           anim8.isComputed( this.gravity ) ||
+           anim8.isComputed( this.velocity ) ||
+           anim8.isComputed( this.damping ) || 
+           anim8.isComputed( this.stiffness );
   },
 
   updateVelocity: function(dt)
@@ -4039,6 +4858,7 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
     
     this.velocity = calc.adds( this.velocity, this.temp0, dt );
   }
+
 });
 
 /**
@@ -4056,7 +4876,9 @@ anim8.spring['linear'] = function(spring)
     anim8.coalesce( spring.rest, true ),
     spring.damping,
     spring.stiffness,
-    spring.gravity
+    spring.velocity,
+    spring.gravity,
+    spring.finishOnRest
   );
 };
 
@@ -4071,9 +4893,9 @@ anim8.spring['linear'] = function(spring)
  * @param {[type]}
  * @param {[type]}
  */
-anim8.DistanceSpring = function(attribute, calculator, position, rest, distance, damping, stiffness, gravity)
+anim8.DistanceSpring = function(attribute, calculator, position, rest, distance, damping, stiffness, velocity, gravity, finishOnRest)
 {
-  this.reset( attribute, calculator, rest, position, gravity );
+  this.set( attribute, calculator, rest, position, velocity, gravity, finishOnRest );
   
   this.distance   = distance;
   this.damping    = damping;
@@ -4083,9 +4905,9 @@ anim8.DistanceSpring = function(attribute, calculator, position, rest, distance,
 
 anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(), 
 {
-  preupdate: function(animator)
+  start: function(now, animator)
   {
-    anim8.Spring.prototype.preupdate.apply( this, arguments );
+    anim8.Spring.prototype.start.apply( this, arguments );
     
     this.temp = this.calculator.create();
   },
@@ -4132,582 +4954,11 @@ anim8.spring['distance'] = function(spring)
     spring.distance,
     spring.damping,
     spring.stiffness,
-    spring.gravity
+    spring.velocity,
+    spring.gravity,
+    spring.finishOnRest
   );
 };
-
-/**
- * [EventState description]
- * @type {[type]}
- */
-anim8.EventState = 
-{
-  CREATED: 0,
-  DELAYED: 1,
-  ANIMATING: 2,
-  SLEEPING: 4,
-  PAUSED: 8,
-  FINISHED: 16
-};
-
-/**
- * [Event description]
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {[type]}
- * @param {Boolean}
- * @param {[type]}
- * @param {Function}
- */
-anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, scale, scaleBase, hasInitialState, parser, next) 
-{
-  if ( attribute )
-  {
-    this.attribute        = attribute;
-    this.path             = path;
-    this.easing           = anim8.easing( easing );
-    this.delay            = anim8.delay( delay );
-    this.duration         = anim8.duration( duration );
-    this.sleep            = anim8.sleep( sleep );
-    this.repeat           = anim8.repeat( repeat );
-    this.scale            = anim8.scale( scale );
-    this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.create() );
-    this.hasInitialState  = anim8.coalesce( hasInitialState, true );
-    this.parser           = parser;
-    this.next             = next; 
-  }
-};
-
-anim8.Event.prototype = 
-{
-  /**
-   * [newInstance description]
-   * @return {[type]}
-   */
-  newInstance: function()
-  {
-    return new anim8.EventInstance( this );
-  },
-
-  /**
-   * [isInstance description]
-   * @return {Boolean}
-   */
-  isInstance: function()
-  {
-    return false
-  },
-
-  /**
-   * [getParser description]
-   * @return {[type]}
-   */
-  getParser: function()
-  {
-    return this.parser;
-  },
-
-  /**
-   * [totalTime description]
-   * @return {[type]}
-   */
-	totalTime: function()
-	{
-		return this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep);
-	},
-
-  /**
-   * [clone description]
-   * @return {[type]}
-   */
-  clone: function()
-  {
-    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null );
-  },
-
-  /**
-   * [isInfinite description]
-   * @return {Boolean}
-   */
-  isInfinite: function()
-  {
-    return (this.repeat === Number.POSITIVE_INFINITY);
-  },
-
-  /**
-   * [timeRemaining description]
-   * @return {[type]}
-   */
-  timeRemaining: function() 
-  {    
-    return this.totalTime() + ( this.next ? this.next.timeRemaining() : 0 );
-  },
-
-  /**
-   * [hasTrue description]
-   * @return {Boolean}
-   */
-  hasComputed: function()
-  {
-    return this.path.computed;
-  },
-
-  /**
-   * [queue description]
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  queue: function(e)
-  {
-    if ( this.next )
-    {
-      this.next.queue( e );
-    }
-    else
-    {
-      this.next = e;
-    }
-  }
-
-};
-
-
-/**
- * [EventInstance description]
- * @param {[type]}
- */
-anim8.EventInstance = function(event)
-{
-	this.event 			      = event;
-	this.attribute 	      = event.attribute;
-	this.path 			      = event.path;
-	this.duration 	      = event.duration;
-	this.easing 		      = event.easing;
-	this.delay 			      = event.delay;
-	this.sleep 			      = event.sleep;
-	this.repeat 		      = event.repeat;
-  this.scale            = event.scale;
-  this.scaleBase        = event.scaleBase;
-  this.hasInitialState  = event.hasInitialState;
-  this.next             = null;
-  this.state 			      = anim8.EventState.CREATED;
-  this.time 			      = 0;
-  this.pauseTime 	      = 0;
-  this.pauseState       = 0;
-	this.elapsed		      = 0;
-  this.cycle            = 0;
-};
-
-anim8.override( anim8.EventInstance.prototype = new anim8.Event(),
-{
-  /**
-   * [newInstance description]
-   * @return {[type]}
-   */
-  newInstance: function()
-  {
-    return new anim8.EventInstance( this.event );
-  },
-
-  /**
-   * [isInstance description]
-   * @return {Boolean}
-   */
-  isInstance: function()
-  {
-    return true
-  },
-
-  /**
-   * [clone description]
-   * @return {[type]}
-   */
-  clone: function()
-  {
-    return new anim8.EventInstance( this.event );
-  },
-
-  /**
-   * [getParser description]
-   * @return {[type]}
-   */
-  getParser: function()
-  {
-    return this.event.parser;
-  },
-
-  /**
-   * [timeRemaining description]
-   * @return {[type]}
-   */
-  timeRemaining: function() 
-  {    
-    return this.totalTime() - this.elapsed + ( this.next ? this.next.timeRemaining() : 0 );
-  },
-
-  /**
-   * [update description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  update: function(now, frame) 
-	{
-    var updated = false;
-    var elapsed = this.catchup( now );
-    
-    if ( this.isAnimating() ) 
-		{			
-      var delta = elapsed / this.duration;
-      
-      if (delta >= 1 || this.duration === 0)
-			{
-        if (!this.isInfinite() && --this.repeat === 0) 
-				{
-          this.finish(frame);
-					
-          return true;
-        } 
-				else 
-				{
-          if (this.sleep)
-					{
-            elapsed = this.progress( elapsed, this.duration, anim8.EventState.SLEEPING ); 
-            delta = 1;
-            
-            this.trigger('sleeping', this);
-          } 
-					else 
-					{
-            elapsed = this.progress( elapsed, this.duration, anim8.EventState.ANIMATING );
-            delta -= 1;
-          }
-        }
-      }
-      
-      this.applyValue( frame, frame[this.attribute], delta );
-      updated = true;
-    }
-    
-    return updated;
-  },
-
-  /**
-   * [catchup description]
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  catchup: function(now)
-  {
-    if ( this.isPaused() )
-    {
-      return;
-    }
-    
-    if ( this.state === anim8.EventState.CREATED )
-    {
-      this.time = now;
-      
-      if ( this.delay )
-      {
-        this.state = anim8.EventState.DELAYED;
-        
-        this.trigger('delaying', this);
-      } 
-      else
-      {
-        this.state = anim8.EventState.ANIMATING;
-      }
-    }
-    
-    var elapsed = now - this.time;
-    
-    if ( this.isDelayed() )
-    {
-      if ( elapsed > this.delay ) 
-      {
-        this.trigger('delayed', this);
-        
-        elapsed = this.progress( elapsed, this.delay, anim8.EventState.ANIMATING );
-      }
-    }
-    
-    if ( this.isSleeping() )
-    {
-      if ( elapsed > this.sleep )
-      {
-        this.trigger('slept', this);
-        
-        elapsed = this.progress( elapsed, this.sleep, anim8.EventState.ANIMATING );
-      }
-    }
-    
-    if ( this.isAnimating() && this.duration )
-    {
-      var cycle = this.duration + this.sleep;
-      var cycleCount = Math.floor( ( elapsed + this.sleep ) / cycle );
-      var maxCycles = Math.min( this.repeat, cycleCount );
-            
-      elapsed = this.progress( elapsed, maxCycles * cycle, anim8.EventState.ANIMATING );
-      
-      if ( !this.isInfinite() )
-      { 
-        if (maxCycles === this.repeat)
-        {
-          elapsed = this.duration;
-          this.repeat = 1;
-        }
-        else
-        {
-          this.repeat -= cycleCount;
-        }
-      }
-      
-      if ( elapsed > this.duration )
-      {
-        elapsed = this.progress( elapsed, this.duration, anim8.EventState.SLEEPING );
-        
-        this.trigger('sleeping', this);
-      }
-    }
-    
-    return elapsed;
-  },
-
-  /**
-   * [computeValue description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  computeValue: function(baseValue, delta)
-  {
-    var value = this.path.compute( baseValue, this.easing( delta ) );
-
-    if ( value !== false && this.scale !== 1.0 )
-    {
-      var calc = this.path.calculator;
-      var baseValue = calc.clone( this.scaleBase );
-      var distance = calc.sub( baseValue, value );
-
-      value = calc.adds( value, distance, -this.scale );
-    }
-
-    return value;
-  },
-
-  /**
-   * [progress description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  progress: function(elapsed, time, newState) 
-  {
-    this.time += time;
-    this.elapsed += time;
-    this.state = newState;
-    
-    return elapsed - time;
-  },
-
-  /**
-   * [finish description]
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  finish: function(frame) 
-  {
-    this.applyValue( frame, this.path.calculator.create(), 1.0 );
-    this.state = anim8.EventState.FINISHED;
-    
-    this.trigger('finish', this);
-  },
-
-  /**
-   * [applyValue description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  applyValue: function(frame, baseValue, delta)
-  {
-    var value = this.computeValue( baseValue, delta );
-    
-    if ( value !== false )
-    {
-      frame[this.attribute] = value;
-    }
-  },
-
-  /**
-   * [getDelta description]
-   * @return {[type]}
-   */
-  getDelta: function()
-  {
-    return this.isAnimating() ? Math.min( 1.0, (anim8.now() - this.time) / this.duration ) : 0.0;
-  },
-
-  /**
-   * [getPoint description]
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  getPoint: function(delta)
-  {
-    return this.computeValue( this.path.calculator.create(), delta );
-  },
-
-  /**
-   * [getFuture description]
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  getFuture: function(fdelta)
-  {
-    return this.getPoint( Math.min( 1.0, this.getDelta() + fdelta ) );
-  },
-
-  /**
-   * [getStart description]
-   * @return {[type]}
-   */
-  getStart: function()
-  {
-    return this.getPoint( 0 );
-  },
-
-  /**
-   * [getEnd description]
-   * @return {[type]}
-   */
-  getEnd: function() 
-	{
-    return this.getPoint( 1 );
-  },
-
-  /**
-   * [pause description]
-   * @return {[type]}
-   */
-  pause: function() 
-  {
-    if (this.state !== anim8.EventState.PAUSED) 
-    {
-      this.pauseTime = anim8.now();
-      this.pauseState = this.state;
-      this.state = anim8.EventState.PAUSED; 
-    }
-  },
-
-  /**
-   * [resume description]
-   * @return {[type]}
-   */
-  resume: function() 
-  {
-    if (this.state === anim8.EventState.PAUSED) 
-    {
-      this.time += anim8.now() - this.pauseTime;
-      this.state = this.pauseState; 
-    }
-  },
-
-  /**
-   * [hasStarted description]
-   * @return {Boolean}
-   */
-  hasStarted: function()
-  {
-    return (this.state !== anim8.EventState.CREATED && this.state !== anim8.EventState.DELAYED);
-  },
-
-  /**
-   * [isAnimating description]
-   * @return {Boolean}
-   */
-  isAnimating: function() 
-  {
-    return (this.state === anim8.EventState.ANIMATING);
-  },
-
-  /**
-   * [isFinished description]
-   * @return {Boolean}
-   */
-  isFinished: function() 
-  {
-    return (this.state === anim8.EventState.FINISHED);
-  },
-
-  /**
-   * [isDelayed description]
-   * @return {Boolean}
-   */
-  isDelayed: function() 
-  {
-    return (this.state === anim8.EventState.DELAYED);
-  },
-
-  /**
-   * [isPaused description]
-   * @return {Boolean}
-   */
-  isPaused: function() 
-  {
-    return (this.state === anim8.EventState.PAUSED);
-  },
-
-  /**
-   * [isSleeping description]
-   * @return {Boolean}
-   */
-  isSleeping: function() 
-  {
-    return (this.state === anim8.EventState.SLEEPING);
-  },
-
-  /**
-   * [hasStates description]
-   * @param  {[type]}
-   * @return {Boolean}
-   */
-  hasStates: function(states) 
-  {
-    return (this.state & states) !== 0;
-  },
-
-  /**
-   * [stateText description]
-   * @return {[type]}
-   */
-  stateText: function() 
-  {
-    switch(this.state) 
-    {
-      case anim8.EventState.CREATED:            return "created";
-      case anim8.EventState.DELAYED:            return "delayed";
-      case anim8.EventState.ANIMATING:          return "animating";
-      case anim8.EventState.SLEEPING:           return "sleeping";
-      case anim8.EventState.FINISHED:           return "finished";
-    }
-  }
-
-});
-
-/**
- * Adds the following event methods to EventInstances: on, once, off, trigger.
- */
-anim8.eventize( anim8.EventInstance.prototype );
 
 /**
  * Returns an animation based on the input. If the input is an instance of anim8.Animation that instance
@@ -4755,6 +5006,10 @@ anim8.animation = function(animation, options, cache)
           last = last.next = parsedAnimation.extend( parsedOptions, true );
         }
       }
+      else
+      {
+        throw parsedAnimation + ' is not a valid animation in "' + animationStrings[ k ] + '"';
+      }
     }
 
     if ( anim8.coalesce( cache, anim8.defaults.cache ) && anim8.isEmpty( options ) )
@@ -4768,8 +5023,8 @@ anim8.animation = function(animation, options, cache)
 	}
 	if ( anim8.isObject( animation ) )
 	{
-		var events = [];
-		var options = options || {};
+    var attrimatorMap = new anim8.AttrimatorMap();
+		var options = anim8.options( options );
 		
 		for (var parserName in animation)
 		{
@@ -4777,14 +5032,18 @@ anim8.animation = function(animation, options, cache)
 			
 			if ( parser !== false )
 			{
-				parser.parse( animation, options, events );
+				parser.parse( animation, options, attrimatorMap );
 			}
 		}
 		
-		if (events.length)
+		if (attrimatorMap.size())
 		{
-			return new anim8.Animation( false, animation, options, events );
+			return new anim8.Animation( false, animation, options, attrimatorMap );
 		}
+    else
+    {
+      throw 'Failed to create any attrimators in anim8.animation';
+    }
 	}
 	
 	return false;
@@ -4806,6 +5065,94 @@ anim8.save = function(name, animation, options)
   animation.name = name;
   
   anim8.animation[ key ] = animation;
+};
+
+/**
+ * Instantiates a new Animation given it's name, the input & options passed, and the attrimators that
+ * were generated from the input & options. If the name is false this is an anonymous animation.
+ * Input & Options are used by parsers to generate attrimators, options allow for an animations
+ * default event properties to be overriden.
+ *
+ * @param {string} name
+ * @param {object} input
+ * @param [object] options
+ * @param {array:anim8.Event} attrimators
+ */
+anim8.Animation = function(name, input, options, attrimators)
+{
+	this.name = name;
+	this.input = input;
+	this.options = options;
+	this.attrimators = attrimators;
+  this.next = null;
+};
+
+anim8.Animation.prototype = 
+{
+  
+  /**
+   * Returns true if this animation was a saved animation, otherwise it's an anonymous one
+   * and false is returned.
+   */
+  isSaved: function()
+  {
+    return (this.name !== false);
+  },
+  
+  /**
+   * Generates an map of event instances from the attrimators in this animation.
+   *
+   * @return {anim8.AttrimatorMap}
+   */
+  newAttrimators: function()
+  {
+    return this.attrimators.clone();
+  },
+
+  /**
+   * Merges options with the options in this animation and places them in the
+   * events.
+   * 
+   * @param  {object} options
+   * @param  {anim8.AttrimatorMap} attrimatorMap
+   * @return {[type]}
+   */
+  merge: function(options, attrimatorMap)
+  {
+    for (var parserName in this.input)
+    {
+      var parser = anim8.parser( parserName );
+      
+      if ( parser !== false )
+      {
+        parser.merge( this.input, options, this.options, attrimatorMap );
+      }
+    }
+
+    return attrimatorMap;
+  },
+
+  /**
+   * Extends this animation and returns an animation modified with the given options. 
+   *
+   * @param {object} options
+   */
+  extend: function(options, force)
+  {
+    if ( anim8.isEmpty( options ) && !force )
+    {
+      return this;
+    }
+
+    var attrimatorMap = this.newAttrimators();
+
+    this.merge( options, attrimatorMap );
+
+    anim8.extend( options, this.options );
+
+    return new anim8.Animation( false, this.input, options, attrimatorMap );
+  }
+
 };
 
 /**
@@ -4943,6 +5290,7 @@ anim8.transition = function(transition, cache)
   return anim8.defaults.noTransition;
 };
 
+
 /**
  * Parses a value into an options object. If the given input is a string it's 
  * expected to be in a similar format to:
@@ -5070,116 +5418,6 @@ anim8.options = function(options, cache)
 };
 
 /**
- * Instantiates a new Animation given it's name, the input & options passed, and the events that
- * were generated from the input & options. If the name is false this is an anonymous animation.
- * Input & Options are used by parsers to generate events, options allow for an animations
- * default event properties to be overriden.
- *
- * @param {string} name
- * @param {object} input
- * @param [object] options
- * @param {array:anim8.Event} events
- */
-anim8.Animation = function(name, input, options, events)
-{
-	this.name = name;
-	this.input = input;
-	this.options = options;
-	this.events = events;
-  this.next = null;
-};
-
-anim8.Animation.prototype = 
-{
-  
-  /**
-   * Returns true if this animation was a saved animation, otherwise it's an anonymous one
-   * and false is returned.
-   */
-  isSaved: function()
-  {
-    return (this.name !== false);
-  },
-  
-  /**
-   * Generates an array of event instances from the events in this animation.
-   */
-  newEvents: function()
-  {
-    var instances = [];
-    
-    for (var i = 0; i < this.events.length; i++)
-    {
-      instances.push( this.events[i].newInstance() );
-    }
-    
-    return instances;
-  },
-
-  /**
-   * Generates an array of event clones from the events in this animation.
-   * 
-   * @return {array}
-   */
-  cloneEvents: function()
-  {
-    var events = [];
-
-    for (var i = 0; i < this.events.length; i++)
-    {
-      events.push( this.events[i].clone() );
-    }
-
-    return events;
-  },
-
-  /**
-   * Merges options with the options in this animation and places them in the
-   * events.
-   * 
-   * @param  {object} options
-   * @param  {array} events
-   * @return {[type]}
-   */
-  merge: function(options, events)
-  {
-    for (var parserName in this.input)
-    {
-      var parser = anim8.parser( parserName );
-      
-      if ( parser !== false )
-      {
-        parser.merge( this.input, options, this.options, events );
-      }
-    }
-
-    return events;
-  },
-
-  /**
-   * Extends this animation and returns an animation modified with the given options. 
-   *
-   * @param {object} options
-   */
-  extend: function(options, force)
-  {
-    if ( anim8.isEmpty( options ) && !force )
-    {
-      return this;
-    }
-
-    var events = this.cloneEvents();
-
-    this.merge( options, events );
-
-    anim8.extend( options, this.options );
-
-    return new anim8.Animation( false, this.input, options, events );
-  }
-
-};
-
-/**
  * Instantiates a new Animator given a subject to animate.
  *
  * @param {any} e
@@ -5199,11 +5437,8 @@ anim8.fn = anim8.Animator.prototype =
 	reset: function(subject)
 	{
 	  this.subject = subject;
-	  this.events = {};
-    this.eventsAdded = [];
-    this.eventsComputed = [];
-    this.springs = {};
-    this.springsAdded = [];
+    this.attrimators = new anim8.AttrimatorMap();
+    this.attrimatorsAdded = [];
 	  this.frame = {};
     this.updated = {};
 	  this.finished = false;
@@ -5274,52 +5509,25 @@ anim8.fn = anim8.Animator.prototype =
    * A method thats invoked along with all other animators before updates are called.
    * This is used to make any necessary preparations before the animator is updated.
    */
-  preupdate: function()
+  preupdate: function(now)
   {
-    // If there are events placed on the animator since the last preupdate
+    // If there are attribute placed on the animator since the last preupdate
     // that has computed values we need to replace the path on the event with
     // a copy containing the computed values. This is where current value & 
-    // relative values are injected from the animator into the even'ts path.
-    var ce = this.eventsComputed;
-    if ( ce.length )
+    // relative values are injected from the animator into the attribute.
+    var aa = this.attrimatorsAdded;
+    if ( aa.length )
     {
-      for (var i = 0; i < ce.length; i++)
+      for (var i = 0; i < aa.length; i++)
       {
-        var e = ce[ i ];
+        var attrimator = aa[ i ];
 
-        e.path = e.path.replaceComputed( e, this );        
+        this.setDefault( attrimator.attribute );
+
+        attrimator.start( now, this );     
       }
 
-      ce.length = 0;
-    }
-    
-    // If there isn't a value in frame for any of the events on the animator,
-    // place the default value.
-    var ea = this.eventsAdded;
-    if ( ea.length )
-    {
-      for (var i = 0; i < ea.length; i++)
-      {
-        this.setDefault( ea[ i].attribute );
-      }
-
-      ea.length = 0;
-    }
-
-    // Call pre update on any new springs.
-    var sa = this.springsAdded;
-    if ( sa.length )
-    {
-      for (var i = 0; i < sa.length; i++)
-      {
-        var s = sa[i];
-
-        this.setDefault( s.attribute );
-
-        s.preupdate( this );
-      }
-
-      sa.length = 0;
+      aa.length = 0;
     }
 
     this.trigger('preupdate');
@@ -5349,67 +5557,40 @@ anim8.fn = anim8.Animator.prototype =
   update: function(now) 
 	{  
     this.wasFinished = this.finished;
-    
     this.finished = true;
-		
-    for (var attr in this.events)
+
+    var attrimators = this.attrimators.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = this.events[ attr ];
-      
-      this.updated[ attr ] = e.update( now, this.frame );
-      
-      this.finished = this.finished && e.isFinished();
-    }
-    
-    for (var attr in this.springs)
-    {
-      var s = this.springs[ attr ];
-      
-      this.updated[ attr ] = s.update( now, this.frame );
-      
-      this.finished = false;
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+
+      this.updated[ attr ] = attrimator.setTime( now, this.frame );
+
+      this.finished = this.finished && attrimator.isFinished();
     }
 	
 		this.trigger('update');
     
     return this;
   },
-  
-  /**
-   * Places the spring in this animator replacing any spring that exists for the same
-   * attribute. The next time the animator is updated the spring will be started.
-   *
-   * @param {anim8.Spring} s
-   */
-  placeSpring: function(s)
-  {
-    var attr = s.attribute;
-    
-    this.springs[ attr ] = s;
-    this.springsAdded.push( s );
-		
-		this.finished = false;
-  },
-  
-  /**
-   * Places the event in this animator replacing any event that exists for the same
-   * attribute. The next time the animator is updated the event will be started.
-   *
-   * @param {anim8.EventInstance} e
-   */
-  placeEvent: function(e)
-  {
-    var attr = e.attribute;
 
-    this.events[ attr ] = e;
-    this.eventsAdded.push( e );
-    
-    if ( e.hasComputed() )
-    {
-       this.eventsComputed.push( e );
-    }
-		
-		this.finished = false;
+  /**
+   * Places the attribute animator in this animator replacing any existing animator
+   * for the same attribute. The next time the animator is updated the attribute
+   * animator will be started.
+   * 
+   * @param  {anim8.Attrimator}
+   */
+  placeAttrimator: function(attrimator)
+  {
+    var attr = attrimator.attribute;
+
+    this.attrimators.put( attr, attrimator );
+    this.attrimatorsAdded.push( attrimator );
+
+    this.finished = false;
   },
   
   /**
@@ -5429,7 +5610,7 @@ anim8.fn = anim8.Animator.prototype =
 	
 		this.trigger('apply');
 	
-    this.trimEvents();
+    this.trimAttrimators();
     
     return this;
   },
@@ -5438,22 +5619,23 @@ anim8.fn = anim8.Animator.prototype =
    * Removes any finished events and places queued events. If the animator previously wasn't finished
    * but now it is the 'finished' event will be triggered.
    */
-  trimEvents: function()
+  trimAttrimators: function()
   {
-    for (var attr in this.events)
+    var attrimators = this.attrimators.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = this.events[attr];
-      
-      if ( e.isFinished() )
+      var attrimator = attrimators[ i ];
+
+      if ( attrimator.isFinished() )
       {
-        if ( e.next )
-        {                    
-          this.placeEvent( e.next );
-          this.finished = false;
+        if ( attrimator.next )
+        {
+          this.placeAttrimator( attrimator.next );
         }
         else
         {
-          delete this.events[attr];
+          this.attrimators.removeAt( i );
         }
       }
     }
@@ -5517,7 +5699,7 @@ anim8.fn = anim8.Animator.prototype =
    * @param {anim8.Animation|string|object} animation
    * @param [object] options
    */
-  createEvents: function(animation, options, cache)
+  createAttrimators: function(animation, options, cache)
   {
     var options = anim8.options( options );    
     var animation = anim8.animation( animation, options, cache );
@@ -5527,66 +5709,27 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
     
-    var events = animation.newEvents();
+    var attrimators = animation.newAttrimators();
     
     if ( animation.isSaved() && !anim8.isEmpty( options ) )
     { 
-      animation.merge( options, events );
+      animation.merge( options, attrimators );
     }
     
-    this.onAnimation( animation, options, events );
+    this.onAnimation( animation, options, attrimators );
 
-    if ( animation.next !== null )
+    while ( animation.next !== null )
     {
-      var eventMap = {};
+      animation = animation.next;
 
-      for (var i = 0; i < events.length; i++)
-      {
-        var e = events[i];
+      var queueAttrimators = animation.newAttrimators();
 
-        eventMap[ e.attribute ] = e;
-      }
+      this.onAnimation( animation, options, queueAttrimators );
 
-      while ( animation.next !== null )
-      {
-        animation = animation.next;
-
-        var queueEvents = animation.newEvents();
-        var maxRemaining = 0;
-
-        for (var i = 0; i < events.length; i++)
-        {
-          var e = events[i];
-
-          if ( !e.isInfinite() )
-          {
-            maxRemaining = Math.max( maxRemaining, e.timeRemaining() );  
-          }
-        }
-
-        for (var i = 0; i < queueEvents.length; i++)
-        {
-          var e = queueEvents[ i ];
-          var existing = eventMap[ e.attribute ];
-
-          if ( existing && !existing.isInfinite() )
-          {
-            e.delay += (maxRemaining - existing.timeRemaining());
-            eventMap[ e.attribute ].queue( e );
-          }
-          else
-          {
-            e.delay += maxRemaining;
-            eventMap[ e.attribute ] = e;
-            events.push( e );
-          }
-        }
-
-        this.onAnimation( animation, options, queueEvents );
-      }      
+      attrimators.queueMap( queueAttrimators );
     }
 
-    return events;
+    return attrimators;
   },
   
   /**
@@ -5594,9 +5737,9 @@ anim8.fn = anim8.Animator.prototype =
    * 
    * @param {anim8.Animation} animation
    * @param {object} options
-   * @param {array:anim8.EventInstance} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  onAnimation: function(animation, options, events)
+  onAnimation: function(animation, options, attrimatorMap)
   {
     
   },
@@ -5616,26 +5759,11 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
 
-    this.placeSpring( spring );
+    this.placeAttrimator( spring );
     
     this.activate();
     
     return spring;
-  },
-  
-  /**
-   * Removes springs for the specified attributes. If no attributes are specified then all springs
-   * are removed. Attributes can be specified as an array of attribute names or a string with attribute
-   * names separated by a space.
-   *
-   * @param {string|Array} attributes
-   */
-  unspring: function(attributes)
-  {
-    return this.springsFor( attributes, function(s)
-    {
-      delete this.springs[ s.attribute ];
-    });
   },
   
   /**
@@ -5649,14 +5777,14 @@ anim8.fn = anim8.Animator.prototype =
    */
 	play: function(animation, options, all, cache)
 	{
-    var events = this.createEvents( animation, options, cache );
+    var attrimatorMap = this.createAttrimators( animation, options, cache );
     
-    if ( events === false )
+    if ( attrimatorMap === false )
     {
       return false;
     }
     
-    this.playEvents( events, all );
+    this.playAttrimators( attrimatorMap, all );
 
     return this.activate();
 	},
@@ -5666,30 +5794,32 @@ anim8.fn = anim8.Animator.prototype =
    * attribute). Existing events will be replaced immediately. This method will not activate the Animator, that has
    * to be done manually.
    * 
-   * @param  {array} events
+   * @param  {anim8.AttributeMap} animatorMap
    * @param  [boolean] all
    * @return {this}
    */
-  playEvents: function(events, all)
+  playAttrimators: function(attrimatorMap, all)
   {
-    var attrs = {};
-    
-    for (var i = 0; i < events.length; i++)
-    { 
-      this.placeEvent( events[i] );
-      
-      attrs[ events[i].attribute ] = true;
-    }
-    
     if ( all )
     {
-      for (var attr in this.events)
+      var attrimators = this.attrimators.values;
+
+      for (var i = attrimators.length - 1; i >= 0; i--)
       {
-        if ( !(attr in attrs) )
+        var attrimator = attrimators[ i ];
+
+        if ( !attrimatorMap.has( attrimator.attribute ) )
         {
-          this.events[ attr ].finish( this.frame );
+          attrimator.finish( this.frame );
         }
       }
+    }
+
+    var attrimators = attrimatorMap.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      this.placeAttrimator( attrimators[i] );
     }
     
     return this;
@@ -5704,14 +5834,14 @@ anim8.fn = anim8.Animator.prototype =
    */
 	queue: function(animation, options, cache)
 	{
-    var events = this.createEvents( animation, options, cache );
+    var attrimatorMap = this.createAttrimators( animation, options, cache );
     
-    if ( events === false )
+    if ( attrimatorMap === false )
     {
       return false;
     }
         
-    this.queueEvents( events );
+    this.queueAttrimators( attrimatorMap );
 
     return this.activate();
 	},
@@ -5724,29 +5854,9 @@ anim8.fn = anim8.Animator.prototype =
    * @param  {array} events
    * @return {this}
    */
-  queueEvents: function(events)
+  queueAttrimators: function(attrimatorMap)
   {
-    var maxRemaining = this.timeRemaining();
-    
-    for (var i = 0; i < events.length; i++)
-    {
-      var e = events[i];
-      var attr = e.attribute;
-      var existing = this.events[ attr ];
-      
-      if ( attr in this.events  && !existing.isInfinite() )
-      {    
-        e.delay += (maxRemaining - existing.timeRemaining());
-        
-        existing.queue( e );
-      }
-      else
-      {
-        e.delay += maxRemaining;
-        
-        this.placeEvent( e );
-      }
-    }
+    this.attrimators.queueMap( attrimatorMap, this.placeAttrimator, this );
     
     return this;
   },
@@ -5756,24 +5866,23 @@ anim8.fn = anim8.Animator.prototype =
    * The transition is made by constructing a quadratic curve from the current value to a 
    * point further on the current path to the starting point of the new animation.
    *
-   * @param {number} transitionTime 
-   * @param {number} transitionDelta
-   * @param {string|function|array} transitionEasing
+   * @param {string|array|object} transition
    * @param {string|object|anim8.Animation} animation
    * @param [object] options
    * @param [boolean] all
+   * @param [Boolean] cache
    */
   transition: function(transition, animation, options, all, cache)
   {
     var transition = anim8.transition( transition );
-    var events = this.createEvents( animation, options, cache );
+    var attrimatorMap = this.createAttrimators( animation, options, cache );
     
-    if ( events === false )
+    if ( attrimatorMap === false )
     {
       return false;
     }
 
-    this.transitionEvents( transition, events, all );
+    this.transitionAttrimators( transition, attrimatorMap, all );
 
     return this.activate();
   },
@@ -5784,64 +5893,60 @@ anim8.fn = anim8.Animator.prototype =
    * point further on the current path to the starting point of the new animation. This method will not activate the 
    * Animator, that has to be done manually.
    *
-   * @param {number} transitionTime 
-   * @param {number} transitionDelta
-   * @param {string|function|array} transitionEasing
-   * @param [array] events
+   * @param {object} transition
+   * @param {anim8.AttrimatorMap} events
    * @param [boolean] all
    */
-  transitionEvents: function(transition, events, all)
+  transitionAttrimators: function(transition, attrimatorMap, all)
   {
-    // Check if we even need to transition
-    var transitionRequired = false;
+    // If intro & outro are 0, use Tween
+    // If intro is 0, use Quadratic Path between current value, outro point, and first point on new path.
+    // If outro is 0, use Quadratic Path between current value, first point on new path, and intro point.
+    // If intro & outro are not 0, use Cubic Path between current value, outro point, first point on new path, and intro point.
+    // If granularity is given > 1 then compile the path, compute intro & outro velocities, and compute deltas for new 
+    //    compiled path based on interpolated velocity over the path (knowing it's length and transition time)
     
-    for (var i = 0; i < events.length && !transitionRequired; i++)
-    {      
-      if ( events[i].attribute in this.events )
-      {
-        transitionRequired = true;
-      }
-    }
-    
+    var current = this.attrimators;
+    var attrimators = attrimatorMap.values;
+
     // Only transition if we need to
-    if ( transitionRequired )
+    if ( current.hasOverlap( attrimatorMap ) )
     {
-      for (var i = 0; i < events.length; i++)
+      for (var i = attrimators.length - 1; i >= 0; i--)
       {
-        var e1 = events[i];
-        var attr = e1.attribute;
-      
-        if ( attr in this.events )
+        var a1 = attrimators[ i ];
+        var attr = a1.attribute;
+
+        if ( current.has( attr ) )
         {
-          var path = e1.path;
-          var calc = path.calculator;
-          var e2 = this.events[attr];
+          var attribute = this.getAttribute( attr );
+          var a2 = current.get( attr );
         
-          var p0 = calc.clone( this.frame[attr] );
-          var p1 = e2.getFuture( transition.outroDelta );
-          var p2 = e1.getPoint( 0 );
+          var p0 = attribute.calculator.clone( this.frame[attr] );
+          var p1 = a2.getFuture( transition.outroDelta );
+          var p2 = a1.getPoint( 0 );
         
-          var transitionPath = new anim8.QuadraticPath( attr, calc, p0, p1, p2 );
+          var transitionPath = new anim8.QuadraticPath( attr, attribute.calculator, p0, p1, p2 );
           var transitionEvent = new anim8.Event( attr, transitionPath, transition.time, transition.easing, 0, 0, 1 ).newInstance();
         
-          transitionEvent.next = e1;
-        
-          this.placeEvent( transitionEvent );
+          transitionEvent.next = a1;
+
+          this.placeAttrimator( transitionEvent );
         }
         else
         {
-          e1.delay += transition.time;
+          a1.delay += transition.time;
      
-          this.placeEvent( e1 );
+          this.placeAttrimator( a1 );
         }
       }
     }
     // We don't need to transition, just play the events
     else
     {
-      for (var i = 0; i < events.length; i++)
-      { 
-        this.placeEvent( events[i] );
+      for (var i = attrimators.length - 1; i >= 0; i--)
+      {
+        this.placeAttrimator( attrimators[ i ] );
       }
     }
     
@@ -5860,7 +5965,7 @@ anim8.fn = anim8.Animator.prototype =
    * @param {string|object|anim8.Animation} animation
    * @param [object] options
    * @param [boolean] all
-   */
+   * /
   transitionInto: function(transition, animation, options, all, cache)
   {
     var transition = anim8.transition( transition );
@@ -5888,7 +5993,7 @@ anim8.fn = anim8.Animator.prototype =
    * @param {string|function|array} transitionEasing
    * @param {array} events
    * @param [boolean] all
-   */
+   * /
   transitionIntoEvents: function(transition, events, all)
   {
     // Check if we even need to transition
@@ -5947,6 +6052,7 @@ anim8.fn = anim8.Animator.prototype =
       
     return this;
   },
+  /**/
 
   /**
    * Tweens a single attribute to a target value.
@@ -5969,7 +6075,7 @@ anim8.fn = anim8.Animator.prototype =
     var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
     var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
-    this.placeEvent( event.newInstance() );
+    this.placeAttrimator( event );
     
     return this.activate();
   },
@@ -5997,7 +6103,7 @@ anim8.fn = anim8.Animator.prototype =
       var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
-      this.placeEvent( event.newInstance() );
+      this.placeAttrimator( event );
     }
 
     return this.activate();
@@ -6026,7 +6132,7 @@ anim8.fn = anim8.Animator.prototype =
     var path      = new anim8.Tween( attr, attribute.calculator, start, end );
     var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
-    this.placeEvent( event.newInstance() );
+    this.placeAttrimator( event );
 
     return this.activate();
   },
@@ -6056,59 +6162,10 @@ anim8.fn = anim8.Animator.prototype =
       var path      = new anim8.Tween( attr, attribute.calculator, start, end );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
-      this.placeEvent( event.newInstance() );
+      this.placeAttrimator( event );
     }
 
     return this.activate();
-  },
-	
-	/**
-	 * Applies the initial state of all unstarted current events for the specified attributes immediately. 
-	 * Attribute names can be given as an array or a space separated string. If no attributes are given all 
-	 * attributes are assumed.
-	 *
-   * @param {string|array} attributes
-	 */
-	applyInitialState: function(attributes)
-	{
-		var eventCount = this.eventsFor( attributes, function(event, attr)
-		{
-			if ( !event.hasStarted() && event.hasInitialState )
-			{
-        this.setDefault( attr );
-
-				event.applyValue( this.frame, this.frame[ attr ], 0.0 );
-				
-				this.updated[ attr ] = true;
-			}
-			
-		});
-		
-		this.apply();
-		
-		return eventCount;
-	},
-
-  /**
-   * Returns the amount of time remaining for all finite events in this Animator.
-   * 
-   * @return {number} milliseconds
-   */
-  timeRemaining: function()
-  {
-    var remaining = 0;
-
-    for (var attr in this.events)
-    {
-      var e = this.events[ attr ];
-      
-      if ( !e.isInfinite() )
-      {
-        remaining = Math.max( remaining, e.timeRemaining() );  
-      }
-    }
-
-    return remaining;
   },
   
   /**
@@ -6171,7 +6228,7 @@ anim8.fn = anim8.Animator.prototype =
       options.scaleBase
     );
     
-    this.placeEvent( event.newInstance() );
+    this.placeAttrimator( event );
     
     return this.activate();
   },
@@ -6184,13 +6241,14 @@ anim8.fn = anim8.Animator.prototype =
    * @param {function} callback
    * @param {object} objects
    */
-  objectsFor: function(attributes, callback, objects)
+  attrimatorsFor: function(attributes, callback, objects)
   {
 		if ( anim8.isString( attributes ) )
 		{
 			attributes = attributes.split( ' ' );
 		}
-    
+   
+    var attrimatorMap = this.attrimators; 
     var resulting = !anim8.isFunction( callback );
     var results = [];
     
@@ -6199,59 +6257,42 @@ anim8.fn = anim8.Animator.prototype =
       for (var i = 0; i < attributes.length; i++)
       {
         var attr = attributes[i];
+        var attrimator = attrimatorMap.get( attr );
         
-        if ( attr in objects )
+        if ( attrimator )
         {
           if ( resulting )
           {
-            results.push( objects[attr] );
+            results.push( attrimator );
           }
           else
           {
-            callback.call( this, objects[attr], attr );
+            callback.call( this, attrimator, attr );
           }
         }
       }
 		}
     else
     {
-      for (var attr in objects)
+      var attrimators = attrimatorMap.values;
+
+      for (var i = attrimators.length - 1; i >= 0; i--)
       {
+        var attrimator = attrimators[ i ];
+
         if ( resulting )
         {
-          results.push( objects[attr] );
+          results.push( attrimator );
         }
         else
         {
-          callback.call( this, objects[attr], attr );
+          callback.call( this, attrimator, attrimator.attribute );
         }
       }
     }
     
 		return resulting ? results : this;
   },
-  
-  /**
-   * Invokes the callback for each event for the given attributes.
-   * 
-   * @param {string|array} attributes
-   * @param {function} callback
-   */
-	eventsFor: function(attributes, callback)
-	{
-		return this.objectsFor( attributes, callback, this.events );
-	},
-  
-  /**
-   * Invokes the callback for each spring for the given attributes.
-   *
-   * @param {string|array} attributes
-   * @param {function} callback
-   */
-	springsFor: function(attributes, callback)
-	{
-		return this.objectsFor( attributes, callback, this.springs );
-	},
 	
   /**
    * Stops all events for the specified attributes. Attribute names can be given as an array
@@ -6261,9 +6302,9 @@ anim8.fn = anim8.Animator.prototype =
    */
 	stop: function(attributes)
 	{
-		return this.eventsFor( attributes, function(event, attr) 
+		return this.attrimatorsFor( attributes, function(attrimator, attr) 
 		{
-			delete this.events[ attr ];
+      this.attrimators.remove( attr );
 		});
 	},
   
@@ -6276,14 +6317,14 @@ anim8.fn = anim8.Animator.prototype =
    */
 	end: function(attributes)
 	{
-		return this.eventsFor( attributes, function(event) 
+		return this.attrimatorsFor( attributes, function(attrimator) 
 		{
-			while (event.next)
+			while (attrimator.next)
 			{
-				event = event.next;
+				attrimator = attrimator.next;
 			}
 			
-			event.finish( this.frame );
+			attrimator.finish( this.frame );
 		});
 	},
   
@@ -6295,9 +6336,9 @@ anim8.fn = anim8.Animator.prototype =
    */
 	finish: function(attributes)
 	{
-		return this.eventsFor( attributes, function(event)
+		return this.attrimatorsFor( attributes, function(attrimator)
 		{
-			event.finish( this.frame );
+			attrimator.finish( this.frame );
 		});
 	},
   
@@ -6309,9 +6350,9 @@ anim8.fn = anim8.Animator.prototype =
    */
 	pause: function(attributes)
 	{
-		return this.eventsFor( attributes, function(event)
+		return this.attrimatorsFor( attributes, function(attrimator)
 		{
-			event.pause();
+			attrimator.pause();
 		});
 	},
   
@@ -6323,9 +6364,9 @@ anim8.fn = anim8.Animator.prototype =
    */
 	resume: function(attributes)
 	{
-		return this.eventsFor( attributes, function(event)
+		return this.attrimatorsFor( attributes, function(attrimator)
 		{
-			event.resume();
+			attrimator.resume();
 		});
 	},
   
@@ -6358,9 +6399,8 @@ anim8.fn = anim8.Animator.prototype =
   {
     if ( anim8.isString( attributes ) )
     {
-      delete this.events[ attributes ];
-      delete this.springs[ attributes ];
-      delete this.frame[ attribute ];
+      this.attrimators.remove( attributes );
+      delete this.frame[ attributes ];
     }
     else if ( anim8.isArray( attributes ) )
     {
@@ -6397,54 +6437,24 @@ anim8.fn = anim8.Animator.prototype =
     
     return out;
   },
+
+  /**
+   * Returns the amount of finite time remaining before the animator is done
+   * animating. Attrimators that don't have a known end time aren't included.
+   */
+  timeRemaining: function()
+  {
+    return this.attrimators.timeRemaining();
+  },
   
   /**
    * Returns true if there are any events on this Animator.
    */
-  hasEvents: function()
+  hasAttrimators: function()
   {
-    for (var attr in this.events)
-    {
-      return true;
-    }
-    
-    return false;
+    return this.attrimators.size() > 0;
   },
   
-  /**
-   * Returns true if there are any springs on this Animator.
-   */
-  hasSprings: function()
-  {
-    for (var attr in this.springs)
-    {
-      return true;
-    }
-    
-    return false;
-  },
-  
-  /**
-   * Returns true if there are any springs on this Animator or animating events.
-   */
-  isAnimating: function()
-  {
-    if ( this.hasSprings() )
-    {
-      return true;
-    }
-    
-    for (var attr in this.events)
-    {
-      if ( this.events[attr].isAnimating() )
-      {
-        return true;
-      }
-    }
-    
-    return false;
-  },
-
   /**
    * Returns the subject of the Animator optionally passing it through a wrapper
    * function before it's returned.
@@ -6512,10 +6522,11 @@ anim8.DeferAnimator = function(animator, previous, eventType, event)
  */
 anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator, 
 [
-  'play', 'queue', 'transition', 'transitionInto', 'restore', 'set', 'unset', 'resume', 'pause', 
-  'finish', 'end', 'stop', 'follow', 'applyInitialState', 'tweenTo', 
-  'tween', 'tweenMany', 'tweenManyTo', 'spring', 'unspring', 'apply', 
-  'placeSpring', 'placeEvent', 'invoke'
+  'restore', 'placeAttrimator', 'preupdate', 'update', 'apply', 'trimAttrimators',
+  'activate', 'deactivate', 'destroy', 'spring', 'play', 'playAttrimators', 'queue',
+  'queueAttrimators', 'transition', 'transitionAttrimators', 'tween', 'tweenTo', 
+  'tweenMany', 'tweenManyTo', 'follow', 'stop', 'end', 'finish', 'pause', 'resume',
+  'set', 'unset', 'get', 'invoke'
 ]);
 
 
@@ -6627,8 +6638,8 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   /**
    * Reverses the order of animators in the array.
    */
-   reverse: function()
-   {
+  reverse: function()
+  {
     var last = this.length - 1;
     var mid = Math.floor( this.length / 2 );
 
@@ -6642,7 +6653,7 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
     }
 
     return this;
-   },
+  },
 
   /**
    * Activates all Animators in the array if they aren't active already.
@@ -6673,10 +6684,6 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   },
 
   /**
-   * Returns an array of the subjects optionally
-   */
-
-  /**
    * Plays a sequence of events separated by a delay given an animation to play on all Animators.
    */
   sequence: function(delay, easing)
@@ -6685,49 +6692,60 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   },
 
   /**
+   * [timeRemaining description]
+   * @return {[type]}
+   */
+  timeRemaining: function()
+  {
+    var maxRemaining = 0;
+
+    for (var i = 0; i < this.length; i++)
+    {
+      maxRemaining = Math.max( maxRemaining, this[ i ].timeRemaining() );
+    }
+
+    return maxRemaining;
+  },
+
+  /**
    * Adds the following methods to make an array of Animators appear like a single Animator.
    */
-  restore              : anim8.delegate( 'restore', anim8.delegate.RETURN_THIS ),
-  placeSpring          : anim8.delegate( 'placeSpring', anim8.delegate.RETURN_THIS ),
-  placeEvent           : anim8.delegate( 'placeEvent', anim8.delegate.RETURN_THIS ),
-  preupdate            : anim8.delegate( 'preupdate', anim8.delegate.RETURN_THIS ),
-  update               : anim8.delegate( 'update', anim8.delegate.RETURN_THIS ),
-  apply                : anim8.delegate( 'apply', anim8.delegate.RETURN_THIS ),
-  trimEvents           : anim8.delegate( 'trimEvents', anim8.delegate.RETURN_THIS ),
-  deactivate           : anim8.delegate( 'deactivate', anim8.delegate.RETURN_THIS ),
-  destroy              : anim8.delegate( 'destroy', anim8.delegate.RETURN_THIS ),
-  spring               : anim8.delegate( 'spring', anim8.delegate.RETURN_RESULTS ),
-  unspring             : anim8.delegate( 'unspring', anim8.delegate.RETURN_THIS ),
-  play                 : anim8.delegate( 'play', anim8.delegate.RETURN_THIS ),
-  playEvents           : anim8.delegate( 'playEvents', anim8.delegate.RETURN_THIS ),
-  queue                : anim8.delegate( 'queue', anim8.delegate.RETURN_THIS ),
-  queueEvents          : anim8.delegate( 'queueEvents', anim8.delegate.RETURN_THIS ),
-  transition           : anim8.delegate( 'transition', anim8.delegate.RETURN_THIS ),
-  transitionEvents     : anim8.delegate( 'transitionEvents', anim8.delegate.RETURN_THIS ),
-  transitionInto       : anim8.delegate( 'transitionInto', anim8.delegate.RETURN_THIS ),
-  transitionIntoEvents : anim8.delegate( 'transitionIntoEvents', anim8.delegate.RETURN_THIS ),
-  tween                : anim8.delegate( 'tween', anim8.delegate.RETURN_THIS ),
-  tweenTo              : anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS ),
-  tweenMany            : anim8.delegate( 'tweenMany', anim8.delegate.RETURN_THIS ),
-  tweenManyTo          : anim8.delegate( 'tweenManyTo', anim8.delegate.RETURN_THIS ),
-  applyInitialState    : anim8.delegate( 'applyInitialState', anim8.delegate.RETURN_THIS ),
-  follow               : anim8.delegate( 'follow', anim8.delegate.RETURN_THIS ),
-  eventsFor            : anim8.delegate( 'eventsFor', anim8.delegate.RETURN_RESULTS ),
-  springsFor           : anim8.delegate( 'springsFor', anim8.delegate.RETURN_RESULTS ),
-  stop                 : anim8.delegate( 'stop', anim8.delegate.RETURN_THIS ),
-  end                  : anim8.delegate( 'end', anim8.delegate.RETURN_THIS ),
-  finish               : anim8.delegate( 'finish', anim8.delegate.RETURN_THIS ),
-  pause 			         : anim8.delegate( 'pause', anim8.delegate.RETURN_THIS ),
-  resume 			         : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
-  set                  : anim8.delegate( 'set', anim8.delegate.RETURN_THIS ),
-  get                  : anim8.delegate( 'get', anim8.delegate.RETURN_FIRST ),
-  isAnimating          : anim8.delegate( 'isAnimating', anim8.delegate.RETURN_TRUE ),
-  hasEvents            : anim8.delegate( 'hasEvents', anim8.delegate.RETURN_TRUE ),
-  hasSprings           : anim8.delegate( 'hasSprings', anim8.delegate.RETURN_TRUE ),
-  on			             : anim8.delegate( 'on', anim8.delegate.RETURN_THIS ),
-  once		             : anim8.delegate( 'once', anim8.delegate.RETURN_THIS ),
-  off			             : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
-  trigger              : anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS )
+  restore               : anim8.delegate( 'restore', anim8.delegate.RETURN_THIS ),
+  placeAttrimator       : anim8.delegate( 'placeAttrimator', anim8.delegate.RETURN_THIS ),
+  preupdate             : anim8.delegate( 'preupdate', anim8.delegate.RETURN_THIS ),
+  update                : anim8.delegate( 'update', anim8.delegate.RETURN_THIS ),
+  apply                 : anim8.delegate( 'apply', anim8.delegate.RETURN_THIS ),
+  trimAttrimators       : anim8.delegate( 'trimAttrimators', anim8.delegate.RETURN_THIS ),
+  activate              : anim8.delegate( 'activate', anim8.delegate.RETURN_THIS ),
+  deactivate            : anim8.delegate( 'deactivate', anim8.delegate.RETURN_THIS ),
+  destroy               : anim8.delegate( 'destroy', anim8.delegate.RETURN_THIS ),
+  spring                : anim8.delegate( 'spring', anim8.delegate.RETURN_RESULTS ),
+  play                  : anim8.delegate( 'play', anim8.delegate.RETURN_THIS ),
+  playAttrimators       : anim8.delegate( 'playAttrimators', anim8.delegate.RETURN_THIS ),
+  queue                 : anim8.delegate( 'queue', anim8.delegate.RETURN_THIS ),
+  queueAttrimators      : anim8.delegate( 'queueAttrimators', anim8.delegate.RETURN_THIS ),
+  transition            : anim8.delegate( 'transition', anim8.delegate.RETURN_THIS ),
+  transitionAttrimators : anim8.delegate( 'transitionAttrimators', anim8.delegate.RETURN_THIS ),
+  tween                 : anim8.delegate( 'tween', anim8.delegate.RETURN_THIS ),
+  tweenTo               : anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS ),
+  tweenMany             : anim8.delegate( 'tweenMany', anim8.delegate.RETURN_THIS ),
+  tweenManyTo           : anim8.delegate( 'tweenManyTo', anim8.delegate.RETURN_THIS ),
+  follow                : anim8.delegate( 'follow', anim8.delegate.RETURN_THIS ),
+  attrimatorsFor        : anim8.delegate( 'attrimatorsFor', anim8.delegate.RETURN_RESULTS ),
+  stop                  : anim8.delegate( 'stop', anim8.delegate.RETURN_THIS ),
+  end                   : anim8.delegate( 'end', anim8.delegate.RETURN_THIS ),
+  finish                : anim8.delegate( 'finish', anim8.delegate.RETURN_THIS ),
+  pause 			          : anim8.delegate( 'pause', anim8.delegate.RETURN_THIS ),
+  resume 			          : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
+  set                   : anim8.delegate( 'set', anim8.delegate.RETURN_THIS ),
+  unset                 : anim8.delegate( 'unset', anim8.delegate.RETURN_THIS ),
+  get                   : anim8.delegate( 'get', anim8.delegate.RETURN_FIRST ),
+  hasAttrimators        : anim8.delegate( 'hasAttrimators', anim8.delegate.RETURN_TRUE ),
+  invoke                : anim8.delegate( 'invoke', anim8.delegate.RETURN_THIS ),
+  on			              : anim8.delegate( 'on', anim8.delegate.RETURN_THIS ),
+  once		              : anim8.delegate( 'once', anim8.delegate.RETURN_THIS ),
+  off			              : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
+  trigger               : anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS )
 
 });
 
@@ -6833,7 +6851,7 @@ anim8.run = function()
   // notify animators that we're about to update
   anim8.animating.each(function(animator)
   {
-    animator.preupdate();
+    animator.preupdate( now );
   });
   
   // update animating based on the current time
@@ -6911,20 +6929,21 @@ anim8.Sequence.prototype =
    * @param  {[type]}
    * @return {[type]}
    */
-  createEvents: function(animation, options, i)
+  createAttrimators: function(animation, options, i)
   {
-    var events = animation.newEvents();
+    var attrimatorMap = animation.newAttrimators();
+    var attrimators = attrimatorMap.values;
     var delta = i / (this.animators.length - 1);
     var delayOffset = this.easing( delta ) * this.maxDelay();
     
-    for (var k = 0; k < events.length; k++)
+    for (var k = attrimators.length - 1; k >= 0; k--)
     {
-      events[k].delay += delayOffset;
+      attrimators[ k ].delay += delayOffset;
     }
 
-    animation.merge( options, events );
+    animation.merge( options, attrimatorMap );
     
-    return events;
+    return attrimatorMap;
   },
 
   /**
@@ -6960,7 +6979,7 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.playEvents( sequence.createEvents( anim, options, i ), all );       
+      animator.playAttrimators( sequence.createAttrimators( anim, options, i ), all );       
     });
     
     return this.add();
@@ -6996,14 +7015,15 @@ anim8.Sequence.prototype =
     this.animators.each(function(animator, i)
     {
       var delayOffset = maxRemaining - remaining[i];
-      var events = sequence.createEvents( anim, options, i );
-      
-      for (var i = 0; i < events.length; i++)
+      var attrimatorMap = sequence.createAttrimators( anim, options, i );
+      var attrimators = attrimatorMap.values;
+
+      for (var k = attrimators.length - 1; k >= 0; k--)
       {
-        events[ i ].delay += delayOffset;
+        attrimators[ k ].delay += delayOffset;
       }
       
-      animator.queueEvents( events );
+      animator.queueAttrimators( attrimatorMap );
     });
     
     return this.add();
@@ -7035,40 +7055,7 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionEvents( transition, sequence.createEvents( anim, options, i ), all );
-    });
-    
-    return this.add();
-  },
-
-  /**
-   * [transitionInto description]
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @param  {[type]}
-   * @return {[type]}
-   */
-  transitionInto: function(transition, animation, options, all, cache)
-  {
-    var transition = anim8.transition( transition );
-    var options = anim8.options( options );
-    var anim = anim8.animation( animation, options, cache );
-
-    if ( anim === false )
-    {
-      return this;
-    }
-
-    var sequence = this;
-
-    this.animators.each(function(animator, i)
-    {
-      animator.transitionIntoEvents( transition, sequence.createEvents( anim, options, i ), all );
+      animator.transitionAttrimators( transition, sequence.createAttrimators( anim, options, i ), all );
     });
     
     return this.add();
@@ -7080,7 +7067,6 @@ anim8.Sequence.prototype =
   add: function()
   {
     this.animators.activate();
-    this.animators.applyInitialState();
     
     return this;
   }
@@ -7121,13 +7107,13 @@ anim8.Parser.prototype =
   
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimatorMap to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
     throw 'Parser.parse not implemented';
   },
@@ -7144,9 +7130,9 @@ anim8.Parser.prototype =
    * @param {object} animation
    * @param {object} newOptions
    * @param {object} oldOptions
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  merge: function( animation, newOptions, oldOptions, events )
+  merge: function( animation, newOptions, oldOptions, attrimatorMap )
   {
     var durations = animation.durations || {};
     var easings   = animation.easings || {};
@@ -7156,16 +7142,19 @@ anim8.Parser.prototype =
     var scales    = animation.scales || {};
     var scaleBases= animation.scaleBases || {};
     
-    for (var i = 0; i < events.length; i++)
+    var attrimators = attrimatorMap.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = events[i];
-      var attr = e.attribute;
-      var calc = e.path.calculator;
+      var e = attrimators[ i ];
       
       if ( e.getParser() !== this )
       {
         continue;
       }
+      
+      var attr = e.attribute;
+      var calc = e.path.calculator;
 
       e.easing    = anim8.easing( anim8.coalesce( easings[attr],   newOptions.easing,   oldOptions.easing   ), e.easing );
       e.repeat    = anim8.repeat( anim8.coalesce( repeats[attr],   newOptions.repeat,   oldOptions.repeat   ), e.repeat );
@@ -7191,17 +7180,17 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
 {
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
     // 1. If deltas wasn't specified, assume a uniform distribution of points
     // 2. If deltas was an array, expand out into an object where the keys are attributes and the value is the delta array
-    // 3. Generate the events
+    // 3. Generate the attrimators
     
     var factory = anim8.factory( animation.factory );
   	var deltas = animation.deltas;
@@ -7263,7 +7252,7 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
       var path      = new anim8.DeltaPath( attr, attribute.calculator, values[attr], deltas[attr] );
       var event     = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
   	}
   }
 });
@@ -7288,15 +7277,15 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
     
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
-    // 1. Generate the events, only caring about the delays and durations
+    // 1. Generate the attrimators, only caring about the delays and durations
     
     var factory = anim8.factory( animation.factory );
   	var values = animation.final;
@@ -7318,7 +7307,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var path       = new anim8.PointPath( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, scale, scaleBase, false, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
   	}
   },
 
@@ -7334,26 +7323,28 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} newOptions
    * @param {object} oldOptions
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  merge: function( animation, newOptions, oldOptions, events )
+  merge: function( animation, newOptions, oldOptions, attrimatorMap )
   {
     var durations = animation.durations || {};
     var delays    = animation.delays || {};
     var scales    = animation.scales || {};
     var scaleBases = animation.scaleBases || {};
     
-    for (var i = 0; i < events.length; i++)
+    var attrimators = attrimatorMap.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = events[i];
-      var attr = e.attribute;
-      var calc = e.path.calculator;
+      var e = attrimators[i];
         
       if ( e.getParser() !== this )
       {
         continue;
       }
 
+      var attr = e.attribute;
+      var calc = e.path.calculator;
       var delay = anim8.coalesce( delays[attr], newOptions.delay, oldOptions.delay );
       var duration = anim8.coalesce( durations[attr], newOptions.duration, oldOptions.duration );
 
@@ -7386,15 +7377,15 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
     
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
-    // 1. Generate the events, only caring about the delays
+    // 1. Generate the attrimators, only caring about the delays
     
     var factory    = anim8.factory( animation.factory );
   	var values     = animation.initial;
@@ -7412,7 +7403,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var path       = new anim8.PointPath( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, scale, scaleBase, true, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
   	}
   },
 
@@ -7428,25 +7419,28 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} newOptions
    * @param {object} oldOptions
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  merge: function( animation, newOptions, oldOptions, events )
+  merge: function( animation, newOptions, oldOptions, attrimatorMap )
   {
     var durations = animation.durations || {};
     var delays    = animation.delays || {};
     var scales = animation.scales || {};
     var scaleBases = animation.scaleBases || {};
     
-    for (var i = 0; i < events.length; i++)
+    var attrimators = attrimatorMap.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = events[i];
-      var attr = e.attribute;
-      var calc = e.path.calculator;
+      var e = attrimators[i];
         
       if ( e.getParser() !== this )
       {
         continue;
       }
+      
+      var attr = e.attribute;
+      var calc = e.path.calculator;
       
       e.delay = anim8.time( anim8.coalesce( delays[attr], newOptions.delay, oldOptions.delay ), e.delay );
       e.scale = anim8.coalesce( scales[attr], newOptions.scale, oldOptions.scale, e.scale );
@@ -7474,20 +7468,20 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
 {
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
     // 1. Normalize keys by converting aliases to the actual value
     // 2. Split up keys that have commas into multiple entries
     // 3. Validate keys and remove invalid ones - also calculate max key value
     // 4. Sort frames by the key
     // 5. Expand frames to generate delta arrays, value arrays, and easing arrays
-    // 6. Generate the events
+    // 6. Generate the attrimators
     
     var factory = anim8.factory( animation.factory );
     var kframes = animation.keyframe;
@@ -7629,7 +7623,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
       var path      = new anim8.KeyframePath( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
       var event     = new anim8.Event( attr, path, duration, teasing, delay, sleep, repeat, scale, scaleBase, true, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
     }
   }
 });
@@ -7643,24 +7637,24 @@ anim8.parser['keyframe'] = new anim8.ParserKeyframe();
 /**
  * Instantiates a new parser for the 'tweenTo' animation type.
  */
-anim8.ParserTween = function()
+anim8.ParserTweenTo = function()
 {
   
 };
 
-// ParserTween extends anim8.Parser()
-anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
+// ParserTweenTo extends anim8.Parser()
+anim8.override( anim8.ParserTweenTo.prototype = new anim8.Parser(),
 {
     
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
@@ -7688,7 +7682,7 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, value );
       var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
   	}
   }
 });
@@ -7696,7 +7690,66 @@ anim8.override( anim8.ParserTween.prototype = new anim8.Parser(),
 /**
  * Register the parser.
  */
-anim8.parser['tweenTo'] = new anim8.ParserTween();
+anim8.parser['tweenTo'] = new anim8.ParserTweenTo();
+
+
+/**
+ * Instantiates a new parser for the 'tweenFrom' animation type.
+ */
+anim8.ParserTweenFrom = function()
+{
+  
+};
+
+// ParserTweenFrom extends anim8.Parser()
+anim8.override( anim8.ParserTweenFrom.prototype = new anim8.Parser(),
+{
+    
+  /**
+   * Parses the animation object (and optionally an option object) and pushes
+   * all generated attrimators to the given array.
+   * 
+   * @param {object} animation
+   * @param {object} options
+   * @param {anim8.AttrimatorMap} attrimatorMap
+   */
+  parse: function( animation, options, attrimatorMap )
+  {
+    // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
+
+    var factory    = anim8.factory( animation.factory );
+    var tweenFrom  = animation.tweenFrom;
+    var durations  = animation.durations || {};
+    var easings    = animation.easings || {};
+    var delays     = animation.delays || {};
+    var sleeps     = animation.sleeps || {};
+    var repeats    = animation.repeats || {};
+    var scales     = animation.scales || {};
+    var scaleBases = animation.scaleBase || {};
+
+  	for (var attr in tweenFrom)
+  	{
+      var attribute  = factory.attribute( attr );
+      var value      = attribute.parse( tweenFrom[attr] );
+      var duration   = anim8.coalesce( durations[attr], options.duration );
+      var easing     = anim8.coalesce( easings[attr], options.easing );
+      var delay      = anim8.coalesce( delays[attr], options.delay );
+      var sleep      = anim8.coalesce( sleeps[attr], options.sleep );
+      var repeat     = anim8.coalesce( repeats[attr], options.repeat );
+      var scale      = anim8.coalesce( scales[attr], options.scale );
+      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var path       = new anim8.Tween( attr, attribute.calculator, value, anim8.computed.current );
+      var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
+      
+      attrimatorMap.put( attr, event );
+  	}
+  }
+});
+
+/**
+ * Register the parser.
+ */
+anim8.parser['tweenFrom'] = new anim8.ParserTweenFrom();
 
 
 /**
@@ -7713,13 +7766,13 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
     
   /**
    * Parses the animation object (and optionally an option object) and pushes
-   * all generated events to the given array.
+   * all generated attrimators to the given array.
    * 
    * @param {object} animation
    * @param {object} options
-   * @param {Array} events
+   * @param {anim8.AttrimatorMap} attrimatorMap
    */
-  parse: function( animation, options, events )
+  parse: function( animation, options, attrimatorMap )
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
@@ -7747,7 +7800,7 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, anim8.computed.relative( value ) );
       var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
-      events.push( event );
+      attrimatorMap.put( attr, event );
   	}
   }
 });
@@ -7951,7 +8004,7 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
 
       var calculatorName = attribute.calculator;
       var calculator = anim8.calculator( calculatorName );
-      var defaultValue = calculator.parse( attribute.defaultValue, calculator.create() );
+      var defaultValue = calculator.parse( attribute.defaultValue, calculator.zero );
 
       attribute.calculatorName = calculatorName;
       attribute.calculator = calculator;
