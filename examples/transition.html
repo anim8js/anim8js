@@ -37,7 +37,7 @@
       
       setInterval( function()
       {        
-        if ( !anim8or.isAnimating() )
+        if ( !anim8or.hasAttrimators() )
         {
           anim8or.play({
             keyframe: {
@@ -53,7 +53,7 @@
       
       window.onclick = function(e)
       {
-        if (anim8or.isAnimating())
+        if (anim8or.hasAttrimators())
         {
           anim8or.transition( '1s 0.3 linear', {
             keyframe: {

@@ -44,7 +44,7 @@
 42. [X] Add priority to factory
 43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent. Once a new animation cycle is hit, all events (checked up to next) are made active - this fixes the issue of infinite events being stopped on queue
 44. [X] Add anim8.options which parses options, remove anim8.parseAnimationString
-45. [ ] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
+45. [X] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
 46. [X] Add relative value parsing (similar to true) which adds/subtracts a value
 47. [X] Add move parser
 48. [X] Factory.attribute returns a resolved version of an attribute where calculator is instanceof anim8.Calculator, defaultValue is parsed, defaultUnit is present, and property is a reference (contains calculatorName, propertyName, name)
@@ -60,11 +60,11 @@
 58. [ ] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
 59. [ ] Throw cycle start & end events, add functions to listen start/end of last animation added
 60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition (req: 63)
-61. [ ] Add anim8.Physics : anim8.AttributeAnimator
+61. [X] Add anim8.Physics : anim8.AttributeAnimator
 62. [X] Replace object iteration with anim8.FastMap
 63. [ ] Refactor transition into a single method
 64. [X] Replace calc.create() with calc.zero() where possible.
-65. [ ] Add endTime to attrimators
+65. [X] Add endTime to attrimators
 66. [X] Add tweenFrom parser
-67. [ ] Add physics parser
-68. [ ] Add spring parser
+67. [X] Add physics parser
+68. [X] Add spring parser

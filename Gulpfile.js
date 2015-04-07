@@ -37,6 +37,7 @@ var core =
   './lib/anim8js-spring.js',
   './lib/anim8js-spring-linear.js',
   './lib/anim8js-spring-distance.js',
+  './lib/anim8js-physics.js',
   './lib/anim8js-animation.js',
   './lib/anim8js-transition.js',
   './lib/anim8js-options.js',
@@ -52,6 +53,8 @@ var core =
   './lib/anim8js-parser-tweenTo.js',
   './lib/anim8js-parser-tweenFrom.js',
   './lib/anim8js-parser-move.js',
+  './lib/anim8js-parser-springs.js',
+  './lib/anim8js-parser-physics.js',
   './lib/anim8js-factory.js',
   './lib/anim8js-object.js'
 ];

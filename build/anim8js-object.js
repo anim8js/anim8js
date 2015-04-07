@@ -587,6 +587,21 @@ anim8.repeat = (function()
 })();
 
 /**
+ * Parses a number from the given input and if the input isn't a valid number
+ * then returnOnInvalid is returned.
+ * 
+ * @param  {any} value
+ * @param  {any} returnOnInvalid
+ * @return {any}
+ */
+anim8.number = function(value, returnOnInvalid)
+{
+  var parsed = parseFloat( value );
+
+  return isNaN( parsed ) ? returnOnInvalid : parsed;
+};
+
+/**
  * Parses scale from a string or number.
  * 
  * @param  {string|number}
@@ -594,12 +609,7 @@ anim8.repeat = (function()
  */
 anim8.scale = function(scale, returnOnInvalid)
 {
-  if ( anim8.isNumber( scale ) )
-  {
-    return scale;
-  }
-
-  return anim8.coalesce( returnOnInvalid, anim8.defaults.scale );
+  return anim8.number( scale, anim8.defaults.scale );
 };
 
 /**
@@ -1985,6 +1995,18 @@ anim8.Calculator = function()
 
 anim8.Calculator.prototype = 
 {
+
+  /**
+   * [createConstants description]
+   * @return {[type]}
+   */
+  createConstants: function()
+  {
+    this.ZERO = this.create();
+    this.ONE = this.parse( 1.0, this.ZERO );
+    this.INFINITY = this.parse( Number.POSITIVE_INFINITY, this.ZERO );
+  },
+
   /**
    * [parse description]
    * @param  {[type]}
@@ -2163,6 +2185,53 @@ anim8.Calculator.prototype =
   },
 
   /**
+   * [min description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  min: function(out, a, b)
+  {
+    throw 'Calculator.min not implemented';
+  },
+
+  /**
+   * [max description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  max: function(out, a, b)
+  {
+    throw 'Calculator.max not implemented';
+  },
+
+  /**
+   * [clamp description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  clamp: function(out, min, max)
+  {
+    var distSq = this.distanceSq( out, this.ZERO );
+
+    if ( distSq < min * min )
+    {
+      return this.scale( out, min / Math.sqrt( distSq ) );
+    }
+    else if ( distSq > max * max )
+    {
+      return this.scale( out, max / Math.sqrt( distSq ) );
+    }
+
+    return out;
+  },
+
+  /**
    * [isRelative description]
    * @param  {[type]}
    * @return {Boolean}
@@ -2280,6 +2349,14 @@ anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(),
   isEqual: function(a, b, epsilon) 
   {
     return Math.abs(a - b) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    return Math.min( a, b );
+  },
+  max: function(out, a, b)
+  {
+    return Math.max( a, b );
   }
 });
 
@@ -2462,6 +2539,18 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
 	{
     return Math.abs(a.x - b.x) < epsilon && 
 					 Math.abs(a.y - b.y) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.x = Math.min(a.x, b.x);
+    out.y = Math.min(a.y, b.y);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.x = Math.max(a.x, b.x);
+    out.y = Math.max(a.y, b.y);
+    return out;
   }
 });
 
@@ -2609,6 +2698,20 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
     return Math.abs(a.x - b.x) < epsilon && 
 		  		 Math.abs(a.y - b.y) < epsilon && 
 					 Math.abs(a.z - b.z) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.x = Math.min(a.x, b.x);
+    out.y = Math.min(a.y, b.y);
+    out.z = Math.min(a.z, b.z);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.x = Math.max(a.x, b.x);
+    out.y = Math.max(a.y, b.y);
+    out.z = Math.max(a.z, b.z);
+    return out;
   }
 });
 
@@ -2775,6 +2878,22 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 					 Math.abs(a.y - b.y) < epsilon && 
 				   Math.abs(a.z - b.z) < epsilon && 
 		       Math.abs(a.angle - b.angle) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.x = Math.min(a.x, b.x);
+    out.y = Math.min(a.y, b.y);
+    out.z = Math.min(a.z, b.z);
+    out.angle = Math.min(a.angle, b.angle);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.x = Math.max(a.x, b.x);
+    out.y = Math.max(a.y, b.y);
+    out.z = Math.max(a.z, b.z);
+    out.angle = Math.max(a.angle, b.angle);
+    return out;
   }
 });
 
@@ -2938,6 +3057,20 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
     return Math.abs(a.r - b.r) < epsilon && 
            Math.abs(a.g - b.g) < epsilon && 
            Math.abs(a.b - b.b) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.r = Math.min(a.r, b.r);
+    out.g = Math.min(a.g, b.g);
+    out.b = Math.min(a.b, b.b);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.r = Math.max(a.r, b.r);
+    out.g = Math.max(a.g, b.g);
+    out.b = Math.max(a.b, b.b);
+    return out;
   }
 });
 
@@ -3114,6 +3247,22 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
            Math.abs(a.g - b.g) < epsilon && 
            Math.abs(a.b - b.b) < epsilon && 
            Math.abs(a.a - b.a) < epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.r = Math.min(a.r, b.r);
+    out.g = Math.min(a.g, b.g);
+    out.b = Math.min(a.b, b.b);
+    out.a = Math.min(a.a, b.a);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.r = Math.max(a.r, b.r);
+    out.g = Math.max(a.g, b.g);
+    out.b = Math.max(a.b, b.b);
+    out.a = Math.max(a.a, b.a);
+    return out;
   }
 });
 
@@ -3381,8 +3530,8 @@ anim8.path['tween'] = function(path)
   return new anim8.Tween(
     path.name, 
     calc,
-    calc.parse( path.start, calc.zero ),
-    calc.parse( path.end, calc.zero )
+    calc.parse( path.start, calc.ZERO ),
+    calc.parse( path.end, calc.ZERO )
   );
 };
 
@@ -3933,8 +4082,11 @@ anim8.Attrimator.prototype =
 
     this.startTime = 0;
     this.pauseTime = 0;
+    this.elapsed = 0;
+    this.stopTime = Number.POSITIVE_INFINITY;
     this.paused = false;
     this.cycle = 0;
+    this.delay = 0;
   },
 
   /**
@@ -3948,6 +4100,7 @@ anim8.Attrimator.prototype =
   start: function(now, animator)
   {
     this.startTime = now;
+    this.elapsed = 0;
   },
 
   /**
@@ -3966,15 +4119,32 @@ anim8.Attrimator.prototype =
       return false;
     }
 
-    var value = this.valueAt( now - this.startTime );
-    var updated = value !== false;
+    var updated = false;
+    var elapsed = now - this.startTime;
+    var updated = false;
 
-    if ( updated )
+    if ( elapsed > this.stopTime )
     {
-      frame[ this.attribute ] = value;
+      updated = this.finish( frame );
+    }
+    else if ( elapsed >= this.delay )
+    {
+      updated = this.update( elapsed, frame );
     }
 
+    this.elapsed = elapsed;
+
     return updated;
+  },
+
+  /**
+   * [update description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  update: function(elapsed, frame)
+  {
+    throw 'Attrimator.update not implemented';
   },
 
   /**
@@ -3984,7 +4154,7 @@ anim8.Attrimator.prototype =
    */
   getElapsed: function()
   {
-    return 0;
+    return this.elapsed;
   },
 
   /**
@@ -4005,7 +4175,7 @@ anim8.Attrimator.prototype =
    */
   totalTime: function()
   {
-    return Number.POSITIVE_INFINITY;
+    return this.stopTime;
   },
 
   /**
@@ -4015,7 +4185,7 @@ anim8.Attrimator.prototype =
    */
   timeRemaining: function() 
   {    
-    return this.totalTime() + ( this.next ? this.next.timeRemaining() : 0 );
+    return this.totalTime() - this.elapsed + ( this.next ? this.next.timeRemaining() : 0 );
   },
 
   /**
@@ -4046,7 +4216,7 @@ anim8.Attrimator.prototype =
    */
   isInfinite: function()
   {
-    return true;
+    return (this.stopTime === Number.POSITIVE_INFINITY);
   },
 
   /**
@@ -4306,9 +4476,8 @@ anim8.Event = function(attribute, path, duration, easing, delay, sleep, repeat, 
   this.sleep            = anim8.sleep( sleep );
   this.repeat           = anim8.repeat( repeat );
   this.scale            = anim8.scale( scale );
-  this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.zero );
+  this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.ZERO );
   this.hasInitialState  = anim8.coalesce( hasInitialState, true );
-  this.elapsed          = 0;
 };
 
 anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
@@ -4332,26 +4501,22 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
     {
       this.path = this.path.replaceComputed( this, animator );
     }
+
+    if ( this.hasInitialState )
+    {
+      this.applyValue( animator.frame, animator.frame[ this.attribute ], 0 ); 
+    }
   },
 
   /**
-   * Updates this attribute animator given a time to animate to and the frame to
-   * provide with a new value. This method will return true if the attribute
-   * this is animating has been updated and needs to be applied to the subject.
-   * 
-   * @param  {Number} now
-   * @param  {Object} frame
-   * @return {Boolean}
+   * [update description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
    */
-  setTime: function(now, frame)
+  update: function(elapsed, frame)
   {
-    if ( this.paused )
-    {
-      return false;
-    }
-
     var updated = false;
-    var elapsed = now - this.startTime;
     var delay = this.delay;
     var duration = this.duration;
     var sleep = this.sleep;
@@ -4360,60 +4525,42 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
     var newState = this.state;
     var delta = 0;
 
-    if ( elapsed >= delay )
+    elapsed -= delay;
+
+    var cycle = duration + sleep;
+    var iteration = Math.floor( ( elapsed + sleep ) / cycle );
+
+    if (iteration >= repeat)
     {
-      elapsed -= delay;
+      newState = anim8.EventState.FINISHED;
+      delta = 1;
+    }
+    else
+    {
+      elapsed -= iteration * cycle;
 
-      var cycle = duration + sleep;
-      var iteration = Math.floor( ( elapsed + sleep ) / cycle );
-
-      if (iteration >= repeat)
+      if ( elapsed > duration )
       {
-        newState = anim8.EventState.FINISHED;
+        newState = anim8.EventState.SLEEPING;
         delta = 1;
       }
       else
       {
-        elapsed -= iteration * cycle;
-
-        if ( elapsed > duration )
-        {
-          newState = anim8.EventState.SLEEPING;
-          delta = 1;
-        }
-        else
-        {
-          newState = anim8.EventState.ANIMATING;
-          delta = elapsed / duration;
-        }
+        newState = anim8.EventState.ANIMATING;
+        delta = elapsed / duration;
       }
     }
-    else
-    {
-      newState = anim8.EventState.DELAYED;
-    }
-
+    
     if ( newState === anim8.EventState.ANIMATING || 
-       ( newState !== anim8.EventState.ANIMATING && oldState === anim8.EventState.ANIMATING ) ||
-       ( newState === anim8.EventState.DELAYED && this.hasInitialState ) )
+       ( newState !== anim8.EventState.ANIMATING && oldState === anim8.EventState.ANIMATING ) )
     {
       this.applyValue( frame, frame[ this.attribute ], delta );
       updated = true;
     }
 
     this.state = newState;
-    this.elapsed = elapsed;
 
     return updated;
-  },
-
-  /**
-   * [getElapsed description]
-   * @return {[type]}
-   */
-  getElapsed: function()
-  {
-    return this.elapsed;
   },
 
   /**
@@ -4499,18 +4646,8 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
    */
 	totalTime: function()
 	{
-		return this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep);
+		return Math.min( this.stopTime, this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep) );
 	},
-
-  /**
-   * The time remaining before this animator and any following will be finished.
-   * 
-   * @return {Number}
-   */
-  timeRemaining: function() 
-  {    
-    return this.totalTime() - this.elapsed + ( this.next ? this.next.timeRemaining() : 0 );
-  },
 
   /**
    * [clone description]
@@ -4538,7 +4675,7 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
    */
   isInfinite: function()
   {
-    return (this.repeat === Number.POSITIVE_INFINITY);
+    return (this.repeat === Number.POSITIVE_INFINITY) && (this.stopTime !== Number.POSITIVE_INFINITY);
   },
 
   /**
@@ -4627,8 +4764,8 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
     this.calculator = calc;
     this.rest       = this.parseValue( animator, this.rest, attribute.defaultValue );
     this.position   = this.parseValue( animator, this.position, attribute.defaultValue );
-    this.gravity    = this.parseValue( animator, this.gravity, calc.zero );
-    this.velocity   = this.parseValue( animator, this.velocity, calc.zero );
+    this.gravity    = this.parseValue( animator, this.gravity, calc.ZERO );
+    this.velocity   = this.parseValue( animator, this.velocity, calc.ZERO );
   },
 
   /**
@@ -4656,12 +4793,9 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
   {
     var parsed = this.calculator.parse( value, defaultValue );
 
-    if ( anim8.isFunction( parsed ) )
+    if ( anim8.isFunction( parsed ) && parsed.computed )
     {
-      if ( parsed.computed )
-      {
-        parsed = parsed( this, animator );
-      }
+       parsed = parsed( this, animator );
     }
 
     return parsed;
@@ -4671,25 +4805,11 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
    * Updates the spring given the current time in milliseconds and the frame which
    * contains (or will contain) the attribute to which this spring is animating.
    *
-   * @param {number} now
+   * @param {number} elapsed
    * @param {object} frame
    */
-  setTime: function(now, frame)
+  update: function(elapsed, frame)
   {
-    if ( this.paused )
-    {
-      return false;
-    }
-
-    var elapsed = now - this.startTime;
-
-    if ( elapsed < this.delay )
-    {
-      this.elapsed = elapsed;
-
-      return false;
-    }
-
     var calc = this.calculator;
     
     // the number of elapsed seconds (maxed to avoid crazy behavior with low FPS)
@@ -4702,7 +4822,6 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
     this.updateVelocity( dt );
     this.velocity = calc.adds( this.velocity, this.gravity, dt );
     this.position = calc.adds( this.position, this.velocity, dt );
-    this.elapsed = elapsed;
     
     // track whether the attribute has updated so the animator knows if it needs to apply the attribute to the subject.
     var updated = !calc.isEqual( starting, this.position, anim8.Spring.EPSILON );
@@ -4717,15 +4836,6 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
     }
     
     return updated;
-  },
-
-  /**
-   * [getElapsed description]
-   * @return {[type]}
-   */
-  getElapsed: function()
-  {
-    return this.elapsed;
   },
   
   /**
@@ -4826,6 +4936,15 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
   },
 
   /**
+   * [clone description]
+   * @return {[type]}
+   */
+  clone: function()
+  {
+    return new anim8.LinearSpring( this.attribute, this.calculator, this.position, this.rest, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
+  },
+
+  /**
    * Returns whether this animator has computed values which need to be resolved
    * by the subject animator calling prepare on this attribute animator.
    * 
@@ -4905,11 +5024,27 @@ anim8.DistanceSpring = function(attribute, calculator, position, rest, distance,
 
 anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(), 
 {
+
+  /**
+   * [start description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
   start: function(now, animator)
   {
     anim8.Spring.prototype.start.apply( this, arguments );
     
     this.temp = this.calculator.create();
+  },
+
+  /**
+   * [clone description]
+   * @return {[type]}
+   */
+  clone: function()
+  {
+    return new anim8.DistanceSpring( this.attribute, this.calculator, this.position, this.rest, this.distance, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
   },
 
   updateVelocity: function(dt)
@@ -4959,6 +5094,208 @@ anim8.spring['distance'] = function(spring)
     spring.finishOnRest
   );
 };
+
+/**
+ * Animates a single attribute over any period of time.
+ */
+anim8.Physics = function( attribute, parser, calculator, position, velocity, acceleration, terminal, stopTime )
+{
+  this.reset( attribute, parser, null );
+
+  this.calculator   = calculator;
+  this.position     = position;
+  this.velocity     = velocity;
+  this.acceleration = acceleration;
+  this.terminal     = anim8.number( terminal, Number.POSITIVE_INFINITY );
+  this.stopTime     = anim8.time( stopTime, Number.POSITIVE_INFINITY );
+  this.finished     = false;
+};
+
+anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
+{
+
+  /**
+   * Prepares this attribute animator for animation on the given subject animator.
+   * This is called once in anim8.Animator.preupdate before the first time this
+   * animator is updated.
+   * 
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  start: function(now, animator)
+  {
+    this.startTime = now;
+    this.elapsed = 0;
+    this.finished = false;
+
+    var attribute = animator.getAttribute( this.attribute );
+    var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
+
+    this.calculator     = calc;
+    this.position       = this.parseValue( animator, this.position, attribute.defaultValue );
+    this.initalPosition = calc.clone( this.position );
+    this.velocity       = this.parseValue( animator, this.velocity, calc.ZERO );
+    this.acceleration   = this.parseValue( animator, this.acceleration, calc.ZERO );
+    this.temp           = calc.create();
+  },
+
+  /**
+   * Returns whether this animator has computed values which need to be resolved
+   * by the subject animator calling prepare on this attribute animator.
+   * 
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return anim8.isComputed( this.position ) || 
+           anim8.isComputed( this.velocity ) ||
+           anim8.isComputed( this.acceleration );
+  },
+
+  /**
+   * [parseValue description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseValue: function(animator, value, defaultValue)
+  {
+    var parsed = this.calculator.parse( value, defaultValue );
+
+    if ( anim8.isFunction( parsed ) && parsed.computed )
+    {
+       parsed = parsed( this, animator );
+    }
+
+    return parsed;
+  },
+
+  /**
+   * 
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  update: function(elapsed, frame)
+  {
+    var value = this.valueAt( elapsed, true );
+
+    if ( value !== false )
+    {
+      frame[ this.attribute ] = this.position = value;
+
+      return true;
+    }
+
+    var calc = this.calculator;
+    var dt = Math.min( (elapsed - this.elapsed) * 0.001, anim8.Physics.MAX_DT );
+    var vel = calc.copy( this.temp, this.resolveVelocity() );
+    var acc = this.resolveAcceleration();
+    var pos = this.position;
+
+    vel = calc.adds( vel, acc, dt );
+
+    if ( this.terminal !== Number.POSITIVE_INFINITY )
+    {
+      vel = calc.clamp( vel, 0, this.terminal );
+    }
+
+    pos = calc.adds( pos, vel, dt );
+    
+    this.position = pos;
+
+    if ( !anim8.isFunction( this.velocity ) )
+    {
+      this.velocity = calc.copy( this.velocity, vel );
+    }
+
+    frame[ this.attribute ] = pos;
+
+    return true;
+  },
+
+  /**
+   * [resolveVelocity description]
+   * @return {[type]}
+   */
+  resolveVelocity: function()
+  {
+    return anim8.isFunction( this.velocity ) ? this.velocity() : this.velocity;
+  },
+
+  /**
+   * [resolveAcceleration description]
+   * @return {[type]}
+   */
+  resolveAcceleration: function()
+  {
+    return anim8.isFunction( this.acceleration ) ? this.acceleration() : this.acceleration;
+  },
+
+  /**
+   * Returns the value at the given time.
+   * 
+   * @param  {Number} time
+   * @return {any}
+   */
+  valueAt: function(time, usePosition)
+  {
+    if ( anim8.isFunction( this.velocity ) || anim8.isFunction( this.acceleration ) || this.terminal !== Number.POSITIVE_INFINITY )
+    {
+      return false;
+    }
+
+    time -= this.delay;
+    time *= 0.001;
+
+    var calc = this.calculator;
+    var value = usePosition ? calc.copy( this.position, this.initalPosition ) : calc.clone( this.initalPosition );
+    value = calc.adds( value, this.velocity, time );
+    value = calc.adds( value, this.acceleration, time * time );
+
+    return value;
+  },
+
+  /**
+   * Clones this animator.
+   * 
+   * @return {anim8.AttributeAnimator}
+   */
+  clone: function()
+  {
+    return new anim8.Physics( this.attribute, this.parser, this.calculator, this.position, this.velocity, this.acceleration, this.terminal, this.stopTime );
+  },
+
+  /**
+   * Sets the final state of the animator to the frame if one exists.
+   * 
+   * @param  {Object}
+   * @return {Boolean}
+   */
+  finish: function(frame)
+  {
+    this.finished = true;
+
+    return true;
+  },
+
+  /**
+   * [isFinished description]
+   * @return {Boolean}
+   */
+  isFinished: function()
+  {
+    return this.finished;
+  }
+
+});
+
+/**
+ * The maximum elapsed time that should be used for the spring simulation. If you allow the elapsed time
+ * to get to high the spring will overreact and produce undesirable results.
+ */
+anim8.Physics.MAX_DT = 0.1;
 
 /**
  * Returns an animation based on the input. If the input is an instance of anim8.Animation that instance
@@ -5025,6 +5362,7 @@ anim8.animation = function(animation, options, cache)
 	{
     var attrimatorMap = new anim8.AttrimatorMap();
 		var options = anim8.options( options );
+    var helper = new anim8.ParserHelper( animation, options );
 		
 		for (var parserName in animation)
 		{
@@ -5032,7 +5370,7 @@ anim8.animation = function(animation, options, cache)
 			
 			if ( parser !== false )
 			{
-				parser.parse( animation, options, attrimatorMap );
+				parser.parse( animation, options, attrimatorMap, helper );
 			}
 		}
 		
@@ -5119,13 +5457,15 @@ anim8.Animation.prototype =
    */
   merge: function(options, attrimatorMap)
   {
+    var helper = new anim8.ParserHelper( this.input, this.options, options );
+
     for (var parserName in this.input)
     {
       var parser = anim8.parser( parserName );
       
       if ( parser !== false )
       {
-        parser.merge( this.input, options, this.options, attrimatorMap );
+        parser.merge( this.input, options, this.options, attrimatorMap, helper );
       }
     }
 
@@ -5308,114 +5648,121 @@ anim8.transition = function(transition, cache)
  * @param {boolean} cache
  * @return {object}
  */
-anim8.options = function(options, cache)
+anim8.options = (function()
 {
-  var originalInput = options;
-
-  if ( anim8.isString( options ) )
+  function parseProperty(input, out, parseFunction, property, propertyAdd, propertyScale)
   {
-    if ( options in anim8.options )
+    var first = input.charAt( 0 );
+
+    if ( first === '*' )
     {
-      return anim8.options[ options ];
+      parsed = anim8.number( input.substring( 1 ), false );
+
+      if ( parsed !== false )
+      {
+        out[ propertyScale ] = parsed;
+      }
+    }
+    else
+    {
+      if ( first === '+' || first === '-' )
+      {
+        property = propertyAdd;
+        input = input.substring( 1 );
+      }
+
+      var parsed = parseFunction( input, false )
+
+      if ( parsed !== false )
+      {
+        out[ property ] = parsed;
+      }  
     }
 
-    options = options.toLowerCase().split(' ');
+    return parsed;
   }
 
-  if ( anim8.isArray( options ) )
+  return function(options, cache)
   {
-    var parsed = {};
+    var originalInput = options;
 
-    for (var i = 0; i < options.length; i++)
+    if ( anim8.isString( options ) )
     {
-      var part = options[i];
-      var first = part.charAt( 0 );
-
-      // Repeats
-      if ( first === 'x' )
+      if ( options in anim8.options )
       {
-        var repeat = anim8.repeat( part.substring(1), false );
-
-        if ( repeat !== false )
-        {
-          parsed.repeat = repeat;
-        }
+        return anim8.options[ options ];
       }
-      // Sleeping
-      else if ( first === 'z' )
+
+      options = options.toLowerCase().split(' ');
+    }
+
+    if ( anim8.isArray( options ) )
+    {
+      var parsed = {};
+
+      for (var i = 0; i < options.length; i++)
       {
-        var sleep = anim8.time( part.substring(1), false );
+        var part = options[i];
+        var first = part.charAt( 0 );
 
-        if ( sleep !== false )
+        // Repeats
+        if ( first === 'x' )
         {
-          parsed.sleep = sleep;
+          parseProperty( part.substring(1), parsed, anim8.repeat, 'repeat', 'repeatAdd', 'repeatScale' );
         }
-      }
-      // Delay
-      else if ( first === '~' )
-      {
-        var delay = anim8.time( part.substring(1), false );
-
-        if ( delay !== false )
+        // Sleeping
+        else if ( first === 'z' )
         {
-          parsed.delay = delay;
+          parseProperty( part.substring(1), parsed, anim8.time, 'sleep', 'sleepAdd', 'sleepScale' );
         }
-      }
-      // Scaling
-      else if ( first === '!' )
-      {
-        var scale = parseFloat( part.substring(1) );
-
-        if ( !isNaN(scale) )
+        // Delay
+        else if ( first === '~' )
         {
-          parsed.scale = scale;
+          parseProperty( part.substring(1), parsed, anim8.time, 'delay', 'delayAdd', 'delayScale' );
         }
-      }
-      else
-      {
-        // Easing?
-        var easing = anim8.easing( part, false );
-
-        if ( easing !== false )
+        // Scaling
+        else if ( first === '!' )
         {
-          parsed.easing = easing;
-        }
-
-        // Duration?
-        var duration = anim8.time( part, false );
-
-        if ( duration !== false )
-        {
-          parsed.duration = duration;
+          parseProperty( part.substring(1), parsed, anim8.number, 'scale', 'scaleAdd', 'scaleScale' );
         }
         else
         {
-          // If not a duration, might be an alternative repeat? (doesn't start with x)
-          var repeat = anim8.repeat( part, false );
+          // Easing?
+          var easing = anim8.easing( part, false );
 
-          if ( repeat !== false )
+          if ( easing !== false )
           {
-            parsed.repeat = repeat;
+            parsed.easing = easing;
+          }
+
+          // Duration?
+          var duration = parseProperty( part, parsed, anim8.time, 'duration', 'durationAdd', 'durationScale' );
+
+          if ( duration === false )
+          {
+            // If not a duration, might be an alternative repeat? (doesn't start with x)
+            parseProperty( part, parsed, anim8.repeat, 'repeat', 'repeatAdd', 'repeatScale' );
           }
         }
       }
+
+      if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheOptions ) )
+      {
+        anim8.options[ originalInput ] = parsed;
+      }
+
+      return parsed; 
     }
 
-    if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheOptions ) )
+    if ( anim8.isObject( options ) )
     {
-      anim8.options[ originalInput ] = parsed;
+      return options;
     }
 
-    return parsed; 
-  }
+    return anim8.defaults.noOptions;
+  };
 
-  if ( anim8.isObject( options ) )
-  {
-    return options;
-  }
-
-  return anim8.defaults.noOptions;
-};
+})();
 
 /**
  * Instantiates a new Animator given a subject to animate.
@@ -7112,8 +7459,9 @@ anim8.Parser.prototype =
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     throw 'Parser.parse not implemented';
   },
@@ -7131,40 +7479,297 @@ anim8.Parser.prototype =
    * @param {object} newOptions
    * @param {object} oldOptions
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  merge: function( animation, newOptions, oldOptions, attrimatorMap )
-  {
-    var durations = animation.durations || {};
-    var easings   = animation.easings || {};
-    var delays    = animation.delays || {};
-    var sleeps    = animation.sleeps || {};
-    var repeats   = animation.repeats || {};
-    var scales    = animation.scales || {};
-    var scaleBases= animation.scaleBases || {};
-    
+  merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
+  { 
+    var factory = anim8.factory( animation.factory );
     var attrimators = attrimatorMap.values;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
       var e = attrimators[ i ];
+      var attr = e.attribute;
       
       if ( e.getParser() !== this )
       {
         continue;
       }
-      
-      var attr = e.attribute;
-      var calc = e.path.calculator;
 
-      e.easing    = anim8.easing( anim8.coalesce( easings[attr],   newOptions.easing,   oldOptions.easing   ), e.easing );
-      e.repeat    = anim8.repeat( anim8.coalesce( repeats[attr],   newOptions.repeat,   oldOptions.repeat   ), e.repeat );
-      e.delay     = anim8.time(   anim8.coalesce( delays[attr],    newOptions.delay,    oldOptions.delay    ), e.delay );
-      e.sleep     = anim8.time(   anim8.coalesce( sleeps[attr],    newOptions.sleep,    oldOptions.sleep    ), e.sleep );
-      e.duration  = anim8.time(   anim8.coalesce( durations[attr], newOptions.duration, oldOptions.duration ), e.duration );
-      e.scale     =               anim8.coalesce( scales[attr],    newOptions.scale,    oldOptions.scale     , e.scale );
-      e.scaleBase = calc.parse(   anim8.coalesce( scaleBases[attr],newOptions.scaleBase,oldOptions.scaleBase), e.scaleBase );
+      e.easing    = helper.mergeEasing( attr, e.easing );
+      e.repeat    = helper.mergeRepeat( attr, e.repeat );
+      e.delay     = helper.mergeDelay( attr, e.delay );
+      e.sleep     = helper.mergeSleep( attr, e.sleep );
+      e.duration  = helper.mergeDuration( attr, e.duration );
+      e.scale     = helper.mergeScale( attr, e.scale );
+      e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
     }
   }
+};
+
+
+/**
+ * [ParserHelper description]
+ * @param {[type]}
+ * @param {[type]}
+ * @param {[type]}
+ */
+anim8.ParserHelper = function( input, oldOptions, newOptions )
+{
+  this.input = input;
+  this.oldOptions = oldOptions || {};
+  this.newOptions = newOptions || {};
+
+  this.prepareSpecifics( 'easings' );
+  this.prepareSpecifics( 'repeats' );
+  this.prepareSpecifics( 'delays' );
+  this.prepareSpecifics( 'sleeps' );
+  this.prepareSpecifics( 'durations' );
+  this.prepareSpecifics( 'scales' );
+  this.prepareSpecifics( 'scaleBases' );
+};
+
+anim8.ParserHelper.prototype = 
+{
+
+  /**
+   * [prepareSpecifics description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  prepareSpecifics: function(specifics)
+  {
+    if ( !anim8.isObject( this.input[ specifics ] ) )
+    {
+      this.input[ specifics ] = {};
+    }
+  },
+
+  /* PARSING */
+
+  /**
+   * [parseEasing description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseEasing: function(attr)
+  {
+    return this.parseFirst( attr, 'easing', 'easings' );
+  },
+
+  /**
+   * [parseRepeat description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseRepeat: function(attr)
+  {
+    return this.parseNumber( attr, anim8.repeat, anim8.repeat, 'repeat', 'repeatAdd', 'repeatScale', 'repeats' );
+  },
+
+  /**
+   * [parseDelay description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseDelay: function(attr)
+  {
+    return this.parseNumber( attr, anim8.delay, anim8.time, 'delay', 'delayAdd', 'delayScale', 'delays' );
+  },
+
+  /**
+   * [parseSleep description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseSleep: function(attr)
+  {
+    return this.parseNumber( attr, anim8.sleep, anim8.time, 'sleep', 'sleepAdd', 'sleepScale', 'sleeps' );
+  },
+
+  /**
+   * [parseDuration description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseDuration: function(attr)
+  {
+    return this.parseNumber( attr, anim8.duration, anim8.time, 'duration', 'durationAdd', 'durationScale', 'durations' );
+  },
+
+  /**
+   * [parseScale description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseScale: function(attr)
+  {
+    return this.parseNumber( attr, anim8.scale, anim8.number, 'scale', 'scaleAdd', 'scaleScale', 'scales' );
+  },
+
+  /**
+   * [parseScaleBase description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseScaleBase: function(attr)
+  {
+    return this.parseFirst( attr, 'scaleBase', 'scaleBases' );
+  },
+
+  /**
+   * [parseFirst description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseFirst: function(attr, option, specifics)
+  {
+    return anim8.coalesce( this.input[ specifics ][ attr ], this.oldOptions[ option ] );
+  },
+
+  /**
+   * [parseNumber description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parseNumber: function(attr, parseFunction, parseOptionFunction, option, optionAdd, optionScale, specifics)
+  {
+    var baseRaw = anim8.coalesce( this.input[ specifics ][ attr ], this.oldOptions[ option ] );
+    var base = parseFunction( baseRaw );
+    var add = parseOptionFunction( this.oldOptions[ optionAdd ], 0 );
+    var scale = anim8.coalesce( this.oldOptions[ optionScale ], 1 );
+
+    return (add === 0 && scale === 1) ? baseRaw : (base + add) * scale;
+  },
+
+  /* MERGING */
+
+  /**
+   * [mergeEasing description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeEasing: function(attr, current)
+  {
+    return this.mergeFirst( attr, current, anim8.easing, 'easing', 'easings' );
+  },
+
+  /**
+   * [mergeRepeat description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeRepeat: function(attr, current)
+  {
+    return this.mergeNumber( attr, current, anim8.repeat, 'repeat', 'repeatAdd', 'repeatScale', 'repeats' );
+  },
+
+  /**
+   * [mergeDelay description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeDelay: function(attr, current)
+  {
+    return this.mergeNumber( attr, current, anim8.time, 'delay', 'delayAdd', 'delayScale', 'delays' );
+  },
+
+  /**
+   * [mergeSleep description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeSleep: function(attr, current)
+  {
+    return this.mergeNumber( attr, current, anim8.time, 'sleep', 'sleepAdd', 'sleepScale', 'scales' );
+  },
+
+  /**
+   * [mergeDuration description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeDuration: function(attr, current)
+  {
+    return this.mergeNumber( attr, current, anim8.time, 'duration', 'durationAdd', 'durationScale', 'durations' );
+  },
+
+  /**
+   * [mergeScale description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeScale: function(attr, current)
+  {
+    return this.mergeNumber( attr, current, anim8.number, 'scale', 'scaleAdd', 'scaleScale', 'scales' );
+  },
+
+  /**
+   * [mergeScaleBase description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeScaleBase: function(attr, current, factory)
+  {
+    var calc = factory.attribute( attr ).calculator;
+    var parseFunction = function(value, defaultValue) {
+      return calc.parse( value, defaultValue );
+    };
+
+    return this.mergeFirst( attr, current, parseFunction, 'scaleBase', 'scaleBases' );
+  },
+
+  /**
+   * [mergeFirst description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeFirst: function(attr, current, parseOptionFunction, option, specifics)
+  {
+    return parseOptionFunction( anim8.coalesce( this.input[ specifics ][ attr ], this.newOptions[ option ], this.oldOptions[ option ] ), current );
+  },
+
+  /**
+   * [mergeNumber description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  mergeNumber: function(attr, current, parseOptionFunction, option, optionAdd, optionScale, specifics)
+  {
+    var baseRaw = anim8.coalesce( this.input[ specifics ][ attr ], this.newOptions[ option ], this.oldOptions[ option ] );
+    var base = parseOptionFunction( baseRaw, current );
+    var add = parseOptionFunction( anim8.coalesce( this.newOptions[ optionAdd ], this.oldOptions[ optionAdd ] ), 0 );
+    var scale = anim8.coalesce( this.newOptions[ optionScale ], this.oldOptions[ optionScale ], 1 );
+
+    return (base + add) * scale;
+  }
+
 };
 
 /**
@@ -7178,6 +7783,7 @@ anim8.ParserDeltas = function()
 // ParserDeltas extends anim8.Parser()
 anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
 {
+
   /**
    * Parses the animation object (and optionally an option object) and pushes
    * all generated attrimators to the given array.
@@ -7185,8 +7791,9 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. If deltas wasn't specified, assume a uniform distribution of points
     // 2. If deltas was an array, expand out into an object where the keys are attributes and the value is the delta array
@@ -7223,14 +7830,6 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
   		
   		deltas = deltaObject;
   	}
-  	
-    var durations = animation.durations || {};
-    var easings = animation.easings || {};
-    var delays = animation.delays || {};
-    var sleeps = animation.sleeps || {};
-    var repeats = animation.repeats || {};
-    var scales = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
     
   	for (var attr in values)
   	{
@@ -7241,20 +7840,21 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
   		{
   			value[k] = attribute.parse( value[k] );
   		}
-  		
-      var duration  = anim8.coalesce( durations[attr], options.duration );
-      var easing    = anim8.coalesce( easings[attr], options.easing );
-      var delay     = anim8.coalesce( delays[attr], options.delay );
-      var sleep     = anim8.coalesce( sleeps[attr], options.sleep );
-      var repeat    = anim8.coalesce( repeats[attr], options.repeat );
-      var scale     = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase = anim8.coalesce( scaleBases[attr], options.scaleBase );
+
+      var easing    = helper.parseEasing( attr );
+      var delay     = helper.parseDelay( attr );
+      var duration  = helper.parseDuration( attr );
+      var sleep     = helper.parseSleep( attr );
+      var repeat    = helper.parseRepeat( attr );
+      var scale     = helper.parseScale( attr );
+      var scaleBase = helper.parseScaleBase( attr );
       var path      = new anim8.DeltaPath( attr, attribute.calculator, values[attr], deltas[attr] );
       var event     = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
   	}
   }
+  
 });
 
 /**
@@ -7282,28 +7882,23 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Generate the attrimators, only caring about the delays and durations
     
     var factory = anim8.factory( animation.factory );
   	var values = animation.final;
-    var delays = animation.delays || {};
-    var durations = animation.durations || {};
-    var scales = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
-    var calculators = {};
-  	var defaults = {};
     
   	for (var attr in values)
   	{
       var attribute  = factory.attribute( attr );
-      var value      = attribute.parse( values[ attr ] ); 
-      var delay      = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
-      var duration   = anim8.duration( anim8.coalesce( durations[attr], options.duration ) );
-      var scale      = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var value      = attribute.parse( values[ attr ] );
+      var delay      = anim8.delay( helper.parseDelay( attr ) );
+      var duration   = anim8.duration( helper.parseDuration( attr ) );
+      var scale      = helper.parseScale( attr );
+      var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PointPath( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, scale, scaleBase, false, this );
       
@@ -7324,33 +7919,26 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
    * @param {object} newOptions
    * @param {object} oldOptions
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  merge: function( animation, newOptions, oldOptions, attrimatorMap )
+  merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
-    var durations = animation.durations || {};
-    var delays    = animation.delays || {};
-    var scales    = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
-    
+    var factory = anim8.factory( animation.factory );
     var attrimators = attrimatorMap.values;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
       var e = attrimators[i];
+      var attr = e.attribute;
         
       if ( e.getParser() !== this )
       {
         continue;
       }
 
-      var attr = e.attribute;
-      var calc = e.path.calculator;
-      var delay = anim8.coalesce( delays[attr], newOptions.delay, oldOptions.delay );
-      var duration = anim8.coalesce( durations[attr], newOptions.duration, oldOptions.duration );
-
-      e.delay = anim8.delay( delay ) + anim8.duration( duration );
-      e.scale = anim8.coalesce( scales[attr], newOptions.scale, oldOptions.scale, e.scale );
-      e.scaleBase = calc.parse( anim8.coalesce( scaleBases[attr], newOptions.scaleBase, oldOptions.scaleBase ), e.scaleBase );
+      e.delay     = helper.mergeDelay( attr, e.delay ) + helper.mergeDuration( attr, e.duration );
+      e.scale     = helper.mergeScale( attr, e.scale );
+      e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory ); 
     }
   }
 
@@ -7382,24 +7970,22 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Generate the attrimators, only caring about the delays
     
     var factory    = anim8.factory( animation.factory );
   	var values     = animation.initial;
-    var delays     = animation.delays || {};
-    var scales     = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
     
   	for (var attr in values)
   	{
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( values[ attr ] ); 
-      var delay      = anim8.delay( anim8.coalesce( delays[attr], options.delay ) );
-      var scale      = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var delay      = helper.parseDelay( attr );
+      var scale      = helper.parseScale( attr );
+      var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PointPath( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, scale, scaleBase, true, this );
       
@@ -7420,33 +8006,29 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
    * @param {object} newOptions
    * @param {object} oldOptions
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  merge: function( animation, newOptions, oldOptions, attrimatorMap )
+  merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
-    var durations = animation.durations || {};
-    var delays    = animation.delays || {};
-    var scales = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
-    
+    var factory    = anim8.factory( animation.factory );
     var attrimators = attrimatorMap.values;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
       var e = attrimators[i];
+      var attr = e.attribute;
         
       if ( e.getParser() !== this )
       {
         continue;
       }
       
-      var attr = e.attribute;
-      var calc = e.path.calculator;
-      
-      e.delay = anim8.time( anim8.coalesce( delays[attr], newOptions.delay, oldOptions.delay ), e.delay );
-      e.scale = anim8.coalesce( scales[attr], newOptions.scale, oldOptions.scale, e.scale );
-      e.scaleBase = calc.parse( anim8.coalesce( scaleBases[attr], newOptions.scaleBase, oldOptions.scaleBase ), e.scaleBase );
+      e.delay     = helper.mergeDelay( attr, e.delay );
+      e.scale     = helper.mergeScale( attr, e.scale );
+      e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
     }
   }
+  
 });
 
 /**
@@ -7466,6 +8048,7 @@ anim8.ParserKeyframe = function()
 // ParserKeyframe extends anim8.Parser()
 anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
 {
+  
   /**
    * Parses the animation object (and optionally an option object) and pushes
    * all generated attrimators to the given array.
@@ -7473,8 +8056,9 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Normalize keys by converting aliases to the actual value
     // 2. Split up keys that have commas into multiple entries
@@ -7485,15 +8069,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
     
     var factory = anim8.factory( animation.factory );
     var kframes = animation.keyframe;
-    
-    var durations = animation.durations || {};
     var easings = animation.easings || {};
-    var delays = animation.delays || {};
-    var sleeps = animation.sleeps || {};
-    var repeats = animation.repeats || {};
-    var scales = animation.scales || {};
-    var scaleBases = animation.scaleBases || {};
-    
     var teasing = anim8.easing( anim8.coalesce( options.teasing, anim8.defaults.teasing ) );
     
     var sort = false;
@@ -7570,7 +8146,8 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
     // sort if necessary
     if (sort)
     {
-      times.sort(function(a, b) {
+      times.sort(function(a, b) 
+      {
         return a.order - b.order;
       });
       
@@ -7614,12 +8191,12 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
     // create events & paths
     for (var attr in deltas)
     {
-      var duration  = anim8.coalesce( durations[attr], options.duration );
-      var delay     = anim8.coalesce( delays[attr], options.delay );
-      var sleep     = anim8.coalesce( sleeps[attr], options.sleep );
-      var repeat    = anim8.coalesce( repeats[attr], options.repeat );
-      var scale     = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var duration  = helper.parseDuration( attr );
+      var delay     = helper.parseDelay( attr );
+      var sleep     = helper.parseSleep( attr );
+      var repeat    = helper.parseRepeat( attr );
+      var scale     = helper.parseScale( attr );
+      var scaleBase = helper.parseScaleBase( attr );
       var path      = new anim8.KeyframePath( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
       var event     = new anim8.Event( attr, path, duration, teasing, delay, sleep, repeat, scale, scaleBase, true, this );
       
@@ -7653,32 +8230,26 @@ anim8.override( anim8.ParserTweenTo.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
     var factory    = anim8.factory( animation.factory );
     var tweenTo    = animation.tweenTo;
-    var durations  = animation.durations || {};
-    var easings    = animation.easings || {};
-    var delays     = animation.delays || {};
-    var sleeps     = animation.sleeps || {};
-    var repeats    = animation.repeats || {};
-    var scales     = animation.scales || {};
-    var scaleBases = animation.scaleBase || {};
 
   	for (var attr in tweenTo)
   	{
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( tweenTo[attr] );
-      var duration   = anim8.coalesce( durations[attr], options.duration );
-      var easing     = anim8.coalesce( easings[attr], options.easing );
-      var delay      = anim8.coalesce( delays[attr], options.delay );
-      var sleep      = anim8.coalesce( sleeps[attr], options.sleep );
-      var repeat     = anim8.coalesce( repeats[attr], options.repeat );
-      var scale      = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var duration   = helper.parseDuration( attr );
+      var easing     = helper.parseEasing( attr );
+      var delay      = helper.parseDelay( attr );
+      var sleep      = helper.parseSleep( attr );
+      var repeat     = helper.parseRepeat( attr );
+      var scale      = helper.parseScale( attr );
+      var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, value );
       var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
@@ -7712,32 +8283,26 @@ anim8.override( anim8.ParserTweenFrom.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
     var factory    = anim8.factory( animation.factory );
     var tweenFrom  = animation.tweenFrom;
-    var durations  = animation.durations || {};
-    var easings    = animation.easings || {};
-    var delays     = animation.delays || {};
-    var sleeps     = animation.sleeps || {};
-    var repeats    = animation.repeats || {};
-    var scales     = animation.scales || {};
-    var scaleBases = animation.scaleBase || {};
 
   	for (var attr in tweenFrom)
   	{
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( tweenFrom[attr] );
-      var duration   = anim8.coalesce( durations[attr], options.duration );
-      var easing     = anim8.coalesce( easings[attr], options.easing );
-      var delay      = anim8.coalesce( delays[attr], options.delay );
-      var sleep      = anim8.coalesce( sleeps[attr], options.sleep );
-      var repeat     = anim8.coalesce( repeats[attr], options.repeat );
-      var scale      = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var duration   = helper.parseDuration( attr );
+      var easing     = helper.parseEasing( attr );
+      var delay      = helper.parseDelay( attr );
+      var sleep      = helper.parseSleep( attr );
+      var repeat     = helper.parseRepeat( attr );
+      var scale      = helper.parseScale( attr );
+      var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.Tween( attr, attribute.calculator, value, anim8.computed.current );
       var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
@@ -7771,32 +8336,26 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
    * @param {object} animation
    * @param {object} options
    * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
    */
-  parse: function( animation, options, attrimatorMap )
+  parse: function( animation, options, attrimatorMap, helper )
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
     var factory    = anim8.factory( animation.factory );
     var move       = animation.move;
-    var durations  = animation.durations || {};
-    var easings    = animation.easings || {};
-    var delays     = animation.delays || {};
-    var sleeps     = animation.sleeps || {};
-    var repeats    = animation.repeats || {};
-    var scales     = animation.scales || {};
-    var scaleBases = animation.scaleBase || {};
 
   	for (var attr in move)
   	{
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( move[attr] );
-      var duration   = anim8.coalesce( durations[attr], options.duration );
-      var easing     = anim8.coalesce( easings[attr], options.easing );
-      var delay      = anim8.coalesce( delays[attr], options.delay );
-      var sleep      = anim8.coalesce( sleeps[attr], options.sleep );
-      var repeat     = anim8.coalesce( repeats[attr], options.repeat );
-      var scale      = anim8.coalesce( scales[attr], options.scale );
-      var scaleBase  = anim8.coalesce( scaleBases[attr], options.scaleBase );
+      var duration   = helper.parseDuration( attr );
+      var easing     = helper.parseEasing( attr );
+      var delay      = helper.parseDelay( attr );
+      var sleep      = helper.parseSleep( attr );
+      var repeat     = helper.parseRepeat( attr );
+      var scale      = helper.parseScale( attr );
+      var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, anim8.computed.relative( value ) );
       var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
       
@@ -7809,6 +8368,111 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
  * Register the parser.
  */
 anim8.parser['move'] = new anim8.ParserMove();
+
+
+/**
+ * Instantiates a new parser for the 'move' animation type.
+ */
+anim8.ParseSpring = function()
+{
+  
+};
+
+// ParseSpring extends anim8.Parser()
+anim8.override( anim8.ParseSpring.prototype = new anim8.Parser(),
+{
+    
+  /**
+   * Parses the animation object (and optionally an option object) and pushes
+   * all generated attrimators to the given array.
+   * 
+   * @param {object} animation
+   * @param {object} options
+   * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
+   */
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    var factory    = anim8.factory( animation.factory );
+    var springs    = animation.springs;
+
+  	for (var attr in springs)
+  	{
+      var spring     = springs[ attr ];
+
+      if ( !anim8.isDefined( spring.attribute ) )
+      {
+        spring.attribute = attr;
+      }
+
+      var parsed = anim8.spring( spring );
+      
+      if ( parsed !== false )
+      {
+        parsed.parser = this;
+
+        attrimatorMap.put( attr, parsed );  
+      }
+  	}
+  }
+});
+
+/**
+ * Register the parser.
+ */
+anim8.parser['springs'] = new anim8.ParseSpring();
+
+
+/**
+ * Instantiates a new parser for the 'move' animation type.
+ */
+anim8.ParsePhysics = function()
+{
+  
+};
+
+// ParsePhysics extends anim8.Parser()
+anim8.override( anim8.ParsePhysics.prototype = new anim8.Parser(),
+{
+    
+  /**
+   * Parses the animation object (and optionally an option object) and pushes
+   * all generated attrimators to the given array.
+   * 
+   * @param {object} animation
+   * @param {object} options
+   * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
+   */
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    var factory    = anim8.factory( animation.factory );
+    var physics    = animation.physics;
+
+  	for (var attr in physics)
+  	{
+      var physic    = physics[ attr ];
+
+      var attrimator = new anim8.Physics(
+        attr, 
+        this, 
+        physic.calculator, 
+        anim8.coalesce( physic.position, true ), 
+        physic.velocity, 
+        physic.acceleration, 
+        physic.terminal,
+        physic.stopAt
+      );
+
+      attrimatorMap.put( attr, attrimator );
+  	}
+  }
+});
+
+/**
+ * Register the parser.
+ */
+anim8.parser['physics'] = new anim8.ParsePhysics();
 
 
 
@@ -8004,7 +8668,7 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
 
       var calculatorName = attribute.calculator;
       var calculator = anim8.calculator( calculatorName );
-      var defaultValue = calculator.parse( attribute.defaultValue, calculator.zero );
+      var defaultValue = calculator.parse( attribute.defaultValue, calculator.ZERO );
 
       attribute.calculatorName = calculatorName;
       attribute.calculator = calculator;
