@@ -823,9 +823,21 @@ anim8.eventize = function(object)
  * This is especially beneficial when most of the time the contents of the structure need to be iterated and order
  * doesn't matter (since removal performs a swap which breaks insertion order).
  */
-anim8.FastMap = function()
+anim8.FastMap = function(map)
 {
   this.reset();
+
+  if ( map instanceof anim8.FastMap )
+  {
+    this.putMap( map );
+  }
+  else if ( anim8.isObject( map ) )
+  {
+    for (var prop in map)
+    {
+      this.put( prop, map[ prop ] );
+    }
+  }
 };
 
 anim8.FastMap.prototype =
@@ -946,7 +958,7 @@ anim8.FastMap.prototype =
    */
   indexOf: function(key)
   {
-    return this.indices[ key ];
+    return anim8.coalesce( this.indices[ key ], -1 );
   },
 
   /**
@@ -968,32 +980,17 @@ anim8.FastMap.prototype =
    */
   hasOverlap: function(map)
   {
-    if ( map instanceof anim8.FastMap )
-    {
-      var keys = this.keys;
-      var indices = map.indices;
+    var keys = this.keys;
+    var indices = map.indices;
 
-      for (var i = 0; i < keys.length; i++)
+    for (var i = 0; i < keys.length; i++)
+    {
+      if ( keys[i] in indices )
       {
-        if ( keys[i] in indices )
-        {
-          return true;
-        }
+        return true;
       }
     }
-    else if ( anim8.isObject( map ) )
-    {
-      var indices = this.indices;
-
-      for (var prop in map)
-      {
-        if ( prop in indices )
-        {
-          return true;
-        }
-      }
-    }
-
+   
     return false;
   },
 
@@ -9501,33 +9498,6 @@ anim8.dom.property.transform = (function()
   {
     return false;
   }
-
-  var d2 = { translate: true, scale: true };
-  var d3 = { translate3d: true, scale3d: true };
-  var d4 = { rotate3d: true };
-  var axis = ['X', 'Y', 'Z'];
-    
-  var regex = 
-  {
-    translate: /translate\(([^,]+)\s*,\s*([^\)]+)\)/i,
-    translate3d: /translate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
-    translateX: /translateX\(([^\)]+)\)/i,
-    translateY: /translateY\(([^\)]+)\)/i,
-    translateZ: /translateZ\(([^\)]+)\)/i,
-    scale: /scale\(([^,]+)\s*,\s*([^\)]+)\)/i,
-    scale3d: /scale3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
-    scaleX: /scaleX\(([^\)]+)\)/i,
-    scaleY: /scaleY\(([^\)]+)\)/i,
-    scaleZ: /scaleZ\(([^\)]+)\)/i,
-    rotate: /rotate\(([^\)]+)\)/i,
-    rotate3d: /rotate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
-    rotateX: /rotateX\(([^\)]+)\)/i,
-    rotateY: /rotateY\(([^\)]+)\)/i,
-    rotateZ: /rotateZ\(([^\)]+)\)/i,
-    skew: /skew\(([^,]+)\s*,\s*([^\)]+)\)/i,
-    skewX: /skewX\(([^\)]+)\)/i,
-    skewY: /skewY\(([^\)]+)\)/i
-  };
   
   var parse = function( e, value, anim, attr, relativeTo )
   {
@@ -9542,6 +9512,132 @@ anim8.dom.property.transform = (function()
     // TODO show convert this to desiredUnit, however defaultValue may be non-scalar.
     return anim.getAttribute( attr ).defaultValue;    
   };
+
+  var getter1d = function(e, anim, parsed, attr)
+  {
+    return parse( e, parsed[1], anim, attr, 'width' )
+  };
+  var getter2d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, 'width' ),
+      y: parse( e, parsed[2], anim, attr, 'height' )
+    };
+  };
+  var getter3d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, 'width' ),
+      y: parse( e, parsed[2], anim, attr, 'height' ),
+      z: parse( e, parsed[3], anim, attr )
+    };
+  };
+  var getter4d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, 'width' ),
+      y: parse( e, parsed[2], anim, attr, 'height' ),
+      z: parse( e, parsed[3], anim, attr ),
+      angle: parse( e, parsed[4], anim, attr )
+    };
+  };
+
+  var setter1d = function(attr, value, unit)
+  {
+    return attr + '(' + value + unit + ')';
+  };
+  var setter2d = function(attr, value, unit)
+  {
+    return attr + '(' + value.x + unit + ',' + value.y + unit + ')';
+  };
+  var setter3d = function(attr, value, unit)
+  {
+    return attr + '(' + value.x + unit + ',' + value.y + unit + ',' + value.z + unit + ')';
+  };
+  var setter4d = function(attr, value, unit)
+  {
+    return attr + '(' + value.x + ',' + value.y + ',' + value.z + ',' + value.angle + unit + ')';
+  };
+    
+  var regexes = 
+  {
+    translate:    /translate\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    translate3d:  /translate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    translateX:   /translateX\(([^\)]+)\)/i,
+    translateY:   /translateY\(([^\)]+)\)/i,
+    translateZ:   /translateZ\(([^\)]+)\)/i,
+    scale:        /scale\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    scale3d:      /scale3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    scaleX:       /scaleX\(([^\)]+)\)/i,
+    scaleY:       /scaleY\(([^\)]+)\)/i,
+    scaleZ:       /scaleZ\(([^\)]+)\)/i,
+    rotate:       /rotate\(([^\)]+)\)/i,
+    rotate3d:     /rotate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    rotateX:      /rotateX\(([^\)]+)\)/i,
+    rotateY:      /rotateY\(([^\)]+)\)/i,
+    rotateZ:      /rotateZ\(([^\)]+)\)/i,
+    skew:         /skew\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    skewX:        /skewX\(([^\)]+)\)/i,
+    skewY:        /skewY\(([^\)]+)\)/i
+  };
+
+  var getters = 
+  {
+    translate:    getter2d,
+    translate3d:  getter3d,
+    translateX:   getter1d,
+    translateY:   getter1d,
+    translateZ:   getter1d,
+    scale:        getter2d,
+    scale3d:      getter3d,
+    scaleX:       getter1d,
+    scaleY:       getter1d,
+    scaleZ:       getter1d,
+    rotate:       getter1d,
+    rotate3d:     getter4d,
+    rotateX:      getter1d,
+    rotateY:      getter1d,
+    rotateZ:      getter1d,
+    skew:         getter2d,
+    skewX:        getter1d,
+    skewY:        getter1d
+  };
+
+  var setters =
+  {
+    translate:    setter2d,
+    translate3d:  setter3d,
+    translateX:   setter1d,
+    translateY:   setter1d,
+    translateZ:   setter1d,
+    scale:        setter2d,
+    scale3d:      setter3d,
+    scaleX:       setter1d,
+    scaleY:       setter1d,
+    scaleZ:       setter1d,
+    rotate:       setter1d,
+    rotate3d:     setter4d,
+    rotateX:      setter1d,
+    rotateY:      setter1d,
+    rotateZ:      setter1d,
+    skew:         setter2d,
+    skewX:        setter1d,
+    skewY:        setter1d
+  };
+
+  var props = new anim8.FastMap( regexes );
+  var regex = props.values;
+  var attrs = props.keys;
+  props.setters = [];
+  props.getters = [];
+
+  for (var prop in getters)
+  {
+    var i = props.indexOf( prop );
+
+    props.getters[ i ] = getters[ prop ];
+    props.setters[ i ] = setters[ prop ];
+  }
   
   return {
     
@@ -9551,75 +9647,31 @@ anim8.dom.property.transform = (function()
       
       for (var attr in anim.animating) 
       {
-        if ( anim.animating[ attr ] === false && attr in regex ) 
+        var i = props.indexOf( attr );
+
+        if ( i !== -1 && anim.animating[ attr ] === false ) 
         {
-          var parsed = regex[ attr ].exec( style );
+          var parsed = regex[ i ].exec( style );
 
           if ( parsed ) 
           {
-            if ( attr in d4 ) 
-            {
-              anim.frame[attr] = {
-                x: parse( e, parsed[1], anim, attr, 'width' ),
-                y: parse( e, parsed[2], anim, attr, 'height' ),
-                z: parse( e, parsed[3], anim, attr ),
-                angle: parse( e, parsed[4], anim, attr )
-              };
-            }
-            else if ( attr in d3 )
-            {
-              anim.frame[attr] = {
-                x: parse( e, parsed[1], anim, attr, 'width' ),
-                y: parse( e, parsed[2], anim, attr, 'height' ),
-                z: parse( e, parsed[3], anim, attr )
-              };
-            }
-            else if ( attr in d2 ) 
-            {
-              anim.frame[attr] = {
-                x: parse( e, parsed[1], anim, attr, 'width' ),
-                y: parse( e, parsed[2], anim, attr, 'height' )
-              };
-            }
-            else 
-            {
-              anim.frame[attr] = parse( e, parsed[1], anim, attr, 'width' );
-            }
-            
-            anim.animating[attr] = true;
+            anim.frame[ attr ] = props.getters[ i ]( e, anim, parsed, attr );
+            anim.animating[ attr ] = true;
           }
         }
       }
     },
     set: function(e, anim) 
-    {  
-      // we don't check anim.updated[attr] here since the current value of a transform property is important
-      
+    {      
       var transforms = [];
       
-      for (var attr in regex) 
+      for (var i = 0; i < regex.length; i++) 
       {
+        var attr = attrs[ i ];
+
         if (attr in anim.frame) 
-        { 
-          var value = anim.frame[ attr ];
-          var unit = anim.units[ attr ];
-          
-          if (attr in d4) 
-          {
-            transforms.push( attr + '(' + value.x + ',' + value.y + ',' + value.z + ',' + value.angle + unit + ')' );
-          }
-          else if (attr in d3) 
-          {
-            transforms.push( attr + '(' + value.x + unit + ',' + value.y + unit + ',' + value.z + unit + ')' );
-          }
-          else if (attr in d2) 
-          {
-            transforms.push( attr + '(' + value.x + unit + ',' + value.y + unit + ')' );
-          }
-          else
-          {
-            transforms.push( attr + '(' + value + unit + ')' );
-          }
+        {
+          transforms.push( props.setters[ i ]( attr, anim.frame[ attr ], anim.units[ attr ] ) );
         }
       }
 			

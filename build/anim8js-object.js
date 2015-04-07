@@ -823,9 +823,21 @@ anim8.eventize = function(object)
  * This is especially beneficial when most of the time the contents of the structure need to be iterated and order
  * doesn't matter (since removal performs a swap which breaks insertion order).
  */
-anim8.FastMap = function()
+anim8.FastMap = function(map)
 {
   this.reset();
+
+  if ( map instanceof anim8.FastMap )
+  {
+    this.putMap( map );
+  }
+  else if ( anim8.isObject( map ) )
+  {
+    for (var prop in map)
+    {
+      this.put( prop, map[ prop ] );
+    }
+  }
 };
 
 anim8.FastMap.prototype =
@@ -946,7 +958,7 @@ anim8.FastMap.prototype =
    */
   indexOf: function(key)
   {
-    return this.indices[ key ];
+    return anim8.coalesce( this.indices[ key ], -1 );
   },
 
   /**
@@ -968,32 +980,17 @@ anim8.FastMap.prototype =
    */
   hasOverlap: function(map)
   {
-    if ( map instanceof anim8.FastMap )
-    {
-      var keys = this.keys;
-      var indices = map.indices;
+    var keys = this.keys;
+    var indices = map.indices;
 
-      for (var i = 0; i < keys.length; i++)
+    for (var i = 0; i < keys.length; i++)
+    {
+      if ( keys[i] in indices )
       {
-        if ( keys[i] in indices )
-        {
-          return true;
-        }
+        return true;
       }
     }
-    else if ( anim8.isObject( map ) )
-    {
-      var indices = this.indices;
-
-      for (var prop in map)
-      {
-        if ( prop in indices )
-        {
-          return true;
-        }
-      }
-    }
-
+   
     return false;
   },
 
