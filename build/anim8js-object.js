@@ -128,14 +128,14 @@ anim8.defaults =
    * 
    * @type {number}
    */
-  transitionOutroDelta: 0.1,
+  transitionOutro:100,
 
   /**
    * The default transition into delta.
    * 
    * @type {number}
    */
-  transitionIntroDelta: 0.1,
+  transitionIntro: 100,
 
   /**
    * The default transition into delta.
@@ -275,6 +275,23 @@ anim8.now = (function() {
     return new Date().getTime();
   };
   
+})();
+
+/**
+ * [description]
+ * @param  {[type]}
+ * @return {[type]}
+ */
+anim8.trim = (function()
+{ 
+  if (String.prototype.trim) {
+    return function(x) {
+      return x.trim();
+    };
+  }
+  return function(x) {
+    return x.replace(/^([\s]*)|([\s]*)$/g, '');
+  };
 })();
 
 /**
@@ -787,7 +804,7 @@ anim8.eventize = function(object)
     {
       var eventListeners = listeners[ event ];
 			var max = eventListeners.length;
-      
+     
       for (var i = 0; i < max; i++)
       {
         var callback = eventListeners[ i ];
@@ -803,7 +820,7 @@ anim8.eventize = function(object)
 				}
 				else
 				{
-	        eventListeners.length = 0;	
+          delete listeners[ event ];	
 				}
       }
 		}
@@ -4101,6 +4118,17 @@ anim8.Attrimator.prototype =
   },
 
   /**
+   * [startCycle description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  startCycle: function(frame)
+  {
+    return false;
+  },
+
+  /**
    * Updates this attribute animator given a time to animate to and the frame to
    * provide with a new value. This method will return true if the attribute
    * this is animating has been updated and needs to be applied to the subject.
@@ -4152,6 +4180,16 @@ anim8.Attrimator.prototype =
   getElapsed: function()
   {
     return this.elapsed;
+  },
+
+  /**
+   * [stopIn description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  stopIn: function(milliseconds)
+  {
+    this.stopTime = this.getElapsed() + milliseconds;
   },
 
   /**
@@ -4348,16 +4386,23 @@ anim8.override( anim8.AttrimatorMap.prototype = new anim8.FastMap(),
       var attr = attrimator.attribute;
       var existing = this.get( attr );
 
-      if ( existing && !existing.isInfinite() )
+      if ( existing )
       {
-        attrimator.delay += (maxRemaining - existing.timeRemaining());
+        if ( existing.isInfinite() )
+        {
+          existing.stopIn( attrimator.delay + maxRemaining );
+        }
+        else
+        {
+          attrimator.delay += (maxRemaining - existing.timeRemaining());
+        }
 
         existing.queue( attrimator );
       }
       else
       {
         attrimator.delay += maxRemaining;
-        
+
         this.put( attr, attrimator );
 
         if ( anim8.isFunction( onNewAttribute ) )
@@ -4429,7 +4474,44 @@ anim8.override( anim8.AttrimatorMap.prototype = new anim8.FastMap(),
     }
 
     return remaining;
-  }
+  },
+
+  /**
+   * [applyCycle description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  applyCycle: function(nextCycle)
+  {
+    var currentDepth = this.values;
+    var nextDepth = null;
+
+    while ( currentDepth.length )
+    {
+      nextDepth = [];
+
+      for (var i = currentDepth.length - 1; i >= 0; i--)
+      {
+        var attrimator = currentDepth[ i ];
+
+        attrimator.cycle = nextCycle;
+
+        if ( attrimator.next )
+        {
+          nextDepth.push( attrimator.next );
+        }
+      }
+
+      if ( nextDepth.length )
+      {
+        nextCycle++;
+      }
+
+      currentDepth = nextDepth;
+    }
+
+    return nextCycle;
+  },
 
 });
 
@@ -4498,11 +4580,22 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
     {
       this.path = this.path.replaceComputed( this, animator );
     }
+  },
 
+  /**
+   * [startCycle description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  startCycle: function(frame)
+  {
     if ( this.hasInitialState )
     {
-      this.applyValue( animator.frame, animator.frame[ this.attribute ], 0 ); 
+      return this.applyValue( frame, frame[ this.attribute ], 0 );
     }
+
+    return false;
   },
 
   /**
@@ -4634,6 +4727,8 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
     {
       frame[ this.attribute ] = value;
     }
+
+    return value;
   },
 
   /**
@@ -4672,7 +4767,7 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
    */
   isInfinite: function()
   {
-    return (this.repeat === Number.POSITIVE_INFINITY) && (this.stopTime !== Number.POSITIVE_INFINITY);
+    return (this.repeat === Number.POSITIVE_INFINITY) && (this.stopTime === Number.POSITIVE_INFINITY);
   },
 
   /**
@@ -5325,7 +5420,7 @@ anim8.animation = function(animation, options, cache)
 
     for (var k = 0; k < animationStrings.length; k++)
     {
-      var split = animationStrings[ k ].toLowerCase().split(' ');
+      var split = anim8.trim( animationStrings[ k ].toLowerCase() ).split(' ');
       var parsedAnimation = anim8.animation[ split[ 0 ] ];
       var parsedOptions = anim8.options( split.slice( 1 ) );
 
@@ -5496,8 +5591,8 @@ anim8.Animation.prototype =
  * Parses a value into a transition object. If the given input is a string it's
  * expected to be in a similar format to:
  *
- * [time] [outroDelta] +[introDelta] [easing[-easingType]] ^[granularity]
- *
+ * [time] [easing[-easingType]] >[outro] <[intro] /[granularity]
+ * 
  * This is also a registry of transitions, you can add your own transitions that
  * can be used later with syntax like:
  *
@@ -5509,7 +5604,7 @@ anim8.Animation.prototype =
  * @param {boolean} cache
  * @return {object}
  */
-anim8.transition = function(transition, cache)
+anim8.transition = function(transition, cache) 
 {
   // 1. If it's a string, convert it into an array.
   // 2. If it's an array, parse it and convert it into an object.
@@ -5538,22 +5633,32 @@ anim8.transition = function(transition, cache)
       var part = transitionArray[i];
       var first = part.charAt( 0 );
 
-      // Introduction Delta (into next event)
-      if ( first === '+' )
+      // Introduction Time (into next event)
+      if ( first === '<' )
       {
-        var introDelta = parseFloat( part.substring(1) );
+        var intro = anim8.time( part.substring(1), false );
 
-        if ( !isNaN( introDelta ) )
+        if ( !isNaN( intro ) )
         {
-          transition.introDelta = introDelta;
+          transition.intro = intro;
+        }
+      }
+      // Outroduction Time (out of current event)
+      else if ( first === '>' )
+      {
+        var outro = anim8.time( part.substring(1), false );
+
+        if ( !isNaN( outro ) )
+        {
+          transition.outro = outro;
         }
       }
       // Granularity (for smooth transitions)
-      else if ( first === '^' )
+      else if ( first === '/' )
       {
-        var granularity = parseInt( part.substring(1) );
+        var granularity = anim8.number( part.substring(1), false );
 
-        if ( !isNaN( granularity ) && granularity > 0 )
+        if ( granularity !== false )
         {
           transition.granularity = granularity;
         }
@@ -5568,54 +5673,25 @@ anim8.transition = function(transition, cache)
           transition.easing = easing;
         }
 
-        // Outroduction Delta
-        if ( anim8.isDefined( transition.time ) )
+        // Time
+        var time = anim8.time( part, false );
+
+        if ( time !== false )
         {
-          var outroDelta = parseFloat( part );
-
-          if ( !isNaN( outroDelta ) && outroDelta >= 0 && outroDelta <= 1 )
-          {
-            transition.outroDelta = outroDelta;
-          }
+          transition.time = time;
         }
-        else
-        {
-          // Time
-          var time = anim8.time( part, false );
-
-          if ( time !== false )
-          {
-            transition.time = time;
-          }
-        }
-
       }
     }
   }
 
   if ( anim8.isObject( transition ) )
   {
-    if ( !anim8.isNumber( transition.time ) )
-    {
-      transition.time = anim8.time( transition.time, anim8.defaults.transitionTime );
-    }
-    if ( !anim8.isNumber( transition.outroDelta ) )
-    {
-      transition.outroDelta = anim8.defaults.transitionOutroDelta;
-    }
-    if ( !anim8.isNumber( transition.introDelta ) )
-    {
-      transition.introDelta = anim8.defaults.transitionIntroDelta;
-    }
-    if ( !anim8.isDefined( transition.easing ) )
-    {
-      transition.easing = anim8.easing( anim8.defaults.transitionEasing );
-    }
-    if ( !anim8.isNumber( transition.granularity ) )
-    {
-      transition.granularity = anim8.defaults.transitionGranularity;
-    }
-
+    transition.time        = anim8.time( transition.time, anim8.defaults.transitionTime );
+    transition.outro       = anim8.time( transition.outro, anim8.defaults.transitionOutro );
+    transition.intro       = anim8.time( transition.intro, anim8.defaults.transitionIntro );
+    transition.easing      = anim8.easing( anim8.coalesce( transition.easing, anim8.defaults.transitionEasing ) );
+    transition.granularity = anim8.number( transition.granularity, anim8.defaults.transitionGranularity );
+    
     if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheTransitions ) )
     {
       anim8.transition[ originalInput ] = transition;
@@ -5790,6 +5866,7 @@ anim8.fn = anim8.Animator.prototype =
     this.active = false;
     this.cycleCurrent = 0;
     this.cycleNext = 0;
+    this.cycleEnded = 0;
     
     return this;
 	},
@@ -5800,9 +5877,18 @@ anim8.fn = anim8.Animator.prototype =
    * 
    * @return {this}
    */
-  newCycle: function()
+  newCycle: function(attrimators)
   {
     this.cycleNext++;
+
+    if ( attrimators instanceof anim8.AttrimatorMap )
+    {
+      this.cycleNext = attrimators.applyCycle( this.cycleNext );
+    }
+    else if ( attrimators instanceof anim8.Attrimator )
+    {
+      attrimators.cycle = this.cycleNext;
+    }
 
     return this;
   },
@@ -5815,19 +5901,34 @@ anim8.fn = anim8.Animator.prototype =
    */
   applyCurrentCycle: function()
   {
-    /**
-     * Cycle is applied to event before its placed on the animator or queued
-     * When no events/springs exist for the current cycle, increment it and apply it
-     */
-
     var cycle = this.cycleCurrent;
+    var attrimators = this.attrimators.values;
 
-    for (var attr in this.events)
+    for (var i = attrimators.length - 1; i >= 0; i--)
     {
-      var e = this.events[ attr ];
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+
+      if ( attrimator.cycle === cycle )
+      {
+        this.updated[ attr ] = (attrimator.startCycle( this.frame ) !== false) || this.updated[ attr ];
+      }
     }
 
     return this;
+  },
+
+  /**
+   * [endCurrentCycle description]
+   * @return {[type]}
+   */
+  endCurrentCycle: function()
+  {
+    if ( this.cycleCurrent > this.cycleEnded )
+    {
+      this.cycleEnded = this.cycleCurrent;
+      this.trigger( 'cycleEnd:' + this.cycleCurrent, this.cycleCurrent ); 
+    }
   },
 
   /**
@@ -5904,6 +6005,7 @@ anim8.fn = anim8.Animator.prototype =
     this.finished = true;
 
     var attrimators = this.attrimators.values;
+    var minCycle = this.cycleNext;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
@@ -5913,9 +6015,29 @@ anim8.fn = anim8.Animator.prototype =
       this.updated[ attr ] = attrimator.setTime( now, this.frame );
 
       this.finished = this.finished && attrimator.isFinished();
+
+      minCycle = Math.min( minCycle, attrimator.cycle );
     }
-	
-		this.trigger('update');
+
+    if ( this.cycleCurrent < minCycle )
+    {
+      while ( this.cycleCurrent < minCycle )
+      {
+        this.endCurrentCycle();
+        this.cycleCurrent++;
+      }
+      
+      this.cycleCurrent = minCycle;
+      this.applyCurrentCycle();
+      this.trigger( 'cycleStart:' + this.cycleCurrent, this.cycleCurrent );
+    }
+
+    if ( !this.wasFinished && this.finished )
+    {
+      this.endCurrentCycle();
+    }
+
+    this.trigger('update');
     
     return this;
   },
@@ -6103,6 +6225,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
 
+    this.newCycle( spring );
     this.placeAttrimator( spring );
     
     this.activate();
@@ -6128,6 +6251,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
     
+    this.newCycle( attrimatorMap );
     this.playAttrimators( attrimatorMap, all );
 
     return this.activate();
@@ -6185,6 +6309,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
         
+    this.newCycle( attrimatorMap );
     this.queueAttrimators( attrimatorMap );
 
     return this.activate();
@@ -6226,6 +6351,7 @@ anim8.fn = anim8.Animator.prototype =
       return false;
     }
 
+    this.newCycle( attrimatorMap );
     this.transitionAttrimators( transition, attrimatorMap, all );
 
     return this.activate();
@@ -6419,6 +6545,7 @@ anim8.fn = anim8.Animator.prototype =
     var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
     var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
+    this.newCycle( event );
     this.placeAttrimator( event );
     
     return this.activate();
@@ -6440,6 +6567,8 @@ anim8.fn = anim8.Animator.prototype =
   {
     var options = anim8.options( options );
 
+    this.newCycle();
+
     for ( var attr in targets )
     {
       var attribute = this.getAttribute( attr );
@@ -6447,6 +6576,7 @@ anim8.fn = anim8.Animator.prototype =
       var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
+      event.cycle = this.cycleNext;
       this.placeAttrimator( event );
     }
 
@@ -6476,6 +6606,7 @@ anim8.fn = anim8.Animator.prototype =
     var path      = new anim8.Tween( attr, attribute.calculator, start, end );
     var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
     
+    this.newCycle( event );
     this.placeAttrimator( event );
 
     return this.activate();
@@ -6498,6 +6629,8 @@ anim8.fn = anim8.Animator.prototype =
   {
     var options = anim8.options( options );
 
+    this.newCycle();
+
     for ( var attr in starts )
     {
       var attribute = this.getAttribute( attr );
@@ -6506,6 +6639,7 @@ anim8.fn = anim8.Animator.prototype =
       var path      = new anim8.Tween( attr, attribute.calculator, start, end );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
+      event.cycle = this.cycleNext;
       this.placeAttrimator( event );
     }
 
@@ -6572,6 +6706,7 @@ anim8.fn = anim8.Animator.prototype =
       options.scaleBase
     );
     
+    this.newCycle( event );
     this.placeAttrimator( event );
     
     return this.activate();
@@ -6825,11 +6960,11 @@ anim8.fn = anim8.Animator.prototype =
    * @param  {[type]}
    * @return {[type]}
    */
-  invoke: function(func, context, arguments)
+  invoke: function(func, context, args)
   {
     if ( anim8.isFunction( func ) )
     {
-      func.apply( context || this, arguments || [] );
+      func.apply( context || this, args || [] );
     }
   },
 	
@@ -6844,7 +6979,29 @@ anim8.fn = anim8.Animator.prototype =
 	defer: function(eventType, event, callback)
 	{
 		return new anim8.DeferAnimator( this, this, eventType, event, callback );
-	}
+	},
+
+  /**
+   * [onStart description]
+   * @param  {Function}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  onCycleStart: function(callback, context)
+  {
+    this.once( 'cycleStart:' + this.cycleNext, callback, context );
+  },
+
+  /**
+   * [onEnd description]
+   * @param  {Function}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  onCycleEnd: function(callback, context)
+  {
+    this.once( 'cycleEnd:' + this.cycleNext, callback, context );
+  }
   
 };
 
@@ -7323,7 +7480,9 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.playAttrimators( sequence.createAttrimators( anim, options, i ), all );       
+      var attrimators = sequence.createAttrimators( anim, options, i );
+      animator.newCycle( attrimators );
+      animator.playAttrimators( attrimators, all );       
     });
     
     return this.add();
@@ -7367,6 +7526,7 @@ anim8.Sequence.prototype =
         attrimators[ k ].delay += delayOffset;
       }
       
+      animator.newCycle( attrimatorMap );
       animator.queueAttrimators( attrimatorMap );
     });
     
@@ -7399,7 +7559,9 @@ anim8.Sequence.prototype =
 
     this.animators.each(function(animator, i)
     {
-      animator.transitionAttrimators( transition, sequence.createAttrimators( anim, options, i ), all );
+      var attrimators = sequence.createAttrimators( anim, options, i );
+      animator.newCycle( attrimators );
+      animator.transitionAttrimators( transition, attrimators, all );
     });
     
     return this.add();

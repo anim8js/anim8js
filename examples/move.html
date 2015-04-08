@@ -51,6 +51,22 @@
         }
       });
 
+      var cycleStart = function(cycle)
+      {
+        if ( console )
+        {
+          console.log( 'cycleStart', cycle );
+        }
+      };
+
+      var cycleEnd = function(cycle)
+      {
+        if ( console )
+        {
+          console.log( 'cycleEnd', cycle );
+        }
+      };
+
       var anim8or = m8( window.box1 );
 
       document.onkeydown = function(e)
@@ -61,6 +77,12 @@
         if ( ev.keyCode === 38 ) anim8or.queue('moveUp linear 250');
         if ( ev.keyCode === 39 ) anim8or.queue('moveRight linear 250');
         if ( ev.keyCode === 40 ) anim8or.queue('moveDown linear 250');
+
+        if ( ev.keyCode >= 37 && ev.keyCode <= 40 )
+        {
+          anim8or.onCycleStart( cycleStart );
+          anim8or.onCycleEnd( cycleEnd ); 
+        }
       };
       
     </script>

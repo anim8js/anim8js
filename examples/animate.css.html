@@ -262,7 +262,7 @@
         options.eq( i + 1 ).prop( "selected", true );
       }
       
-      options.parent().change();
+      options.closest( 'select' ).change();
     });
   });
 

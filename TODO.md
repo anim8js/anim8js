@@ -18,7 +18,7 @@
 16. [X] Allow reference values in path (they don't get copied - they point to an attribute in another Animator) - add `Animator.ref(attribute)`
 17. [X] Add sequence to anim8 which has a delay between animations, an easing, the animation, and the list of animators. `anim8.sequence(delay, easing, animation[, options])`
 18. [X] Remove anim8.parseValue
-19. [-] Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
+19. [X] (cancelled) Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
 20. [X] Allow reference values in spring.
 21. [X] Add automatic rest & position determination to Springs which defaults to current Animator values.
 22. [X] Complete Event.seek
@@ -42,7 +42,7 @@
 40. [X] Refactor all arrays of events & Animator.events to new anim8.EventMap
 41. [X] Add scale to Event when not 1 takes calculator from path and scales values
 42. [X] Add priority to factory
-43. [ ] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent. Once a new animation cycle is hit, all events (checked up to next) are made active - this fixes the issue of infinite events being stopped on queue
+43. [X] Add concept of animation cycles, which is a number you assign to events when they're placed on an EventMap. Initial state is automatically applied when a new animation cycle is started in placeEvent. Once a new animation cycle is hit, all events (checked up to next) are made active - this fixes the issue of infinite events being stopped on queue
 44. [X] Add anim8.options which parses options, remove anim8.parseAnimationString
 45. [X] Instead of delay/duration/sleep/repeat replacing the previous value, enable use to add or subtract from the existing value
 46. [X] Add relative value parsing (similar to true) which adds/subtracts a value
@@ -57,8 +57,8 @@
 55. [X] Consistently use bracket notation for adding things to registries
 56. [X] Add anim8.transition parsing function, transitions now take objects or strings
 57. [X] Option to cache parsed options & transition strings
-58. [ ] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
-59. [ ] Throw cycle start & end events, add functions to listen start/end of last animation added
+58. [X] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
+59. [X] Throw cycle start & end events, add functions to listen start/end of last animation added
 60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition (req: 63)
 61. [X] Add anim8.Physics : anim8.AttributeAnimator
 62. [X] Replace object iteration with anim8.FastMap
