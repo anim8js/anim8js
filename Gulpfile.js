@@ -55,6 +55,7 @@ var core =
   './lib/anim8js-parser-move.js',
   './lib/anim8js-parser-springs.js',
   './lib/anim8js-parser-physics.js',
+  './lib/anim8js-parser-travel.js',
   './lib/anim8js-factory.js',
   './lib/anim8js-object.js'
 ];

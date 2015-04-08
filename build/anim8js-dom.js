@@ -643,6 +643,17 @@ anim8.constant = function(variable)
 };
 
 /**
+ * Resolves the given variable. If the variable is a function the result is returned.
+ * 
+ * @param  {any}
+ * @return {any}
+ */
+anim8.resolve = function(variable)
+{
+  return anim8.isFunction( variable ) ? variable() : variable;
+};
+
+/**
  * Returns a value between the given minimum and maximum.
  * 
  * @param  {number} v
@@ -1966,6 +1977,72 @@ anim8.computed.relative = function(relativeAmount, mask)
 };
 
 /**
+ * Returns a random value based on the given random selection.
+ * 
+ * 1. If an array is given an item is randomly chosen from that array.
+ * 2. If an instance of anim8.Path is given a point is randomly computed and returned.
+ * 3. If an object with min & max values is given a random value between them is returned.
+ * 
+ * @param  {any} randomSelection
+ * @return {function}
+ */
+anim8.computed.random = function(randomSelection)
+{
+  var randomFunction = null;
+
+  if ( anim8.isArray( randomSelection ) )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+      var selected = randomSelection[ Math.floor( Math.random() * randomSelection.length ) ];
+
+      return calc.parse( selected, calc.ZERO );
+    };
+  }
+  else if ( anim8.isObject( randomSelection ) && randomSelection instanceof anim8.Path )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+
+      return randomSelection.compute( calc.create(), Math.random() );
+    };
+  }
+  else if ( anim8.isObject( randomSelection ) && anim8.isDefined( randomSelection.min ) && anim8.isDefined( randomSelection.max ) )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+      var resolvedMin = anim8.resolve( randomSelection.min );
+      var resolvedMax = anim8.resolve( randomSelection.max );
+      var min = calc.parse( resolvedMin, calc.ZERO );
+      var max = calc.parse( resolvedMax, calc.ZERO );
+
+      return calc.random( calc.create(), min, max );
+    };
+  }
+  else
+  {
+    throw 'Invalid random input: ' + randomSelection;
+  }
+
+  // Marks the function as computed which is a signal to paths & events.
+  randomFunction.computed = true;
+
+  // Place the input on the function if the user wants to modify it live
+  randomFunction.randomSelection = randomSelection;
+
+  return randomFunction;
+};
+
+/**
  * [isComputed description]
  * @param  {[type]}
  * @return {Boolean}
@@ -2131,6 +2208,19 @@ anim8.Calculator.prototype =
     out = this.adds( out, start, 1 - delta );
     out = this.adds( out, end, delta );
     return out;
+  },
+
+  /**
+   * Returns a random value between the given min and max.
+   * 
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  random: function(out, min, max)
+  {
+    return this.interpolate( out, min, max, Math.random() );
   },
 
   /**
@@ -2565,6 +2655,12 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
     out.x = Math.max(a.x, b.x);
     out.y = Math.max(a.y, b.y);
     return out;
+  },
+  random: function(out, min, max)
+  {
+    out.x = (max.x - min.x) * Math.random() + min.x;
+    out.y = (max.y - min.y) * Math.random() + min.y;
+    return out;
   }
 });
 
@@ -2725,6 +2821,13 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
     out.x = Math.max(a.x, b.x);
     out.y = Math.max(a.y, b.y);
     out.z = Math.max(a.z, b.z);
+    return out;
+  },
+  random: function(out, min, max)
+  {
+    out.x = (max.x - min.x) * Math.random() + min.x;
+    out.y = (max.y - min.y) * Math.random() + min.y;
+    out.z = (max.z - min.z) * Math.random() + min.z;
     return out;
   }
 });
@@ -2908,6 +3011,14 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
     out.z = Math.max(a.z, b.z);
     out.angle = Math.max(a.angle, b.angle);
     return out;
+  },
+  random: function(out, min, max)
+  {
+    out.x = (max.x - min.x) * Math.random() + min.x;
+    out.y = (max.y - min.y) * Math.random() + min.y;
+    out.z = (max.z - min.z) * Math.random() + min.z;
+    out.angle = (max.angle - min.angle) * Math.random() + min.angle;
+    return out;
   }
 });
 
@@ -3084,6 +3195,13 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
     out.r = Math.max(a.r, b.r);
     out.g = Math.max(a.g, b.g);
     out.b = Math.max(a.b, b.b);
+    return out;
+  },
+  random: function(out, min, max)
+  {
+    out.r = (max.r - min.r) * Math.random() + min.r;
+    out.g = (max.g - min.g) * Math.random() + min.g;
+    out.b = (max.b - min.b) * Math.random() + min.b;
     return out;
   }
 });
@@ -3276,6 +3394,14 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     out.g = Math.max(a.g, b.g);
     out.b = Math.max(a.b, b.b);
     out.a = Math.max(a.a, b.a);
+    return out;
+  },
+  random: function(out, min, max)
+  {
+    out.r = (max.r - min.r) * Math.random() + min.r;
+    out.g = (max.g - min.g) * Math.random() + min.g;
+    out.b = (max.b - min.b) * Math.random() + min.b;
+    out.a = (max.a - min.a) * Math.random() + min.a;
     return out;
   }
 });
@@ -4935,7 +5061,7 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
    */
   resolveRest: function()
   {
-    return anim8.isFunction( this.rest ) ? this.rest() : this.rest;
+    return anim8.resolve( this.rest );
   },
   
   /**
@@ -5313,7 +5439,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
    */
   resolveVelocity: function()
   {
-    return anim8.isFunction( this.velocity ) ? this.velocity() : this.velocity;
+    return anim8.resolve( this.velocity );
   },
 
   /**
@@ -5322,7 +5448,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
    */
   resolveAcceleration: function()
   {
-    return anim8.isFunction( this.acceleration ) ? this.acceleration() : this.acceleration;
+    return anim8.resolve( this.acceleration );
   },
 
   /**
@@ -7789,6 +7915,28 @@ anim8.ParserHelper.prototype =
   },
 
   /**
+   * [parseEvent description]
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {[type]}
+   * @param  {Boolean}
+   * @return {[type]}
+   */
+  parseEvent: function(attr, path, parser, hasInitialState)
+  {
+    var duration   = this.parseDuration( attr );
+    var easing     = this.parseEasing( attr );
+    var delay      = this.parseDelay( attr );
+    var sleep      = this.parseSleep( attr );
+    var repeat     = this.parseRepeat( attr );
+    var scale      = this.parseScale( attr );
+    var scaleBase  = this.parseScaleBase( attr );
+    var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, hasInitialState, parser );
+
+    return event;
+  },
+
+  /**
    * [parseNumber description]
    * @param  {[type]}
    * @param  {[type]}
@@ -8000,15 +8148,8 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
   			value[k] = attribute.parse( value[k] );
   		}
 
-      var easing    = helper.parseEasing( attr );
-      var delay     = helper.parseDelay( attr );
-      var duration  = helper.parseDuration( attr );
-      var sleep     = helper.parseSleep( attr );
-      var repeat    = helper.parseRepeat( attr );
-      var scale     = helper.parseScale( attr );
-      var scaleBase = helper.parseScaleBase( attr );
-      var path      = new anim8.DeltaPath( attr, attribute.calculator, values[attr], deltas[attr] );
-      var event     = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
+      var path      = new anim8.DeltaPath( attr, attribute.calculator, values[ attr ], deltas[ attr ] );
+      var event     = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
   	}
@@ -8401,16 +8542,9 @@ anim8.override( anim8.ParserTweenTo.prototype = new anim8.Parser(),
   	for (var attr in tweenTo)
   	{
       var attribute  = factory.attribute( attr );
-      var value      = attribute.parse( tweenTo[attr] );
-      var duration   = helper.parseDuration( attr );
-      var easing     = helper.parseEasing( attr );
-      var delay      = helper.parseDelay( attr );
-      var sleep      = helper.parseSleep( attr );
-      var repeat     = helper.parseRepeat( attr );
-      var scale      = helper.parseScale( attr );
-      var scaleBase  = helper.parseScaleBase( attr );
+      var value      = attribute.parse( tweenTo[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, value );
-      var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
+      var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
   	}
@@ -8454,16 +8588,9 @@ anim8.override( anim8.ParserTweenFrom.prototype = new anim8.Parser(),
   	for (var attr in tweenFrom)
   	{
       var attribute  = factory.attribute( attr );
-      var value      = attribute.parse( tweenFrom[attr] );
-      var duration   = helper.parseDuration( attr );
-      var easing     = helper.parseEasing( attr );
-      var delay      = helper.parseDelay( attr );
-      var sleep      = helper.parseSleep( attr );
-      var repeat     = helper.parseRepeat( attr );
-      var scale      = helper.parseScale( attr );
-      var scaleBase  = helper.parseScaleBase( attr );
+      var value      = attribute.parse( tweenFrom[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, value, anim8.computed.current );
-      var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
+      var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
   	}
@@ -8507,16 +8634,9 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
   	for (var attr in move)
   	{
       var attribute  = factory.attribute( attr );
-      var value      = attribute.parse( move[attr] );
-      var duration   = helper.parseDuration( attr );
-      var easing     = helper.parseEasing( attr );
-      var delay      = helper.parseDelay( attr );
-      var sleep      = helper.parseSleep( attr );
-      var repeat     = helper.parseRepeat( attr );
-      var scale      = helper.parseScale( attr );
-      var scaleBase  = helper.parseScaleBase( attr );
+      var value      = attribute.parse( move[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, anim8.computed.relative( value ) );
-      var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, repeat, scale, scaleBase, true, this );
+      var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
   	}
@@ -8632,6 +8752,124 @@ anim8.override( anim8.ParsePhysics.prototype = new anim8.Parser(),
  * Register the parser.
  */
 anim8.parser['physics'] = new anim8.ParsePhysics();
+
+
+/**
+ * Instantiates a new parser for the 'move' animation type.
+ */
+anim8.ParserTravel = function()
+{
+  
+};
+
+// ParserTravel extends anim8.Parser()
+anim8.override( anim8.ParserTravel.prototype = new anim8.Parser(),
+{
+    
+  /**
+   * Parses the animation object (and optionally an option object) and pushes
+   * all generated attrimators to the given array.
+   * 
+   * @param {object} animation
+   * @param {object} options
+   * @param {anim8.AttrimatorMap} attrimatorMap
+   * @param {anim8.ParserHelper} helper
+   */
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
+
+    var factory    = anim8.factory( animation.factory );
+    var travel     = animation.travel;
+
+    /**
+     * The computed function which returns a function which returns a value pointing
+     * to a given target given the current position of the animator.
+     * 
+     * @param  {Number}
+     * @param  {any}
+     * @param  {Number}
+     * @return {Function}
+     */
+    var pointing = function(amount, target, epsilon, subtractVelocity)
+    {
+      var pointingFunction = function(attrimator, animator)
+      {
+        var attribute = animator.getAttribute( attrimator.attribute );
+        var calc = attribute.calculator;
+        var targetValue = anim8.isComputed( target ) ? target( attrimator, animator ) : target;
+        var temp = calc.create();
+
+        return function()
+        {
+          var position   = attrimator.position;
+          var current    = calc.copy( temp, anim8.resolve( targetValue ) );
+          var difference = calc.sub( current, position );
+          var distance   = calc.distance( difference, calc.ZERO );
+
+          if ( distance < epsilon )
+          {
+            attrimator.stopIn( 0 );
+          }
+          else
+          {
+            difference = calc.scale( difference, amount / distance );
+          }
+          
+          if ( subtractVelocity )
+          {
+            difference = calc.sub( difference, attrimator.resolveVelocity() );
+          }
+
+          return difference;
+        };
+      };
+
+      pointingFunction.computed = true;
+
+      return pointingFunction;
+    };
+
+  	for (var attr in travel)
+  	{
+      var traveling     = travel[ attr ];
+      var attribute     = factory.attribute( attr );
+      var from          = attribute.parse( anim8.coalesce( traveling.from, true ) );
+      var to            = attribute.parse( anim8.coalesce( traveling.to, true ) );
+      var velocity      = anim8.number( traveling.velocity, 0 );
+      var acceleration  = anim8.number( traveling.acceleration, 0 );
+      var terminal      = anim8.number( anim8.coalesce( traveling.terminal, traveling.velocity ), Number.POSITIVE_INFINITY );
+      var epsilon       = anim8.number( traveling.epsilon, 0.001 );
+
+      if ( acceleration !== 0 )
+      {
+        acceleration = pointing( acceleration, to, epsilon, true );
+      }
+
+      if ( velocity !== 0 )
+      {
+        velocity = pointing( velocity, to, epsilon, false );
+      }
+
+      var traveler = new anim8.Physics(
+        attr,
+        this,
+        attribute.calculator,
+        from,
+        velocity,
+        acceleration,
+        terminal
+      );
+      
+      attrimatorMap.put( attr, traveler );
+  	}
+  }
+});
+
+/**
+ * Register the parser.
+ */
+anim8.parser['travel'] = new anim8.ParserTravel();
 
 
 

@@ -22,29 +22,6 @@
     
     <script>
 
-      var RandomAngle = function()
-      {
-        return Math.random() * 360;
-      };
-      RandomAngle.computed = true;
-
-      var RandomScale = function()
-      {
-        var scale = Math.random() * 2 + 1;
-
-        return { x: scale, y: scale };
-      }
-      RandomScale.computed = true;
-
-      var RandomVelocity = function()
-      {
-        return {
-          x: Math.random() * 600 - 300,
-          y: Math.random() * -300 - 600
-        };
-      };
-      RandomVelocity.computed = true;
-
       var MousePosition = function() 
       {
         return {
@@ -60,17 +37,20 @@
         physics: {
           translate: {
             position: MousePosition,
-            velocity: RandomVelocity,
+            // Random Velocity
+            velocity: anim8.computed.random({min:{x:-300,y:-900}, max:{x:300,y:-600}}),
             acceleration: {x: 0, y: 600},
             terminal: 1000,
             stopAt: '3s'
           }
         },
         initial: {
-          rotate: RandomAngle
+          // Random Angle
+          rotate: anim8.computed.random({min:0, max:360})
         },
         tweenTo: {
-          rotate: RandomAngle
+          // Random Angle
+          rotate: anim8.computed.random({min:0, max:360})
         },
         keyframe: {
           '0': {
@@ -78,7 +58,8 @@
             backgroundColor: 'blue'
           },
           '50': {
-            scale: RandomScale,
+            // Random Scale
+            scale: anim8.computed.random([1, 1.5, 2, 2.5, 3]),
             backgroundColor: 'red'
           },
           '75': {

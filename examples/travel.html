@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #222;
+    }
+    .box {
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      background-color: orange;
+    }
+    </style>
+  </head>
+  <body>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    
+    <script>
+
+      var MousePosition = function() 
+      {
+        return {
+          x: MousePosition.x,
+          y: MousePosition.y
+        }
+      };
+      MousePosition.x = 0;
+      MousePosition.y = 0;
+
+      var GetDimensions = function()
+      {
+        return {
+          x: window.innerWidth,
+          y: window.innerHeight
+        };
+      };
+
+      anim8.save('toMouseConstant', {
+        travel: {
+          translate: {
+            from: anim8.computed.random({min:0, max: GetDimensions}),
+            to: MousePosition,
+            velocity: 200,
+            epsilon: 10
+          }
+        }
+      });
+
+      anim8.save('toMouseAccel', {
+        travel: {
+          translate: {
+            from: anim8.computed.random({min: 0, max: GetDimensions}),
+            to: MousePosition,
+            acceleration: 10000,
+            epsilon: 10,
+            terminal: 800
+          }
+        }
+      });
+
+      anim8.save('explode', {
+        keyframe: {
+          from: {
+            scale: 1,
+            rotate: 0,
+            opacity: 1,
+            backgroundColor: 'orange'
+          },
+          to: {
+            scale: 10,
+            rotate: anim8.computed.random({min:0, max:3600}),
+            opacity: 0,
+            backgroundColor: 'red'
+          }
+        }
+      });
+
+      window.onmousemove = window.ontouchmove = function(e)
+      {
+        MousePosition.x = e.pageX || e.changedTouches[0].pageX;
+        MousePosition.y = e.pageY || e.changedTouches[0].pageY;
+      };
+
+      window.onclick = window.ondblclick = function(e)
+      {
+        var bullet = document.createElement('div');
+        bullet.classList.add('box');
+        document.body.appendChild( bullet );
+
+        var animator = m8( bullet );
+
+        animator.play( e.type === 'click' ? 'toMouseConstant' : 'toMouseAccel' )
+        animator.onCycleEnd(function() {
+          this.play( 'explode 0.5s' );
+          this.onCycleEnd(function() {
+            this.destroy();
+            document.body.removeChild( this.subject );
+          })
+        });
+      };
+      
+    </script>
+    
+  </body>
+</html>
+  

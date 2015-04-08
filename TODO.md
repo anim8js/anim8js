@@ -68,3 +68,5 @@
 66. [X] Add tweenFrom parser
 67. [X] Add physics parser
 68. [X] Add spring parser
+69. [X] Add anim8.computed.random
+70. [X] Add travel parser which uses Physics to move to a target point at a constant velocity or acceleration
