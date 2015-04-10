@@ -124,21 +124,21 @@ anim8.defaults =
   transitionTime: 500,
 
   /**
-   * The default transition delta.
+   * The default transition outroduction time in milliseconds.
    * 
    * @type {number}
    */
-  transitionOutro:100,
+  transitionOutro: 100,
 
   /**
-   * The default transition into delta.
+   * The default transition introduction time in milliseconds.
    * 
    * @type {number}
    */
   transitionIntro: 100,
 
   /**
-   * The default transition into delta.
+   * The default transition easing when none is specified.
    * 
    * @type {string|function}
    */
@@ -154,6 +154,13 @@ anim8.defaults =
    * @type {Number}
    */
   transitionGranularity: 0,
+
+  /**
+   * TODO
+   * 
+   * @type {Number}
+   */
+  transitionLookup: 10,
 
   /**
    * Whether animtions are cached whenever possible. Animations that can be
@@ -2246,6 +2253,26 @@ anim8.Calculator.prototype =
   },
 
   /**
+   * [length description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  length: function(a)
+  {
+    return this.distance( a, this.ZERO );
+  },
+
+  /**
+   * [lengthSq description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  lengthSq: function(a)
+  {
+    return this.distanceSq( a, this.ZERO );
+  },
+
+  /**
    * [isValid description]
    * @param  {[type]}
    * @return {Boolean}
@@ -2437,6 +2464,18 @@ anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(),
   {
     var ab = a - b;
     return ab * ab;
+  },
+  distance: function(a, b)
+  {
+    return Math.abs( a - b );
+  },
+  length: function(a)
+  {
+    return Math.abs( a );
+  },
+  lengthSq: function(a)
+  {
+    return a * a;
   },
   isValid: function(a) 
   {
@@ -3875,7 +3914,7 @@ anim8.override( anim8.DeltaPath.prototype = new anim8.Path(),
    */
   copy: function() 
   {
-      return new anim8.DeltaPath( this.name, anim8.copy(this.points), anim8.copy(this.deltas), this.calculator );
+    return new anim8.DeltaPath( this.name, anim8.copy(this.points), anim8.copy(this.deltas), this.calculator );
   }
 
 });
@@ -4227,6 +4266,7 @@ anim8.Attrimator.prototype =
     this.paused = false;
     this.cycle = 0;
     this.delay = 0;
+    this.offset = 0;
   },
 
   /**
@@ -4239,8 +4279,9 @@ anim8.Attrimator.prototype =
    */
   start: function(now, animator)
   {
-    this.startTime = now;
-    this.elapsed = 0;
+    this.startTime = now - this.offset;
+    this.elapsed = this.offset;
+    this.finished = false;
   },
 
   /**
@@ -4698,8 +4739,8 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
    */
   start: function(now, animator)
   {
-    this.startTime = now;
-    this.elapsed = 0;
+    anim8.Attrimator.prototype.start.apply( this, arguments );
+    
     this.state = this.delay ? anim8.EventState.DELAYED : anim8.EventState.ANIMATING;
 
     if ( this.hasComputed() )
@@ -4799,7 +4840,18 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
 
     if ( time >= this.delay )
     {
-      delta = Math.max( 1.0, ((time - this.delay) % (this.duration + this.sleep)) / this.duration );
+      var cycle = (this.duration + this.sleep);
+      var elapsed = (time - this.delay);
+      var iteration = Math.floor( ( elapsed + this.sleep ) / cycle );
+
+      if ( iteration >= this.repeat )
+      {
+        delta = 1.0;
+      }
+      else
+      {
+        delta = Math.min( 1.0, (elapsed % cycle) / this.duration );        
+      }
     }
 
     return this.computeValue( out, delta );
@@ -4972,9 +5024,7 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
    */
   start: function(now, animator)
   {
-    this.startTime = now;
-    this.elapsed = 0;
-    this.finished = false;
+    anim8.Attrimator.prototype.start.apply( this, arguments );
 
     var attribute = animator.getAttribute( this.attribute );
     var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
@@ -5342,9 +5392,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
    */
   start: function(now, animator)
   {
-    this.startTime = now;
-    this.elapsed = 0;
-    this.finished = false;
+    anim8.Attrimator.prototype.start.apply( this, arguments );
 
     var attribute = animator.getAttribute( this.attribute );
     var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
@@ -5397,7 +5445,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
    */
   update: function(elapsed, frame)
   {
-    var value = this.valueAt( elapsed, true );
+    var value = this.valueAt( elapsed, this.temp, true );
 
     if ( value !== false )
     {
@@ -5457,7 +5505,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
    * @param  {Number} time
    * @return {any}
    */
-  valueAt: function(time, usePosition)
+  valueAt: function(time, out, usePosition)
   {
     if ( anim8.isFunction( this.velocity ) || anim8.isFunction( this.acceleration ) || this.terminal !== Number.POSITIVE_INFINITY )
     {
@@ -5468,7 +5516,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
     time *= 0.001;
 
     var calc = this.calculator;
-    var value = usePosition ? calc.copy( this.position, this.initalPosition ) : calc.clone( this.initalPosition );
+    var value = usePosition ? calc.copy( this.position, this.initalPosition ) : calc.copy( out, this.initalPosition );
     value = calc.adds( value, this.velocity, time );
     value = calc.adds( value, this.acceleration, time * time );
 
@@ -5717,7 +5765,7 @@ anim8.Animation.prototype =
  * Parses a value into a transition object. If the given input is a string it's
  * expected to be in a similar format to:
  *
- * [time] [easing[-easingType]] >[outro] <[intro] /[granularity]
+ * [time] [easing[-easingType]] >[outro] <[intro] /[granularity] ^[lookup]
  * 
  * This is also a registry of transitions, you can add your own transitions that
  * can be used later with syntax like:
@@ -5779,7 +5827,7 @@ anim8.transition = function(transition, cache)
           transition.outro = outro;
         }
       }
-      // Granularity (for smooth transitions)
+      // Granularity (for velocity conscious transitions)
       else if ( first === '/' )
       {
         var granularity = anim8.number( part.substring(1), false );
@@ -5787,6 +5835,16 @@ anim8.transition = function(transition, cache)
         if ( granularity !== false )
         {
           transition.granularity = granularity;
+        }
+      }
+      // Lookup (for velocity conscious transitions)
+      else if ( first === '^' )
+      {
+        var lookup = anim8.time( part.substring(1), false );
+
+        if ( lookup !== false )
+        {
+          transition.lookup = lookup;
         }
       }
       else
@@ -5817,6 +5875,7 @@ anim8.transition = function(transition, cache)
     transition.intro       = anim8.time( transition.intro, anim8.defaults.transitionIntro );
     transition.easing      = anim8.easing( anim8.coalesce( transition.easing, anim8.defaults.transitionEasing ) );
     transition.granularity = anim8.number( transition.granularity, anim8.defaults.transitionGranularity );
+    transition.lookup      = anim8.time( transition.lookup, anim8.defaults.transitionLookup );
     
     if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheTransitions ) )
     {
@@ -6152,7 +6211,7 @@ anim8.fn = anim8.Animator.prototype =
         this.endCurrentCycle();
         this.cycleCurrent++;
       }
-      
+
       this.cycleCurrent = minCycle;
       this.applyCurrentCycle();
       this.trigger( 'cycleStart:' + this.cycleCurrent, this.cycleCurrent );
@@ -6396,17 +6455,7 @@ anim8.fn = anim8.Animator.prototype =
   {
     if ( all )
     {
-      var attrimators = this.attrimators.values;
-
-      for (var i = attrimators.length - 1; i >= 0; i--)
-      {
-        var attrimator = attrimators[ i ];
-
-        if ( !attrimatorMap.has( attrimator.attribute ) )
-        {
-          attrimator.finish( this.frame );
-        }
-      }
+      this.finishNotPresent( attrimatorMap, 0 );
     }
 
     var attrimators = attrimatorMap.values;
@@ -6417,6 +6466,26 @@ anim8.fn = anim8.Animator.prototype =
     }
     
     return this;
+  },
+
+  /**
+   * [finishNotPresent description]
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  finishNotPresent: function(attrimatorMap, delay)
+  {
+    var attrimators = this.attrimators.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+
+      if ( !attrimatorMap.has( attrimator.attribute ) )
+      {
+        attrimator.stopIn( delay );
+      }
+    }
   },
   
   /**
@@ -6495,6 +6564,7 @@ anim8.fn = anim8.Animator.prototype =
    */
   transitionAttrimators: function(transition, attrimatorMap, all)
   {
+    // CREATING A TRANSITION PATH:
     // If intro & outro are 0, use Tween
     // If intro is 0, use Quadratic Path between current value, outro point, and first point on new path.
     // If outro is 0, use Quadratic Path between current value, first point on new path, and intro point.
@@ -6502,38 +6572,165 @@ anim8.fn = anim8.Animator.prototype =
     // If granularity is given > 1 then compile the path, compute intro & outro velocities, and compute deltas for new 
     //    compiled path based on interpolated velocity over the path (knowing it's length and transition time)
     
+    // TRANSITIONING:
+    // If the animator doesn't have an attrimator for the given attribute just add the attrimator adding the total delay
+    // If the animator has an attrimator currently...
+    //   If the current attrimator or new attrimator don't have values at the desired times...
+    //      Stop the current attrimator after the total delay (adding the delay of the new attrimator as well)
+    //      Queue the new attrimator
+    //   Else
+    //      Create a path using the methods detailed above
+    // If all is true and there's an attrimator left on the animator that isn't being transitioned, stop it after the total delay.
+
     var current = this.attrimators;
     var attrimators = attrimatorMap.values;
+    var totalDelay = transition.outro + transition.time + transition.intro;
+
+    // If transition all attributes, 
+    if ( all )
+    {
+      this.finishNotPresent( attrimatorMap, totalDelay );
+    }
 
     // Only transition if we need to
     if ( current.hasOverlap( attrimatorMap ) )
     {
       for (var i = attrimators.length - 1; i >= 0; i--)
       {
-        var a1 = attrimators[ i ];
-        var attr = a1.attribute;
+        var next = attrimators[ i ];
+        var attr = next.attribute;
+        var curr = current.get( attr );
 
-        if ( current.has( attr ) )
+        if ( curr && anim8.isDefined( this.frame[ attr ] ) )
         {
           var attribute = this.getAttribute( attr );
-          var a2 = current.get( attr );
-        
-          var p0 = attribute.calculator.clone( this.frame[attr] );
-          var p1 = a2.getFuture( transition.outroDelta );
-          var p2 = a1.getPoint( 0 );
-        
-          var transitionPath = new anim8.QuadraticPath( attr, attribute.calculator, p0, p1, p2 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transition.time, transition.easing, 0, 0, 1 ).newInstance();
-        
-          transitionEvent.next = a1;
+          var calc = attribute.calculator;
 
-          this.placeAttrimator( transitionEvent );
+          var p2 = next.valueAt( 0, calc.create() );
+          
+          if ( p2 !== false )
+          {
+            var transitionTime = totalDelay;
+            var p0 = calc.clone( this.frame[ attr ] );            
+            var p1 = transition.outro ? curr.valueAt( curr.getElapsed() + transition.outro, calc.create() ) : false;
+            var p3 = transition.intro ? next.valueAt( transition.intro, calc.create() ) : false;
+            var path = null;
+
+            // If the intro is negative we can look into the past by looking a little bit into
+            // the future and assume the past is going in the same direction (only the opposite). 
+            if ( p3 !== false && transition.intro < 0 && transition.lookup > 0 )
+            {
+              var pastLookahead = next.valueAt( transition.lookup, calc.create() );
+              var pastVelocity = calc.sub( pastLookahead, p2 );
+
+              if ( pastVelocity !== false )
+              {
+                var pastNegativeVelocity = calc.scale( pastVelocity, transition.intro / transition.lookup );
+                var past = calc.add( pastNegativeVelocity, p2 );
+                
+                p3 = p2;
+                p2 = past;
+              }
+            }
+
+            // Build a path with as many as the points as possible.
+            if ( p1 === false && p3 === false )
+            {
+              path = new anim8.Tween( attr, calc, p0, p2 );
+            }
+            else if ( p1 === false )
+            {
+              path = new anim8.QuadraticPath( attr, calc, p0, p2, p3 );
+            }
+            else if ( p3 === false )
+            {
+              path = new anim8.QuadraticPath( attr, calc, p0, p1, p2 );
+            }
+            else
+            {
+              path = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
+            }
+            
+            // If granularity is specified we will try to make the transition 
+            // smooth by maintaining exit (outro) velocity from the current attrimator
+            // and interpolating it to the entrance (intro) velocity for the 
+            // attrimator we're transitioning into.
+            if ( transition.granularity > 2 && transition.lookup > 0 )
+            { 
+              var outTime  = p1 === false ? curr.getElapsed() : curr.getElapsed() + transition.outro;
+              var outPoint = p1 === false ? p0 : p1;
+              var outNext  = curr.valueAt( outTime + transition.lookup, calc.create() );
+
+              var inTime   = p3 === false ? 0 : transition.intro;
+              var inPoint  = p3 === false ? p2 : p3;
+              var inNext   = next.valueAt( inTime + transition.lookup, calc.create() );
+
+              // We can only proceed if we have reference points to calculate
+              // exit & entrance velocity.
+              if ( outNext !== false && inNext !== false )
+              {
+                var outVelocity  = calc.sub( calc.clone( outNext ), outPoint );
+                var outPerMillis = calc.length( outVelocity ) / transition.lookup;
+
+                var inVelocity   = calc.sub( calc.clone( inNext ), inPoint );
+                var inPerMillis  = calc.length( inVelocity ) / transition.lookup;
+
+                var compiled = new anim8.CompiledPath( attr, path, transition.granularity );
+                var points = compiled.points;
+                var lastPoint = points.length - 1;
+                var totalDistance = 0;
+                var distances = [];
+
+                for (var k = 0; k < lastPoint; k++)
+                {
+                  distances[ k ] = totalDistance;
+                  totalDistance += calc.distance( points[ k ], points[ k + 1 ] );
+                }
+                distances[ lastPoint ] = totalDistance;
+
+                if ( !isNaN( totalDistance ) )
+                {
+                  var requiredTime = 2.0 * totalDistance / (outPerMillis + inPerMillis);
+                  var acceleration = 0.5 * (inPerMillis - outPerMillis) / requiredTime;
+                  var timeDelta = requiredTime / lastPoint;
+                  var deltas = [];
+
+                  for (var k = 0; k < lastPoint; k++)
+                  { 
+                    var time = k * timeDelta;
+                    var position = outPerMillis * time + acceleration * time * time;
+
+                    deltas[ k ] = position / totalDistance;
+                  }
+                  deltas[ lastPoint ] = 1.0;
+
+                  path = new anim8.DeltaPath( attr, calc, points, deltas );
+                  transitionTime = requiredTime;
+                }
+              }
+            }
+
+            var transitionEvent = new anim8.Event( attr, path, transitionTime, transition.easing, 0, 0, 1 );
+          
+            transitionEvent.next = next;
+            transitionEvent.cycle = next.cycle;
+
+            next.offset = transition.intro;
+
+            this.placeAttrimator( transitionEvent );
+          }
+          else
+          {
+            curr.stopIn( totalDelay + next.delay );
+            curr.queue( next );
+            next.delay = 0;
+          }
         }
         else
         {
-          a1.delay += transition.time;
-     
-          this.placeAttrimator( a1 );
+          next.delay += totalDelay;
+          
+          this.placeAttrimator( next );
         }
       }
     }
@@ -6548,107 +6745,6 @@ anim8.fn = anim8.Animator.prototype =
     
     return this;
   },
-  
-  /**
-   * Transitions from the currently playing events into a new animation. The transition is made
-   * by constructing a cubic curve from the current value to a point further on the current
-   * path to the starting point of the new animation.
-   *
-   * @param {number} transitionTime 
-   * @param {number} transitionFromDelta
-   * @param {number} transitionIntoDelta
-   * @param {string|function|array} transitionEasing
-   * @param {string|object|anim8.Animation} animation
-   * @param [object] options
-   * @param [boolean] all
-   * /
-  transitionInto: function(transition, animation, options, all, cache)
-  {
-    var transition = anim8.transition( transition );
-    var events = this.createEvents( animation, options, cache );
-    
-    if ( events === false )
-    {
-      return false;
-    }
-    
-    this.transitionIntoEvents( transition, events, all );
-
-    return this.activate();
-  },
-
-  /**
-   * Transitions from the currently playing events into a new animation. The transition is made
-   * by constructing a cubic curve from the current value to a point further on the current
-   * path to the starting point of the new animation. This method will not activate the Animator, that has to be done 
-   * manually.
-   *
-   * @param {number} transitionTime 
-   * @param {number} transitionFromDelta
-   * @param {number} transitionIntoDelta
-   * @param {string|function|array} transitionEasing
-   * @param {array} events
-   * @param [boolean] all
-   * /
-  transitionIntoEvents: function(transition, events, all)
-  {
-    // Check if we even need to transition
-    var transitionRequired = false;
-    
-    for (var i = 0; i < events.length && !transitionRequired; i++)
-    {      
-      if ( events[i].attribute in this.events )
-      {
-        transitionRequired = true;
-      }
-    }
-    
-    // Only transition if we need to
-    if ( transitionRequired )
-    {
-      for (var i = 0; i < events.length; i++)
-      {
-        var e1 = events[i];
-        var attr = e1.attribute;
-      
-        if ( attr in this.events )
-        {
-          var path = e1.path;
-          var calc = path.calculator;
-          var e2 = this.events[attr];
-        
-          var p0 = calc.clone( this.frame[attr] );
-          var p1 = e2.getFuture( transition.outroDelta );
-          var p2 = e1.getPoint( 0 );
-          var p3 = e1.getPoint( transition.introDelta );
-          
-          var transitionPath = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
-          var transitionEvent = new anim8.Event( attr, transitionPath, transition.time, transition.easing, 0, 0, 1 ).newInstance();
-        
-          transitionEvent.next = e1;
-        
-          this.placeEvent( transitionEvent );
-        }
-        else
-        {
-          e1.delay += transition.time;
-     
-          this.placeEvent( e1 );
-        }
-      }
-    }
-    // We don't need to transition, just play the events
-    else
-    {
-      for (var i = 0; i < events.length; i++)
-      { 
-        this.placeEvent( events[i] );
-      }
-    }
-      
-    return this;
-  },
-  /**/
 
   /**
    * Tweens a single attribute to a target value.

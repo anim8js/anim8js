@@ -42,11 +42,11 @@
       });
       
       var anim8or = m8( window.box );
-
+      
       anim8or.play('randomPoint');
       
       setInterval( function()
-      {
+      {        
         if ( !anim8or.hasAttrimators() )
         {
           anim8or.play('randomPoint 3s');
@@ -58,7 +58,7 @@
       {
         if (anim8or.hasAttrimators())
         {
-          anim8or.transition( '1s >0 <0 linear', {
+          anim8or.transition( '500 >250 <250 linear /100', {
             keyframe: {
               from: {
                 center: {x: e.x, y: e.y}
@@ -70,7 +70,7 @@
           }); 
         }
       };
-      
+            
     </script>
     
   </body>

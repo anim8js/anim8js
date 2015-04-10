@@ -59,10 +59,10 @@
 57. [X] Option to cache parsed options & transition strings
 58. [X] Infinite events stop when no more finite events exist in the same cycle and the next event is in the new current cycle
 59. [X] Throw cycle start & end events, add functions to listen start/end of last animation added
-60. [ ] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition (req: 63)
+60. [X] Add transitionSmooth which takes into account current velocity and velocity of the new event to provide a seemless transition (req: 63)
 61. [X] Add anim8.Physics : anim8.AttributeAnimator
 62. [X] Replace object iteration with anim8.FastMap
-63. [ ] Refactor transition into a single method
+63. [X] Refactor transition into a single method
 64. [X] Replace calc.create() with calc.zero() where possible.
 65. [X] Add endTime to attrimators
 66. [X] Add tweenFrom parser

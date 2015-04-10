@@ -24,6 +24,15 @@
       left: 100px;
       right: 100px;
     }
+    #box3 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #0F0;
+      position: absolute;
+      background-color: #6F6;
+      left: 100px;
+      right: 100px;
+    }
     #dot {
       width: 12px;
       height: 12px;
@@ -37,16 +46,28 @@
     
     <div id="box1"></div>
     <div id="box2"></div>
+    <div id="box3"></div>
     <div id="dot"></div>
   
     <script src="../build/anim8js-dom.js"></script>
     
     <script>
     
+      function MousePosition()
+      {
+        return {
+          x: MousePosition.x,
+          y: MousePosition.y
+        };
+      }
+      MousePosition.x = 0;
+      MousePosition.y = 0;
+
       var spring1 = m8( window.box1 ).spring(
       {
         type: 'linear',
         attribute: 'center',
+        rest: MousePosition,
         damping: 2.5,
         stiffness: -30
       });
@@ -55,26 +76,31 @@
       {
         type: 'distance',
         attribute: 'center',
+        rest: MousePosition,
         distance: 100,
         damping: 2.5,
         stiffness: -30,
         gravity: {x: 0, y:1000}
       });
       
+      var spring3 = m8( window.box3 ).spring(
+      {
+        type: 'distance',
+        attribute: 'center',
+        rest: MousePosition,
+        distance: 100,
+        damping: 2.5,
+        stiffness: -30
+      });
+      
       window.onclick = window.ontouchstart = function(e)
       {
-        var x = e.pageX || e.changedTouches[0].pageX;
-        var y = e.pageY || e.changedTouches[0].pageY;
-        
-        spring1.rest.x = x;
-        spring1.rest.y = y;
-        
-        spring2.rest.x = x;
-        spring2.rest.y = y;
+        MousePosition.x = e.pageX || e.changedTouches[0].pageX;
+        MousePosition.y = e.pageY || e.changedTouches[0].pageY;
         
         m8( window.dot ).set(
         {
-          center: {x: x, y: y}
+          center: MousePosition()
         });
       };
       

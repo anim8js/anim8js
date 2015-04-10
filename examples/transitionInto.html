@@ -25,28 +25,31 @@
     <script src="../build/anim8js-animate.css.js"></script>
 		
     <script>
+
+      function getRandomPoint()
+      {
+        return {
+          x: Math.random() * (window.innerWidth - 100) + 50,
+          y: Math.random() * (window.innerHeight - 100) + 50 
+        };
+      }
+      getRandomPoint.computed = true;
+      
+      anim8.save('randomPoint', {
+        tweenTo: {
+          center: getRandomPoint
+        }
+      });
       
       var anim8or = m8( window.box );
       
-      anim8or.play({
-        keyframe: {
-          from: getCurrentPoint(),
-          to: getRandomPoint()
-        }
-      });
+      anim8or.play('randomPoint');
       
       setInterval( function()
       {        
         if ( !anim8or.hasAttrimators() )
         {
-          anim8or.play({
-            keyframe: {
-              from: anim8or.frame,
-              to: getRandomPoint()
-            }
-          }, {
-            duration: '3s'
-          });
+          anim8or.play('randomPoint 3s');
         }
         
       }, 2000);
@@ -55,33 +58,18 @@
       {
         if (anim8or.hasAttrimators())
         {
-          anim8or.transitionInto( '1s 0.3 +0.3 linear', {
+          anim8or.transition( '500 >250 <0 linear', {
             keyframe: {
               from: {
-                'left': e.x,
-                'top': e.y
+                center: {x: e.x, y: e.y}
               },
-              to: getRandomPoint()
+              to: {
+                center: getRandomPoint()
+              }
             }
           }); 
         }
       };
-      
-      function getCurrentPoint()
-      {
-        return {
-          'left': true,
-          'top': true
-        };
-      }
-      
-      function getRandomPoint()
-      {
-        return {
-          'left': Math.random() * (window.innerWidth - 100) + 50,
-          'top': Math.random() * (window.innerHeight - 100) + 50
-        };
-      }
             
     </script>
     
