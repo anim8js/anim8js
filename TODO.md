@@ -18,7 +18,7 @@
 16. [X] Allow reference values in path (they don't get copied - they point to an attribute in another Animator) - add `Animator.ref(attribute)`
 17. [X] Add sequence to anim8 which has a delay between animations, an easing, the animation, and the list of animators. `anim8.sequence(delay, easing, animation[, options])`
 18. [X] Remove anim8.parseValue
-19. [X] (cancelled) Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
+19. [X] *cancelled* Animators can be removed from subject after X seconds of inactivity (default functionality). Add `anim8.free()`.
 20. [X] Allow reference values in spring.
 21. [X] Add automatic rest & position determination to Springs which defaults to current Animator values.
 22. [X] Complete Event.seek
