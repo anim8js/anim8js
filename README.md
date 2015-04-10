@@ -9,7 +9,7 @@ in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between 
 ### Features  
 1. Play animations by name, name & modifiers, or by custom definition.
 2. Queue animations.
-3. Transition into a new animation smoothly.
+3. Transition into a new animation in 6 different ways.
 4. Play multiple animations at once over different attributes.
 5. Springs.
 6. Animation sequences.
@@ -17,6 +17,7 @@ in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between 
 8. Save animations to be used later.
 9. Modify animations with a delay, duration, repeats, sleeping between repeats, scale, and easing.
 10. Relative Values
+11. Physics
 
 ### Concepts  
 - `Subject` = The thing being animated (an object, HTML element, etc).

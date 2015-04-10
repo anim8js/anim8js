@@ -70,3 +70,5 @@
 68. [X] Add spring parser
 69. [X] Add anim8.computed.random
 70. [X] Add travel parser which uses Physics to move to a target point at a constant velocity or acceleration
+71. [ ] EaselJS Plugin
+72. [ ] Pixi.js Plugin

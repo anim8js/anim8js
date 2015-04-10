@@ -9127,6 +9127,7 @@ anim8.override( anim8.ObjectFactory.prototype = new anim8.Factory(),
     {
       animator = new anim8.Animator( subject );
       animator.factory = this;
+      animator.frame = subject;
       
       subject.$animator = animator;
     }
@@ -9205,7 +9206,7 @@ anim8.object.attribute = function(attr)
   {
     return attr;
   }
-  if ( anim8.isString( attr ) && attr in anim8.dom.attribute ) 
+  if ( anim8.isString( attr ) && attr in anim8.object.attribute ) 
   {
     return anim8.object.attribute[ attr ];
   }

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #666;
+      }
+      #container {
+        position: relative;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+      }
+      #canvas {
+        position: relative;
+        left: -512px;
+        top: -336px;
+        background-color: black; 
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    
+    <div id="container">
+      <canvas id="canvas" width="1024" height="672"></canvas> 
+    </div>
+
+    <script src="https://code.createjs.com/easeljs-0.8.0.min.js"></script>
+    <script src="../build/anim8js-object.js"></script>
+    <script>
+
+      function MouseX()
+      {
+        return MouseX.value;
+      };
+      MouseX.value = 0;
+
+      function MouseY()
+      {
+        return MouseY.value;
+      };
+      MouseY.value = 0;
+
+      function init() 
+      {
+        var stage = new createjs.Stage('canvas');
+
+        var circle = new createjs.Graphics.Circle(0,0,30);
+        var shape = new createjs.Shape();
+        shape.graphics.beginFill("DeepSkyBlue").append(circle);
+        shape.x = 100;
+        shape.y = 100;
+        stage.addChild(shape);
+
+        anim8( shape ).play({
+          springs: {
+            x: {
+              type: 'linear',
+              rest: MouseX,
+              damping: 2.5,
+              stiffness: -30
+            },
+            y: {
+              type: 'linear',
+              rest: MouseY,
+              damping: 2.5,
+              stiffness: -30
+            }
+          }
+        });
+
+        anim8( circle ).play({
+          keyframe: {
+            from: {
+              radius: 30,
+            },
+            to: {
+              radius: 50
+            }
+          }
+        }, 'infinite quad-yoyo');
+
+        anim8.on('end', stage.update, stage);
+      }
+
+      canvas.onmousemove = function(e)
+      {
+        MouseX.value = e.pageX - container.offsetLeft - canvas.offsetLeft;
+        MouseY.value = e.pageY - container.offsetTop - canvas.offsetTop;
+      };
+
+    </script>
+  </body>
+</html>
