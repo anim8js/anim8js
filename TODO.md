@@ -10,7 +10,7 @@
 8. [X] Make anim8.Calculator class
 9. [X] Move all dom functions to anim8.dom namespace
 10. [X] Figure out how to separate attributes for one animatable type to the next (add attribute resolution to Factory?)
-11. [ ] Finish Document
+11. [X] Finish Document
 12. [ ] Create an animated splash page showcasing library
 13. [X] Change Animator.eventsFor to return an array if a function was not provided
 14. [X] Correct `anim8.isFunction`
@@ -72,3 +72,5 @@
 70. [X] Add travel parser which uses Physics to move to a target point at a constant velocity or acceleration
 71. [ ] EaselJS Plugin
 72. [ ] Pixi.js Plugin
+73. [X] Add anim8.pause() & anim8.resume() as shorthand for anim8.animating.pause/resume()
+74. [ ] Test in IE

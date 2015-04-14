@@ -167,8 +167,10 @@ transitionEasing, cache
 
 - `Easing`: anim8.easing.myCustomEasing = function(x) { ... };
 - `Path`: anim8.path.myCustomPath = function(pathDefinition) { ... return *instance of anim8.Path* ... };
+- `Spring`: anim8.calculator.myCustomSpring = function(springDefinition) { ... return *instance of anim8.Spring* ... };
 - `Parser`: anim8.parser.myCustomParser = *instance of anim8.Parser*;
 - `Animation`: anim8.save( 'myAnimationName', *animation definition* );
-- `Calculator`: anim8.calculator.create( 'myCustomCalculator', *calculator methods* );
+- `Calculator`: anim8.calculator.myCustomCalculator = *instance of anim8.Calculator*;
+
 
 

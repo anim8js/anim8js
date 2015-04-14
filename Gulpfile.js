@@ -75,7 +75,6 @@ var animatecss =
 
 var jquery =
 [
-  './lib/anim8js-jquery.js',
   './plugins/anim8js-jquery.js'
 ];
 
