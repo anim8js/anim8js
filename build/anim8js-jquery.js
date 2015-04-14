@@ -1633,7 +1633,10 @@ anim8.easingType.mirror = function(easing)
  */
 anim8.easingType.reverse = function(easing)
 {
-  return easing( 1.0 - x );
+  return function(x)
+  {
+    return easing( 1.0 - x );
+  };
 };
 
 /**
@@ -1644,7 +1647,10 @@ anim8.easingType.reverse = function(easing)
  */
 anim8.easingType.flip = function(easing)
 {
-  return 1.0 - easing( x );
+  return function(x)
+  {
+    return 1.0 - easing( x );
+  };
 };
 
 
@@ -7303,7 +7309,7 @@ anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator,
   'activate', 'deactivate', 'destroy', 'spring', 'play', 'playAttrimators', 'queue',
   'queueAttrimators', 'transition', 'transitionAttrimators', 'tween', 'tweenTo', 
   'tweenMany', 'tweenManyTo', 'follow', 'stop', 'end', 'finish', 'pause', 'resume',
-  'set', 'unset', 'get', 'invoke'
+  'set', 'unset', 'get', 'invoke', 'onCycleStart', 'onCycleEnd'
 ]);
 
 
@@ -7531,15 +7537,17 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   end                   : anim8.delegate( 'end', anim8.delegate.RETURN_THIS ),
   finish                : anim8.delegate( 'finish', anim8.delegate.RETURN_THIS ),
   pause                 : anim8.delegate( 'pause', anim8.delegate.RETURN_THIS ),
-  resume                 : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
+  resume                : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
   set                   : anim8.delegate( 'set', anim8.delegate.RETURN_THIS ),
   unset                 : anim8.delegate( 'unset', anim8.delegate.RETURN_THIS ),
   get                   : anim8.delegate( 'get', anim8.delegate.RETURN_FIRST ),
   hasAttrimators        : anim8.delegate( 'hasAttrimators', anim8.delegate.RETURN_TRUE ),
   invoke                : anim8.delegate( 'invoke', anim8.delegate.RETURN_THIS ),
+  onCycleStart          : anim8.delegate( 'onCycleStart', anim8.delegate.RETURN_THIS ),
+  onCycleEnd            : anim8.delegate( 'onCycleEnd', anim8.delegate.RETURN_THIS ),
   on                    : anim8.delegate( 'on', anim8.delegate.RETURN_THIS ),
   once                  : anim8.delegate( 'once', anim8.delegate.RETURN_THIS ),
-  off                    : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
+  off                   : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
   trigger               : anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS )
 
 });
@@ -12922,9 +12930,11 @@ anim8.factory['jquery'] = new anim8.jQueryFactory();
   
   $.fn.clone = function()
   {
-    this.removeAttr( anim8.factory.dom.attribute );
+    var clone = cloner.apply( this, arguments );
+    
+    clone.removeAttr( anim8.factory.dom.elementAttribute );
 
-    return cloner.apply( this, arguments );
+    return clone;
   };
 
   /**

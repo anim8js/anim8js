@@ -78,9 +78,11 @@ anim8.factory['jquery'] = new anim8.jQueryFactory();
   
   $.fn.clone = function()
   {
-    this.removeAttr( anim8.factory.dom.attribute );
+    var clone = cloner.apply( this, arguments );
+    
+    clone.removeAttr( anim8.factory.dom.elementAttribute );
 
-    return cloner.apply( this, arguments );
+    return clone;
   };
 
   /**
