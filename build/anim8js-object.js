@@ -832,7 +832,7 @@ anim8.eventize = function(object)
     if (listeners && event in listeners)
     {
       var eventListeners = listeners[ event ];
-			var max = eventListeners.length;
+      var max = eventListeners.length;
      
       for (var i = 0; i < max; i++)
       {
@@ -843,16 +843,16 @@ anim8.eventize = function(object)
       
       if ( clear )
       {
-				if ( eventListeners.length !== max )
-				{
-					listeners[ event ] = eventListeners.slice( max );	
-				}
-				else
-				{
-          delete listeners[ event ];	
-				}
+        if ( eventListeners.length !== max )
+        {
+          listeners[ event ] = eventListeners.slice( max );  
+        }
+        else
+        {
+          delete listeners[ event ];  
+        }
       }
-		}
+    }
   };
   
   /**
@@ -1089,129 +1089,129 @@ anim8.FastMap.prototype =
  */
 anim8.Defer = function(factory, methods)
 {
-	this.$factory = factory;
-	
-	for (var i = 0; i < methods.length; i++)
-	{	
-		this[ methods[i] ] = this.$push( methods[i] );
-	}
+  this.$factory = factory;
+  
+  for (var i = 0; i < methods.length; i++)
+  {  
+    this[ methods[i] ] = this.$push( methods[i] );
+  }
 };
 
 anim8.Defer.prototype = 
-{	
-	/**
-	 * Resets the defer instance.
-	 * 
-	 * @param  {anim8.eventize} eventable
-	 * @param  {any} previous
-	 * @param  {String} eventType
-	 * @param  {String} event
-	 * @param  {Function} callback
-	 */
-	$reset: function(eventable, previous, eventType, event, callback)
-	{
-		this.$eventable = eventable;
-		this.$previous = previous;
-		this.$eventType = eventType;
-		this.$event = event;
+{  
+  /**
+   * Resets the defer instance.
+   * 
+   * @param  {anim8.eventize} eventable
+   * @param  {any} previous
+   * @param  {String} eventType
+   * @param  {String} event
+   * @param  {Function} callback
+   */
+  $reset: function(eventable, previous, eventType, event, callback)
+  {
+    this.$eventable = eventable;
+    this.$previous = previous;
+    this.$eventType = eventType;
+    this.$event = event;
     this.$callback = callback;
-		this.$calls = [];
-		this.$next = [];
-		
-		if ( this.$isRoot() )
-		{
-			this.$register();
-		}
-	},
+    this.$calls = [];
+    this.$next = [];
+    
+    if ( this.$isRoot() )
+    {
+      this.$register();
+    }
+  },
 
-	/**
-	 * Determines whether this Defer instance is at the root.
-	 * 
-	 * @return {Boolean}
-	 */
-	$isRoot: function()
-	{
-		return this.$eventable === this.$previous;
-	},
+  /**
+   * Determines whether this Defer instance is at the root.
+   * 
+   * @return {Boolean}
+   */
+  $isRoot: function()
+  {
+    return this.$eventable === this.$previous;
+  },
 
-	/**
-	 * Registers this Defer instance with the eventable.
-	 */
-	$register: function()
-	{
-		this.$eventable[ this.$eventType ]( this.$event, this.$run, this );
-	},
+  /**
+   * Registers this Defer instance with the eventable.
+   */
+  $register: function()
+  {
+    this.$eventable[ this.$eventType ]( this.$event, this.$run, this );
+  },
 
-	/**
-	 * Creates a defered function which passes the method and arguments for
-	 * any method call into an array of calls on this Defer instance.
-	 * 
-	 * @param  {String} methodName
-	 * @return {Function}
-	 */
-	$push: function(methodName)
-	{
-		return function() 
-		{
-			this.$calls.push( [methodName, arguments] );
-			
-			return this;
-		};
-	},
+  /**
+   * Creates a defered function which passes the method and arguments for
+   * any method call into an array of calls on this Defer instance.
+   * 
+   * @param  {String} methodName
+   * @return {Function}
+   */
+  $push: function(methodName)
+  {
+    return function() 
+    {
+      this.$calls.push( [methodName, arguments] );
+      
+      return this;
+    };
+  },
 
-	/**
-	 * Executes all defered method calls and starts any child Defer instances.
-	 */
-	$run: function() 
-	{
-		// Invoke the callback if one was given.
+  /**
+   * Executes all defered method calls and starts any child Defer instances.
+   */
+  $run: function() 
+  {
+    // Invoke the callback if one was given.
     if ( anim8.isFunction( this.$callback ) )
     {
       this.$callback.call( this.$eventable, this );
     }
     
-		for (var i = 0; i < this.$calls.length; i++)
-		{
-			var call = this.$calls[ i ];
-			
-			this.$eventable[ call[0] ].apply( this.$eventable, call[1] );
-		}
-		
-		for (var k = 0; k < this.$next.length; k++)
-		{
-			this.$next[ k ].$register();
-		}
-	},
+    for (var i = 0; i < this.$calls.length; i++)
+    {
+      var call = this.$calls[ i ];
+      
+      this.$eventable[ call[0] ].apply( this.$eventable, call[1] );
+    }
+    
+    for (var k = 0; k < this.$next.length; k++)
+    {
+      this.$next[ k ].$register();
+    }
+  },
 
-	/**
-	 * Returns the object before the defer statement.
-	 *
-	 * @return {any}
-	 */
-	undefer: function()
-	{
-		return this.$previous;
-	},
+  /**
+   * Returns the object before the defer statement.
+   *
+   * @return {any}
+   */
+  undefer: function()
+  {
+    return this.$previous;
+  },
 
-	/**
-	 * Defers any following method calls to after the given event is triggered. A
-	 * callback can be specified which is a function invoked after the event is
-	 * triggered.
-	 * 
-	 * @param {String} eventType
-	 * @param {String} event
-	 * @param {Function} callback
-	 * @return {anim8.Defer}
-	 */
-	defer: function(eventType, event, callback)
-	{
-		var next = new this.$factory( this.$eventable, this, eventType, event, callback );
-		
-		this.$next.push( next );
-		
-		return next;
-	}
-	
+  /**
+   * Defers any following method calls to after the given event is triggered. A
+   * callback can be specified which is a function invoked after the event is
+   * triggered.
+   * 
+   * @param {String} eventType
+   * @param {String} event
+   * @param {Function} callback
+   * @return {anim8.Defer}
+   */
+  defer: function(eventType, event, callback)
+  {
+    var next = new this.$factory( this.$eventable, this, eventType, event, callback );
+    
+    this.$next.push( next );
+    
+    return next;
+  }
+  
 };
 
 /**
@@ -1232,37 +1232,37 @@ anim8.Defer.prototype =
 anim8.easing = function(easing, returnOnInvalid) 
 {
   if ( anim8.isFunction( easing ) ) 
-	{
+  {
     return easing;
   }
-	if ( anim8.isString( easing ) )
-	{
-		if ( easing in anim8.easing )
-		{
-			return anim8.easing[ easing ];
-		}
+  if ( anim8.isString( easing ) )
+  {
+    if ( easing in anim8.easing )
+    {
+      return anim8.easing[ easing ];
+    }
     
-		if ( easing.indexOf('-') !== -1 )
-		{
-			var pair = easing.split('-');
-			var e = pair[0];
-			var t = pair[1];
-			
-			if ( pair.length >= 2 && e in anim8.easing && t in anim8.easingType )
-			{				
-				return anim8.easingType[ t ]( anim8.easing[ e ] );
-			}
-		}
-	}
+    if ( easing.indexOf('-') !== -1 )
+    {
+      var pair = easing.split('-');
+      var e = pair[0];
+      var t = pair[1];
+      
+      if ( pair.length >= 2 && e in anim8.easing && t in anim8.easingType )
+      {        
+        return anim8.easingType[ t ]( anim8.easing[ e ] );
+      }
+    }
+  }
   if ( anim8.isArray( easing ) && easing.length === 4 && anim8.isNumber( easing[0] ) && anim8.isNumber( easing[1] ) && anim8.isNumber( easing[2] ) && anim8.isNumber( easing[3] ) ) 
-	{
+  {
     return anim8.easing.bezier.apply( null, easing );
   }
   if ( !anim8.isDefined( easing ) ) 
-	{
+  {
     return anim8.easing( anim8.defaults.easing );
   }
-	
+  
   if ( anim8.isDefined( returnOnInvalid ) )
   {
     return returnOnInvalid;
@@ -1285,14 +1285,14 @@ anim8.isEasingName = function(easing)
     return true;
   }
   
-	var pair = easing.split('-');
-	var e = pair[0];
-	var t = pair[1];
-	
-	if ( pair.length >= 2 && e in anim8.easing && t in anim8.easingType )
-	{				
+  var pair = easing.split('-');
+  var e = pair[0];
+  var t = pair[1];
+  
+  if ( pair.length >= 2 && e in anim8.easing && t in anim8.easingType )
+  {        
     return true;
-	}
+  }
   
   return false;
 };
@@ -1346,14 +1346,14 @@ anim8.easing.quintic = function(x)
 anim8.easing.back = function(x) 
 {
   var x2 = x * x;
-	var x3 = x2 * x;
-	return x3 + x2 - x;
+  var x3 = x2 * x;
+  return x3 + x2 - x;
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJzaW4oeCoxLjU3MDc5NjMyNjc5KSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0wLjE5MjUwMDAwMDAwMDAwMDI1IiwiMS40MzI0OTk5OTk5OTk5OTk5IiwiMC4wMTc0OTk5OTk5OTk5OTk4NzciLCIxLjAxNzQ5OTk5OTk5OTk5OTgiXX1d
 anim8.easing.sine = function(x) 
 {
-	return Math.sin( x * 1.57079632679 );
+  return Math.sin( x * 1.57079632679 );
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoMS4wLXgqKDcuMC8xMCkpKngqKDEwLjAvMy4wKSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0wLjE5MjUwMDAwMDAwMDAwMDI1IiwiMS40MzI0OTk5OTk5OTk5OTk5IiwiMC4wMTc0OTk5OTk5OTk5OTk4NzciLCIxLjAxNzQ5OTk5OTk5OTk5OTgiXX1d
@@ -1368,8 +1368,8 @@ anim8.easing.elastic = function(x)
   var x2 = x * x;
   var x3 = x2 * x;
   var scale = x2 * ((2.0 * x3) + x2 - (4.0 * x) + 2.0);
-	var wave = -Math.sin(x * 10.9955742876);
-	return scale * wave;
+  var wave = -Math.sin(x * 10.9955742876);
+  return scale * wave;
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJhYnMoeC1zaW4oeCozLjE0MTU5MjY1MzU5KSkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItMC4xOTI1MDAwMDAwMDAwMDAyNSIsIjEuNDMyNDk5OTk5OTk5OTk5OSIsIjAuMDE3NDk5OTk5OTk5OTk5ODc3IiwiMS4wMTc0OTk5OTk5OTk5OTk4Il19XQ--
@@ -1401,20 +1401,20 @@ anim8.easing.bounce = function(x)
 anim8.easing.smallbounce = function(x) 
 {
   var inv = 1.0 - x;
-	return (1.0 - Math.abs(inv * inv * Math.cos(x * x * 14.8044066016)));
+  return (1.0 - Math.abs(inv * inv * Math.cos(x * x * 14.8044066016)));
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoMS4wLWFicygoMS14KSooMS14KSpjb3MoeCp4KjcpKSkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItMC4xOTI1MDAwMDAwMDAwMDAyNSIsIjEuNDMyNDk5OTk5OTk5OTk5OSIsIjAuMDE3NDk5OTk5OTk5OTk5ODc3IiwiMS4wMTc0OTk5OTk5OTk5OTk4Il19XQ--
 anim8.easing.tinybounce = function(x) 
 {
   var inv = 1.0 - x;
-	return (1.0 - Math.abs(inv * inv * Math.cos(x * x * 7.0)));
+  return (1.0 - Math.abs(inv * inv * Math.cos(x * x * 7.0)));
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIoY29zKHgqeCoxMi4wKSp4KigxLjAteCkreCkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjEwMDAsIndpbmRvdyI6WyItMC4xOTI1MDAwMDAwMDAwMDAyNSIsIjEuNDMyNDk5OTk5OTk5OTk5OSIsIjAuMDE3NDk5OTk5OTk5OTk5ODc3IiwiMS4wMTc0OTk5OTk5OTk5OTk4Il19XQ--
 anim8.easing.hesitant = function(x) 
 {
-	return (Math.cos(x * x * 12.0) * x * (1.0 - x) + x);
+  return (Math.cos(x * x * 12.0) * x * (1.0 - x) + x);
 };
 
 // http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJzcXJ0KHgpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTAuMTkyNTAwMDAwMDAwMDAwMjUiLCIxLjQzMjQ5OTk5OTk5OTk5OTkiLCIwLjAxNzQ5OTk5OTk5OTk5OTg3NyIsIjEuMDE3NDk5OTk5OTk5OTk5OCJdfV0-
@@ -1441,7 +1441,7 @@ anim8.easing.log10 = function(x)
 anim8.easing.slingshot = function(x)
 {
   if (x < 0.7) {
-		return (x * -0.357);
+    return (x * -0.357);
   } else {
     var d = x - 0.7;
     return ((d * d * 27.5 - 0.5) * 0.5);
@@ -1517,21 +1517,21 @@ anim8.easing.bezier = function(mX1, mY1, mX2, mY2)
  */
 anim8.easingType = function(easingType, optional)
 {
-	if ( anim8.isFunction( easingType ) )
-	{
-		return easingType;
-	}
-	if ( anim8.isString( easingType ) && easingType in anim8.easingType )
-	{
-		return anim8.easingType[ easingType ];
-	}
+  if ( anim8.isFunction( easingType ) )
+  {
+    return easingType;
+  }
+  if ( anim8.isString( easingType ) && easingType in anim8.easingType )
+  {
+    return anim8.easingType[ easingType ];
+  }
   
   if ( optional )
   {
     return false;
   }
-	
-	throw easingType + ' is not a valid easing type';
+  
+  throw easingType + ' is not a valid easing type';
 };
 
 /**
@@ -1542,10 +1542,10 @@ anim8.easingType = function(easingType, optional)
  */
 anim8.easingType.in = function(easing) 
 {
-	return function(x) 
-	{
-		return easing( x );
-	};
+  return function(x) 
+  {
+    return easing( x );
+  };
 };
 
 /**
@@ -1556,10 +1556,10 @@ anim8.easingType.in = function(easing)
  */
 anim8.easingType.out = function(easing) 
 {
-	return function(x) 
-	{
-		return 1.0 - easing( 1.0 - x );
-	};
+  return function(x) 
+  {
+    return 1.0 - easing( 1.0 - x );
+  };
 };
 
 /**
@@ -1570,17 +1570,17 @@ anim8.easingType.out = function(easing)
  */
 anim8.easingType.inout = function(easing) 
 {
-	return function(x) 
-	{
-	  if ( x < 0.5 ) 
-	  {
-	    return easing( 2.0 * x ) * 0.5;
-	  } 
-	  else 
-	  {
-	    return 1.0 - (easing( 2.0 - 2.0 * x ) * 0.5);
-	  }
-	};
+  return function(x) 
+  {
+    if ( x < 0.5 ) 
+    {
+      return easing( 2.0 * x ) * 0.5;
+    } 
+    else 
+    {
+      return 1.0 - (easing( 2.0 - 2.0 * x ) * 0.5);
+    }
+  };
 };
 
 /**
@@ -1591,17 +1591,17 @@ anim8.easingType.inout = function(easing)
  */
 anim8.easingType.yoyo = function(easing) 
 {
-	return function(x) 
-	{
-	  if ( x < 0.5 ) 
-	  {
-	    return easing( 2.0 * x );
-	  } 
-	  else 
-	  {
-	    return easing( 2.0 - 2.0 * x );
-	  }
-	};
+  return function(x) 
+  {
+    if ( x < 0.5 ) 
+    {
+      return easing( 2.0 * x );
+    } 
+    else 
+    {
+      return easing( 2.0 - 2.0 * x );
+    }
+  };
 };
 
 /**
@@ -1612,17 +1612,17 @@ anim8.easingType.yoyo = function(easing)
  */
 anim8.easingType.mirror = function(easing)
 {
-	return function(x)
-	{
-		if ( x < 0.5 )
-		{
-			return easing( 2.0 * x );
-		}
-		else
-		{
-			return 1.0 - easing( 2.0 - 2.0 * x );
-		}
-	};
+  return function(x)
+  {
+    if ( x < 0.5 )
+    {
+      return easing( 2.0 * x );
+    }
+    else
+    {
+      return 1.0 - easing( 2.0 - 2.0 * x );
+    }
+  };
 };
 
 /**
@@ -1633,7 +1633,7 @@ anim8.easingType.mirror = function(easing)
  */
 anim8.easingType.reverse = function(easing)
 {
-	return easing( 1.0 - x );
+  return easing( 1.0 - x );
 };
 
 /**
@@ -1644,7 +1644,7 @@ anim8.easingType.reverse = function(easing)
  */
 anim8.easingType.flip = function(easing)
 {
-	return 1.0 - easing( x );
+  return 1.0 - easing( x );
 };
 
 
@@ -2175,12 +2175,12 @@ anim8.calculator = function(calc)
   {
     return calc;
   }
-	if ( anim8.isString( calc ) && calc in anim8.calculator )
-	{
-		return anim8.calculator[ calc ];
-	}
-	
-	return anim8.calculator.default;
+  if ( anim8.isString( calc ) && calc in anim8.calculator )
+  {
+    return anim8.calculator[ calc ];
+  }
+  
+  return anim8.calculator.default;
 };
 
 /**
@@ -2647,8 +2647,8 @@ anim8.Point2dCalculator = function()
 
 anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(), 
 {
-	parse: function(x, defaultValue)
-	{
+  parse: function(x, defaultValue)
+  {
     // Values computed live.
     if ( anim8.isFunction( x ) )
     {
@@ -2660,16 +2660,16 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
       return anim8.computed.current;
     }
     // When a number is given a uniform point is returned.
-		if ( anim8.isNumber( x ) )
-		{
-			return {
-				x: x,
-				y: x
-			};
-		}
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        x: x,
+        y: x
+      };
+    }
     // When an object is given, check for relative values.
-		if ( anim8.isObject( x ) )
-		{
+    if ( anim8.isObject( x ) )
+    {
       var cx = anim8.coalesce( x.x, defaultValue.x );
       var cy = anim8.coalesce( x.y, defaultValue.y );
       var rx = this.getRelativeAmount( cx );
@@ -2693,7 +2693,7 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
 
         return parsed;
       }
-		}
+    }
     // Relative values & left/right/middle/center/top/bottom aliases.
     if ( anim8.isString( x ) )
     {
@@ -2750,33 +2750,33 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
     {
       return this.clone( defaultValue );      
     }
-		
-		return false;
-	},
+    
+    return false;
+  },
   copy: function(out, copy) 
-	{
+  {
     out.x = copy.x;
     out.y = copy.y;
     return out;
   },
   create: function() 
-	{
+  {
     return {x: 0.0, y:0.0};
   },
   zero: function(out) 
-	{
+  {
     out.x = 0.0;
     out.y = 0.0;
     return out;
   },
   adds: function(out, amount, amountScale) 
-	{
+  {
     out.x += amount.x * amountScale;
     out.y += amount.y * amountScale;
     return out;
   },
   mul: function(out, scale) 
-	{
+  {
     out.x *= scale.x;
     out.y *= scale.y;
     return out;
@@ -2788,28 +2788,28 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
     return out;
   },
   distanceSq: function(a, b) 
-	{
+  {
     var dx = a.x - b.x;
     var dy = a.y - b.y;    
     return dx * dx + dy * dy;
   },
   isValid: function(a) 
-	{
+  {
     return typeof a === 'object' && 'x' in a && 'y' in a;
   },
   isNaN: function(a) 
-	{
+  {
     return isNaN(a.x) || isNaN(a.y);
   },
   isZero: function(a, epsilon) 
-	{
+  {
     return Math.abs(a.x) < epsilon && 
-					 Math.abs(a.y) < epsilon;
+           Math.abs(a.y) < epsilon;
   },
   isEqual: function(a, b, epsilon) 
-	{
+  {
     return Math.abs(a.x - b.x) < epsilon && 
-					 Math.abs(a.y - b.y) < epsilon;
+           Math.abs(a.y - b.y) < epsilon;
   },
   min: function(out, a, b)
   {
@@ -2847,8 +2847,8 @@ anim8.Point3dCalculator = function()
 
 anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(), 
 {
-	parse: function(x, defaultValue)
-	{
+  parse: function(x, defaultValue)
+  {
     // Values computed live.
     if ( anim8.isFunction( x ) )
     {
@@ -2860,17 +2860,17 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
       return anim8.computed.current;
     }
     // When a number is given a uniform point is returned.
-		if ( anim8.isNumber( x ) )
-		{
-			return {
-				x: x,
-				y: x,
-				z: x
-			};
-		}
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        x: x,
+        y: x,
+        z: x
+      };
+    }
     // When an object is given, check for relative values.
-		if ( anim8.isObject( x ) )
-		{
+    if ( anim8.isObject( x ) )
+    {
       var cx = anim8.coalesce( x.x, defaultValue.x );
       var cy = anim8.coalesce( x.y, defaultValue.y );
       var cz = anim8.coalesce( x.z, defaultValue.z );
@@ -2898,7 +2898,7 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
 
         return parsed;
       }
-		}
+    }
     // If only a relative value is given it will modify the X, Y, & Z components evenly.
     if ( this.isRelative( x ) )
     {
@@ -2915,39 +2915,39 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
     {
       return this.clone( defaultValue );      
     }
-		
-		return false;
-	},
+    
+    return false;
+  },
   copy: function(out, copy) 
-	{
+  {
     out.x = copy.x;
     out.y = copy.y;
-		out.z = copy.z;
+    out.z = copy.z;
     return out;
   },
   create: function() 
-	{
+  {
     return {x: 0.0, y:0.0, z:0.0};
   },
   zero: function(out) 
-	{ 
+  { 
     out.x = 0.0;
     out.y = 0.0;
-		out.z = 0.0;
+    out.z = 0.0;
     return out;
   },
   adds: function(out, amount, amountScale) 
-	{
+  {
     out.x += amount.x * amountScale;
     out.y += amount.y * amountScale;
-		out.z += amount.z * amountScale;
+    out.z += amount.z * amountScale;
     return out;
   },
   mul: function(out, scale) 
-	{
+  {
     out.x *= scale.x;
     out.y *= scale.y;
-		out.z *= scale.z;
+    out.z *= scale.z;
     return out;
   },
   interpolate: function(out, start, end, delta) 
@@ -2958,30 +2958,30 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
     return out;
   },
   distanceSq: function(a, b) 
-	{
+  {
     var dx = a.x - b.x;
     var dy = a.y - b.y;   
-		var dz = a.z - b.z; 
+    var dz = a.z - b.z; 
     return dx * dx + dy * dy + dz * dz;
   },
   isValid: function(a) 
-	{
+  {
     return typeof a === 'object' && 'x' in a && 'y' in a && 'z' in a;
   },
   isNaN: function(a) 
-	{
+  {
     return isNaN(a.x) || isNaN(a.y) || isNaN(a.z);
   },
   isZero: function(a, epsilon) 
-	{
+  {
     return Math.abs(a.x) < epsilon && 
-					 Math.abs(a.y) < epsilon && Math.abs(a.z) < epsilon;
+           Math.abs(a.y) < epsilon && Math.abs(a.z) < epsilon;
   },
   isEqual: function(a, b, epsilon) 
-	{
+  {
     return Math.abs(a.x - b.x) < epsilon && 
-		  		 Math.abs(a.y - b.y) < epsilon && 
-					 Math.abs(a.z - b.z) < epsilon;
+           Math.abs(a.y - b.y) < epsilon && 
+           Math.abs(a.z - b.z) < epsilon;
   },
   min: function(out, a, b)
   {
@@ -3022,8 +3022,8 @@ anim8.QuaternionCalculator = function()
 
 anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(), 
 {
-	parse: function(x, defaultValue)
-	{
+  parse: function(x, defaultValue)
+  {
     // Values computed live.
     if ( anim8.isFunction( x ) )
     {
@@ -3035,18 +3035,18 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
       return anim8.computed.current;
     }
     // When only a number is given assume it's an angle around the Z-axis.
-		if ( anim8.isNumber( x ) )
-		{
-			return {
-				x: 0,
-				y: 0,
-				z: 1,
-				angle: x
-			};
-		}
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        x: 0,
+        y: 0,
+        z: 1,
+        angle: x
+      };
+    }
     // When an object is given, check for relative values.
-		if ( anim8.isObject( x ) )
-		{
+    if ( anim8.isObject( x ) )
+    {
       var cx = anim8.coalesce( x.x, defaultValue.x );
       var cy = anim8.coalesce( x.y, defaultValue.y );
       var cz = anim8.coalesce( x.z, defaultValue.z );
@@ -3078,7 +3078,7 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 
         return parsed;
       }
-		}
+    }
     // When a relative value is given, assume it's for an angle around the Z-axis.
     if ( this.isRelative( x ) )
     {
@@ -3095,43 +3095,43 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
     {
       return this.clone( defaultValue );      
     }
-		
-		return false;
-	},
+    
+    return false;
+  },
   copy: function(out, copy) 
-	{
+  {
     out.x = copy.x;
     out.y = copy.y;
-		out.z = copy.z;
-		out.angle = copy.angle;
+    out.z = copy.z;
+    out.angle = copy.angle;
     return out;
   },
   create: function() 
-	{
+  {
     return {x: 0.0, y:0.0, z:0.0, angle:0.0};
   },
   zero: function(out) 
-	{
+  {
     out.x = 0.0;
     out.y = 0.0;
-		out.z = 0.0;
-		out.angle = 0.0;
+    out.z = 0.0;
+    out.angle = 0.0;
     return out;
   },
   adds: function(out, amount, amountScale) 
-	{
+  {
     out.x += amount.x * amountScale;
     out.y += amount.y * amountScale;
-		out.z += amount.z * amountScale;
-		out.angle += amount.angle * amountScale;
+    out.z += amount.z * amountScale;
+    out.angle += amount.angle * amountScale;
     return out;
   },
   mul: function(out, scale) 
-	{
+  {
     out.x *= scale.x;
     out.y *= scale.y;
-		out.z *= scale.z;
-		out.angle *= scale.angle;
+    out.z *= scale.z;
+    out.angle *= scale.angle;
     return out;
   },
   interpolate: function(out, start, end, delta) 
@@ -3143,34 +3143,34 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
     return out;
   },
   distanceSq: function(a, b) 
-	{
+  {
     var dx = a.x - b.x;
     var dy = a.y - b.y;   
-		var dz = a.z - b.z; 
-		var da = a.angle - b.angle;
+    var dz = a.z - b.z; 
+    var da = a.angle - b.angle;
     return dx * dx + dy * dy + dz * dz + da * da;
   },
   isValid: function(a) 
-	{
+  {
     return typeof a === 'object' && 'x' in a && 'y' in a && 'z' in a && 'angle' in a;
   },
   isNaN: function(a) 
-	{
+  {
     return isNaN(a.x) || isNaN(a.y) || isNaN(a.z) || isNaN(a.angle);
   },
   isZero: function(a, epsilon) 
-	{
+  {
     return Math.abs(a.x) < epsilon && 
-		  		 Math.abs(a.y) < epsilon && 
-		       Math.abs(a.z) < epsilon && 
-		       Math.abs(a.angle) < epsilon;
+           Math.abs(a.y) < epsilon && 
+           Math.abs(a.z) < epsilon && 
+           Math.abs(a.angle) < epsilon;
   },
   isEqual: function(a, b, epsilon) 
-	{
+  {
     return Math.abs(a.x - b.x) < epsilon && 
-					 Math.abs(a.y - b.y) < epsilon && 
-				   Math.abs(a.z - b.z) < epsilon && 
-		       Math.abs(a.angle - b.angle) < epsilon;
+           Math.abs(a.y - b.y) < epsilon && 
+           Math.abs(a.z - b.z) < epsilon && 
+           Math.abs(a.angle - b.angle) < epsilon;
   },
   min: function(out, a, b)
   {
@@ -3215,8 +3215,8 @@ anim8.RGBCalculator = function()
 
 anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(), 
 {
-	parse: function(x, defaultValue)
-	{
+  parse: function(x, defaultValue)
+  {
     // Values computed live.
     if ( anim8.isFunction( x ) )
     {
@@ -3228,14 +3228,14 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
       return anim8.computed.current;
     }
     // When a number is given a grayscale color is returned.
-		if ( anim8.isNumber( x ) )
-		{
-			return {
-				r: x,
-				g: x,
-				b: x
-			};
-		}
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        r: x,
+        g: x,
+        b: x
+      };
+    }
     // When an object is given, check for relative values.
     if ( anim8.isObject( x ) )
     {
@@ -3277,9 +3277,9 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
         return anim8.computed.relative( { r: rx, g: rx, b: rx } ); 
       }
     }
-		
+    
     // Try to parse the color.
-		var parsed = anim8.color.parse( x );
+    var parsed = anim8.color.parse( x );
 
     if ( parsed !== false )
     {
@@ -3293,34 +3293,34 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
     }
     
     return false;    
-	},
+  },
   copy: function(out, copy) 
-	{
+  {
     out.r = copy.r;
     out.g = copy.g;
     out.b = copy.b;
     return out;
   },
   create: function() 
-	{
+  {
     return {r: 0, g:0, b:0};
   },
   zero: function(out) 
-	{
+  {
     out.r = 0;
     out.g = 0;
     out.b = 0;
     return out;
   },
   adds: function(out, amount, amountScale) 
-	{
+  {
     out.r += amount.r * amountScale;
     out.g += amount.g * amountScale;
     out.b += amount.b * amountScale;
     return out;
   },
   mul: function(out, scale) 
-	{
+  {
     out.r *= scale.r;
     out.g *= scale.g;
     out.b *= scale.b;
@@ -3334,28 +3334,28 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
     return out;
   },
   distanceSq: function(a, b) 
-	{
+  {
     var dr = a.r - b.r;
     var dg = a.g - b.g;    
     var db = a.b - b.b;    
     return dr * dr + dg * dg + db * db;
   },
   isValid: function(a) 
-	{
+  {
     return anim8.isObject( a ) && 'r' in a && 'g' in a && 'b' in a;
   },
   isNaN: function(a) 
-	{
+  {
     return isNaN(a.r) || isNaN(a.g) || isNaN(a.b);
   },
   isZero: function(a, epsilon) 
-	{
+  {
     return Math.abs(a.r) < epsilon && 
            Math.abs(a.g) < epsilon && 
            Math.abs(a.b) < epsilon;
   },
   isEqual: function(a, b, epsilon) 
-	{
+  {
     return Math.abs(a.r - b.r) < epsilon && 
            Math.abs(a.g - b.g) < epsilon && 
            Math.abs(a.b - b.b) < epsilon;
@@ -3401,8 +3401,8 @@ anim8.RGBACalculator = function()
 
 anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(), 
 {
-	parse: function(x, defaultValue)
-	{
+  parse: function(x, defaultValue)
+  {
     // Values computed live.
     if ( anim8.isFunction( x ) )
     {
@@ -3414,15 +3414,15 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
       return anim8.computed.current;
     }
     // When a number is given an opaque grayscale color is returned.
-		if ( anim8.isNumber( x ) )
-		{
-			return {
-				r: x,
-				g: x,
-				b: x,
-				a: 1.0
-			};
-		}
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        r: x,
+        g: x,
+        b: x,
+        a: 1.0
+      };
+    }
     // When an object is given, check for relative values.
     if ( anim8.isObject( x ) )
     {
@@ -3484,9 +3484,9 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     }
     
     return false;  
-	},
+  },
   copy: function(out, copy) 
-	{
+  {
     out.r = copy.r;
     out.g = copy.g;
     out.b = copy.b;
@@ -3494,11 +3494,11 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     return out;
   },
   create: function() 
-	{
+  {
     return {r: 0, g:0, b:0, a:0};
   },
   zero: function(out) 
-	{
+  {
     out.r = 0;
     out.g = 0;
     out.b = 0;
@@ -3506,7 +3506,7 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     return out;
   },
   adds: function(out, amount, amountScale) 
-	{
+  {
     out.r += amount.r * amountScale;
     out.g += amount.g * amountScale;
     out.b += amount.b * amountScale;
@@ -3514,7 +3514,7 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     return out;
   },
   mul: function(out, scale) 
-	{
+  {
     out.r *= scale.r;
     out.g *= scale.g;
     out.b *= scale.b;
@@ -3530,7 +3530,7 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     return out;
   },
   distanceSq: function(a, b) 
-	{
+  {
     var dr = a.r - b.r;
     var dg = a.g - b.g;    
     var db = a.b - b.b;    
@@ -3538,22 +3538,22 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
     return dr * dr + dg * dg + db * db + da * da;
   },
   isValid: function(a) 
-	{
+  {
     return anim8.isObject( a ) && 'r' in a && 'g' in a && 'b' in a && 'a' in a;
   },
   isNaN: function(a) 
-	{
+  {
     return isNaN(a.r) || isNaN(a.g) || isNaN(a.b) || isNaN(a.a);
   },
   isZero: function(a, epsilon) 
-	{
+  {
     return Math.abs(a.r) < epsilon && 
            Math.abs(a.g) < epsilon && 
            Math.abs(a.b) < epsilon && 
            Math.abs(a.a) < epsilon;
   },
   isEqual: function(a, b, epsilon) 
-	{
+  {
     return Math.abs(a.r - b.r) < epsilon && 
            Math.abs(a.g - b.g) < epsilon && 
            Math.abs(a.b - b.b) < epsilon && 
@@ -3650,7 +3650,7 @@ anim8.Path.prototype =
    * @return {T}
    */
   compute: function(out, delta) 
-	{
+  {
     throw 'Path.compute not implemented';
   },
 
@@ -3661,7 +3661,7 @@ anim8.Path.prototype =
    * @see anim8.computed
    */
   hasComputed: function() 
-	{
+  {
     var ps = this.points;
     
     for (var i = 0; i < ps.length; i++) 
@@ -4937,10 +4937,10 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
 
     return this.computeValue( out, delta );
   },
-	totalTime: function()
-	{
-		return Math.min( this.stopTime, this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep) );
-	},
+  totalTime: function()
+  {
+    return Math.min( this.stopTime, this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep) );
+  },
   clone: function()
   {
     return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null );
@@ -5517,8 +5517,8 @@ anim8.animation = function(animation, options, cache)
   {
     return animation;
   }
-	if ( anim8.isString( animation ) )
-	{
+  if ( anim8.isString( animation ) )
+  {
     var key = animation.toLowerCase();
 
     if ( key in anim8.animation )
@@ -5561,34 +5561,34 @@ anim8.animation = function(animation, options, cache)
     }
 
     return anim;
-	}
-	if ( anim8.isObject( animation ) )
-	{
+  }
+  if ( anim8.isObject( animation ) )
+  {
     var attrimatorMap = new anim8.AttrimatorMap();
-		var options = anim8.options( options );
+    var options = anim8.options( options );
     var helper = new anim8.ParserHelper( animation, options );
-		
-		for (var parserName in animation)
-		{
-			var parser = anim8.parser( parserName );
-			
-			if ( parser !== false )
-			{
-				parser.parse( animation, options, attrimatorMap, helper );
-			}
-		}
-		
-		if (attrimatorMap.size())
-		{
-			return new anim8.Animation( false, animation, options, attrimatorMap );
-		}
+    
+    for (var parserName in animation)
+    {
+      var parser = anim8.parser( parserName );
+      
+      if ( parser !== false )
+      {
+        parser.parse( animation, options, attrimatorMap, helper );
+      }
+    }
+    
+    if (attrimatorMap.size())
+    {
+      return new anim8.Animation( false, animation, options, attrimatorMap );
+    }
     else
     {
       throw 'Failed to create any attrimators in anim8.animation';
     }
-	}
-	
-	return false;
+  }
+  
+  return false;
 };
 
 /**
@@ -5624,10 +5624,10 @@ anim8.save = function(name, animation, options)
  */
 anim8.Animation = function(name, input, options, attrimators)
 {
-	this.name = name;
-	this.input = input;
-	this.options = options;
-	this.attrimators = attrimators;
+  this.name = name;
+  this.input = input;
+  this.options = options;
+  this.attrimators = attrimators;
   this.next = null;
 };
 
@@ -5976,7 +5976,7 @@ anim8.options = (function()
  */
 anim8.Animator = function(e) 
 {
-	this.reset( e );
+  this.reset( e );
 };
 
 anim8.fn = anim8.Animator.prototype = 
@@ -5988,22 +5988,22 @@ anim8.fn = anim8.Animator.prototype =
    * @param {any} subject
    * @return {this}
    */
-	reset: function(subject)
-	{
-	  this.subject = subject;
+  reset: function(subject)
+  {
+    this.subject = subject;
     this.attrimators = new anim8.AttrimatorMap();
     this.attrimatorsAdded = [];
-	  this.frame = {};
+    this.frame = {};
     this.updated = {};
-	  this.finished = false;
-		this.factory = null;
+    this.finished = false;
+    this.factory = null;
     this.active = false;
     this.cycleCurrent = 0;
     this.cycleNext = 0;
     this.cycleEnded = 0;
     
     return this;
-	},
+  },
 
   /**
    * Starts a new animation cycle. This is done before events & springs are 
@@ -6152,7 +6152,7 @@ anim8.fn = anim8.Animator.prototype =
    * @return {this}
    */
   update: function(now) 
-	{  
+  {  
     this.wasFinished = this.finished;
     this.finished = true;
 
@@ -6223,18 +6223,18 @@ anim8.fn = anim8.Animator.prototype =
    * @return {this}
    */
   apply: function()
-	{
+  {
     for (var attr in this.frame)
     {
       if ( this.updated[ attr ] )
       {
         this.subject[ attr ] = this.frame[ attr ]; 
-				this.updated[ attr ] = false;
+        this.updated[ attr ] = false;
       }
     }
-	
-		this.trigger('apply');
-	
+  
+    this.trigger('apply');
+  
     this.trimAttrimators();
     
     return this;
@@ -6307,12 +6307,12 @@ anim8.fn = anim8.Animator.prototype =
    *
    * @return {this}
    */
-	deactivate: function()
-	{ 
+  deactivate: function()
+  { 
     this.trigger('deactivate', this);
 
     return this;
-	},
+  },
   
   /**
    * A method that can be invoked to destroy an animator - removing any 
@@ -6425,8 +6425,8 @@ anim8.fn = anim8.Animator.prototype =
    * @see anim8.animation
    * @see anim8.options
    */
-	play: function(animation, options, all, cache)
-	{
+  play: function(animation, options, all, cache)
+  {
     var attrimatorMap = this.createAttrimators( animation, options, cache );
     
     if ( attrimatorMap === false )
@@ -6438,7 +6438,7 @@ anim8.fn = anim8.Animator.prototype =
     this.playAttrimators( attrimatorMap, all );
 
     return this.activate();
-	},
+  },
 
   /**
    * Plays a map of attrimators. Attributes in the attrimator map that are 
@@ -6480,8 +6480,8 @@ anim8.fn = anim8.Animator.prototype =
    * @see anim8.animation
    * @see anim8.options
    */
-	queue: function(animation, options, cache)
-	{
+  queue: function(animation, options, cache)
+  {
     var attrimatorMap = this.createAttrimators( animation, options, cache );
     
     if ( attrimatorMap === false )
@@ -6493,7 +6493,7 @@ anim8.fn = anim8.Animator.prototype =
     this.queueAttrimators( attrimatorMap );
 
     return this.activate();
-	},
+  },
 
   /**
    * Queues a map of attrimators. The map of attrimators will be started at the
@@ -6964,17 +6964,17 @@ anim8.fn = anim8.Animator.prototype =
    */
   attrimatorsFor: function(attributes, callback)
   {
-		if ( anim8.isString( attributes ) )
-		{
-			attributes = attributes.split( ' ' );
-		}
+    if ( anim8.isString( attributes ) )
+    {
+      attributes = attributes.split( ' ' );
+    }
    
     var attrimatorMap = this.attrimators; 
     var resulting = !anim8.isFunction( callback );
     var results = [];
     
-		if ( anim8.isArray( attributes ) )
-		{
+    if ( anim8.isArray( attributes ) )
+    {
       for (var i = 0; i < attributes.length; i++)
       {
         var attr = attributes[i];
@@ -6992,7 +6992,7 @@ anim8.fn = anim8.Animator.prototype =
           }
         }
       }
-		}
+    }
     else
     {
       var attrimators = attrimatorMap.values;
@@ -7012,9 +7012,9 @@ anim8.fn = anim8.Animator.prototype =
       }
     }
     
-		return resulting ? results : this;
+    return resulting ? results : this;
   },
-	
+  
   /**
    * Stops all attributes for the specified attributes. Attribute names can be 
    * given as an array or a space separated string. If no attributes are given 
@@ -7023,13 +7023,13 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String|Array} attributes
    * @return {this}
    */
-	stop: function(attributes)
-	{
-		return this.attrimatorsFor( attributes, function(attrimator, attr) 
-		{
+  stop: function(attributes)
+  {
+    return this.attrimatorsFor( attributes, function(attrimator, attr) 
+    {
       this.attrimators.remove( attr );
-		});
-	},
+    });
+  },
   
   /**
    * Ends all attributes for the specified attributes. If attributes are queued 
@@ -7041,18 +7041,18 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String|Array} attributes
    * @return {this}
    */
-	end: function(attributes)
-	{
-		return this.attrimatorsFor( attributes, function(attrimator) 
-		{
-			while (attrimator.next)
-			{
-				attrimator = attrimator.next;
-			}
-			
-			attrimator.finish( this.frame );
-		});
-	},
+  end: function(attributes)
+  {
+    return this.attrimatorsFor( attributes, function(attrimator) 
+    {
+      while (attrimator.next)
+      {
+        attrimator = attrimator.next;
+      }
+      
+      attrimator.finish( this.frame );
+    });
+  },
   
   /**
    * Finishes all current attrimators for the specified attributes. Attribute 
@@ -7062,13 +7062,13 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String|Array} attributes
    * @return {this}
    */
-	finish: function(attributes)
-	{
-		return this.attrimatorsFor( attributes, function(attrimator)
-		{
-			attrimator.finish( this.frame );
-		});
-	},
+  finish: function(attributes)
+  {
+    return this.attrimatorsFor( attributes, function(attrimator)
+    {
+      attrimator.finish( this.frame );
+    });
+  },
   
   /**
    * Pauses all current attrimators for the specified attributes. Attribute 
@@ -7078,13 +7078,13 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String|Array} attributes
    * @return {this}
    */
-	pause: function(attributes)
-	{
-		return this.attrimatorsFor( attributes, function(attrimator)
-		{
-			attrimator.pause();
-		});
-	},
+  pause: function(attributes)
+  {
+    return this.attrimatorsFor( attributes, function(attrimator)
+    {
+      attrimator.pause();
+    });
+  },
   
   /**
    * Resumes all current attrimators for the specified attributes. Attribute 
@@ -7094,13 +7094,13 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String|Array} attributes
    * @return {this}
    */
-	resume: function(attributes)
-	{
-		return this.attrimatorsFor( attributes, function(attrimator)
-		{
-			attrimator.resume();
-		});
-	},
+  resume: function(attributes)
+  {
+    return this.attrimatorsFor( attributes, function(attrimator)
+    {
+      attrimator.resume();
+    });
+  },
   
   /**
    * Sets the given attributes to this Animator immediately.
@@ -7113,7 +7113,7 @@ anim8.fn = anim8.Animator.prototype =
     for (var attr in attributes)
     {
       this.frame[ attr ] = attributes[ attr ];
-			this.updated[ attr ] = true;
+      this.updated[ attr ] = true;
     }
     
     this.apply();
@@ -7233,21 +7233,21 @@ anim8.fn = anim8.Animator.prototype =
 
     return this;
   },
-	
-	/**
-	 * Defers the method calls following this one to when the given event type 
+  
+  /**
+   * Defers the method calls following this one to when the given event type 
    * (on or once) and event. To return this animator you need to call undefer() 
    * as many times as you called defer().
-	 *
-	 * @param {String} eventType
-	 * @param {String} event
+   *
+   * @param {String} eventType
+   * @param {String} event
    * @param [Function] callback
    * @return {anim8.DeferAnimator}
-	 */
-	defer: function(eventType, event, callback)
-	{
-		return new anim8.DeferAnimator( this, this, eventType, event, callback );
-	},
+   */
+  defer: function(eventType, event, callback)
+  {
+    return new anim8.DeferAnimator( this, this, eventType, event, callback );
+  },
 
   /**
    * Invokes the given callback when the last animation that was 
@@ -7291,7 +7291,7 @@ anim8.eventize( anim8.Animator.prototype );
  */
 anim8.DeferAnimator = function(animator, previous, eventType, event)
 {
-	this.$reset( animator, previous, eventType, event );
+  this.$reset( animator, previous, eventType, event );
 };
 
 /**
@@ -7342,8 +7342,8 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
         break;
       }
     }
-  	
-  	return this;
+    
+    return this;
   },
 
   /**
@@ -7370,22 +7370,22 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
    * @return {this}
    */
   filter: function(filterer)
-  {	
-  	var alive = 0;
-  	
-  	for (var i = 0; i < this.length; i++)
-  	{
-  		var remove = filterer( this[i] );
-  		
-  		if ( !remove )
-  		{
-  			this[alive++] = this[i];
-  		}
-  	}
-  	
-  	this.length = alive;
-  	
-  	return this;
+  {  
+    var alive = 0;
+    
+    for (var i = 0; i < this.length; i++)
+    {
+      var remove = filterer( this[i] );
+      
+      if ( !remove )
+      {
+        this[alive++] = this[i];
+      }
+    }
+    
+    this.length = alive;
+    
+    return this;
   },
 
   /**
@@ -7530,16 +7530,16 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   stop                  : anim8.delegate( 'stop', anim8.delegate.RETURN_THIS ),
   end                   : anim8.delegate( 'end', anim8.delegate.RETURN_THIS ),
   finish                : anim8.delegate( 'finish', anim8.delegate.RETURN_THIS ),
-  pause 			          : anim8.delegate( 'pause', anim8.delegate.RETURN_THIS ),
-  resume 			          : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
+  pause                 : anim8.delegate( 'pause', anim8.delegate.RETURN_THIS ),
+  resume                 : anim8.delegate( 'resume', anim8.delegate.RETURN_THIS ),
   set                   : anim8.delegate( 'set', anim8.delegate.RETURN_THIS ),
   unset                 : anim8.delegate( 'unset', anim8.delegate.RETURN_THIS ),
   get                   : anim8.delegate( 'get', anim8.delegate.RETURN_FIRST ),
   hasAttrimators        : anim8.delegate( 'hasAttrimators', anim8.delegate.RETURN_TRUE ),
   invoke                : anim8.delegate( 'invoke', anim8.delegate.RETURN_THIS ),
-  on			              : anim8.delegate( 'on', anim8.delegate.RETURN_THIS ),
-  once		              : anim8.delegate( 'once', anim8.delegate.RETURN_THIS ),
-  off			              : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
+  on                    : anim8.delegate( 'on', anim8.delegate.RETURN_THIS ),
+  once                  : anim8.delegate( 'once', anim8.delegate.RETURN_THIS ),
+  off                    : anim8.delegate( 'off', anim8.delegate.RETURN_THIS ),
   trigger               : anim8.delegate( 'trigger', anim8.delegate.RETURN_THIS )
 
 });
@@ -7972,12 +7972,12 @@ anim8.parser = function(parser)
   {
     return parser;
   }
-	if ( anim8.isString( parser ) && parser in anim8.parser )
-	{
-		return anim8.parser[ parser ];
-	}
-	
-	return false;
+  if ( anim8.isString( parser ) && parser in anim8.parser )
+  {
+    return anim8.parser[ parser ];
+  }
+  
+  return false;
 };
 
 /**
@@ -8374,15 +8374,15 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
     // 3. Generate the attrimators
     
     var factory = anim8.factory( animation.factory );
-  	var deltas = animation.deltas;
-  	var values = animation.values;
+    var deltas = animation.deltas;
+    var values = animation.values;
 
     if ( !anim8.isDefined( deltas ) )
     {
       var valueCount = 0;
       
-  		for (var attr in values)
-  		{
+      for (var attr in values)
+      {
         valueCount++; 
       }
       
@@ -8393,33 +8393,33 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
         deltas[i] = i / (valueCount - 1);
       }
     }
-  	if ( anim8.isArray( deltas ) )
-  	{
-  		var deltaObject = {};
-  		
-  		for (var attr in values)
-  		{
-  			deltaObject[attr] = deltas;	
-  		}
-  		
-  		deltas = deltaObject;
-  	}
+    if ( anim8.isArray( deltas ) )
+    {
+      var deltaObject = {};
+      
+      for (var attr in values)
+      {
+        deltaObject[attr] = deltas;  
+      }
+      
+      deltas = deltaObject;
+    }
     
-  	for (var attr in values)
-  	{
-  		var value = values[ attr ];
+    for (var attr in values)
+    {
+      var value = values[ attr ];
       var attribute = factory.attribute( attr );
-  		
-  		for (var k = 0; k < value.length; k++)
-  		{
-  			value[k] = attribute.parse( value[k] );
-  		}
+      
+      for (var k = 0; k < value.length; k++)
+      {
+        value[k] = attribute.parse( value[k] );
+      }
 
       var path      = new anim8.DeltaPath( attr, attribute.calculator, values[ attr ], deltas[ attr ] );
       var event     = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   }
 });
 
@@ -8445,10 +8445,10 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
     // 1. Generate the attrimators, only caring about the delays and durations
     
     var factory = anim8.factory( animation.factory );
-  	var values = animation.final;
+    var values = animation.final;
     
-  	for (var attr in values)
-  	{
+    for (var attr in values)
+    {
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( values[ attr ] );
       var delay      = anim8.delay( helper.parseDelay( attr ) );
@@ -8459,7 +8459,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, scale, scaleBase, false, this );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   },
   merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
@@ -8506,10 +8506,10 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
     // 1. Generate the attrimators, only caring about the delays
     
     var factory    = anim8.factory( animation.factory );
-  	var values     = animation.initial;
+    var values     = animation.initial;
     
-  	for (var attr in values)
-  	{
+    for (var attr in values)
+    {
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( values[ attr ] ); 
       var delay      = helper.parseDelay( attr );
@@ -8519,7 +8519,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   },
   merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
@@ -8683,13 +8683,13 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
           pathEasings[attr] = [];
           attributes[attr] = factory.attribute( attr );
         }
-  			
+        
         deltas[attr].push( frame.order / maxTime );
         values[attr].push( attributes[ attr ].parse( frame.value[ attr ] ) );
         pathEasings[attr].push( anim8.easing( anim8.coalesce( easings[ attr ], easing ) ) );
       }
     }
-  	
+    
     // create events & paths
     for (var attr in deltas)
     {
@@ -8731,15 +8731,15 @@ anim8.override( anim8.ParserTweenTo.prototype = new anim8.Parser(),
     var factory    = anim8.factory( animation.factory );
     var tweenTo    = animation.tweenTo;
 
-  	for (var attr in tweenTo)
-  	{
+    for (var attr in tweenTo)
+    {
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( tweenTo[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, value );
       var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   }
 });
 
@@ -8767,15 +8767,15 @@ anim8.override( anim8.ParserTweenFrom.prototype = new anim8.Parser(),
     var factory    = anim8.factory( animation.factory );
     var tweenFrom  = animation.tweenFrom;
 
-  	for (var attr in tweenFrom)
-  	{
+    for (var attr in tweenFrom)
+    {
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( tweenFrom[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, value, anim8.computed.current );
       var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   }
 });
 
@@ -8803,15 +8803,15 @@ anim8.override( anim8.ParserMove.prototype = new anim8.Parser(),
     var factory    = anim8.factory( animation.factory );
     var move       = animation.move;
 
-  	for (var attr in move)
-  	{
+    for (var attr in move)
+    {
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( move[ attr ] );
       var path       = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, anim8.computed.relative( value ) );
       var event      = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
-  	}
+    }
   }
 });
 
@@ -8837,8 +8837,8 @@ anim8.override( anim8.ParseSpring.prototype = new anim8.Parser(),
     var factory    = anim8.factory( animation.factory );
     var springs    = animation.springs;
 
-  	for (var attr in springs)
-  	{
+    for (var attr in springs)
+    {
       var spring     = springs[ attr ];
 
       if ( !anim8.isDefined( spring.attribute ) )
@@ -8854,7 +8854,7 @@ anim8.override( anim8.ParseSpring.prototype = new anim8.Parser(),
 
         attrimatorMap.put( attr, parsed );  
       }
-  	}
+    }
   }
 });
 
@@ -8880,8 +8880,8 @@ anim8.override( anim8.ParsePhysics.prototype = new anim8.Parser(),
     var factory    = anim8.factory( animation.factory );
     var physics    = animation.physics;
 
-  	for (var attr in physics)
-  	{
+    for (var attr in physics)
+    {
       var physic    = physics[ attr ];
 
       var attrimator = new anim8.Physics(
@@ -8896,7 +8896,7 @@ anim8.override( anim8.ParsePhysics.prototype = new anim8.Parser(),
       );
 
       attrimatorMap.put( attr, attrimator );
-  	}
+    }
   }
 });
 
@@ -8972,8 +8972,8 @@ anim8.override( anim8.ParserTravel.prototype = new anim8.Parser(),
       return pointingFunction;
     };
 
-  	for (var attr in travel)
-  	{
+    for (var attr in travel)
+    {
       var traveling     = travel[ attr ];
       var attribute     = factory.attribute( attr );
       var from          = attribute.parse( anim8.coalesce( traveling.from, true ) );
@@ -9004,7 +9004,7 @@ anim8.override( anim8.ParserTravel.prototype = new anim8.Parser(),
       );
       
       attrimatorMap.put( attr, traveler );
-  	}
+    }
   }
 });
 
