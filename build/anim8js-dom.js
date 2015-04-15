@@ -6102,7 +6102,10 @@ anim8.fn = anim8.Animator.prototype =
    */
   applyInitialState: function()
   {
-    this.preupdate( anim8.now() );
+    var now = anim8.now();
+
+    this.preupdate( now );
+    this.update( now );
     this.apply();
     
     return this;
@@ -6702,7 +6705,7 @@ anim8.fn = anim8.Animator.prototype =
                 var inVelocity   = calc.sub( calc.clone( inNext ), inPoint );
                 var inPerMillis  = calc.length( inVelocity ) / transition.lookup;
 
-                var compiled = new anim8.CompiledPath( attr, path, transition.granularity );
+                var compiled = new anim8.PathCompiled( attr, path, transition.granularity );
                 var points = compiled.points;
                 var lastPoint = points.length - 1;
                 var totalDistance = 0;
@@ -6731,7 +6734,7 @@ anim8.fn = anim8.Animator.prototype =
                   }
                   deltas[ lastPoint ] = 1.0;
 
-                  path = new anim8.DeltaPath( attr, calc, points, deltas );
+                  path = new anim8.PathDelta( attr, calc, points, deltas );
                   transitionTime = requiredTime;
                 }
               }
@@ -8493,7 +8496,7 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
         value[k] = attribute.parse( value[k] );
       }
 
-      var path      = new anim8.DeltaPath( attr, attribute.calculator, values[ attr ], deltas[ attr ] );
+      var path      = new anim8.PathDelta( attr, attribute.calculator, values[ attr ], deltas[ attr ] );
       var event     = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
@@ -8533,7 +8536,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var duration   = anim8.duration( helper.parseDuration( attr ) );
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
-      var path       = new anim8.PointPath( attr, attribute.calculator, value );
+      var path       = new anim8.PathPoint( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 1, scale, scaleBase, false, this );
       
       attrimatorMap.put( attr, event );
@@ -8593,7 +8596,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var delay      = helper.parseDelay( attr );
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
-      var path       = new anim8.PointPath( attr, attribute.calculator, value );
+      var path       = new anim8.PathPoint( attr, attribute.calculator, value );
       var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 1, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
@@ -8777,7 +8780,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
       var repeat    = helper.parseRepeat( attr );
       var scale     = helper.parseScale( attr );
       var scaleBase = helper.parseScaleBase( attr );
-      var path      = new anim8.KeyframePath( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
+      var path      = new anim8.PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
       var event     = new anim8.Event( attr, path, duration, teasing, delay, sleep, repeat, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
