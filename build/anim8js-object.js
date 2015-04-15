@@ -2526,12 +2526,12 @@ anim8.Calculator.prototype =
 /**
  * A calculator for number primitives.
  */
-anim8.NumberCalculator = function()
+anim8.CalculatorNumber = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.CalculatorNumber.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -2640,18 +2640,18 @@ anim8.override( anim8.NumberCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculators.
  */
-anim8.calculator['default'] = anim8.calculator['number'] = new anim8.NumberCalculator();
+anim8.calculator['default'] = anim8.calculator['number'] = new anim8.CalculatorNumber();
 
 
 /*
  * A calculator for objects with an x and y component (number)
  */
-anim8.Point2dCalculator = function()
+anim8.Calculator2d = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.Calculator2d.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -2840,18 +2840,18 @@ anim8.override( anim8.Point2dCalculator.prototype = new anim8.Calculator(),
 /**
  * Register all calculators.
  */
-anim8.calculator['2d'] = new anim8.Point2dCalculator();
+anim8.calculator['2d'] = new anim8.Calculator2d();
 
 
 /**
  * A calculator for objects with an x, y, and z component (number)
  */
-anim8.Point3dCalculator = function()
+anim8.Calculator3d = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.Calculator3d.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -3015,7 +3015,7 @@ anim8.override( anim8.Point3dCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['3d'] = new anim8.Point3dCalculator();
+anim8.calculator['3d'] = new anim8.Calculator3d();
 
 
 /**
@@ -3214,12 +3214,12 @@ anim8.calculator['quaternion'] = new anim8.QuaternionCalculator();
 /**
  * A calculator for objects with r, g, & b components (numbers 0 -> 255)
  */
-anim8.RGBCalculator = function()
+anim8.CalculatorRGB = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.CalculatorRGB.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -3392,7 +3392,7 @@ anim8.override( anim8.RGBCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['rgb'] = new anim8.RGBCalculator();
+anim8.calculator['rgb'] = new anim8.CalculatorRGB();
 
 
 
@@ -3400,12 +3400,12 @@ anim8.calculator['rgb'] = new anim8.RGBCalculator();
  * A calculator for objects with r, g, & b components 
  * (numbers 0 -> 255) and an a (alpha) component (0.0 -> 1.0).
  */
-anim8.RGBACalculator = function()
+anim8.CalculatorRGBA = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.CalculatorRGBA.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -3594,7 +3594,7 @@ anim8.override( anim8.RGBACalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['rgba'] = new anim8.RGBACalculator();
+anim8.calculator['rgba'] = new anim8.CalculatorRGBA();
 
 
 /**
@@ -3824,7 +3824,7 @@ anim8.path['tween'] = function(path)
 
 
 /**
- * Instantiates a new CubicPath.
+ * Instantiates a new PathCubic.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
@@ -3833,12 +3833,12 @@ anim8.path['tween'] = function(path)
  * @param {T} p2
  * @param {T} p3
  */
-anim8.CubicPath = function(name, calculator, p0, p1, p2, p3)
+anim8.PathCubic = function(name, calculator, p0, p1, p2, p3)
 {
   this.reset( name, calculator, [p0, p1, p2, p3] );
 };
 
-anim8.override( anim8.CubicPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathCubic.prototype = new anim8.Path(),
 {
   compute: function(out, d1)
   {
@@ -3859,7 +3859,7 @@ anim8.override( anim8.CubicPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.CubicPath( this.name, this.calculator, this.points[0], this.points[1], this.points[2], this.points[3] );
+    return new anim8.PathCubic( this.name, this.calculator, this.points[0], this.points[1], this.points[2], this.points[3] );
   },
   isLinear: function()
   {
@@ -3871,13 +3871,13 @@ anim8.override( anim8.CubicPath.prototype = new anim8.Path(),
  * Parses an object for a cubic path.
  * 
  * @param {Object} path
- * @return {anim8.CubicPath}
+ * @return {anim8.PathCubic}
  */
 anim8.path['cubic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
-  return new anim8.CubicPath(
+  return new anim8.PathCubic(
     path.name,
     calc,
     calc.parse( path.p0 ),
@@ -3889,7 +3889,7 @@ anim8.path['cubic'] = function(path)
 
 
 /**
- * Instantiates a new QuadraticPath.
+ * Instantiates a new PathQuadratic.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
@@ -3897,12 +3897,12 @@ anim8.path['cubic'] = function(path)
  * @param {T} p1
  * @param {T} p2
  */
-anim8.QuadraticPath = function(name, calculator, p0, p1, p2)
+anim8.PathQuadratic = function(name, calculator, p0, p1, p2)
 {
   this.reset( name, calculator, [p0, p1, p2] );
 };
 
-anim8.override( anim8.QuadraticPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathQuadratic.prototype = new anim8.Path(),
 {
   compute: function(out, d1)
   {
@@ -3920,7 +3920,7 @@ anim8.override( anim8.QuadraticPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.QuadraticPath( this.name, this.calculator, this.points[0], this.points[1], this.points[2] );
+    return new anim8.PathQuadratic( this.name, this.calculator, this.points[0], this.points[1], this.points[2] );
   },
   isLinear: function()
   {
@@ -3933,13 +3933,13 @@ anim8.override( anim8.QuadraticPath.prototype = new anim8.Path(),
  * Parses an object for a quadratic path.
  * 
  * @param {Object} path
- * @return {anim8.QuadraticPath}
+ * @return {anim8.PathQuadratic}
  */
 anim8.path['quadratic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
-  return new anim8.QuadraticPath(
+  return new anim8.PathQuadratic(
     path.name,
     calc,
     calc.parse( path.p0 ),
@@ -3950,20 +3950,20 @@ anim8.path['quadratic'] = function(path)
 
 
 /**
- * Instantiates a new DeltaPath.
+ * Instantiates a new PathDelta.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
  * @param {Array} points
  * @param {Array} deltas
  */
-anim8.DeltaPath = function(name, calculator, points, deltas) 
+anim8.PathDelta = function(name, calculator, points, deltas) 
 {
   this.reset( name, calculator, points );
   this.deltas = deltas;
 };
 
-anim8.override( anim8.DeltaPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathDelta.prototype = new anim8.Path(),
 {
   compute: function(out, delta) 
   {
@@ -3981,7 +3981,7 @@ anim8.override( anim8.DeltaPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.DeltaPath( this.name, anim8.copy(this.points), anim8.copy(this.deltas), this.calculator );
+    return new anim8.PathDelta( this.name, anim8.copy(this.points), anim8.copy(this.deltas), this.calculator );
   }
 });
 
@@ -3989,7 +3989,7 @@ anim8.override( anim8.DeltaPath.prototype = new anim8.Path(),
  * Parses an object for a delta path.
  * 
  * @param {Object} path
- * @return {anim8.DeltaPath}
+ * @return {anim8.PathDelta}
  */
 anim8.path['delta'] = function(path)
 {
@@ -4010,7 +4010,7 @@ anim8.path['delta'] = function(path)
     path.points[ i ] = calc.parse( path.points[i] );
   }
   
-  return new anim8.DeltaPath(
+  return new anim8.PathDelta(
     path.name,
     calc,
     path.points,
@@ -4020,18 +4020,18 @@ anim8.path['delta'] = function(path)
 
 
 /**
- * Instantiates a new JumpPath.
+ * Instantiates a new PathJump.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
  * @param {Array} points
  */
-anim8.JumpPath = function(name, calculator, points)
+anim8.PathJump = function(name, calculator, points)
 {
   this.reset( name, calculator, points );
 };
 
-anim8.override( anim8.JumpPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathJump.prototype = new anim8.Path(),
 {
   compute: function(out, delta)
   {
@@ -4042,7 +4042,7 @@ anim8.override( anim8.JumpPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.JumpPath( this.name, this.calculator, anim8.copy(this.points) );
+    return new anim8.PathJump( this.name, this.calculator, anim8.copy(this.points) );
   }
 });
 
@@ -4050,7 +4050,7 @@ anim8.override( anim8.JumpPath.prototype = new anim8.Path(),
  * Parses an object for a jump path.
  * 
  * @param {Object} path
- * @return {anim8.JumpPath}
+ * @return {anim8.PathJump}
  */
 anim8.path['jump'] = function(path)
 {
@@ -4061,7 +4061,7 @@ anim8.path['jump'] = function(path)
     path.points[ i ] = calc.parse( path.points[i] );
   }
   
-  return new anim8.JumpPath(
+  return new anim8.PathJump(
     path.name, 
     calc,
     path.points
@@ -4071,13 +4071,13 @@ anim8.path['jump'] = function(path)
 
 
 /**
- * Instantiates a new CompiledPath.
+ * Instantiates a new PathCompiled.
  * 
  * @param {String|false} name
  * @param {anim8.Path} path
  * @param {Number} pointCount
  */
-anim8.CompiledPath = function(name, path, pointCount)
+anim8.PathCompiled = function(name, path, pointCount)
 {
   var calc = path.calculator;
   var points = [];
@@ -4090,7 +4090,7 @@ anim8.CompiledPath = function(name, path, pointCount)
   this.reset( name, calc, points );
 };
 
-anim8.override( anim8.CompiledPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathCompiled.prototype = new anim8.Path(),
 {
   compute: function(out, delta)
   {
@@ -4101,7 +4101,7 @@ anim8.override( anim8.CompiledPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.CompiledPath( this.name, this, this.points.length );
+    return new anim8.PathCompiled( this.name, this, this.points.length );
   }
 });
 
@@ -4109,11 +4109,11 @@ anim8.override( anim8.CompiledPath.prototype = new anim8.Path(),
  * Parses an object for a compiled path.
  * 
  * @param {Object} path
- * @return {anim8.CompiledPath}
+ * @return {anim8.PathCompiled}
  */
 anim8.path['compiled'] = function(path)
 {
-  return new anim8.CompiledPath(
+  return new anim8.PathCompiled(
     path.name,
     anim8.path( path.path ),
     path.pointCount
@@ -4122,7 +4122,7 @@ anim8.path['compiled'] = function(path)
 
 
 /**
- * Instantiates a new KeyframePath.
+ * Instantiates a new PathKeyframe.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
@@ -4130,14 +4130,14 @@ anim8.path['compiled'] = function(path)
  * @param {Array} deltas
  * @param {Array} easings
  */
-anim8.KeyframePath = function(name, calculator, points, deltas, easings) 
+anim8.PathKeyframe = function(name, calculator, points, deltas, easings) 
 {
   this.reset( name, calculator, points );
   this.deltas = deltas;
   this.easings = easings;
 };
 
-anim8.override( anim8.KeyframePath.prototype = new anim8.Path(),
+anim8.override( anim8.PathKeyframe.prototype = new anim8.Path(),
 {
   compute: function(out, delta) 
   {  
@@ -4165,7 +4165,7 @@ anim8.override( anim8.KeyframePath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.KeyframePath( this.name, this.calculator, anim8.copy(this.points), anim8.copy(this.deltas), anim8.copy(this.easings) );
+    return new anim8.PathKeyframe( this.name, this.calculator, anim8.copy(this.points), anim8.copy(this.deltas), anim8.copy(this.easings) );
   }
 });
 
@@ -4173,7 +4173,7 @@ anim8.override( anim8.KeyframePath.prototype = new anim8.Path(),
  * Parses an object for a keyframe path.
  * 
  * @param {Object} path
- * @return {anim8.KeyframePath}
+ * @return {anim8.PathKeyframe}
  */
 anim8.path['keyframe'] = function(point)
 {
@@ -4211,7 +4211,7 @@ anim8.path['keyframe'] = function(point)
     path.points[ i ] = calc.parse( path.points[i] );
   }
   
-  return new anim8.KeyframePath(
+  return new anim8.PathKeyframe(
     path.name,
     calc,
     path.points,
@@ -4222,18 +4222,18 @@ anim8.path['keyframe'] = function(point)
 
 
 /**
- * Instantiates a new PointPath.
+ * Instantiates a new PathPoint.
  * 
  * @param {String|false} name
  * @param {anim8.Calculator} calculator
  * @param {T} point
  */
-anim8.PointPath = function(name, calculator, point)
+anim8.PathPoint = function(name, calculator, point)
 {
   this.reset( name, calculator, [point] );
 };
 
-anim8.override( anim8.PointPath.prototype = new anim8.Path(),
+anim8.override( anim8.PathPoint.prototype = new anim8.Path(),
 {
   compute: function(out, delta)
   {
@@ -4241,7 +4241,7 @@ anim8.override( anim8.PointPath.prototype = new anim8.Path(),
   },
   copy: function() 
   {
-    return new anim8.PointPath( this.name, this.calculator, this.points[0] );
+    return new anim8.PathPoint( this.name, this.calculator, this.points[0] );
   }
 });
 
@@ -4250,13 +4250,13 @@ anim8.override( anim8.PointPath.prototype = new anim8.Path(),
  * Parses an object for a point path.
  * 
  * @param {Object} path
- * @return {anim8.PointPath}
+ * @return {anim8.PathPoint}
  */
 anim8.path['point'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
   
-  return new anim8.PointPath(
+  return new anim8.PathPoint(
     path.name,
     calc,
     calc.parse( path.point )
@@ -5155,7 +5155,7 @@ anim8.Spring.EPSILON = 0.0001;
 
 
 /**
- * Instantiates a new LinearSpring.
+ * Instantiates a new SpringLinear.
  * 
  * @param {String|false} attribute
  * @param {anim8.Calculator} calculator
@@ -5167,7 +5167,7 @@ anim8.Spring.EPSILON = 0.0001;
  * @param {T} gravity
  * @param {Boolean} finishOnRest
  */
-anim8.LinearSpring = function(attribute, calculator, position, rest, damping, stiffness, velocity, gravity, finishOnRest)
+anim8.SpringLinear = function(attribute, calculator, position, rest, damping, stiffness, velocity, gravity, finishOnRest)
 {
   this.set( attribute, calculator, rest, position, velocity, gravity, finishOnRest );
   
@@ -5177,7 +5177,7 @@ anim8.LinearSpring = function(attribute, calculator, position, rest, damping, st
   this.temp1        = null;
 };
 
-anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(), 
+anim8.override( anim8.SpringLinear.prototype = new anim8.Spring(), 
 {
   start: function(now, animator)
   {
@@ -5193,7 +5193,7 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
   },
   clone: function()
   {
-    return new anim8.LinearSpring( this.attribute, this.calculator, this.position, this.rest, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
+    return new anim8.SpringLinear( this.attribute, this.calculator, this.position, this.rest, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
   },
   hasComputed: function()
   {
@@ -5227,11 +5227,11 @@ anim8.override( anim8.LinearSpring.prototype = new anim8.Spring(),
  * Register the spring parser.
  * 
  * @param {Object}
- * @return {anim8.LinearSpring}
+ * @return {anim8.SpringLinear}
  */
 anim8.spring['linear'] = function(spring)
 { 
-  return new anim8.LinearSpring(
+  return new anim8.SpringLinear(
     spring.attribute,
     spring.calculator,
     anim8.coalesce( spring.position, true ),
@@ -5245,7 +5245,7 @@ anim8.spring['linear'] = function(spring)
 };
 
 /**
- * Instantiates a new DistanceSpring.
+ * Instantiates a new SpringDistance.
  * 
  * @param {String|false} attribute
  * @param {anim8.Calculator} calculator
@@ -5258,7 +5258,7 @@ anim8.spring['linear'] = function(spring)
  * @param {T} gravity
  * @param {Boolean} finishOnRest
  */
-anim8.DistanceSpring = function(attribute, calculator, position, rest, distance, damping, stiffness, velocity, gravity, finishOnRest)
+anim8.SpringDistance = function(attribute, calculator, position, rest, distance, damping, stiffness, velocity, gravity, finishOnRest)
 {
   this.set( attribute, calculator, rest, position, velocity, gravity, finishOnRest );
   
@@ -5268,7 +5268,7 @@ anim8.DistanceSpring = function(attribute, calculator, position, rest, distance,
   this.temp       = null;
 };
 
-anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(), 
+anim8.override( anim8.SpringDistance.prototype = new anim8.Spring(), 
 {
   start: function(now, animator)
   {
@@ -5278,7 +5278,7 @@ anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(),
   },
   clone: function()
   {
-    return new anim8.DistanceSpring( this.attribute, this.calculator, this.position, this.rest, this.distance, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
+    return new anim8.SpringDistance( this.attribute, this.calculator, this.position, this.rest, this.distance, this.damping, this.stiffness, this.velocity, this.gravity, this.finishOnRest );
   },
   updateVelocity: function(dt)
   {
@@ -5310,11 +5310,11 @@ anim8.override( anim8.DistanceSpring.prototype = new anim8.Spring(),
  * Register the spring parser.
  * 
  * @param {Object}
- * @return {anim8.LinearSpring}
+ * @return {anim8.SpringDistance}
  */
 anim8.spring['distance'] = function(spring)
 { 
-  return new anim8.DistanceSpring(
+  return new anim8.SpringDistance(
     spring.attribute,
     spring.calculator,
     anim8.coalesce( spring.position, true ),
@@ -6667,15 +6667,15 @@ anim8.fn = anim8.Animator.prototype =
             }
             else if ( p1 === false )
             {
-              path = new anim8.QuadraticPath( attr, calc, p0, p2, p3 );
+              path = new anim8.PathQuadratic( attr, calc, p0, p2, p3 );
             }
             else if ( p3 === false )
             {
-              path = new anim8.QuadraticPath( attr, calc, p0, p1, p2 );
+              path = new anim8.PathQuadratic( attr, calc, p0, p1, p2 );
             }
             else
             {
-              path = new anim8.CubicPath( attr, calc, p0, p1, p2, p3 );
+              path = new anim8.PathCubic( attr, calc, p0, p1, p2, p3 );
             }
             
             // If granularity is specified we will try to make the transition 
