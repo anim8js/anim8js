@@ -6094,6 +6094,19 @@ anim8.fn = anim8.Animator.prototype =
   { 
     return this;
   },
+
+  /**
+   * Applies the initial state of recently added attrimators immediately.
+   * 
+   * @return {this}
+   */
+  applyInitialState: function()
+  {
+    this.preupdate( anim8.now() );
+    this.apply();
+    
+    return this;
+  },
   
   /**
    * A method thats invoked along with all other animators before updates are 
@@ -6647,7 +6660,7 @@ anim8.fn = anim8.Animator.prototype =
               }
             }
 
-            // Build a path with as many as the points as possible.
+            // Build a path with as many of the points as possible.
             if ( p1 === false && p3 === false )
             {
               path = new anim8.Tween( attr, calc, p0, p2 );
@@ -6790,7 +6803,7 @@ anim8.fn = anim8.Animator.prototype =
    * Tweens a single attribute to a target value.
    *
    * @param {String} attr
-   * @param {any} target
+   * @param {T} target
    * @param {String|Array|Object} options
    * @return {this}
    * @see anim8.options
@@ -6841,9 +6854,9 @@ anim8.fn = anim8.Animator.prototype =
    * Tweens an attribute from a starting value to an ending value.
    *
    * @param {String} attr
-   * @param {any} starts
-   * @param {any} ends
-   * @param {Object} options
+   * @param {T} starts
+   * @param {T} ends
+   * @param {String|Array|Object} options
    * @return {this}
    * @see anim8.options
    */
@@ -6867,7 +6880,7 @@ anim8.fn = anim8.Animator.prototype =
    *
    * @param {Object} starts
    * @param {Object} ends
-   * @param {Object} options
+   * @param {String|Array|Object} options
    * @return {this}
    * @see anim8.options
    */
@@ -6882,6 +6895,59 @@ anim8.fn = anim8.Animator.prototype =
       var attribute = this.getAttribute( attr );
       var start     = attribute.parse( starts[ attr ] );
       var end       = attribute.parse( ends[ attr ] );
+      var path      = new anim8.Tween( attr, attribute.calculator, start, end );
+      var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
+      
+      event.cycle = this.cycleNext;
+      this.placeAttrimator( event );
+    }
+
+    return this.activate();
+  },
+
+  /**
+   * Moves an attribute relative to its current value.
+   * 
+   * @param {String} attr
+   * @param {T} amount
+   * @param {String|Array|Object} options
+   * @return {this}
+   */
+  move: function(attr, amount, options)
+  {
+    var options   = anim8.options( options );
+    var attribute = this.getAttribute( attr );
+    var relative  = attribute.parse( amount );
+    var start     = anim8.computed.current;
+    var end       = anim8.isComputed( relative ) ? relative : anim8.computed.relative( relative );
+    var path      = new anim8.Tween( attr, attribute.calculator, start, end );
+    var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
+    
+    this.newCycle( event );
+    this.placeAttrimator( event );
+
+    return this.activate();
+  },
+
+  /**
+   * Moves multiple attribute relative to their current value.
+   * 
+   * @param {Object} amounts
+   * @param {String|Array|Object} options
+   * @return {this}
+   */
+  moveMany: function(amounts, options)
+  {
+    var options = anim8.options( options );
+
+    this.newCycle();
+
+    for ( var attr in amounts )
+    {
+      var attribute = this.getAttribute( attr );
+      var relative  = attribute.parse( amounts[ attr ] );
+      var start     = anim8.computed.current;
+      var end       = anim8.isComputed( relative ) ? relative : anim8.computed.relative( relative );
       var path      = new anim8.Tween( attr, attribute.calculator, start, end );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
@@ -7309,7 +7375,8 @@ anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator,
   'activate', 'deactivate', 'destroy', 'spring', 'play', 'playAttrimators', 'queue',
   'queueAttrimators', 'transition', 'transitionAttrimators', 'tween', 'tweenTo', 
   'tweenMany', 'tweenManyTo', 'follow', 'stop', 'end', 'finish', 'pause', 'resume',
-  'set', 'unset', 'get', 'invoke', 'onCycleStart', 'onCycleEnd'
+  'set', 'unset', 'get', 'invoke', 'onCycleStart', 'onCycleEnd', 'move', 'moveMany',
+  'applyInitialState'
 ]);
 
 
@@ -7513,6 +7580,7 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
    */
   restore               : anim8.delegate( 'restore', anim8.delegate.RETURN_THIS ),
   placeAttrimator       : anim8.delegate( 'placeAttrimator', anim8.delegate.RETURN_THIS ),
+  applyInitialState     : anim8.delegate( 'applyInitialState', anim8.delegate.RETURN_THIS ),
   preupdate             : anim8.delegate( 'preupdate', anim8.delegate.RETURN_THIS ),
   update                : anim8.delegate( 'update', anim8.delegate.RETURN_THIS ),
   apply                 : anim8.delegate( 'apply', anim8.delegate.RETURN_THIS ),
@@ -7531,6 +7599,8 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   tweenTo               : anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS ),
   tweenMany             : anim8.delegate( 'tweenMany', anim8.delegate.RETURN_THIS ),
   tweenManyTo           : anim8.delegate( 'tweenManyTo', anim8.delegate.RETURN_THIS ),
+  move                  : anim8.delegate( 'move', anim8.delegate.RETURN_THIS ),
+  moveMany              : anim8.delegate( 'moveMany', anim8.delegate.RETURN_THIS ),
   follow                : anim8.delegate( 'follow', anim8.delegate.RETURN_THIS ),
   attrimatorsFor        : anim8.delegate( 'attrimatorsFor', anim8.delegate.RETURN_RESULTS ),
   stop                  : anim8.delegate( 'stop', anim8.delegate.RETURN_THIS ),

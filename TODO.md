@@ -74,3 +74,6 @@
 72. [ ] Pixi.js Plugin
 73. [X] Add anim8.pause() & anim8.resume() as shorthand for anim8.animating.pause/resume()
 74. [ ] Test in IE
+75. [X] Animator.move
+76. [X] Animator.applyInitialState
+77. [ ] transform DOM property get logic
