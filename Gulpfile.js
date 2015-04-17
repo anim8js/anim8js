@@ -78,6 +78,16 @@ var jquery =
   './plugins/anim8js-jquery.js'
 ];
 
+var easel =
+[
+  './plugins/anim8js-easel.js'
+];
+
+var pixi =
+[
+  './plugins/anim8js-pixi.js'
+];
+
 var builds = 
 {
   objects: 
@@ -106,7 +116,21 @@ var builds =
     filename: 'anim8js-jquery.js',
     minified: 'anim8js-jquery.min.js',
     output: './build/',
-    include: core.concat( dom, animatecss, jquery )
+    include: core.concat( dom, jquery )
+  },
+  easel:
+  {
+    filename: 'anim8js-easel.js',
+    minified: 'anim8js-easel.min.js',
+    output: './build/',
+    include: core.concat( easel )
+  },
+  pixi:
+  {
+    filename: 'anim8js-pixi.js',
+    minified: 'anim8js-pixi.min.js',
+    output: './build/',
+    include: core.concat( pixi )
   }
 };
 
@@ -139,12 +163,16 @@ gulp.task( 'js:objects:min',    executeMinifiedBuild( builds.objects ) );
 gulp.task( 'js:dom:min',        executeMinifiedBuild( builds.dom ) );
 gulp.task( 'js:animatecss:min', executeMinifiedBuild( builds.animatecss ) );
 gulp.task( 'js:jquery:min',     executeMinifiedBuild( builds.jquery ) );
+gulp.task( 'js:easel:min',      executeMinifiedBuild( builds.easel ) );
+gulp.task( 'js:pixi:min',       executeMinifiedBuild( builds.pixi ) );
 
 gulp.task( 'js:objects',        executeBuild( builds.objects ) );
 gulp.task( 'js:dom',            executeBuild( builds.dom ) );
 gulp.task( 'js:animatecss',     executeBuild( builds.animatecss ) );
 gulp.task( 'js:jquery',         executeBuild( builds.jquery ) );
+gulp.task( 'js:easel',          executeBuild( builds.easel ) );
+gulp.task( 'js:pixi',           executeBuild( builds.pixi ) );
 
-gulp.task( 'js:min', ['js:objects:min', 'js:dom:min', 'js:animatecss:min', 'js:jquery:min']);
-gulp.task( 'js', ['js:objects', 'js:dom', 'js:animatecss', 'js:jquery']);
+gulp.task( 'js:min', ['js:objects:min', 'js:dom:min', 'js:animatecss:min', 'js:jquery:min', 'js:easel:min', 'js:pixi:min']);
+gulp.task( 'js', ['js:objects', 'js:dom', 'js:animatecss', 'js:jquery', 'js:easel', 'js:pixi']);
 gulp.task( 'default', ['js:min', 'js'] );

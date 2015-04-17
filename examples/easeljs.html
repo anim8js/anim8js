@@ -32,20 +32,14 @@
     </div>
 
     <script src="../3rd/easeljs-0.8.0.min.js"></script>
-    <script src="../build/anim8js-object.js"></script>
+    <script src="../build/anim8js-easel.js"></script>
     <script>
 
-      function MouseX()
+      function Mouse()
       {
-        return MouseX.value;
+        return Mouse.Position;
       };
-      MouseX.value = 0;
-
-      function MouseY()
-      {
-        return MouseY.value;
-      };
-      MouseY.value = 0;
+      Mouse.Position = {x: 0, y: 0};
 
       function init() 
       {
@@ -60,39 +54,24 @@
 
         anim8( shape ).play({
           springs: {
-            x: {
+            position: {
               type: 'linear',
-              rest: MouseX,
-              damping: 2.5,
-              stiffness: -30
-            },
-            y: {
-              type: 'linear',
-              rest: MouseY,
+              rest: Mouse,
               damping: 2.5,
               stiffness: -30
             }
           }
         });
 
-        anim8( circle ).play({
-          keyframe: {
-            from: {
-              radius: 30,
-            },
-            to: {
-              radius: 50
-            }
-          }
-        }, 'infinite quad-yoyo');
-
+        anim8( circle ).tween('radius', 30, 50, 'infinite quad-yoyo');
+        
         anim8.on('end', stage.update, stage);
       }
 
       canvas.onmousemove = function(e)
       {
-        MouseX.value = e.pageX - container.offsetLeft - canvas.offsetLeft;
-        MouseY.value = e.pageY - container.offsetTop - canvas.offsetTop;
+        Mouse.Position.x = e.pageX - container.offsetLeft - canvas.offsetLeft;
+        Mouse.Position.y = e.pageY - container.offsetTop - canvas.offsetTop;
       };
 
     </script>

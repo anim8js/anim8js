@@ -70,10 +70,12 @@
 68. [X] Add spring parser
 69. [X] Add anim8.computed.random
 70. [X] Add travel parser which uses Physics to move to a target point at a constant velocity or acceleration
-71. [ ] EaselJS Plugin
-72. [ ] Pixi.js Plugin
+71. [X] EaselJS Plugin
+72. [X] Pixi.js Plugin
 73. [X] Add anim8.pause() & anim8.resume() as shorthand for anim8.animating.pause/resume()
 74. [ ] Test in IE
 75. [X] Animator.move
 76. [X] Animator.applyInitialState
 77. [ ] transform DOM property get logic
+78. [X] Add tweenFrom & tweenFromMany to Animator
+79. [X] Add easeType only parsing to anim8.easing

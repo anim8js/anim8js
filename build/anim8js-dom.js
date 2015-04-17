@@ -1241,6 +1241,10 @@ anim8.easing = function(easing, returnOnInvalid)
     {
       return anim8.easing[ easing ];
     }
+    if ( easing in anim8.easingType )
+    {
+      return anim8.easingType[ easing ]( anim8.easing( anim8.defaults.easing ) );
+    }
     
     if ( easing.indexOf('-') !== -1 )
     {
@@ -3021,12 +3025,12 @@ anim8.calculator['3d'] = new anim8.Calculator3d();
 /**
  * A calculator for objects with an x, y, z, and angle components.
  */
-anim8.QuaternionCalculator = function()
+anim8.CalculatorQuaternion = function()
 {
   this.createConstants();
 };
 
-anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(), 
+anim8.override( anim8.CalculatorQuaternion.prototype = new anim8.Calculator(), 
 {
   parse: function(x, defaultValue)
   {
@@ -3208,7 +3212,7 @@ anim8.override( anim8.QuaternionCalculator.prototype = new anim8.Calculator(),
 /**
  * Register the calculator.
  */
-anim8.calculator['quaternion'] = new anim8.QuaternionCalculator();
+anim8.calculator['quaternion'] = new anim8.CalculatorQuaternion();
 
 
 /**
@@ -6107,7 +6111,7 @@ anim8.fn = anim8.Animator.prototype =
     this.preupdate( now );
     this.update( now );
     this.apply();
-    
+
     return this;
   },
   
@@ -6826,7 +6830,7 @@ anim8.fn = anim8.Animator.prototype =
   },
 
   /**
-   * Tweens a multiple attributes to target values.
+   * Tweens multiple attributes to target values.
    *
    * @param {Object} targets
    * @param {String|Array|Object} options
@@ -6844,6 +6848,57 @@ anim8.fn = anim8.Animator.prototype =
       var attribute = this.getAttribute( attr );
       var end       = attribute.parse( targets[ attr ] );
       var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
+      var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
+      
+      event.cycle = this.cycleNext;
+      this.placeAttrimator( event );
+    }
+
+    return this.activate();
+  },
+
+  /**
+   * Tweens a single attribute from a starting value to the current value.
+   *
+   * @param {String} attr
+   * @param {T} starting
+   * @param {String|Array|Object} options
+   * @return {this}
+   * @see anim8.options
+   */
+  tweenFrom: function(attr, starting, options)
+  {
+    var options   = anim8.options( options );
+    var attribute = this.getAttribute( attr );
+    var start     = attribute.parse( starting );
+    var path      = new anim8.Tween( attr, attribute.calculator, start, anim8.computed.current );
+    var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
+    
+    this.newCycle( event );
+    this.placeAttrimator( event );
+    
+    return this.activate();
+  },
+
+  /**
+   * Tweens multiple attributes from starting values to the current values.
+   *
+   * @param {Object} startings
+   * @param {String|Array|Object} options
+   * @return {this}
+   * @see anim8.options
+   */
+  tweenManyFrom: function(startings, options)
+  {
+    var options = anim8.options( options );
+
+    this.newCycle();
+
+    for ( var attr in startings )
+    {
+      var attribute = this.getAttribute( attr );
+      var start     = attribute.parse( startings[ attr ] );
+      var path      = new anim8.Tween( attr, attribute.calculator, start, anim8.computed.current );
       var event     = new anim8.Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.repeat, options.scale, options.scaleBase );
       
       event.cycle = this.cycleNext;
@@ -7379,7 +7434,7 @@ anim8.DeferAnimator.prototype = new anim8.Defer( anim8.DeferAnimator,
   'queueAttrimators', 'transition', 'transitionAttrimators', 'tween', 'tweenTo', 
   'tweenMany', 'tweenManyTo', 'follow', 'stop', 'end', 'finish', 'pause', 'resume',
   'set', 'unset', 'get', 'invoke', 'onCycleStart', 'onCycleEnd', 'move', 'moveMany',
-  'applyInitialState'
+  'applyInitialState', 'tweenFrom', 'tweenManyFrom'
 ]);
 
 
@@ -7600,8 +7655,10 @@ anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
   transitionAttrimators : anim8.delegate( 'transitionAttrimators', anim8.delegate.RETURN_THIS ),
   tween                 : anim8.delegate( 'tween', anim8.delegate.RETURN_THIS ),
   tweenTo               : anim8.delegate( 'tweenTo', anim8.delegate.RETURN_THIS ),
+  tweenFrom             : anim8.delegate( 'tweenFrom', anim8.delegate.RETURN_THIS ),
   tweenMany             : anim8.delegate( 'tweenMany', anim8.delegate.RETURN_THIS ),
   tweenManyTo           : anim8.delegate( 'tweenManyTo', anim8.delegate.RETURN_THIS ),
+  tweenManyFrom         : anim8.delegate( 'tweenManyFrom', anim8.delegate.RETURN_THIS ),
   move                  : anim8.delegate( 'move', anim8.delegate.RETURN_THIS ),
   moveMany              : anim8.delegate( 'moveMany', anim8.delegate.RETURN_THIS ),
   follow                : anim8.delegate( 'follow', anim8.delegate.RETURN_THIS ),
@@ -9322,7 +9379,7 @@ anim8.object.attribute['default']                 = {defaultValue: 0};
 /**
  * A factory for HTML Elements
  */
-anim8.DomFactory = function()
+anim8.FactoryDom = function()
 {
   this.cached = {};
   this.ids = 0;
@@ -9331,7 +9388,7 @@ anim8.DomFactory = function()
   this.attributes = {};
 };
 
-anim8.override( anim8.DomFactory.prototype = new anim8.Factory(),
+anim8.override( anim8.FactoryDom.prototype = new anim8.Factory(),
 {
   
   /**
@@ -9357,7 +9414,7 @@ anim8.override( anim8.DomFactory.prototype = new anim8.Factory(),
     
     if (!(animatorId in this.cached)) 
     {
-      var animator = new anim8.DomAnimator( subject );
+      var animator = new anim8.AnimatorDom( subject );
       
       subject.setAttribute( this.elementAttribute, animatorId = animator.id = ++this.ids );
       
@@ -9423,7 +9480,7 @@ anim8.override( anim8.DomFactory.prototype = new anim8.Factory(),
 /**
  * Registers the DOM factory.
  */
-anim8.factory['default'] = anim8.factory['dom'] = new anim8.DomFactory();
+anim8.factory['default'] = anim8.factory['dom'] = new anim8.FactoryDom();
 
 /* TODO don't apply styles if they're impercivable (convert value to pixels of applicable) */
 
@@ -10577,16 +10634,16 @@ anim8.dom.attribute = function(attr)
     return anim8.dom.attribute[ attr ];
   }
   
-  return anim8.dom.attribute.default;
+  return anim8.dom.attribute['default'];
 };
 
 /**
  * The default attribute.
  */
-anim8.dom.attribute.default                 = {defaultValue: 0};
+anim8.dom.attribute['default']              = {defaultValue: 0};
 
 /**
- * All animatable attributes for DomAnimators & HTMLElements.
+ * All animatable attributes for AnimatorDoms & HTMLElements.
  */
 
 anim8.dom.attribute.padding                 = {defaultValue: 0, defaultUnit: 'px'};
@@ -10689,13 +10746,13 @@ anim8.dom.attribute.outlineColor            = {defaultValue: anim8.color(), calc
 
 
 /**
- * Instantiates a new DomAnimator given a subject.
+ * Instantiates a new AnimatorDom given a subject.
  * 
  * @param {HTMLElement} e
  */
-anim8.DomAnimator = function(e)
+anim8.AnimatorDom = function(subject)
 {
-  this.reset( e );
+  this.reset( subject );
   this.properties = new anim8.FastMap();
   this.propertiesPreset = new anim8.FastMap();
   this.attributeToProperty = {};
@@ -10710,7 +10767,7 @@ anim8.DomAnimator = function(e)
 /**
  * Extends anim8.Animator
  */
-anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
+anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
 {
   preupdate: function(now)
   {
@@ -10766,7 +10823,7 @@ anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
   },
   update: function(now)
   {
-    anim8.Animator.prototype.update.apply( this, arguments );
+    anim8.fn.update.apply( this, arguments );
       
     this.getStyles();
     this.stylesUpdated = true;
@@ -10823,7 +10880,7 @@ anim8.override( anim8.DomAnimator.prototype = new anim8.Animator(),
   },
   placeAttrimator: function( attrimator )
   {
-    anim8.Animator.prototype.placeAttrimator.apply( this, arguments );
+    anim8.fn.placeAttrimator.apply( this, arguments );
     
     var attr = attrimator.attribute;
     var attribute = this.getAttribute( attr );
