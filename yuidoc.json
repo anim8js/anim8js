@@ -1,0 +1,14 @@
+{
+    "name": "anim8js",
+    "description": "anim8js: The Javascript Animation Library",
+    "version": "0.1.0",
+    "url": "http://anim8js.io/",
+    "options": {
+        "linkNatives": "true",
+        "paths": [
+          "./lib",
+          "./plugins"
+        ],
+        "outdir": "./apidocs"
+    }
+}
