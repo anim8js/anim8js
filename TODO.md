@@ -79,3 +79,7 @@
 77. [ ] transform DOM property get logic
 78. [X] Add tweenFrom & tweenFromMany to Animator
 79. [X] Add easeType only parsing to anim8.easing
+80. [X] Add nopeat to Animator & Attrimator
+81. [X] Add & operator to anim8.animation parser which combines generated attrimators into single attrimator map
+82. [X] Add @ operator to anim8.animation parser which defines an offset into the animation
+83. [X] Add array parsing to calculator
