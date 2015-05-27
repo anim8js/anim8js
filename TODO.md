@@ -76,7 +76,7 @@
 74. [ ] Test in IE
 75. [X] Animator.move
 76. [X] Animator.applyInitialState
-77. [ ] transform DOM property get logic
+77. [X] transform DOM property get logic
 78. [X] Add tweenFrom & tweenFromMany to Animator
 79. [X] Add easeType only parsing to anim8.easing
 80. [X] Add nopeat to Animator & Attrimator

@@ -12361,6 +12361,57 @@ anim8.dom.property.transform = (function()
   {
     return attr + '(' + value.x + ',' + value.y + ',' + value.z + ',' + value.angle + unit + ')';
   };
+  var combine = function(ax, ay, bx, by, ascl, bscl)
+  {
+    return {
+      x: (ascl * ax) + (bscl * bx),
+      y: (ascl * ay) + (bscl * by)
+    };
+  };
+  var place1d = function(anim, e, attr, value, relativeTo)
+  {
+    if ( anim.animating[ attr ] === false )
+    {
+      anim.frame[ attr ] = anim8.dom.convert( e, value, anim.units[ attr ], relativeTo );
+      anim.animating[ attr ] = true;
+    }
+  };
+  var place2d = function(anim, e, attr, valueX, valueY, relativeToX, relativeToY)
+  {
+    if ( anim.animating[ attr ] === false )
+    {
+      anim.frame[ attr ] = {
+        x: anim8.dom.convert( e, valueX, anim.units[ attr ], relativeToX ),
+        y: anim8.dom.convert( e, valueY, anim.units[ attr ], relativeToY )
+      };
+      anim.animating[ attr ] = true;
+    }
+  };
+  var place3d = function(anim, e, attr, valueX, valueY, valueZ, relativeToX, relativeToY, relativeToZ)
+  {
+    if ( anim.animating[ attr ] === false )
+    {
+      anim.frame[ attr ] = {
+        x: anim8.dom.convert( e, valueX, anim.units[ attr ], relativeToX ),
+        y: anim8.dom.convert( e, valueY, anim.units[ attr ], relativeToY ),
+        z: anim8.dom.convert( e, valueZ, anim.units[ attr ], relativeToZ )
+      };
+      anim.animating[ attr ] = true;
+    }
+  };
+  var place4d = function(anim, e, attr, valueX, valueY, valueZ, valueRotate, relativeToX, relativeToY, relativeToZ, relativeToRotate)
+  {
+    if ( anim.animating[ attr ] === false )
+    {
+      anim.frame[ attr ] = {
+        x: anim8.dom.convert( e, valueX, anim.units[ attr ], relativeToX ),
+        y: anim8.dom.convert( e, valueY, anim.units[ attr ], relativeToY ),
+        z: anim8.dom.convert( e, valueZ, anim.units[ attr ], relativeToZ ),
+        angle: anim8.dom.convert( e, valueRotate, anim.units[ attr ], relativeToRotate )
+      };
+      anim.animating[ attr ] = true;
+    }
+  };
     
   var regexes = 
   {
@@ -12375,14 +12426,16 @@ anim8.dom.property.transform = (function()
     scaleY:       /scaleY\(([^\)]+)\)/i,
     scaleZ:       /scaleZ\(([^\)]+)\)/i,
     rotate:       /rotate\(([^\)]+)\)/i,
+    skew:         /skew\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    skewX:        /skewX\(([^\)]+)\)/i,
+    skewY:        /skewY\(([^\)]+)\)/i,
     rotate3d:     /rotate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
     rotateX:      /rotateX\(([^\)]+)\)/i,
     rotateY:      /rotateY\(([^\)]+)\)/i,
-    rotateZ:      /rotateZ\(([^\)]+)\)/i,
-    skew:         /skew\(([^,]+)\s*,\s*([^\)]+)\)/i,
-    skewX:        /skewX\(([^\)]+)\)/i,
-    skewY:        /skewY\(([^\)]+)\)/i
+    rotateZ:      /rotateZ\(([^\)]+)\)/i
   };
+
+  var matrix = /matrix\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\)/i;
 
   var getters = 
   {
@@ -12447,6 +12500,70 @@ anim8.dom.property.transform = (function()
     get: function(e, anim) 
     {
       var style = anim8.dom.style( e, css );
+
+      var matrixParsed = matrix.exec( style );
+
+      if ( matrixParsed )
+      {
+        var a = parseFloat( matrixParsed[ 1 ] );
+        var b = parseFloat( matrixParsed[ 2 ] );
+        var c = parseFloat( matrixParsed[ 3 ] );
+        var d = parseFloat( matrixParsed[ 4 ] );
+        var tx = parseFloat( matrixParsed[ 5 ] );
+        var ty = parseFloat( matrixParsed[ 6 ] );
+
+        // Make sure the matrix is invertible
+        if ((a * d - b * c) !== 0)
+        {
+          // Take care of translation
+          var translateX = tx + 'px';
+          var translateY = ty + 'px';
+
+          // Compute X scale factor and normalize first row.
+          var scaleX = Math.sqrt( a * a + b * b );
+          if ( scaleX !== 0 )
+          {
+            a /= scaleX;
+            b /= scaleX;
+          }
+
+          // Compute shear factor and make 2nd row orthogonal to 1st.
+          var skew = a * c + b * d;
+          var combined = combine( c, d, a, b, 1.0, -skew );
+          c = combined.x;
+          d = combined.y;
+
+          // Now, compute Y scale and normalize 2nd row.
+          var scaleY = Math.sqrt( c * c + d * d );
+          if ( scaleY !== 0 )
+          {
+            c /= scaleY;
+            d /= scaleY;
+            skew /= scaleY; 
+          }
+
+          // Now, get the rotation out
+          var rotate = Math.atan2( b, a ) + 'rad';
+
+          // Place values in animator.
+          place2d( anim, e, 'translate', translateX, translateY, 'width', 'height' );
+          place3d( anim, e, 'translate3d', translateX, translateY, 0, 'width', 'height' );
+          place1d( anim, e, 'translateX', translateX, 'width' );
+          place1d( anim, e, 'translateY', translateY, 'height' );
+          place2d( anim, e, 'scale', scaleX, scaleY );
+          place1d( anim, e, 'scaleX', scaleX );
+          place1d( anim, e, 'scaleY', scaleY );
+          place3d( anim, e, 'scale3d', scaleX, scaleY, 1 );
+          place1d( anim, e, 'rotate', rotate );
+          place4d( anim, e, 'rotate3d', 0, 0, 1, rotate );
+          place1d( anim, e, 'rotateZ', rotate );
+          place2d( anim, e, 'skew', skew, skew );
+          place1d( anim, e, 'skewX', skew );
+          place1d( anim, e, 'skewY', skew );
+
+          return;
+        }
+      }
       
       for (var attr in anim.animating) 
       {
@@ -12468,7 +12585,7 @@ anim8.dom.property.transform = (function()
     {      
       var transforms = [];
       
-      for (var i = 0; i < regex.length; i++) 
+      for (var i = 0; i < attrs.length; i++) 
       {
         var attr = attrs[ i ];
 

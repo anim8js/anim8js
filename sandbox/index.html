@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+    <link rel="stylesheet" href="https://highlightjs.org//static/styles/monokai_sublime.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    
+    <!-- Semantic.UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.6/semantic.min.css">
+
+  <!--
+  <link rel="stylesheet" href="   ">
+  <script src="   "></script>
+  -->
+
+  </head>
+  <body>
+
+<div class="ui two column centered grid">
+  <div class="column">
+
+<!--
+<div class="ui existing secondary segment"><pre><code class="code hljs xml">&lt;div class=&quot;ui rail&quot;&gt;
+  &lt;div class=&quot;ui sticky&quot;&gt;
+    &lt;!- - Any arbitrary content !- -&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&quot;context&quot;&gt;
+  &lt;!- - Long flowing text content !- -&gt;
+&lt;/div&gt;
+</code></pre></div>
+-->
+
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <div class="ui segment">
+        <div class="ui left rail">
+          <div class="ui segment">
+            Left Rail Content
+          </div>
+        </div>
+        <p>
+          Anim8js is the ultimate Javascript Animation Library
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="column">
+      <h1>Animation Sequences</h1>
+      <div class="ui visible negative message"><!--positive info warning negative -->
+        <div class="header">
+          You are eligible for a reward
+        </div>
+        <p>You can always see me</p>
+      </div>
+      <div class="ui pointing menu">
+        <a class="active item blue" data-tab="js">Javascript</a>
+        <a class="item purple" data-tab="html">HTML</a>
+      </div>
+      <div class="ui active tab segment" data-tab="js">
+        <pre><code class="javascript hljs monokai_sublime">$('#letters').sequence().animators().sequence(0.5, 'linear').play('tada');</code></pre>
+      </div>
+      <div class="ui tab segment" data-tab="html">
+        HTML
+      </div>
+    </div>
+  </div>
+
+</div>
+  
+  <style>
+  .ui.pointing.menu {
+    margin-bottom: 0;
+  }
+  .ui.tab.segment {
+    margin-top: 0;
+    padding: 10px;
+  }
+  .ui.tab.segment pre {
+    margin: 0;
+  }
+  </style>
+  <script>
+    $('.menu .item')
+      .tab()
+    ;
+  </script>
+
+  </body>
+</html>
