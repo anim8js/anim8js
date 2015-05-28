@@ -246,7 +246,7 @@ anim8.factory['jquery'] = new anim8.jQueryFactory();
       if (this.nodeType === 3)
       {
         // Break up node wrapping each character
-        var text = this.wholeText;
+        var text = this.data;
 
         if (text.length > 1)
         {

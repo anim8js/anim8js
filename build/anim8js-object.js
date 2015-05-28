@@ -264,7 +264,17 @@ anim8.defaults =
    * @for anim8.defaults
    * @default {}
    */
-  noTransition: {}
+  noTransition: {},
+
+  /**
+   * The target number of milliseconds between frames. This only applies if the
+   * browser doesn't support any of the requestAnimationFrame variations.
+   * 
+   * @property {Number} frameRate
+   * @for anim8.defaults
+   * @default 33
+   */
+  frameRate: 33
 
 };
 
@@ -2037,7 +2047,7 @@ anim8.easingType = function(easingType, optional)
  * @param {Function} easing
  * @return {Function}
  */
-anim8.easingType.in = function(easing) 
+anim8.easingType['in'] = function(easing) 
 {
   return function(x) 
   {
@@ -9652,7 +9662,7 @@ anim8.requestRun = (function()
     return function(callback)
     {
       var now = anim8.now();
-      var timeToCall = Math.max( 0, 16 - (now - lastTime) );
+      var timeToCall = Math.max( 1, anim8.defaults.frameRate - (now - lastTime) );
       var id = window.setTimeout( function() { callback( now + timeToCall ); }, timeToCall );
       lastTime = now + timeToCall;
       return id;
@@ -10650,7 +10660,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PathPoint( attr, attribute.calculator, value );
-      var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 0, 1, scale, scaleBase, false, this );
+      var event      = new anim8.Event( attr, path, 0, anim8.easing(), delay + duration, 0, 0, 1, scale, scaleBase, false, this );
       
       attrimatorMap.put( attr, event );
     }
@@ -10714,7 +10724,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PathPoint( attr, attribute.calculator, value );
-      var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 0, 1, scale, scaleBase, true, this );
+      var event      = new anim8.Event( attr, path, 0, anim8.easing(), delay, 0, 0, 1, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
     }
@@ -11312,7 +11322,7 @@ anim8.factory = function(factory)
     return anim8.factory[ factory ];
   }
 
-  return anim8.factory.default;
+  return anim8.factory['default'];
 };
 
 /**
@@ -11496,7 +11506,7 @@ anim8.object.attribute = function(attr)
     return anim8.object.attribute[ attr ];
   }
   
-  return anim8.object.attribute.default;
+  return anim8.object.attribute['default'];
 };
 
 /**

@@ -20,30 +20,25 @@
   <body>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
-
-      var MousePosition = function() 
-      {
-        return {
-          x: MousePosition.x,
-          y: MousePosition.y
-        }
-      };
-      MousePosition.x = 0;
-      MousePosition.y = 0;
 
       var GetDimensions = function()
       {
         return {
-          x: window.innerWidth,
-          y: window.innerHeight
+          x: windowWidth(),
+          y: windowHeight()
         };
       };
 
       anim8.save('toMouseConstant', {
         travel: {
-          translate: {
+          center: {
             from: anim8.computed.random({min:0, max: GetDimensions}),
             to: MousePosition,
             velocity: 200,
@@ -54,7 +49,7 @@
 
       anim8.save('toMouseAccel', {
         travel: {
-          translate: {
+          center: {
             from: anim8.computed.random({min: 0, max: GetDimensions}),
             to: MousePosition,
             acceleration: 10000,
@@ -81,21 +76,15 @@
         }
       });
 
-      window.onmousemove = window.ontouchmove = function(e)
-      {
-        MousePosition.x = e.pageX || e.changedTouches[0].pageX;
-        MousePosition.y = e.pageY || e.changedTouches[0].pageY;
-      };
-
-      window.onclick = window.ondblclick = function(e)
+      var addTraveler = function(mouse, ev, type)
       {
         var bullet = document.createElement('div');
-        bullet.classList.add('box');
+        bullet.className = 'box';
         document.body.appendChild( bullet );
 
         var animator = m8( bullet );
 
-        animator.play( e.type === 'click' ? 'toMouseConstant' : 'toMouseAccel' )
+        animator.play( ev.type === 'click' ? 'toMouseConstant' : 'toMouseAccel' )
         animator.onCycleEnd(function() {
           this.play( 'explode 0.5s' );
           this.onCycleEnd(function() {
@@ -104,6 +93,9 @@
           })
         });
       };
+
+      $listen( document, 'click', addTraveler );
+      $listen( document, 'dblclick', addTraveler );
       
     </script>
     

@@ -33,13 +33,18 @@
 
     <script src="../3rd/pixi.js"></script>
     <script src="../build/anim8js-pixi.js"></script>
+    <script src="examples.js"></script>
+  
     <script>
 
       function Mouse()
       {
-        return Mouse.Position;
+        return {
+          x: Mouse.x,
+          y: Mouse.y
+        };
       };
-      Mouse.Position = {x: 0, y: 0};
+      Mouse.x = Mouse.y = 0;
 
       function init() 
       {
@@ -50,11 +55,14 @@
         var renderer = PIXI.autoDetectRenderer(viewWidth, viewHeight, null, false, true);
         renderer.view.className = "rendererView";
         renderer.view.id = 'canvas';
-        renderer.view.onmousemove = function(e)
+
+        $listen( renderer.view, 'mousemove', function(mouse, ev)
         {
-          Mouse.Position.x = e.pageX - container.offsetLeft - canvas.offsetLeft;
-          Mouse.Position.y = e.pageY - container.offsetTop - canvas.offsetTop;
-        };
+          var offset = getOffsetMouse( ev );
+
+          Mouse.x = offset.x;
+          Mouse.y = offset.y;
+        });
 
         // add render view to DOM
         container.appendChild( renderer.view );

@@ -20,6 +20,11 @@
     <div id="box1"></div>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
       
@@ -69,10 +74,8 @@
 
       var anim8or = m8( window.box1 );
 
-      document.onkeydown = function(e)
+      $listen( document, 'keydown', function(mouse, ev)
       {
-        var ev = window.event || e;
-
         if ( ev.keyCode === 37 ) anim8or.queue('moveLeft linear 250');
         if ( ev.keyCode === 38 ) anim8or.queue('moveUp linear 250');
         if ( ev.keyCode === 39 ) anim8or.queue('moveRight linear 250');
@@ -83,7 +86,7 @@
           anim8or.onCycleStart( cycleStart );
           anim8or.onCycleEnd( cycleEnd ); 
         }
-      };
+      });
       
     </script>
     

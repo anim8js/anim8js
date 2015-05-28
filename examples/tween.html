@@ -22,24 +22,22 @@
     <div id="box"></div>
 		
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
 		
     <script>
       
-      var anim8or = m8( window.box );
-      
-      window.onclick = function(e)
+      var updateAnimation = function(mouse)
       {
-        anim8or.tween( 'center', {x: e.x, y: e.y}, getRandomPoint() );
+        m8( window.box ).tween( 'center', mouse, getRandomPoint() );
       };
+
+      $listen( document, 'click', updateAnimation );
+      $listen( document, 'touchstart', updateAnimation );
       
-      function getRandomPoint()
-      {
-        return {
-          x: Math.random() * (window.innerWidth - 100) + 50,
-          y: Math.random() * (window.innerHeight - 100) + 50
-        };
-      }
-            
     </script>
     
   </body>

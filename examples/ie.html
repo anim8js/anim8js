@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #box1,
+    #box1_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      left: 100px;
+      top: 100px;
+      position: absolute;
+      background-color: #66F;
+    }
+    #box1_original {
+      background-color: #99F; 
+    }
+    #box2,
+    #box2_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #0F0;
+      left: 300px;
+      top: 100px;
+      position: absolute;
+      background-color: #6F6;
+    }
+    #box2_original {
+      background-color: #9F9; 
+    }
+    #box3,
+    #box3_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #F00;
+      left: 500px;
+      top: 100px;
+      position: absolute;
+      background-color: #F66;
+    }
+    #box3_original {
+      background-color: #F99; 
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1_original"></div>
+    <div id="box1"></div>
+    
+    <div id="box2_original"></div>
+    <div id="box2"></div>
+    
+    <div id="box3_original"></div>
+    <div id="box3"></div>
+   
+    <script src="../build/anim8js-dom.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+    
+    <script>
+    
+      anim8.save('rotate', {
+        keyframe: {
+          from: {
+            rotate: 0
+          },
+          to: {
+            rotate: 360
+          }
+        }
+      }, {
+        easing: 'linear'
+      });
+
+      anim8.save('grow', {
+        keyframe: {
+          '0,100': {
+            scale: 1,
+            opacity: 0.5
+          },
+          '25': {
+            scale: 0.5
+          },
+          '75': {
+            scale: 1.5
+          }
+        }
+      }, {
+        easing: 'linear'
+      });
+
+      m8( window.box1 ).play( 'rotate 4s' );
+
+      m8( window.box2 ).play( 'grow 4s' );
+
+      m8( window.box3 ).play( 'grow 4s & rotate 4s' );
+      
+    </script>
+    
+  </body>
+</html>

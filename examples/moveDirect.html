@@ -21,20 +21,23 @@
     <div id="box1"></div>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
 
       var anim8or = m8( window.box1 );
 
-      document.onkeydown = function(e)
+      $listen( document, 'keydown', function(mouse, ev)
       {
-        var ev = window.event || e;
-
         if ( ev.keyCode === 37 ) anim8or.move('rotate', 90);
         if ( ev.keyCode === 38 ) anim8or.move('rotate', -90);
         if ( ev.keyCode === 39 ) anim8or.move('left', 100);
         if ( ev.keyCode === 40 ) anim8or.move('left', -100);
-      };
+      });
       
     </script>
     

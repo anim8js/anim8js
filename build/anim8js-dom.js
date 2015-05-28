@@ -264,7 +264,17 @@ anim8.defaults =
    * @for anim8.defaults
    * @default {}
    */
-  noTransition: {}
+  noTransition: {},
+
+  /**
+   * The target number of milliseconds between frames. This only applies if the
+   * browser doesn't support any of the requestAnimationFrame variations.
+   * 
+   * @property {Number} frameRate
+   * @for anim8.defaults
+   * @default 33
+   */
+  frameRate: 33
 
 };
 
@@ -2037,7 +2047,7 @@ anim8.easingType = function(easingType, optional)
  * @param {Function} easing
  * @return {Function}
  */
-anim8.easingType.in = function(easing) 
+anim8.easingType['in'] = function(easing) 
 {
   return function(x) 
   {
@@ -9652,7 +9662,7 @@ anim8.requestRun = (function()
     return function(callback)
     {
       var now = anim8.now();
-      var timeToCall = Math.max( 0, 16 - (now - lastTime) );
+      var timeToCall = Math.max( 1, anim8.defaults.frameRate - (now - lastTime) );
       var id = window.setTimeout( function() { callback( now + timeToCall ); }, timeToCall );
       lastTime = now + timeToCall;
       return id;
@@ -10650,7 +10660,7 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PathPoint( attr, attribute.calculator, value );
-      var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay + duration, 0, 0, 1, scale, scaleBase, false, this );
+      var event      = new anim8.Event( attr, path, 0, anim8.easing(), delay + duration, 0, 0, 1, scale, scaleBase, false, this );
       
       attrimatorMap.put( attr, event );
     }
@@ -10714,7 +10724,7 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var scale      = helper.parseScale( attr );
       var scaleBase  = helper.parseScaleBase( attr );
       var path       = new anim8.PathPoint( attr, attribute.calculator, value );
-      var event      = new anim8.Event( attr, path, 0, anim8.easing.default, delay, 0, 0, 1, scale, scaleBase, true, this );
+      var event      = new anim8.Event( attr, path, 0, anim8.easing(), delay, 0, 0, 1, scale, scaleBase, true, this );
       
       attrimatorMap.put( attr, event );
     }
@@ -11312,7 +11322,7 @@ anim8.factory = function(factory)
     return anim8.factory[ factory ];
   }
 
-  return anim8.factory.default;
+  return anim8.factory['default'];
 };
 
 /**
@@ -11496,7 +11506,7 @@ anim8.object.attribute = function(attr)
     return anim8.object.attribute[ attr ];
   }
   
-  return anim8.object.attribute.default;
+  return anim8.object.attribute['default'];
 };
 
 /**
@@ -11763,16 +11773,23 @@ anim8.dom.convert = (function()
    * For Example: anim8.toPixels( 100, 'in' ) 
    *    returns how many pixels are in 1 inch, with up to 2 decimal points of accuracy.
    */
-  var toPixels = function(baseValue, baseUnit, defaultRate)
+  var toPixels = function(baseValue, baseUnit, defaultRate, approximate)
   {
     if ( document.body )
     {
-      var div = document.createElement('div');
-      document.body.appendChild( div );
-      div.style.width = baseValue + baseUnit;
-      var pixels = (div.offsetWidth / baseValue);
-      document.body.removeChild( div );
-      return pixels || defaultRate;
+      try
+      {
+        var div = document.createElement('div');
+        document.body.appendChild( div );
+        div.style.width = baseValue + baseUnit;
+        var pixels = (div.offsetWidth / baseValue);
+        document.body.removeChild( div );
+        return pixels || defaultRate; 
+      }
+      catch (e)
+      {
+        return approximate;
+      }
     }
     
     return defaultRate;
@@ -11831,14 +11848,14 @@ anim8.dom.convert = (function()
   
   var conversions = {};
   
-  conversions.pt  = { px: toPixels(100, 'pt') };
-  conversions.in  = { px: toPixels(100, 'in') };
-  conversions.cm  = { px: toPixels(1000, 'cm') };
-  conversions.mm  = { px: toPixels(100000, 'mm') };
-  conversions.vw  = { px: toPixels(1000, 'vw') };
-  conversions.deg = { rad: Math.PI / 180.0};
+  conversions['pt']  = { px: toPixels(100, 'pt') };
+  conversions['in']  = { px: toPixels(100, 'in') };
+  conversions['cm']  = { px: toPixels(1000, 'cm') };
+  conversions['mm']  = { px: toPixels(100000, 'mm') };
+  conversions['vw']  = { px: toPixels(1000, 'vw') };
+  conversions['deg'] = { rad: Math.PI / 180.0};
 
-  conversions.em = 
+  conversions['em'] = 
   {
     px: function(e, relativeTo) 
     {
@@ -11846,7 +11863,7 @@ anim8.dom.convert = (function()
     }
   };
   
-  conversions.rem = 
+  conversions['rem'] = 
   {
     px: function(e, relativeTo) 
     {
@@ -12779,7 +12796,7 @@ anim8.dom.property.center =
   {
     var rw = anim.cached.width * 0.5;
     var rh = anim.cached.height * 0.5;
-        
+    
     if ( anim.updated.center )
     {
       anim.styles.left = (anim.frame.center.x - rw) + anim.units.center;

@@ -33,13 +33,18 @@
 
     <script src="../3rd/easeljs-0.8.0.min.js"></script>
     <script src="../build/anim8js-easel.js"></script>
+    <script src="examples.js"></script>
+    
     <script>
 
       function Mouse()
       {
-        return Mouse.Position;
-      };
-      Mouse.Position = {x: 0, y: 0};
+        return {
+          x: Mouse.x,
+          y: Mouse.y
+        };
+      }
+      Mouse.x = Mouse.y = 0;
 
       function init() 
       {
@@ -53,7 +58,7 @@
         stage.addChild(shape);
 
         anim8( shape ).play({
-          springs: {
+          springs: {   
             position: {
               type: 'linear',
               rest: Mouse,
@@ -68,11 +73,13 @@
         anim8.on('end', stage.update, stage);
       }
 
-      canvas.onmousemove = function(e)
+      $listen( window.canvas, 'mousemove', function(mouse, ev)
       {
-        Mouse.Position.x = e.pageX - container.offsetLeft - canvas.offsetLeft;
-        Mouse.Position.y = e.pageY - container.offsetTop - canvas.offsetTop;
-      };
+        var offset = getOffsetMouse( ev );
+
+        Mouse.x = offset.x;
+        Mouse.y = offset.y;
+      });
 
     </script>
   </body>

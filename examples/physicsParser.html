@@ -8,6 +8,7 @@
       width: 100%;
       height: 100%;
       background-color: #222;
+      overflow: hidden;
     }
     .box {
       width: 10px;
@@ -19,23 +20,19 @@
   <body>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
 
-      var MousePosition = function() 
-      {
-        return {
-          x: MousePosition.x,
-          y: MousePosition.y
-        }
-      };
-      MousePosition.x = 0;
-      MousePosition.y = 0;
       MousePosition.computed = true;
 
       anim8.save('shoot', {
         physics: {
-          translate: {
+          center: {
             position: MousePosition,
             // Random Velocity
             velocity: anim8.computed.random({min:{x:-300,y:-900}, max:{x:300,y:-600}}),
@@ -76,14 +73,10 @@
       });
 
       var toRemove = [];
-
-      window.onmousemove = window.ontouchmove = function(e)
+      var createBullet = function(mouse)
       {
-        MousePosition.x = e.pageX || e.changedTouches[0].pageX;
-        MousePosition.y = e.pageY || e.changedTouches[0].pageY;
-
         var bullet = document.createElement('div');
-        bullet.classList.add('box');
+        bullet.className = 'box';
         document.body.appendChild( bullet );
 
         m8( bullet )
@@ -93,7 +86,10 @@
             this.destroy();
           }
         );
-      }
+      };
+
+      $listen( document, 'mousemove', createBullet );
+      $listen( document, 'touchmove', createBullet );
 
       m8.on('end', function()
       {

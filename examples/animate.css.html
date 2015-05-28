@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en"><head>
   <title>Animate.css</title>
   <meta charset="utf-8">
@@ -31,12 +32,16 @@
       border-bottom-right-radius: 4px;
       border-right-width: 1px;
     }
+    #animationSandbox {
+      position: relative;
+      display: block;
+    }
   </style>
 <style type="text/css"></style></head>
 <body>
 <header class="site__header island">
   <div class="wrap" style="position:relative">
-   <span id="animationSandbox" style="display: block; position:relative" class=""><h1 class="site__title mega">Animate.css.js</h1></span>
+   <span id="animationSandbox"><h1 class="site__title mega">Animate.css.js</h1></span>
     <span class="beta subhead">Just-add-water CSS animations</span>
   </div>
 </header><!-- /.site__header -->
@@ -213,6 +218,10 @@
 	
   <script src="../build/anim8js-dom.js"></script>
   <script src="../build/anim8js-animate.css.js"></script>
+    
+  <!--[if lte IE 8]>
+  <script src="../build/anim8js-ie.js"></script>
+  <![endif]-->
 
 <script>
 
@@ -226,7 +235,7 @@
         .restore()
       .undefer()
     ;
-      
+    
     return false;
   }
   

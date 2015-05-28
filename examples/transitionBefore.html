@@ -23,17 +23,13 @@
 		
     <script src="../build/anim8js-dom.js"></script>
     <script src="../build/anim8js-animate.css.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
 		
     <script>
-
-      function getRandomPoint()
-      {
-        return {
-          x: Math.random() * (window.innerWidth - 100) + 50,
-          y: Math.random() * (window.innerHeight - 100) + 50 
-        };
-      }
-      getRandomPoint.computed = true;
       
       anim8.save('randomPoint', {
         tweenTo: {
@@ -53,15 +49,15 @@
         }
         
       }, 2000);
-      
-      window.onclick = function(e)
+
+      var animateTo = function(mouse)
       {
         if (anim8or.hasAttrimators())
         {
           anim8or.transition( '500 >100 <-100 linear /100', {
             keyframe: {
               from: {
-                center: {x: e.x, y: e.y}
+                center: mouse
               },
               to: {
                 center: getRandomPoint()
@@ -70,6 +66,9 @@
           }); 
         }
       };
+
+      $listen( document, 'click', animateTo );
+      $listen( document, 'touchstart', animateTo );
             
     </script>
     

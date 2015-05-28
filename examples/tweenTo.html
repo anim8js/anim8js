@@ -28,21 +28,26 @@
     <div id="dot"></div>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
       
-      window.onclick = window.ontouchstart = function(e)
+      var updateAnimation = function(mouse)
       {
-        var x = e.pageX || e.changedTouches[0].pageX;
-        var y = e.pageY || e.changedTouches[0].pageY;
-        
         m8( window.dot ).set(
         {
-          center: {x: x, y: y}
+          center: mouse
         });
         
-        m8( window.box1 ).tweenTo( 'center', {x: x, y: y} );
+        m8( window.box1 ).tweenTo( 'center', mouse );
       };
+
+      $listen( document, 'click', updateAnimation );
+      $listen( document, 'touchstart', updateAnimation );
       
     </script>
     

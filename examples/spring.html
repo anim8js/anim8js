@@ -50,24 +50,19 @@
     <div id="dot"></div>
   
     <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
     
     <script>
     
-      function MousePosition()
-      {
-        return {
-          x: MousePosition.x,
-          y: MousePosition.y
-        };
-      }
-      MousePosition.x = 0;
-      MousePosition.y = 0;
-
       var spring1 = m8( window.box1 ).spring(
       {
         type: 'linear',
         attribute: 'center',
-        rest: MousePosition,
+        rest: MouseClicked,
         damping: 2.5,
         stiffness: -30
       });
@@ -76,7 +71,7 @@
       {
         type: 'distance',
         attribute: 'center',
-        rest: MousePosition,
+        rest: MouseClicked,
         distance: 100,
         damping: 2.5,
         stiffness: -30,
@@ -87,22 +82,22 @@
       {
         type: 'distance',
         attribute: 'center',
-        rest: MousePosition,
+        rest: MouseClicked,
         distance: 100,
         damping: 2.5,
         stiffness: -30
       });
-      
-      window.onclick = window.ontouchstart = function(e)
-      {
-        MousePosition.x = e.pageX || e.changedTouches[0].pageX;
-        MousePosition.y = e.pageY || e.changedTouches[0].pageY;
-        
+
+      var setDot = function(mouse)
+      { 
         m8( window.dot ).set(
         {
-          center: MousePosition()
+          center: mouse
         });
       };
+      
+      $listen( document, 'click', setDot );
+      $listen( document, 'touchstart', setDot );
       
     </script>
     

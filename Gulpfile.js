@@ -88,6 +88,11 @@ var pixi =
   './plugins/anim8js-pixi.js'
 ];
 
+var ie = 
+[
+  './lib/anim8js-dom-IE.js'
+];
+
 var builds = 
 {
   objects: 
@@ -131,6 +136,13 @@ var builds =
     minified: 'anim8js-pixi.min.js',
     output: './build/',
     include: core.concat( pixi )
+  },
+  ie:
+  {
+    filename: 'anim8js-ie.js',
+    minified: 'anim8js-ie.min.js',
+    output: './build/',
+    include: ie
   }
 };
 
@@ -165,6 +177,7 @@ gulp.task( 'js:animatecss:min', executeMinifiedBuild( builds.animatecss ) );
 gulp.task( 'js:jquery:min',     executeMinifiedBuild( builds.jquery ) );
 gulp.task( 'js:easel:min',      executeMinifiedBuild( builds.easel ) );
 gulp.task( 'js:pixi:min',       executeMinifiedBuild( builds.pixi ) );
+gulp.task( 'js:ie:min',       executeMinifiedBuild( builds.ie ) );
 
 gulp.task( 'js:objects',        executeBuild( builds.objects ) );
 gulp.task( 'js:dom',            executeBuild( builds.dom ) );
@@ -172,7 +185,8 @@ gulp.task( 'js:animatecss',     executeBuild( builds.animatecss ) );
 gulp.task( 'js:jquery',         executeBuild( builds.jquery ) );
 gulp.task( 'js:easel',          executeBuild( builds.easel ) );
 gulp.task( 'js:pixi',           executeBuild( builds.pixi ) );
+gulp.task( 'js:ie',           executeBuild( builds.ie ) );
 
-gulp.task( 'js:min', ['js:objects:min', 'js:dom:min', 'js:animatecss:min', 'js:jquery:min', 'js:easel:min', 'js:pixi:min']);
-gulp.task( 'js', ['js:objects', 'js:dom', 'js:animatecss', 'js:jquery', 'js:easel', 'js:pixi']);
+gulp.task( 'js:min', ['js:objects:min', 'js:dom:min', 'js:animatecss:min', 'js:jquery:min', 'js:easel:min', 'js:pixi:min', 'js:ie:min']);
+gulp.task( 'js', ['js:objects', 'js:dom', 'js:animatecss', 'js:jquery', 'js:easel', 'js:pixi', 'js:ie']);
 gulp.task( 'default', ['js:min', 'js'] );

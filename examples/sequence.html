@@ -215,9 +215,12 @@
   <script src="../build/anim8js-jquery.js"></script>
   <script>
     anim8.defaults.duration = 2000;
-    anim8.log = anim8.isDefined( console ) ? console.log : false;
   </script>
   <script src="../build/anim8js-animate.css.js"></script>
+    
+  <!--[if lte IE 8]>
+  <script src="../build/anim8js-ie.js"></script>
+  <![endif]-->
 
   <style>
     #letters div.sequenced {
