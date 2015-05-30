@@ -73,7 +73,7 @@
 71. [X] EaselJS Plugin
 72. [X] Pixi.js Plugin
 73. [X] Add anim8.pause() & anim8.resume() as shorthand for anim8.animating.pause/resume()
-74. [ ] Test in IE
+74. [X] Test in IE
 75. [X] Animator.move
 76. [X] Animator.applyInitialState
 77. [X] transform DOM property get logic
@@ -83,3 +83,4 @@
 81. [X] Add & operator to anim8.animation parser which combines generated attrimators into single attrimator map
 82. [X] Add @ operator to anim8.animation parser which defines an offset into the animation
 83. [X] Add array parsing to calculator
+84. [ ] IE transform percent units

@@ -47,6 +47,19 @@
     #box3_original {
       background-color: #F99; 
     }
+    #box4,
+    #box4_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #000;
+      left: 100px;
+      top: 300px;
+      position: absolute;
+      background-color: #666;
+    }
+    #box4_original {
+      background-color: #999; 
+    }
     </style>
   </head>
   <body>
@@ -59,6 +72,9 @@
     
     <div id="box3_original"></div>
     <div id="box3"></div>
+    
+    <div id="box4_original"></div>
+    <div id="box4"></div>
    
     <script src="../build/anim8js-dom.js"></script>
     
@@ -98,12 +114,30 @@
         easing: 'linear'
       });
 
+      anim8.save('move', {
+        keyframe: {
+          '0,50,100': {
+            translate: 0
+          },
+          '25': {
+            translate: {x:200, y: 0}
+          },
+          '75': {
+            translate: {x:0, y:200}
+          }
+        }
+      }, {
+        easing: 'linear'
+      });
+
       m8( window.box1 ).play( 'rotate 4s' );
 
       m8( window.box2 ).play( 'grow 4s' );
 
       m8( window.box3 ).play( 'grow 4s & rotate 4s' );
       
+      m8( window.box4 ).play( 'grow 8s & rotate 8s & move 8s' );
+
     </script>
     
   </body>
