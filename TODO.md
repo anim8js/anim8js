@@ -83,4 +83,4 @@
 81. [X] Add & operator to anim8.animation parser which combines generated attrimators into single attrimator map
 82. [X] Add @ operator to anim8.animation parser which defines an offset into the animation
 83. [X] Add array parsing to calculator
-84. [ ] IE transform percent units
+84. [X] IE transform percent units

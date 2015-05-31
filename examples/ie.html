@@ -60,6 +60,19 @@
     #box4_original {
       background-color: #999; 
     }
+    #box5,
+    #box5_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #F0F;
+      left: 300px;
+      top: 300px;
+      position: absolute;
+      background-color: #F6F;
+    }
+    #box5_original {
+      background-color: #F9F; 
+    }
     </style>
   </head>
   <body>
@@ -75,6 +88,9 @@
     
     <div id="box4_original"></div>
     <div id="box4"></div>
+    
+    <div id="box5_original"></div>
+    <div id="box5"></div>
    
     <script src="../build/anim8js-dom.js"></script>
     
@@ -109,6 +125,9 @@
           '75': {
             scale: 1.5
           }
+        },
+        initial: {
+          origin: 100
         }
       }, {
         easing: 'linear'
@@ -125,9 +144,36 @@
           '75': {
             translate: {x:0, y:200}
           }
+        },
+        units: {
+          translate: '%'
         }
       }, {
         easing: 'linear'
+      });
+
+      anim8.save('wiggle', {
+        keyframe: {
+          '0,25,50,75,100': {
+            skewX: 0,
+            skewY: 0
+          },
+          '12.5': {
+            skewX: 30
+          },
+          '37.5': {
+            skewX: -30
+          },
+          '62.5': {
+            skewY: 30
+          },
+          '87.5': {
+            skewY: -30
+          }
+        },
+        initial: {
+          origin: 0
+        }
       });
 
       m8( window.box1 ).play( 'rotate 4s' );
@@ -137,6 +183,8 @@
       m8( window.box3 ).play( 'grow 4s & rotate 4s' );
       
       m8( window.box4 ).play( 'grow 8s & rotate 8s & move 8s' );
+
+      m8( window.box5 ).play( 'wiggle 8s' );
 
     </script>
     
