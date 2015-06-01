@@ -11762,7 +11762,7 @@ anim8.dom.parseValue = (function()
  * @param {HTMLElement} e
  * @param {String} from
  * @param {String} toUnit
- * @param {String} relativeTo
+ * @param {String|Number} relativeTo
  * @return {Number|false}
  */
 anim8.dom.convert = (function()
