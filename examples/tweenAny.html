@@ -400,6 +400,21 @@
         };
       };
 
+      var p1_length_update = function()
+      {
+        var attr = p1_length_attribute.value;
+
+        var request = {};
+        request[ attr ] = p1_length_unit.value;
+
+        var response = anim8or.get( request );
+
+        if ( attr in response )
+        {
+          p1_length.value = response[ attr ];
+        }
+      };
+
       $listen( p1_length_attribute, 'change', function()
       {
         var attr = p1_length_attribute.value;
@@ -408,20 +423,33 @@
         p1_length.value = definition.defaultValue;
         p1_length_unit.value = definition.defaultUnit;
 
-        var request = {};
-        request[ attr ] = definition.defaultUnit;
-        var response = anim8or.get( request );
+        p1_length_update();
+      });
 
-        if ( attr in response )
-        {
-          p1_length.value = response[ attr ];
-        }
+      $listen( p1_length_unit, 'change', function()
+      {
+        p1_length_update();
       });
 
       $listen( p1_length_tween, 'click', function()
       {
         anim8or.tweenTo( p1_length_attribute.value, p1_length.value, getOptions(), p1_length_unit.value );
       });
+
+      var p1_angle_update = function()
+      {
+        var attr = p1_angle_attribute.value;
+
+        var request = {};
+        request[ attr ] = p1_angle_unit.value;
+
+        var response = anim8or.get( request );
+
+        if ( attr in response )
+        {
+          p1_angle.value = response[ attr ];
+        }
+      };
 
       $listen( p1_angle_attribute, 'change', function()
       {
@@ -431,20 +459,34 @@
         p1_angle.value = definition.defaultValue;
         p1_angle_unit.value = definition.defaultUnit;
 
-        var request = {};
-        request[ attr ] = definition.defaultUnit;
-        var response = anim8or.get( request );
+        p1_angle_update();
+      });
 
-        if ( attr in response )
-        {
-          p1_angle.value = response[ attr ];
-        }
+      $listen( p1_angle_unit, 'change', function()
+      {
+        p1_angle_update();
       });
 
       $listen( p1_angle_tween, 'click', function()
       {
         anim8or.tweenTo( p1_angle_attribute.value, p1_angle.value, getOptions(), p1_angle_unit.value );
       });
+
+      var p2_length_update = function()
+      {
+        var attr = p2_length_attribute.value;
+
+        var request = {};
+        request[ attr ] = p2_length_unit.value;
+
+        var response = anim8or.get( request );
+
+        if ( attr in response )
+        {
+          p2_length_x.value = response[ attr ].x;
+          p2_length_y.value = response[ attr ].y;
+        }
+      };
 
       $listen( p2_length_attribute, 'change', function()
       {
@@ -455,21 +497,35 @@
         p2_length_y.value = definition.defaultValue.y;
         p2_length_unit.value = definition.defaultUnit;
 
-        var request = {};
-        request[ attr ] = definition.defaultUnit;
-        var response = anim8or.get( request );
+        p2_length_update();
+      });
 
-        if ( attr in response )
-        {
-          p2_length_x.value = response[ attr ].x;
-          p2_length_y.value = response[ attr ].y;
-        }
+      $listen( p2_length_unit, 'change', function()
+      {
+        p2_length_update();
       });
 
       $listen( p2_length_tween, 'click', function()
       {
         anim8or.tweenTo( p2_length_attribute.value, [p2_length_x.value, p2_length_y.value], getOptions(), p2_length_unit.value );
       });
+
+      var p3_length_update = function()
+      {
+        var attr = p3_length_attribute.value;
+
+        var request = {};
+        request[ attr ] = p3_length_unit.value;
+
+        var response = anim8or.get( request );
+
+        if ( attr in response )
+        {
+          p3_length_x.value = response[ attr ].x;
+          p3_length_y.value = response[ attr ].y;
+          p3_length_z.value = response[ attr ].z;
+        }
+      };
 
       $listen( p3_length_attribute, 'change', function()
       {
@@ -481,22 +537,33 @@
         p3_length_z.value = definition.defaultValue.z;
         p3_length_unit.value = definition.defaultUnit;
 
-        var request = {};
-        request[ attr ] = definition.defaultUnit;
-        var response = anim8or.get( request );
+        p3_length_update();
+      });
 
-        if ( attr in response )
-        {
-          p3_length_x.value = response[ attr ].x;
-          p3_length_y.value = response[ attr ].y;
-          p3_length_z.value = response[ attr ].z;
-        }
+      $listen( p3_length_unit, 'change', function()
+      {
+        p3_length_update();
       });
 
       $listen( p3_length_tween, 'click', function()
       {
         anim8or.tweenTo( p3_length_attribute.value, [p3_length_x.value, p3_length_y.value, p3_length_z.value], getOptions(), p3_length_unit.value );
       });
+
+      var rgb_update = function()
+      {
+        var attr = rgb_attribute.value;
+
+        var request = {};
+        request[ attr ] = true;
+
+        var response = anim8or.get( request );
+
+        if ( attr in response )
+        {
+          rgb_value.value = anim8.color.format( response[ attr ] );
+        }
+      };
 
       $listen( rgb_attribute, 'change', function()
       {
@@ -505,14 +572,7 @@
 
         rgb_value.value = anim8.color.format( definition.defaultValue );
 
-        var request = {};
-        request[ attr ] = true;
-        var response = anim8or.get( request );
-
-        if ( attr in response )
-        {
-          rgb_value.value = anim8.color.format( response[ attr ] );
-        }
+        rgb_update();
       });
 
       $listen( rgb_tween, 'click', function()
@@ -537,6 +597,12 @@
         o.innerHTML = easingType;
         option_easingType.appendChild( o );
       }
+
+      p1_angle_update();
+      p1_length_update();
+      p2_length_update();
+      p3_length_update();
+      rgb_update();
       
     </script>
     

@@ -86,4 +86,5 @@
 84. [X] IE transform percent units
 85. [X] Dom animator should parse units from tween, tweenTo, tweenManyTo, tweenMany tweenFrom, tweenManyFrom, move, moveMany
 86. [X] Fix zIndex property
-87. [ ] Modify anim8.computed.current for DomAnimator to convert the current value (if it exists) into the desired unit. We need to keep track of the previous unit.
+87. [X] Modify anim8.computed.current for DomAnimator to convert the current value (if it exists) into the desired unit. We need to keep track of the previous unit.
+88. [X] Add attributes: textShadowX, textShadowY, textShadowBlur, textShadowColor, shadowX, shadowY, shadowBlur, shadowSpread, shadowColor, shadowInset,

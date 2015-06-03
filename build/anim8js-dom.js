@@ -12131,6 +12131,8 @@ anim8.dom.property.textIndent               = anim8.dom.property.factory( 'textI
 anim8.dom.property.borderSpacing            = anim8.dom.property.factory( 'borderSpacing' );
 anim8.dom.property.fontSize                 = anim8.dom.property.factory( 'fontSize', 'parentFontSize' );
 anim8.dom.property.lineHeight               = anim8.dom.property.factory( 'lineHeight', 'fontSize' );
+anim8.dom.property.letterSpacing            = anim8.dom.property.factory( 'letterSpacing' );
+
 anim8.dom.property.zIndex                   = anim8.dom.property.factory( 'zIndex' );
 
 anim8.dom.property.color                    = anim8.dom.property.factoryColor( 'color' );
@@ -12154,6 +12156,11 @@ anim8.dom.property.top                      = anim8.dom.property.factoryDerivabl
 anim8.dom.property.right                    = anim8.dom.property.factoryDerivable('right', 'parentWidth', function(e) { return (e.parentNode.scrollWidth - (e.offsetLeft + e.offsetWidth)) + 'px'; });
 anim8.dom.property.bottom                   = anim8.dom.property.factoryDerivable('bottom', 'parentHeight', function(e) { return (e.parentNode.scrollHeight - (e.offsetTop + e.offsetHeight)) + 'px'; });
 anim8.dom.property.left                     = anim8.dom.property.factoryDerivable('left', 'parentWidth', function(e) { return e.offsetLeft + 'px'; });
+
+anim8.dom.property.zIndex.set = function(e, anim)
+{
+  anim.styles.zIndex = Math.floor( anim.frame.zIndex );
+};
 
 anim8.dom.property.visibility = 
 {
@@ -12667,6 +12674,260 @@ anim8.dom.property.opacity = (function()
   
 })();
 
+anim8.dom.property.shadow = (function()
+{
+  var css = anim8.dom.prefix(['WebkitBoxShadow', 'MozBoxShadow', 'boxShadow']);
+
+  if ( !css )
+  {
+    return anim8.dom.property.noop;
+  }
+
+  var parsePart = function( e, anim, attr, value, relativeTo )
+  {
+    if ( anim.updating[ attr ] === false && value )
+    {
+      var parsed = anim8.dom.convert( e, value, anim.units[ attr ], relativeTo );
+
+      if ( parsed !== false )
+      {
+        anim.frame[ attr ] = parsed;
+        anim.updating[ attr ] = true;
+      }
+    }
+  };
+
+  return {
+
+    get: function(e, anim)
+    {
+      var style = anim8.dom.style( e, css );
+      var parts = style.split( ' ' );
+
+      if ( parts.length < 3 )
+      {
+        return;
+      }
+
+      var inset = 0;
+
+      if ( parts[ 0 ] === 'inset' )
+      {
+        inset = 1;
+        parts.shift();
+      }
+
+      var x = parts[ 0 ];
+      var y = parts[ 1 ];
+      var blur = false, spread = false, color = false;
+
+      switch ( parts.length ) {
+        case 3:
+          color = parts[ 2 ];
+          break;
+        case 4:
+          blur = parts[ 2 ];
+          color = parts[ 3 ];
+          break;
+        case 5:
+          blur = parts[ 2 ];
+          spread = parts[ 3 ];
+          color = parts[ 4 ];
+          break;
+      }
+
+      parsePart( e, anim, 'shadowX', x, 'width' );
+      parsePart( e, anim, 'shadowY', y, 'height' );
+      parsePart( e, anim, 'shadowBlur', blur, 'width' );
+      parsePart( e, anim, 'shadowSpread', spread, 'width' );
+
+      if ( anim.updating.shadowPosition === false )
+      {
+        var parsedX = anim8.dom.convert( e, x, anim.units.shadowPosition, 'width' );
+        var parsedY = anim8.dom.convert( e, y, anim.units.shadowPosition, 'height' );
+
+        if ( parsedX !== false && parsedY !== false )
+        {
+          anim.frame.shadowPosition = {
+            x: parsedX,
+            y: parsedY
+          };
+          anim.updating.shadowPosition = true;
+        }
+      }
+
+      if ( anim.updating.shadowInset === false )
+      {
+        anim.frame.shadowInset = inset;
+        anim.updating.shadowInset = true;
+      }
+
+      if ( anim.updating.shadowColor === false )
+      {
+        var parsed = anim8.color.parse( color );
+
+        if ( parsed !== false )
+        {
+          anim.frame.shadowColor = parsed;
+          anim.updating.shadowColor = true;
+        }
+      }
+
+    },
+
+    set: function(e, anim)
+    {
+      var style = '';
+
+      if ( anim.frame.inset )
+      {
+        style += inset + ' ';
+      }
+
+      style += anim.valueOr( 'shadowX', 'shadowPosition', 'x' ) + ' ';
+      style += anim.valueOr( 'shadowY', 'shadowPosition', 'y' ) + ' ';
+
+      if ( anim8.isNumber( anim.frame.shadowBlur ) )
+      {
+        style += anim.value( 'shadowBlur' ) + ' ';
+      }
+
+      if ( anim8.isNumber( anim.frame.shadowSpread ) )
+      {
+        style += anim.value( 'shadowSpread' ) + ' ';
+      }
+
+      style += anim8.color.format( anim.frame.shadowColor );
+
+      anim.styles[ css ] = style;
+    },
+
+    unset: function(e)
+    {
+      e.style[ css ] = null;
+    }
+
+  };
+
+})();
+
+
+anim8.dom.property.textShadow = (function()
+{
+  var css = anim8.dom.prefix(['WebkitTextShadow', 'MozTextShadow', 'textShadow']);
+
+  if ( !css )
+  {
+    return anim8.dom.property.noop;
+  }
+
+  var parsePart = function( e, anim, attr, value, relativeTo )
+  {
+    if ( anim.updating[ attr ] === false && value )
+    {
+      var parsed = anim8.dom.convert( e, value, anim.units[ attr ], relativeTo );
+
+      if ( parsed !== false )
+      {
+        anim.frame[ attr ] = parsed;
+        anim.updating[ attr ] = true;
+      }
+    }
+  };
+
+  return {
+
+    get: function(e, anim)
+    {
+      var style = anim8.dom.style( e, css );
+      var parts = style.split( ' ' );
+
+      if ( parts.length < 3 )
+      {
+        return;
+      }
+
+      var x = parts[ 0 ];
+      var y = parts[ 1 ];
+      var blur = false, color = false;
+
+      switch ( parts.length ) {
+        case 3:
+          color = parts[ 2 ];
+          break;
+        case 4:
+          blur = parts[ 2 ];
+          color = parts[ 3 ];
+          break;
+      }
+
+      parsePart( e, anim, 'textShadowX', x, 'width' );
+      parsePart( e, anim, 'textShadowY', y, 'height' );
+      parsePart( e, anim, 'textShadowBlur', blur, 'width' );
+
+      if ( anim.updating.textShadowPosition === false )
+      {
+        var parsedX = anim8.dom.convert( e, x, anim.units.textShadowPosition, 'width' );
+        var parsedY = anim8.dom.convert( e, y, anim.units.textShadowPosition, 'height' );
+
+        if ( parsedX !== false && parsedY !== false )
+        {
+          anim.frame.textShadowPosition = {
+            x: parsedX,
+            y: parsedY
+          };
+          anim.updating.textShadowPosition = true;
+        }
+      }
+
+      if ( anim.updating.textShadowColor === false )
+      {
+        var parsed = anim8.color.parse( color );
+
+        if ( parsed !== false )
+        {
+          anim.frame.textShadowColor = parsed;
+          anim.updating.textShadowColor = true;
+        }
+      }
+    },
+
+    set: function(e, anim)
+    {
+      var style = '';
+
+      if ( anim.frame.inset )
+      {
+        style += inset + ' ';
+      }
+
+      style += anim.valueOr( 'textShadowX', 'textShadowPosition', 'x' ) + ' ';
+      style += anim.valueOr( 'textShadowY', 'textShadowPosition', 'y' ) + ' ';
+
+      if ( anim8.isNumber( anim.frame.textShadowBlur ) )
+      {
+        style += anim.value( 'textShadowBlur' ) + ' ';
+      }
+
+      if ( anim8.isNumber( anim.frame.textShadowSpread ) )
+      {
+        style += anim.value( 'textShadowSpread' ) + ' ';
+      }
+
+      style += anim8.color.format( anim.frame.textShadowColor );
+
+      anim.styles[ css ] = style;
+    },
+
+    unset: function(e)
+    {
+      e.style[ css ] = null;
+    }
+
+  };
+
+})();
+
 anim8.dom.property.filter = (function() 
 {
   var css = anim8.dom.prefix(['WebkitFilter', 'MozFilter', 'OFilter', 'msFilter', 'filter']);
@@ -12678,10 +12939,10 @@ anim8.dom.property.filter = (function()
   
   var methods = 
   {
-    grayscale:   'grayscale',
-    sepia:       'sepia',
+    grayscale:  'grayscale',
+    sepia:      'sepia',
     saturate:   'saturate',
-    hueRotate:   'hue-rotate',
+    hueRotate:  'hue-rotate',
     invert:     'invert',
     brightness: 'brightness',
     contrast:   'contrast',
@@ -12953,11 +13214,12 @@ anim8.dom.attribute.borderBottomWidth       = {defaultValue: 0, defaultUnit: 'px
 anim8.dom.attribute.borderLeftWidth         = {defaultValue: 0, defaultUnit: 'px'};
 
 anim8.dom.attribute.outlineWidth            = {defaultValue: 0, defaultUnit: 'px'};
-anim8.dom.attribute.outlineOffset            = {defaultValue: 0};
+anim8.dom.attribute.outlineOffset           = {defaultValue: 0};
 anim8.dom.attribute.textIndent              = {defaultValue: 0, defaultUnit: 'px'};
-anim8.dom.attribute.borderSpacing            = {defaultValue: 0, defaultUnit: 'px'};
+anim8.dom.attribute.borderSpacing           = {defaultValue: 0, defaultUnit: 'px'};
 anim8.dom.attribute.fontSize                = {defaultValue: 1, defaultUnit: 'em'};
 anim8.dom.attribute.lineHeight              = {defaultValue: 1, defaultUnit: 'em'};
+anim8.dom.attribute.letterSpacing           = {defaultValue: 0, defaultUnit: 'px'};
 
 anim8.dom.attribute.origin                  = {defaultValue: {x:50, y:50}, defaultUnit: '%', property: 'transformOrigin', calculator: '2d'};
 anim8.dom.attribute.originX                 = {defaultValue: 50, defaultUnit: '%', property: 'transformOrigin'};
@@ -13026,6 +13288,20 @@ anim8.dom.attribute.borderBottomColor       = {defaultValue: anim8.color(), calc
 anim8.dom.attribute.borderLeftColor         = {defaultValue: anim8.color(), calculator: 'rgba'};
 anim8.dom.attribute.borderColor             = {defaultValue: anim8.color(), calculator: 'rgba'};
 anim8.dom.attribute.outlineColor            = {defaultValue: anim8.color(), calculator: 'rgba'};
+
+anim8.dom.attribute.textShadowX             = {defaultValue: 0, defaultUnit: 'px', property: 'textShadow'};
+anim8.dom.attribute.textShadowY             = {defaultValue: 0, defaultUnit: 'px', property: 'textShadow'};
+anim8.dom.attribute.textShadowPosition      = {defaultValue: {x: 0, y: 0}, defaultUnit: 'px', calculator: '2d', property: 'textShadow'};
+anim8.dom.attribute.textShadowBlur          = {defaultValue: 0, defaultUnit: 'px', property: 'textShadow'};
+anim8.dom.attribute.textShadowColor         = {defaultValue: anim8.color(), calculator: 'rgba', property: 'textShadow'};
+
+anim8.dom.attribute.shadowX                 = {defaultValue: 0, defaultUnit: 'px', property: 'shadow'};
+anim8.dom.attribute.shadowY                 = {defaultValue: 0, defaultUnit: 'px', property: 'shadow'};
+anim8.dom.attribute.shadowPosition          = {defaultValue: {x: 0, y: 0}, defaultUnit: 'px', calculator: '2d', property: 'shadow'};
+anim8.dom.attribute.shadowBlur              = {defaultValue: 0, defaultUnit: 'px', property: 'shadow'};
+anim8.dom.attribute.shadowSpread            = {defaultValue: 0, defaultUnit: 'px', property: 'shadow'};
+anim8.dom.attribute.shadowColor             = {defaultValue: anim8.color(), calculator: 'rgba', property: 'shadow'};
+anim8.dom.attribute.shadowInset             = {defaultValue: 0, property: 'shadow'};
 
 
 /**
@@ -13456,6 +13732,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   tweenTo: function(attr, target, options, unit)
   {
+    this.convertExisting( attr, unit );
     anim8.fn.tweenTo.apply( this, arguments );
     this.units[ attr ] = unit || this.units[ attr ];
     return this;
@@ -13474,6 +13751,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   tweenManyTo: function(targets, options, units)
   {
+    this.convertExistingMany( units );
     anim8.fn.tweenManyTo.apply( this, arguments );
     anim8.override( this.units, units );
     return this;
@@ -13493,6 +13771,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   tweenFrom: function(attr, starting, options, unit)
   {
+    this.convertExisting( attr, unit );
     anim8.fn.tweenFrom.apply( this, arguments );
     this.units[ attr ] = unit || this.units[ attr ];
     return this;
@@ -13509,8 +13788,9 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {Object} [units]
    * @chainable
    */
-  tweenManyFrom: function(startings, options)
+  tweenManyFrom: function(startings, options, units)
   {
+    this.convertExistingMany( units );
     anim8.fn.tweenManyFrom.apply( this, arguments );
     anim8.override( this.units, units );
     return this;
@@ -13531,6 +13811,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   tween: function(attr, starts, ends, options, unit)
   {
+    this.convertExisting( attr, unit );
     anim8.fn.tweenFrom.apply( this, arguments );
     this.units[ attr ] = unit || this.units[ attr ];
     return this;
@@ -13550,6 +13831,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   tweenMany: function(starts, ends, options, units)
   {
+    this.convertExistingMany( units );
     anim8.fn.tweenMany.apply( this, arguments );
     anim8.override( this.units, units );
     return this;
@@ -13569,6 +13851,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   move: function(attr, amount, options, unit)
   {
+    this.convertExisting( attr, unit );
     anim8.fn.move.apply( this, arguments );
     this.units[ attr ] = unit || this.units[ attr ];
     return this;
@@ -13587,6 +13870,7 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   moveMany: function(amounts, options, units)
   {
+    this.convertExistingMany( units );
     anim8.fn.moveMany.apply( this, arguments );
     anim8.override( this.units, units );
     return this;
@@ -13606,9 +13890,47 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    */
   follow: function(attr, path, options, unit)
   {
+    this.convertExisting( attr, unit );
     anim8.fn.follow.apply( this, arguments );
     this.units[ attr ] = unit || this.units[ attr ];
     return this;
+  },
+
+  /**
+   * Converts any existing attributes to the desired units.
+   *
+   * @method convertExistingMany
+   * @param  {Object} units
+   */
+  convertExistingMany: function(units)
+  {
+    if ( units && anim8.isObject( units ) )
+    {
+      var current = this.get( units );
+
+      for (var attr in current)
+      {
+        this.frame[ attr ] = current[ attr ];
+      }
+    }
+  },
+
+  /**
+   * Converts any existing attribute to the desired unit.
+   *
+   * @method convertExisting
+   * @param  {String} attr
+   * @param  {String} toUnit
+   */
+  convertExisting: function(attr, toUnit)
+  {
+    if ( toUnit && attr in this.frame && attr in this.units && this.units[ attr ] !== toUnit )
+    {
+      var request = {};
+      request[ attr ] = toUnit;
+
+      this.convertExistingMany( request );
+    }
   }
 
 });
