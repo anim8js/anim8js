@@ -2445,7 +2445,7 @@ anim8.color.parsers =
     }
   },
   { /* RGB(r,g,b) */
-    regex: /^rgb\(\s*(\d{3})\s*,\s*(\d{3})\s*,\s*(\d{3})\s*\)$/i,
+    regex: /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i,
     parse: function(input) {
       var matches = this.regex.exec(input);
       if (matches !== null) {
@@ -2460,7 +2460,7 @@ anim8.color.parsers =
     }
   },
   { /* RGBA(r,g,b,a) */
-    regex: /^rgba\(\s*(\d{3})\s*,\s*(\d{3})\s*,\s*(\d{3})\s*,\s*([01]?\.\d+|[01])\)$/i,
+    regex: /^rgba\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*([01]?\.\d+|[01])\)$/i,
     parse: function(input) {
       var matches = this.regex.exec(input);
       if (matches !== null) {
@@ -8563,6 +8563,7 @@ anim8.fn = anim8.Animator.prototype =
     if ( anim8.isString( attributes ) )
     {
       this.attrimators.remove( attributes );
+      
       delete this.frame[ attributes ];
     }
     else if ( anim8.isArray( attributes ) )
@@ -11773,7 +11774,7 @@ anim8.dom.convert = (function()
    * For Example: anim8.toPixels( 100, 'in' ) 
    *    returns how many pixels are in 1 inch, with up to 2 decimal points of accuracy.
    */
-  var toPixels = function(baseValue, baseUnit, defaultRate, approximate)
+  var toPixels = function(baseValue, baseUnit, defaultRate)
   {
     if ( document.body )
     {
@@ -11784,11 +11785,12 @@ anim8.dom.convert = (function()
         div.style.width = baseValue + baseUnit;
         var pixels = (div.offsetWidth / baseValue);
         document.body.removeChild( div );
+
         return pixels || defaultRate; 
       }
       catch (e)
       {
-        return approximate;
+        // Do nothing
       }
     }
     
@@ -11848,12 +11850,12 @@ anim8.dom.convert = (function()
   
   var conversions = {};
   
-  conversions['pt']  = { px: toPixels(100, 'pt') };
-  conversions['in']  = { px: toPixels(100, 'in') };
-  conversions['cm']  = { px: toPixels(1000, 'cm') };
-  conversions['mm']  = { px: toPixels(100000, 'mm') };
-  conversions['vw']  = { px: toPixels(1000, 'vw') };
-  conversions['deg'] = { rad: Math.PI / 180.0};
+  conversions['pt']  = { px: toPixels( 100, 'pt', 1 ) };
+  conversions['in']  = { px: toPixels( 100, 'in', 72 ) };
+  conversions['cm']  = { px: toPixels( 1000, 'cm', 72 / 2.54 ) };
+  conversions['mm']  = { px: toPixels( 100000, 'mm', 72 / 25.4 ) };
+  conversions['vw']  = { px: toPixels( 1000, 'vw', 1024 * 0.01 ) };
+  conversions['deg'] = { rad: Math.PI / 180.0 };
 
   conversions['em'] = 
   {
@@ -11883,7 +11885,7 @@ anim8.dom.convert = (function()
       }
       if ( relativeTo in variables )
       {
-        return variables[ relativeTo ]( e ) / 100.0;
+        return variables[ relativeTo ]( e ) * 0.01;
       }
       
       return 1.0;
@@ -11971,9 +11973,11 @@ anim8.dom.convert = (function()
     {
       var converter1 = conversions[ fromUnit ].px;
       var converter2 = conversions.px[ toUnit ];
+
+      var combined = getConverterScale( e, converter1, relativeTo ) *
+                     getConverterScale( e, converter2, relativeTo );
       
-      value *= getConverterScale( e, converter1, relativeTo );
-      value *= getConverterScale( e, converter2, relativeTo );
+      value *= combined;
     }
     
     return value;
@@ -12064,7 +12068,8 @@ anim8.dom.property.factoryColor = function(nm)
     {
       if (anim.animating[nm] === false) 
       {
-        var parsed = anim8.color.parse( e.style[nm] );
+        var style = anim8.dom.style( e, nm );
+        var parsed = anim8.color.parse( style );
         
         if (parsed !== false) 
         {
@@ -12702,7 +12707,7 @@ anim8.dom.property.filter = (function()
         {
           var parsed = patterns[attr].exec( style );
           
-          if (parsed !== false) 
+          if ( parsed ) 
           {
             var converted = anim8.dom.convert( e, parsed[1], anim.units[ attr ] );
             
@@ -12969,8 +12974,8 @@ anim8.dom.attribute.height                  = {defaultValue: 0, defaultUnit: 'px
 anim8.dom.attribute.minHeight               = {defaultValue: 0, defaultUnit: 'px'};
 anim8.dom.attribute.maxHeight               = {defaultValue: 0, defaultUnit: 'px'};
 
-anim8.dom.attribute.angle                   = {defaultValue: 0, property: 'orbit'};
-anim8.dom.attribute.distance                = {defaultValue: 0, property: 'orbit'};
+anim8.dom.attribute.angle                   = {defaultValue: 0, property: 'orbit', defaultUnit: 'deg'};
+anim8.dom.attribute.distance                = {defaultValue: 0, property: 'orbit', defaultUnit: 'px'};
 anim8.dom.attribute.orbitOffset             = {defaultValue: {x:50, y:50}, defaultUnit: '%', property: 'orbitOffset', calculator: '2d'};
 
 anim8.dom.attribute.top                     = {defaultValue: 0, defaultUnit: 'px'};
@@ -12984,9 +12989,9 @@ anim8.dom.attribute.centerY                 = {defaultValue: 0, defaultUnit: 'px
 
 anim8.dom.attribute.blur                    = {defaultValue: 0, property: 'filter', defaultUnit: 'px'};
 anim8.dom.attribute.sepia                   = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
-anim8.dom.attribute.brightness              = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
+anim8.dom.attribute.brightness              = {defaultValue: 100, property: 'filter', defaultUnit: '%'};
 anim8.dom.attribute.grayscale               = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
-anim8.dom.attribute.contrast                = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
+anim8.dom.attribute.contrast                = {defaultValue: 100, property: 'filter', defaultUnit: '%'};
 anim8.dom.attribute.invert                  = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
 anim8.dom.attribute.saturation              = {defaultValue: 0, property: 'filter', defaultUnit: '%'};
 anim8.dom.attribute.hueRotate               = {defaultValue: 0, property: 'filter', defaultUnit: 'deg'};
@@ -13435,6 +13440,175 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
     }
     
     return value + this.units[ attr ];
+  },
+
+  /**
+   * Tweens a single attribute to a target value.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tweenTo
+   * @param {String} attr
+   * @param {T} target
+   * @param {String|Array|Object} [options]
+   * @param {String} [unit]
+   * @chainable
+   */
+  tweenTo: function(attr, target, options, unit)
+  {
+    anim8.fn.tweenTo.apply( this, arguments );
+    this.units[ attr ] = unit || this.units[ attr ];
+    return this;
+  },
+
+  /**
+   * Tweens multiple attributes to target values.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tweenManyTo
+   * @param {Object} targets
+   * @param {String|Array|Object} [options]
+   * @param {Object} [units]
+   * @chainable
+   */
+  tweenManyTo: function(targets, options, units)
+  {
+    anim8.fn.tweenManyTo.apply( this, arguments );
+    anim8.override( this.units, units );
+    return this;
+  },
+
+  /**
+   * Tweens a single attribute from a starting value to the current value.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tweenFrom
+   * @param {String} attr
+   * @param {T} starting
+   * @param {String|Array|Object} [options]
+   * @param {String} [unit]
+   * @chainable
+   */
+  tweenFrom: function(attr, starting, options, unit)
+  {
+    anim8.fn.tweenFrom.apply( this, arguments );
+    this.units[ attr ] = unit || this.units[ attr ];
+    return this;
+  },
+
+  /**
+   * Tweens multiple attributes from starting values to the current values.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tweenManyFrom
+   * @param {Object} startings
+   * @param {String|Array|Object} [options]
+   * @param {Object} [units]
+   * @chainable
+   */
+  tweenManyFrom: function(startings, options)
+  {
+    anim8.fn.tweenManyFrom.apply( this, arguments );
+    anim8.override( this.units, units );
+    return this;
+  },
+  
+  /**
+   * Tweens an attribute from a starting value to an ending value.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tween
+   * @param {String} attr
+   * @param {T} starts
+   * @param {T} ends
+   * @param {String|Array|Object} [options]
+   * @param {String} [unit]
+   * @chainable
+   */
+  tween: function(attr, starts, ends, options, unit)
+  {
+    anim8.fn.tweenFrom.apply( this, arguments );
+    this.units[ attr ] = unit || this.units[ attr ];
+    return this;
+  },
+  
+  /**
+   * Tweens multiple attributes from starting values to ending values.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method tweenMany
+   * @param {Object} starts
+   * @param {Object} ends
+   * @param {String|Array|Object} [options]
+   * @param {Object} [units]
+   * @chainable
+   */
+  tweenMany: function(starts, ends, options, units)
+  {
+    anim8.fn.tweenMany.apply( this, arguments );
+    anim8.override( this.units, units );
+    return this;
+  },
+
+  /**
+   * Moves an attribute relative to its current value.
+   * 
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method move
+   * @param {String} attr
+   * @param {T} amount
+   * @param {String|Array|Object} [options]
+   * @param {String} [unit]
+   * @chainable
+   */
+  move: function(attr, amount, options, unit)
+  {
+    anim8.fn.move.apply( this, arguments );
+    this.units[ attr ] = unit || this.units[ attr ];
+    return this;
+  },
+
+  /**
+   * Moves multiple attribute relative to their current value.
+   * 
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method moveMany
+   * @param {Object} amounts
+   * @param {String|Array|Object} [options]
+   * @param {Object} [units]
+   * @chainable
+   */
+  moveMany: function(amounts, options, units)
+  {
+    anim8.fn.moveMany.apply( this, arguments );
+    anim8.override( this.units, units );
+    return this;
+  },
+  
+  /**
+   * Follows the attribute along the given path definition.
+   * 
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   * 
+   * @method follow
+   * @param {String} attr
+   * @param {Path|Object|String} path
+   * @param {Object} [options]
+   * @param {String} [unit]
+   * @chainable
+   */
+  follow: function(attr, path, options, unit)
+  {
+    anim8.fn.follow.apply( this, arguments );
+    this.units[ attr ] = unit || this.units[ attr ];
+    return this;
   }
 
 });

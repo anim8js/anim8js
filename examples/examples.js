@@ -93,18 +93,22 @@ function $listen(object, type, callback)
   }
   catch (e)
   {
-    object.attachEvent( 'on' + type, listener );
-  }
-  finally
-  {
     try
     {
-      object['on' + type] = listener;
+      object.attachEvent( 'on' + type, listener ); 
     }
-    catch(die)
+    catch (ee)
     {
-      alert('Use a decent browser.');
-      location.href = 'http://www.mozilla.org/en-US/firefox/new/';
+      try
+      {
+        object['on' + type] = listener;
+      }
+      catch(eee)
+      {
+        alert('Use a decent browser.');
+
+        location.href = 'http://www.mozilla.org/en-US/firefox/new/';
+      }
     }
   }
 }

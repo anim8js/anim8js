@@ -84,3 +84,6 @@
 82. [X] Add @ operator to anim8.animation parser which defines an offset into the animation
 83. [X] Add array parsing to calculator
 84. [X] IE transform percent units
+85. [X] Dom animator should parse units from tween, tweenTo, tweenManyTo, tweenMany tweenFrom, tweenManyFrom, move, moveMany
+86. [X] Fix zIndex property
+87. [ ] Modify anim8.computed.current for DomAnimator to convert the current value (if it exists) into the desired unit. We need to keep track of the previous unit.
