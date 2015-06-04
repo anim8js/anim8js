@@ -16,57 +16,52 @@ anim8.matrix = {
   
   identity: function() {
     return {
-      m11: 1.0, m12: 0.0, m21: 0.0, m22: 1.0, dx: 0.0, dy: 0.0
+      m11: 1.0, m12: 0.0, m21: 0.0, m22: 1.0
     };
   },
   
   multiply: function(a, b) {
-    var out = this.identity(); 
-    out.m11 = (a.m11 * b.m11) + (a.m12 * b.m21);
-    out.m22 = (a.m21 * b.m12) + (a.m22 * b.m22);
-    out.m21 = (a.m21 * b.m11) + (a.m22 * b.m21);
-    out.m12 = (a.m11 * b.m12) + (a.m12 * b.m22);
-    out.dx = (a.dx * b.m11) + (a.dy * b.dx) + b.dx;
-    out.dy = (a.dx * b.m12) + (a.dy * b.dy) + b.dy;
-    return out;
+    return {
+      m11: (a.m11 * b.m11) + (a.m12 * b.m21),
+      m22: (a.m21 * b.m12) + (a.m22 * b.m22),
+      m21: (a.m21 * b.m11) + (a.m22 * b.m21),
+      m12: (a.m11 * b.m12) + (a.m12 * b.m22)
+    };
   },
   
   rotate: function(radians) {
     var cos = Math.cos( radians );
     var sin = Math.sin( radians );
-    var out = this.identity();          
-    out.m11 = cos;
-    out.m12 = sin;
-    out.m21 = -sin;
-    out.m22 = cos;
-    return out;
+    return {
+      m11: cos, 
+      m12: -sin,
+      m21: sin,
+      m22: cos
+    };
   },
   
   scale: function(scaleX, scaleY) {
-    var out = this.identity();          
-    out.m11 = scaleX;
-    out.m22 = scaleY;
-    return out;
-  },
-  
-  translate: function(dx, dy) {
-    var out = this.identity();          
-    out.dx = dx;
-    out.dy = dy;
-    return out;
+    return {
+      m11: scaleX,
+      m12: 0.0,
+      m21: 0.0,
+      m22: scaleY
+    };
   },
 
   skew: function(skewX, skewY) {
-    var out = this.identity();
-    out.m12 = Math.tan( skewX );
-    out.m21 = Math.tan( skewY );
-    return out;
+    return {
+      m11: 1.0,
+      m12: Math.tan( skewX ),
+      m21: Math.tan( skewY ),
+      m22: 1.0
+    };
   },
 
   transform: function(matrix, x, y) {
     return {
-      x: matrix.m11 * x + matrix.m12 * y + matrix.dx,
-      y: matrix.m21 * x + matrix.m22 * y + matrix.dy
+      x: matrix.m11 * x + matrix.m12 * y,
+      y: matrix.m21 * x + matrix.m22 * y
     };
   },
 
@@ -103,14 +98,286 @@ anim8.dom.concatenateStyle = function(anim, style, value)
   }
 }
 
-/* transform IE <= 8 */
+anim8.dom.setProperty = function(attr, property)
+{
+  var attribute = anim8.dom.attribute[ attr ];
+
+  if ( anim8.isString( attribute.property ) || !anim8.isDefined( attribute.property ) )
+  {
+    attribute.property = property;
+  }
+  else
+  {
+    attribute.propertyName = property;
+    attribute.property = anim8.dom.property( property );
+  }
+};
+
+/* transform, blur, opacity, margin top & left IE <= 8 */
 if ( anim8.browser.IE && anim8.browser.IE <= 8 )
 {
-  anim8.dom.property.transform = 
+  anim8.dom.property.ieTransform = 
   {
-    get: function()
+    presettings:
     {
+      width: {
+        savedAs: 'width',
+        property: 'width',
+        relativeTo: 'parentWidth',
+        defaultProperty: 'offsetWidth',
+        toUnit: 'px'
+      },
+      height: {
+        savedAs: 'height',
+        property: 'height',
+        relativeTo: 'parentHeight',
+        defaultProperty: 'offsetHeight',
+        toUnit: 'px'
+      },
+      rotate: {
+        savedAs: 'rotate',
+        property: 'rotate',
+        toUnit: 'rad'
+      },
+      rotate3d: {
+        savedAs: 'rotate',
+        property: 'rotate3d',
+        subproperty: 'angle',
+        toUnit: 'rad'
+      },
+      skewX: {
+        savedAs: 'skewX',
+        property: 'skewX',
+        toUnit: 'rad'
+      },
+      skew2dX: {
+        savedAs: 'skewX',
+        property: 'skew',
+        subproperty: 'x',
+        toUnit: 'rad'/*,
+        remove: true*/
+      },
+      skewY: {
+        savedAs: 'skewY',
+        property: 'skewY',
+        toUnit: 'rad'
+      },
+      skew2dY: {
+        savedAs: 'skewY',
+        property: 'skew',
+        subproperty: 'y',
+        toUnit: 'rad'/*,
+        remove: true*/
+      },
+      translateX: {
+        savedAs: 'translateX',
+        property: 'translateX',
+        relativeTo: 'width',
+        toUnit: 'px'
+      },
+      translate2dX: {
+        savedAs: 'translateX',
+        property: 'translate',
+        subproperty: 'x',
+        toUnit: 'px',
+        relativeTo: 'width'
+      },
+      translate3dX: {
+        savedAs: 'translateX',
+        property: 'translate3d',
+        subproperty: 'x',
+        toUnit: 'px',
+        relativeTo: 'width'/*,
+        remove: true*/
+      },
+      translateY: {
+        savedAs: 'translateY',
+        property: 'translateY',
+        relativeTo: 'height',
+        toUnit: 'px'
+      },
+      translate2dY: {
+        savedAs: 'translateY',
+        property: 'translate',
+        subproperty: 'y',
+        toUnit: 'px',
+        relativeTo: 'height'
+      },
+      translate3dY: {
+        savedAs: 'translateY',
+        property: 'translate3d',
+        subproperty: 'y',
+        toUnit: 'px',
+        relativeTo: 'height'/*,
+        remove: true*/
+      },
+      scaleX: {
+        savedAs: 'scaleX',
+        property: 'scaleX'
+      },
+      scale2dX: {
+        savedAs: 'scaleX',
+        property: 'scale',
+        subproperty: 'x'
+      },
+      scale3dX: {
+        savedAs: 'scaleX',
+        property: 'scale3d',
+        subproperty: 'x'/*,
+        remove: true*/
+      },
+      scaleY: {
+        savedAs: 'scaleY',
+        property: 'scaleY'
+      },
+      scale2dY: {
+        savedAs: 'scaleY',
+        property: 'scale',
+        subproperty: 'y'
+      },
+      scale3dY: {
+        savedAs: 'scaleY',
+        property: 'scale3d',
+        subproperty: 'y'/*,
+        remove: true*/
+      },
+      originX: {
+        savedAs: 'originX',
+        property: 'originX',
+        toUnit: '%',
+        relativeTo: 'width'
+      },
+      origin2dX: {
+        savedAs: 'originX',
+        property: 'origin',
+        subproperty: 'x',
+        toUnit: '%',
+        relativeTo: 'width'/*,
+        remove: true*/
+      },
+      originY: {
+        savedAs: 'originY',
+        property: 'originY',
+        toUnit: '%',
+        relativeTo: 'height'
+      },
+      origin2dY: {
+        savedAs: 'originY',
+        property: 'origin',
+        subproperty: 'y',
+        toUnit: '%',
+        relativeTo: 'height'/*,
+        remove: true*/
+      },
+      marginLeft: {
+        savedAs: 'marginLeft',
+        property: 'marginLeft',
+        toUnit: 'px',
+        relativeTo: 'parentWidth'
+      },
+      marginTop: {
+        savedAs: 'marginTop',
+        property: 'marginTop',
+        toUnit: 'px',
+        relativeTo: 'parentWidth'
+      },
+      blur: {
+        savedAs: 'blur',
+        property: 'blur',
+        toUnit: 'px',
+        relativeTo: 'parentWidth',
+        remove: true
+      },
+      opacity: {
+        savedAs: 'opacity',
+        property: 'opacity',
+        remove: true
+      }
+    },
+    get: function(e, anim)
+    {
+      var settings = this.presettings;
 
+      anim8.dom.property.marginLeft.get( e, anim );
+      anim8.dom.property.marginTop.get( e, anim );
+
+      this.getFramed( e, anim, settings.rotate );
+      this.getFramed( e, anim, settings.rotate3d );
+      this.getFramed( e, anim, settings.skewX );
+      this.getFramed( e, anim, settings.skewY );
+      this.getFramed( e, anim, settings.skew2dX );
+      this.getFramed( e, anim, settings.skew2dY );
+      this.getFramed( e, anim, settings.translateX );
+      this.getFramed( e, anim, settings.translate2dX );
+      this.getFramed( e, anim, settings.translate3dX );
+      this.getFramed( e, anim, settings.translateY );
+      this.getFramed( e, anim, settings.translate2dY );
+      this.getFramed( e, anim, settings.translate3dY );
+      this.getFramed( e, anim, settings.scaleX );
+      this.getFramed( e, anim, settings.scale2dX );
+      this.getFramed( e, anim, settings.scale3dX );
+      this.getFramed( e, anim, settings.scaleY );
+      this.getFramed( e, anim, settings.scale2dY );
+      this.getFramed( e, anim, settings.scale3dY );
+      this.getFramed( e, anim, settings.originX );
+      this.getFramed( e, anim, settings.originY );
+      this.getFramed( e, anim, settings.origin2dX );
+      this.getFramed( e, anim, settings.origin2dY );
+
+      this.getFramed( e, anim, settings.blur );
+      this.getFramed( e, anim, settings.opacity );
+    },
+    getFramed: function(e, flash, def)
+    {
+      var anim = anim8.coalesce( flash.source, flash );
+      var attr = def.property; 
+      var value = anim.frame[ attr ];
+
+      if ( anim8.isBoolean( flash.animating[ attr ] ) && anim8.isDefined( value ) )
+      {
+        var fromUnit = def.toUnit;
+        var toUnit = flash.units[ attr ];
+
+        if ( def.subproperty )
+        {
+          var attribute = anim.getAttribute( attr );
+
+          if ( !flash.frame[ attr ] )
+          {
+            flash.frame[ attr ] = attribute.cloneDefault();
+          }
+
+          var converted = value[ def.subproperty ];
+
+          if ( fromUnit !== toUnit )
+          {
+            converted = anim8.dom.convert( e, converted + fromUnit, toUnit, def.relativeTo );
+          }
+
+          if ( converted !== false )
+          {
+            flash.frame[ attr ][ def.subproperty ] = converted;
+            flash.animating[ attr ] = true;
+          }
+        }
+        else
+        {
+          var converted = value;
+
+          if ( fromUnit !== toUnit ) 
+          {
+            converted = anim8.dom.convert( e, converted + fromUnit, toUnit, def.relativeTo );
+          }
+
+          if ( converted !== false )
+          {
+            flash.frame[ attr ] = converted;
+            flash.animating[ attr ] = true;
+          }
+        }
+      }
+
+      return ( flash.animating[ attr ] === true );
     },
     resolveRelativeTo: function(anim, relativeTo)
     {
@@ -141,7 +408,14 @@ if ( anim8.browser.IE && anim8.browser.IE <= 8 )
           actualValue = anim8.dom.convert( e, united, def.toUnit, relativeTo );
         }
 
-        anim.cached[ def.savedAs ] = actualValue;
+        if ( actualValue !== false )
+        {
+          anim.cached[ def.savedAs ] = actualValue;          
+        }
+        else
+        {
+          canConvert = false;
+        }
       }
       else if ( def.remove )
       {
@@ -189,158 +463,6 @@ if ( anim8.browser.IE && anim8.browser.IE <= 8 )
       relativeTo = this.resolveRelativeTo( anim, relativeTo );
 
       return anim8.dom.convert( e, attribute.defaultValue + attribute.defaultUnit, toUnit, relativeTo );
-    },
-    presettings:
-    {
-      width: {
-        savedAs: 'width',
-        property: 'width',
-        relativeTo: 'parentWidth',
-        defaultProperty: 'offsetWidth',
-        toUnit: 'px'
-      },
-      height: {
-        savedAs: 'height',
-        property: 'height',
-        relativeTo: 'parentHeight',
-        defaultProperty: 'offsetHeight',
-        toUnit: 'px'
-      },
-      rotate: {
-        savedAs: 'rotate',
-        property: 'rotate',
-        toUnit: 'rad'
-      },
-      rotate3d: {
-        savedAs: 'rotate',
-        property: 'rotate3d',
-        subproperty: 'angle',
-        toUnit: 'rad'
-      },
-      skewX: {
-        savedAs: 'skewX',
-        property: 'skewX',
-        toUnit: 'rad'
-      },
-      skew2dX: {
-        savedAs: 'skewX',
-        property: 'skew',
-        subproperty: 'x',
-        toUnit: 'rad',
-        remove: true
-      },
-      skewY: {
-        savedAs: 'skewY',
-        property: 'skewY',
-        toUnit: 'rad'
-      },
-      skew2dY: {
-        savedAs: 'skewY',
-        property: 'skew',
-        subproperty: 'y',
-        toUnit: 'rad',
-        remove: true
-      },
-      translateX: {
-        savedAs: 'translateX',
-        property: 'translateX',
-        relativeTo: 'width',
-        toUnit: 'px'
-      },
-      translate2dX: {
-        savedAs: 'translateX',
-        property: 'translate',
-        subproperty: 'x',
-        toUnit: 'px',
-        relativeTo: 'width'
-      },
-      translate3dX: {
-        savedAs: 'translateX',
-        property: 'translate3d',
-        subproperty: 'x',
-        toUnit: 'px',
-        relativeTo: 'width',
-        remove: true
-      },
-      translateY: {
-        savedAs: 'translateY',
-        property: 'translateY',
-        relativeTo: 'height',
-        toUnit: 'px'
-      },
-      translate2dY: {
-        savedAs: 'translateY',
-        property: 'translate',
-        subproperty: 'y',
-        toUnit: 'px',
-        relativeTo: 'height'
-      },
-      translate3dY: {
-        savedAs: 'translateY',
-        property: 'translate3d',
-        subproperty: 'y',
-        toUnit: 'px',
-        relativeTo: 'height',
-        remove: true
-      },
-      scaleX: {
-        savedAs: 'scaleX',
-        property: 'scaleX'
-      },
-      scale2dX: {
-        savedAs: 'scaleX',
-        property: 'scale',
-        subproperty: 'x'
-      },
-      scale3dX: {
-        savedAs: 'scaleX',
-        property: 'scale3d',
-        subproperty: 'x',
-        remove: true
-      },
-      scaleY: {
-        savedAs: 'scaleY',
-        property: 'scaleY'
-      },
-      scale2dY: {
-        savedAs: 'scaleY',
-        property: 'scale',
-        subproperty: 'y'
-      },
-      scale3dY: {
-        savedAs: 'scaleY',
-        property: 'scale3d',
-        subproperty: 'y',
-        remove: true
-      },
-      originX: {
-        savedAs: 'originX',
-        property: 'originX',
-        toUnit: '%',
-        relativeTo: 'width'
-      },
-      origin2dX: {
-        savedAs: 'originX',
-        property: 'origin',
-        subproperty: 'x',
-        toUnit: '%',
-        relativeTo: 'width',
-        remove: true
-      },
-      originY: {
-        savedAs: 'originY',
-        property: 'originY',
-        toUnit: '%',
-        relativeTo: 'height'
-      },
-      origin2dY: {
-        savedAs: 'originY',
-        property: 'origin',
-        subproperty: 'y',
-        toUnit: '%',
-        relativeTo: 'height',
-        remove: true
-      }
     },
     preset: function(e, anim)
     {
@@ -423,6 +545,47 @@ if ( anim8.browser.IE && anim8.browser.IE <= 8 )
 
       cached.originX = this.cachedOrDefault( e, anim, cached.originX, attrs.originX, '%', 'width' );
       cached.originY = this.cachedOrDefault( e, anim, cached.originY, attrs.originY, '%', 'height' );
+
+      if ( !anim8.isDefined( cached.baseMarginLeft ) )
+      {
+        var margins = anim.get({
+          marginLeft: 'px',
+          marginTop: 'px'
+        });
+
+        cached.baseMarginLeft = margins.marginLeft || 0;
+        cached.baseMarginTop = margins.marginTop || 0;
+      }
+
+      if ( this.cacheConverted( e, anim, settings.marginLeft ) )
+      {
+        cached.marginLeft -= cached.baseMarginLeft;
+      }
+      else
+      {
+        cached.marginLeft = 0;
+      }
+
+      if ( this.cacheConverted( e, anim, settings.marginTop ) )
+      {
+        cached.marginTop -= cached.baseMarginTop;
+      }
+      else
+      {
+        cached.marginTop = 0;
+      }
+
+      this.cacheValue( e, anim, settings.opacity );
+
+      this.cacheConverted( e, anim, settings.blur );
+    },
+    unset: function(e, anim)
+    {
+      e.style.filter = '';
+      e.style.marginLeft = (anim.cached.baseMarginLeft || 0) + 'px';
+      e.style.marginTop = (anim.cached.baseMarginTop || 0) + 'px';
+
+      anim.cached = {};
     },
     set: function(e, anim)
     {
@@ -430,133 +593,109 @@ if ( anim8.browser.IE && anim8.browser.IE <= 8 )
       var attrs = anim8.dom.attribute;
       var w = cached.width;
       var h = cached.height;
+      var anchorX = cached.originX * 0.01;
+      var anchorY = cached.originY * 0.01;
+      var dx = 0;
+      var dy = 0;
+      var matrix = anim8.matrix.identity();
 
-      var scales     = anim8.isDefined( cached.scaleX ) || anim8.isDefined( cached.scaleY );
-      var translates = anim8.isDefined( cached.translateX );
-      var rotates    = anim8.isDefined( cached.rotate );
-      var skews      = anim8.isDefined( cached.skewX );
-
-      if ( scales || rotates || translates || skews )
+      if ( anim8.isDefined( cached.scaleX ) || anim8.isDefined( cached.scaleY ) )
       {
-        var anchorX = cached.originX * 0.01;
-        var anchorY = cached.originY * 0.01;
-        var dx = 0;
-        var dy = 0;
-        
-        var matrix = anim8.matrix.identity();
+        matrix = anim8.matrix.multiply( matrix, anim8.matrix.scale( 
+          anim8.coalesce( cached.scaleX, attrs.scaleX.defaultValue ), 
+          anim8.coalesce( cached.scaleY, attrs.scaleY.defaultValue )
+        ));
+      }
+      
+      if ( anim8.isDefined( cached.skewX ) )
+      {
+        matrix = anim8.matrix.multiply( matrix, anim8.matrix.skew( cached.skewX, cached.skewY ) );
+      }
 
-        if ( scales )
-        {
-          matrix = anim8.matrix.multiply( matrix, anim8.matrix.scale( 
-            anim8.coalesce( cached.scaleX, attrs.scaleX.defaultValue ), 
-            anim8.coalesce( cached.scaleY, attrs.scaleY.defaultValue )
-          ));
-        }
-        
-        if ( skews )
-        {
-          matrix = anim8.matrix.multiply( matrix, anim8.matrix.skew( cached.skewX, cached.skewY ) );
-        }
+      if ( anim8.isDefined( cached.rotate ) )
+      {
+        matrix = anim8.matrix.multiply( matrix, anim8.matrix.rotate( cached.rotate ) );
+      }
+      
+      if ( anim8.isDefined( cached.translateX ) )
+      {
+        dx += cached.translateX;
+        dy += cached.translateY;
+      }
 
-        if ( rotates )
-        {
-          matrix = anim8.matrix.multiply( matrix, anim8.matrix.rotate( cached.rotate ) );
-        }
-        
-        if ( translates )
-        {
-          dx += cached.translateX;
-          dy += cached.translateY;
-        }
+      // Calculate the new size of the element based on the matrix. We need to
+      // adjust by the difference because IE is special.
+      var newSize = anim8.matrix.adjustment( matrix, w, h );
+      dx += (w - newSize.x) * 0.5;
+      dy += (h - newSize.y) * 0.5;
 
-        // Calculate the new size of the element based on the matrix. We need to
-        // adjust by the difference because IE is special.
-        var newSize = anim8.matrix.adjustment( matrix, w, h );
-        dx += (w - newSize.x) * 0.5;
-        dy += (h - newSize.y) * 0.5;
+      // Adjust for a non-centered transformation
+      var hw = w * 0.5;
+      var hh = h * 0.5;
+      var origin = anim8.matrix.transform( matrix, hw, hh );
+      dx += (hw - origin.x) * (anchorX * 2 - 1);
+      dy += (hh - origin.y) * (anchorY * 2 - 1);
 
-        // Adjust for a non-centered transformation
-        var hw = w * 0.5;
-        var hh = h * 0.5;
-        var origin = anim8.matrix.transform( matrix, hw, hh );
-        dx += (hw - origin.x) * (anchorX * 2 - 1);
-        dy += (hh - origin.y) * (anchorY * 2 - 1);
+      // If margin is already specified, add it to the new margin value.
+      dx += cached.marginLeft + cached.baseMarginLeft;
+      dy += cached.marginTop + cached.baseMarginTop;
 
-        // Yes, because this makes sense.
-        var imageTransform = 'progid:DXImageTransform.Microsoft.Matrix(SizingMethod=\'auto expand\'' + 
+      // Set the margin to account for a lack of translation.
+      anim.styles.marginLeft = dx + 'px';
+      anim.styles.marginTop = dy + 'px';
+
+      // The array of filter operations
+      var filters = [];
+
+      // Transformations
+      if ( matrix.m11 !== 1.0 || matrix.m12 !== 0.0 || matrix.m21 !== 0.0 || matrix.m22 !== 1.0 )
+      {
+        var transformFilter = 'progid:DXImageTransform.Microsoft.Matrix(SizingMethod=\'auto expand\'' + 
           ', M11=' + matrix.m11 + ', M12=' + matrix.m12 + 
           ', M21=' + matrix.m21 + ', M22=' + matrix.m22 + ')';
 
-        // If margin is already specified, add it to the new margin value.
-        if ( anim8.isDefined( anim.styles.marginLeft ) )
-        {
-          dx += anim8.convert( e, anim.styles.marginLeft, 'px', w * 0.01 );
-        }
-        if ( anim8.isDefined( anim.styles.marginTop ) )
-        {
-          dy += anim8.convert( e, anim.styles.marginTop, 'px', h * 0.01 );
-        }
-
-        // Set the margin to account for a lack of translation.
-        anim.styles.marginLeft = dx + 'px';
-        anim.styles.marginTop = dy + 'px';
-
-        // Set the filter properties!
-        anim8.dom.concatenateStyle( anim, 'msFilter', '"' + imageTransform + '"' );
-        anim8.dom.concatenateStyle( anim, 'filter', imageTransform );
-
-        // Force layout
-        anim.styles.zoom = 1;
+        filters.push( transformFilter );
       }
-    }
-  };
-}
 
-/* blur IE <= 8 */
-if ( anim8.browser.IE && anim8.browser.IE <= 8 )
-{
-  // var regex = /progid:DXImageTransform\.Microsoft\.Blur\(PixelRadius=([^']+)\)/;
+      // Opacity
+      if ( anim8.isNumber( cached.opacity ) && !isNaN( cached.opacity )  )
+      {
+        var opacityFilter = 'progid:DXImageTransform.Microsoft.Alpha(Opacity=' + ( cached.opacity * 100 ) + ')';
 
-  anim8.dom.attribute.blur.property = 'blur';
+        filters.push( opacityFilter );
+      }
 
-  anim8.dom.property.blur = 
-  {
-    get: function() 
-    {
+      // Blur
+      if ( anim8.isNumber( cached.blur ) && !isNaN( cached.blur ) )
+      {
+        var blurFilter = 'progid:DXImageTransform.Microsoft.Blur(PixelRadius=\'' + ( cached.blur ) + 'px\')';
 
-    },
-    set: function(e, anim) 
-    {
-      var imageTransform = 'progid:DXImageTransform.Microsoft.Blur(PixelRadius=\'' + (anim.frame.blur) + 'px\')';
+        filters.push( blurFilter );
+      }
 
-      anim8.dom.concatenateStyle( anim, 'msFilter', '"' + imageTransform + '"' );
-      anim8.dom.concatenateStyle( anim, 'filter', imageTransform );
+      // Set the filter properties!
+      anim.styles.filter = filters.join( ' ' );
 
+      // Force layout
       anim.styles.zoom = 1;
     }
   };
-}
 
-/* opacity <= IE 8 */
-if ( anim8.browser.IE && anim8.browser.IE <= 8 )
-{
-  // var regex = /alpha\(opacity=([^\)]+)\)/i;
+  var attributes = [
+    'marginLeft', 'marginTop', 
+    'blur', 
+    'opacity', 
+    'origin', 'originX', 'originY', 
+    'translate', 'translateX', 'translateY', 'translateZ', 'translate3d', 
+    'rotate', 'rotate3d', 
+    'skew', 'skewX', 'skewY',
+    'scale', 'scaleX', 'scaleY', 'scaleZ', 'scale3d'
+  ];
 
-  anim8.dom.property.opacity = 
+  for ( var i = 0; i < attributes.length; i++ )
   {
-    get: function() 
-    {
-
-    },
-    set: function(e, anim)
-    {
-      var filter = 'alpha(opacity=' + (anim.frame.opacity * 100) + ')';
-
-      anim8.dom.concatenateStyle( anim, 'filter', filter );
-
-      anim.styles.zoom = 1;
-    }
-  };
+    anim8.dom.setProperty( attributes[ i ], 'ieTransform' );
+  }
 }
 
 /* minWidth < IE 8 */

@@ -7,6 +7,7 @@
       margin: 0;
       width: 100%;
       height: 100%;
+      overflow: hidden;
     }
     #box1,
     #box1_original {
@@ -32,7 +33,7 @@
       background-color: #6F6;
     }
     #box2_original {
-      background-color: #9F9; 
+      background-color: #9F9;
     }
     #box3,
     #box3_original {
@@ -73,6 +74,19 @@
     #box5_original {
       background-color: #F9F; 
     }
+    #box6,
+    #box6_original {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #FF0;
+      left: 500px;
+      top: 300px;
+      position: absolute;
+      background-color: #FF6;
+    }
+    #box6_original {
+      background-color: #FF9; 
+    }
     </style>
   </head>
   <body>
@@ -91,6 +105,9 @@
     
     <div id="box5_original"></div>
     <div id="box5"></div>
+    
+    
+    <div id="box6"></div>
    
     <script src="../build/anim8js-dom.js"></script>
     
@@ -131,6 +148,12 @@
         }
       }, {
         easing: 'linear'
+      });
+
+      anim8.save('blink', {
+        values: {
+          opacity: [0, 1, 0]
+        }
       });
 
       anim8.save('move', {
@@ -185,6 +208,8 @@
       m8( window.box4 ).play( 'grow 8s & rotate 8s & move 8s' );
 
       m8( window.box5 ).play( 'wiggle 8s' );
+
+      m8( window.box6 ).play( 'blink 4s' );
 
     </script>
     

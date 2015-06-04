@@ -34,6 +34,7 @@ var core =
   './lib/anim8js-attrimator.js',
   './lib/anim8js-attrimator-map.js',
   './lib/anim8js-event.js',
+  './lib/anim8js-oncer.js',
   './lib/anim8js-spring.js',
   './lib/anim8js-spring-linear.js',
   './lib/anim8js-spring-distance.js',

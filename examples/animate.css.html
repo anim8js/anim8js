@@ -39,14 +39,14 @@
   </style>
 <style type="text/css"></style></head>
 <body>
-<header class="site__header island">
+<div class="site__header island">
   <div class="wrap" style="position:relative">
    <span id="animationSandbox"><h1 class="site__title mega">Animate.css.js</h1></span>
-    <span class="beta subhead">Just-add-water CSS animations</span>
+   <span class="beta subhead">Just-add-water CSS animations</span>
   </div>
-</header><!-- /.site__header -->
+</div><!-- /.site__header -->
 
-<main class="site__content island" role="content">
+<div class="site__content island" role="content">
   <div class="wrap">
     <form>
       <select class="input input--dropdown js--animations">
@@ -212,7 +212,7 @@
     <hr>
     <p class="meta"><a href="https://raw.github.com/daneden/animate.css/master/animate.css" download="animate.css">Download Animate.css.js</a> or <a href="http://github.com/daneden/animate.css">View on GitHub</a></p>
   </div>
-</main><!-- /.site__content -->
+</div><!-- /.site__content -->
 
   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	
@@ -229,6 +229,7 @@
   {
     m8( window.animationSandbox )
       .stop()
+      .off()
       .restore()
       .play( $('.js--animations').val() )
       .defer( 'once', 'finished' )
@@ -243,6 +244,7 @@
   {
     m8( window.animationSandbox )
       .stop()
+      .off()
       .restore()
       .play( $('.js--action').val() + $('.js--direction').val() + $('.js--y').val() + $('.js--x').val() + $('.js--size').val() )
       .defer( 'once', 'finished' )

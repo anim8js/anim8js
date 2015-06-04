@@ -39,11 +39,11 @@
       padding: 6px;
       height: 27px;
     }
-    input[type=number] {
+    .number-input {
       width: 50px;
       padding: 0px 4px;
     }
-    input[type=color] {
+    .color-input {
       width: 70px;
       height: 27px;
       margin-top: -3px;
@@ -56,14 +56,13 @@
     .unit {
       width: 70px;
     }
-    .grouping>* {
-      display: inline-block;
-    }
     .right {
       float: right;
     }
-    .options>div {
+    .options .option {
+      display: inline;
       display: inline-block;
+      zoom: 1;
     }
     #attributes {
       left: 100px;
@@ -102,9 +101,9 @@
 
     <div class="options">
 
-      <div>
+      <div class="option">
         <small>&nbsp;delay</small><br>
-        <input id="option_delay" type="number" value="0">
+        <input id="option_delay" type="number" value="0" class="number-input">
         <select id="option_delay_unit">
           <option value="s" selected>sec</option>
           <option value="ms">ms</option>
@@ -116,9 +115,9 @@
         </select>
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;duration</small><br>
-        <input id="option_duration" type="number" value="1">
+        <input id="option_duration" type="number" value="1" class="number-input">
         <select id="option_duration_unit">
           <option value="s" selected>sec</option>
           <option value="ms">ms</option>
@@ -130,14 +129,14 @@
         </select>
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;repeat</small><br>
-        <input id="option_repeat" type="number" value="1">
+        <input id="option_repeat" type="number" value="1" class="number-input">
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;sleep</small><br>
-        <input id="option_sleep" type="number" value="0">
+        <input id="option_sleep" type="number" value="0" class="number-input">
         <select id="option_sleep_unit">
           <option value="s" selected>sec</option>
           <option value="ms">ms</option>
@@ -149,9 +148,9 @@
         </select>
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;offset</small><br>
-        <input id="option_offset" type="number" value="0">
+        <input id="option_offset" type="number" value="0" class="number-input">
         <select id="option_offset_unit">
           <option value="s" selected>sec</option>
           <option value="ms">ms</option>
@@ -163,12 +162,12 @@
         </select>
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;scale</small><br>
-        <input id="option_scale" type="number" value="1">
+        <input id="option_scale" type="number" value="1" class="number-input">
       </div>
       |
-      <div>
+      <div class="option">
         <small>&nbsp;easing</small><br>
         <select id="option_easing"></select>
         <select id="option_easingType">
@@ -268,7 +267,7 @@
         <option value="pc">pc</option>
       </select>
 
-      <input id="p1_length" type="number">
+      <input id="p1_length" type="number" class="number-input">
 
       <button id="p1_length_unset" class="right">Unset</button>
       <button id="p1_length_move" class="right">Move</button>
@@ -291,7 +290,7 @@
         <option value="rad">rad</option>
       </select>
 
-      <input id="p1_angle" type="number">
+      <input id="p1_angle" type="number" class="number-input">
 
       <button id="p1_angle_tween" class="right">Tween</button>
 
@@ -319,8 +318,8 @@
         <option value="pc">pc</option>
       </select>
 
-      <input id="p2_length_x" type="number" placeholder=" x">
-      <input id="p2_length_y" type="number" placeholder=" y">
+      <input id="p2_length_x" type="number" placeholder=" x" class="number-input">
+      <input id="p2_length_y" type="number" placeholder=" y" class="number-input">
 
       <button id="p2_length_tween" class="right">Tween</button>
 
@@ -346,9 +345,9 @@
         <option value="pc">pc</option>
       </select>
 
-      <input id="p3_length_x" type="number" placeholder=" x">
-      <input id="p3_length_y" type="number" placeholder=" y">
-      <input id="p3_length_z" type="number" placeholder=" z">
+      <input id="p3_length_x" type="number" placeholder=" x" class="number-input">
+      <input id="p3_length_y" type="number" placeholder=" y" class="number-input">
+      <input id="p3_length_z" type="number" placeholder=" z" class="number-input">
 
       <button id="p3_length_tween" class="right">Tween</button>
 
@@ -367,7 +366,7 @@
         <option value="outlineColor">outlineColor</option>
       </select>
 
-      <input id="rgb_value" type="color">
+      <input id="rgb_value" type="color" class="color-input">
 
       <button id="rgb_tween" class="right">Tween</button>
 

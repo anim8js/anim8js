@@ -88,3 +88,11 @@
 86. [X] Fix zIndex property
 87. [X] Modify anim8.computed.current for DomAnimator to convert the current value (if it exists) into the desired unit. We need to keep track of the previous unit.
 88. [X] Add attributes: textShadowX, textShadowY, textShadowBlur, textShadowColor, shadowX, shadowY, shadowBlur, shadowSpread, shadowColor, shadowInset,
+89. [X] IE8 Tweening
+90. [ ] Pass attributes to property.unset
+91. [X] Make anim8.Animators not extend Array
+92. [X] anim8.eventize.off should only accept events, or none at all to remove all listeners
+93. [X] queued animations applying initial state to early
+94. [X] Fix transform clearing for IE
+95. [X] jquery.html issue with origin being wrong (really short duration events) - setter attrimator needed
+96. [ ] Investigate IE8 transform issues (see travel.html & animate.css.html) - scaling, rotation, & skewing are off.
