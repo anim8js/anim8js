@@ -96,3 +96,8 @@
 94. [X] Fix transform clearing for IE
 95. [X] jquery.html issue with origin being wrong (really short duration events) - setter attrimator needed
 96. [ ] Investigate IE8 transform issues (see travel.html & animate.css.html) - scaling, rotation, & skewing are off.
+97. [X] Refactor animation parsing logic. 
+98. [ ] Add groupId (Number) to attrimators which tells what attrimators should be on the same animation cycle
+99. [ ] Add mergeId (Number) to attrimators which tells option merging
+100. [X] Add queue parser
+101. [X] Add and parser

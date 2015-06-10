@@ -2791,6 +2791,100 @@ anim8.isComputed = function(x)
   return anim8.isFunction( x ) && x.computed;
 };
 
+
+/**
+ * Creates a composite dyanmic attribute which is an object of existing 
+ * attributes which takes advantage of an object based calculator.
+ *
+ * **Example:**
+ * 
+ *     anim8.object.attribute.topLeft = { 
+ *       dynamic: anim8.composite({x:'left', y:'top'}), 
+ *       calculator:'2d', 
+ *       defaultValue: {x: 0, y: 0}, 
+ *       defaultUnit: 'px' 
+ *     };
+ *
+ * Which results in the values in 'topLeft' being placed in left and top.
+ * 
+ * @method anim8.composite
+ * @param  {Object} map
+ * @for Core
+ * @return {Function}
+ */
+anim8.composite = function( map )
+{
+  return function( value, frame )
+  {
+    for ( var prop in map )
+    {
+      frame[ map[ prop ] ] = value[ prop ];
+    }
+  };
+};
+
+/**
+ * Creates a partial dynamic attribute which is a value that's placed in a 
+ * sub-property of an attribute.
+ *
+ * **Example:**
+ * 
+ *     anim8.object.attribute.x = {
+ *       dynamic: anim8.partial( 'position', 'x' ),
+ *       calculator: 'number',
+ *       defaultValue: 0,
+ *       defaultUnit: 'px'
+ *     };
+ *
+ * Which results in the values in 'x' being placed in position.x
+ *
+ * @method anim8.partial
+ * @param {String} attribute
+ * @param {String} subattribute
+ * @for Core
+ * @return {Function}
+ */
+anim8.partial = function( attribute, subattribute )
+{
+  return function( value, frame )
+  {
+    if ( !anim8.isObject( frame[ attribute ] ) )
+    {
+      frame[ attribute ] = {};
+    }
+
+    frame[ attribute ][ subattribute ] = value;
+  }
+};
+
+/**
+ * Creates a dynamic attribute which spreads its value over several attributes.
+ *
+ * **Example:**
+ * 
+ *     anim8.dom.attribute.padding = {
+ *       dynamic: anim8.spread( ['paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom' ] ),
+ *       calculator: 'number',
+ *       defaultValue: 0,
+ *       defaultUnit: 'px'
+ *     };
+ *
+ * Which results in the value in 'padding' being placed in paddingLeft, paddingTop,
+ * paddingRight, and paddingBottom.
+ * 
+ * @param  {Array} attributes
+ * @return {Function}
+ */
+anim8.spread = function( attributes )
+{
+  return function( value, frame )
+  {
+    for ( var i = 0; i < attributes.length; i++ )
+    {
+      frame[ attributes[ i ] ] = value;
+    }
+  };
+};
 /**
  * A collection of calculators. A calculator is responsible for performing
  * mathematical operations for a specific animatable data type.
@@ -5049,52 +5143,6 @@ anim8.path['keyframe'] = function(point)
 
 
 /**
- * Instantiates a new PathPoint.
- * 
- * @param {String|false} name
- * @param {Calculator} calculator
- * @param {T} point
- * @class PathPoint
- * @constructor
- * @extends Path
- */
-anim8.PathPoint = function(name, calculator, point)
-{
-  this.reset( name, calculator, [point] );
-};
-
-anim8.override( anim8.PathPoint.prototype = new anim8.Path(),
-{
-  compute: function(out, delta)
-  {
-    return this.calculator.copy( out, this.resolvePoint( 0 ) );
-  },
-  copy: function() 
-  {
-    return new anim8.PathPoint( this.name, this.calculator, this.points[0] );
-  }
-});
-
-
-/**
- * Parses an object for a point path.
- * 
- * @param {Object} path
- * @return {PathPoint}
- */
-anim8.path['point'] = function(path)
-{
-  var calc = anim8.calculator( path.calculator );
-  
-  return new anim8.PathPoint(
-    path.name,
-    calc,
-    calc.parse( path.point )
-  );
-};
-
-
-/**
  * Animates a single attribute over any period of time.
  *
  * @class Attrimator
@@ -5712,7 +5760,38 @@ anim8.override( anim8.AttrimatorMap.prototype = new anim8.FastMap(),
     }
 
     return nextCycle;
+  },
+
+  /**
+   * Iterates through all attrimators in this map, at any depth.
+   *
+   * @method iterate
+   * @param  {Function} callback
+   * @param  {Object} [context]
+   * @chainable
+   */
+  iterate: function(callback, context)
+  {
+    var values = this.values;
+
+    for (var i = values.length - 1; i >= 0; i--)
+    {
+      var attrimator = values[i];
+      var previous = null;
+      var depth = 0;
+
+      while ( attrimator )
+      {
+        callback.call( context || this, attrimator, depth++, previous );
+
+        attrimator = (previous = attrimator).next;
+      }
+    }
+
+    return this;
   }
+
+
 
 });
 
@@ -5749,7 +5828,7 @@ anim8.EventState =
  * @constructor
  * @extends Attrimator
  */
-anim8.Event = function(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, parser, next) 
+anim8.Event = function(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, parser, next, input) 
 {
   this.reset( attribute, parser, next );
 
@@ -5824,6 +5903,7 @@ anim8.Event = function(attribute, path, duration, easing, delay, sleep, offset, 
 
   this.delay            = anim8.delay( delay );
   this.offset           = anim8.offset( offset );
+  this.input            = input;
 };
 
 anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
@@ -5985,7 +6065,7 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
   },
   clone: function()
   {
-    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null );
+    return new anim8.Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.parser, this.next ? this.next.clone() : null, this.input );
   },
   hasComputed: function()
   {
@@ -6033,7 +6113,7 @@ anim8.Event.fromOptions = function(attr, path, options)
  * @constructor
  * @extends Attrimator
  */
-anim8.Oncer = function( attribute, value, delay, hasInitialState, parser, next) 
+anim8.Oncer = function( attribute, value, delay, hasInitialState, parser, next, input ) 
 {
   this.reset( attribute, parser, next );
 
@@ -6055,6 +6135,7 @@ anim8.Oncer = function( attribute, value, delay, hasInitialState, parser, next)
 
   this.delay            = anim8.delay( delay );
   this.applied          = false;
+  this.input            = input;
 };
 
 anim8.override( anim8.Oncer.prototype = new anim8.Attrimator(),
@@ -6668,14 +6749,14 @@ anim8.Physics.MAX_DT = 0.1;
 
 
 /**
- * Returns an instance of anim8.Animation based on the given input & options. If 
- * the input is an instance of anim8.Animation that instance is immediately 
- * returned. If the input is a string the animation with that name is returned. 
- * If the input is a string with an animation name and an option string the
- * animation with the given name modified by any additional options is returned.
- * Commas can be used to queue animation & option pairs one after another. If 
- * the input is an object an anonymous animation is created. If no animation
- * could be determined then false is returned.
+ * Returns an instance of {{#crossLink "Animation"}}{{/crossLink}} based on the 
+ * given input & options. If the input is a string the animation with that name 
+ * is returned. If the input is a string with an animation name and an option 
+ * string the animation with the given name modified by any additional options 
+ * is returned. Commas can be used to queue animation & option pairs one after 
+ * another. Ampersands can be used to play animations at the same time. If the 
+ * input is an object an anonymous animation is created. If no animation could 
+ * be determined then false is returned.
  *
  * **Examples:**
  * 
@@ -6683,6 +6764,7 @@ anim8.Physics.MAX_DT = 0.1;
  *     anim8.animation('wiggle ~1s 4s z40ms x5 !1.2');
  *     anim8.animation('wiggle', {...options...});
  *     anim8.animation('wiggle, tada ~50ms, fadeOut 2s');
+ *     anim8.animation('wiggle & tada !3, fadeOut');
  *     anim8.animation({...definition...});
  * 
  * If the given input is a string you can cache it. An example would be
@@ -6702,100 +6784,191 @@ anim8.Physics.MAX_DT = 0.1;
  */
 anim8.animation = function(animation, options, cache)
 {
+  var options = anim8.options( options, cache );
+  var hasOptions = !anim8.isEmpty( options );
+
   if ( animation instanceof anim8.Animation )
   {
+    if ( hasOptions )
+    {
+      var attrimators = animation.newAttrimators();
+
+      animation.merge( options, attrimators );
+
+      return new anim8.Animation( false, animation.input, options, attrimators);
+    }
+
     return animation;
   }
   if ( anim8.isString( animation ) )
   {
     var key = animation.toLowerCase();
 
-    if ( key in anim8.animation )
+    if ( key in anim8.animation && !hasOptions )
     {
       return anim8.animation[ key ];
     }
 
-    var animationsQueued = animation.split(',');
-    var anim = false;
-    var last = false;
+    var attrimators = anim8.attrimatorsFor( animation, options, cache );
 
-    for (var k = 0; k < animationsQueued.length; k++)
+    if ( key in anim8.animation && !hasOptions )
     {
-      var animationsMerged = animationsQueued[ k ].split( '&' );
-      var base = false;
-
-      for (var j = 0; j < animationsMerged.length; j++)
-      {
-        var animationString = anim8.trim( animationsMerged[ j ].toLowerCase() );
-        var animationSplit = animationString.split( ' ' );
-        var parsedAnimation = anim8.animation[ animationSplit[ 0 ] ];
-        var parsedOptions = anim8.options( animationSplit.slice( 1 ) );
-
-        if ( parsedAnimation )
-        {
-          var extendedAnimation = parsedAnimation.extend( parsedOptions, true );
-
-          if ( base === false )
-          {
-            base = extendedAnimation;
-
-            if ( anim === false )
-            {
-              last = anim = base;
-            }
-            else
-            {
-              last = last.next = base;
-            }
-          }
-          else
-          {
-            base.attrimators.putMap( extendedAnimation.attrimators );
-          }
-        }
-        else
-        {
-          throw parsedAnimation + ' is not a valid animation in "' + animationsQueued[ k ] + '"';
-        }
-      }
+      return anim8.animation[ key ];
     }
 
-    if ( anim8.coalesce( cache, anim8.defaults.cache ) && anim8.isEmpty( options ) )
-    {
-      anim.name = animation;
-
-      anim8.animation[ key ] = anim;
-    }
-
-    return anim;
+    return new anim8.Animation( false, {}, options, attrimators );
   }
   if ( anim8.isObject( animation ) )
   {
-    var attrimatorMap = new anim8.AttrimatorMap();
-    var options = anim8.options( options );
+    var attrimators = anim8.attrimatorsFor( animation, options, cache );
+
+    return new anim8.Animation( false, animation, options, attrimators );
+  }
+  
+  return false;
+};
+
+/**
+ * Generates an AttrimatorMap for the given animation and options. If the 
+ * animation given is an instance of {{#crossLink "Animation"}}{{/crossLink}}
+ * then a copy of that animations attrimators is returned, and if options are
+ * specified then they are merged into the generated attrimators. If the 
+ * animation given is an object it's properties are iterated and for each parser
+ * with a matching name attrimators are generated. If the animation given is a
+ * string of a cached or saved animation then it's handled as if an instance of
+ * {{#crossLink "Animation"}}{{/crossLink}} was given. If the animation given
+ * is a string which isn't saved or cached it goes through the following parsing
+ * logic.
+ *
+ * - Split up the string into sections with `,` which queues animations.
+ * - Split up each of the sections with `&` which enables animations to play
+ *   simultaneously.
+ * - For each of those sections, take the first word as the name of the 
+ *   animation and any remaining text as the options for that animation.
+ *
+ * If no attrimators could be parsed, an empty attrimator map is returned. If
+ * the animation given is a string that specifies animations that don't exist
+ * an error is thrown.
+ * 
+ * **Examples:**
+ * 
+ *     anim8.attrimatorsFor('wiggle');
+ *     anim8.attrimatorsFor('wiggle ~1s 4s z40ms x5 !1.2');
+ *     anim8.attrimatorsFor('wiggle', {...options...});
+ *     anim8.attrimatorsFor('wiggle, tada ~50ms, fadeOut 2s');
+ *     anim8.attrimatorsFor('wiggle & tada !3, fadeOut');
+ *     anim8.attrimatorsFor({...definition...});
+ * 
+ * If the given input is a string you can cache it. An example would be
+ * 'wiggle ~1s 2s x3' - if `cache` is true and you call this method again it won't
+ * need to be parsed again.
+ *
+ * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+ * 
+ * @method anim8.attrimatorsFor
+ * @for Core
+ * @param {Object|String} animation
+ * @param {Object|String} [options]
+ * @param {Boolean} [cache=false]
+ * @return {AttrimatorMap}
+ */
+anim8.attrimatorsFor = function( animation, options, cache )
+{
+  var options = anim8.options( options, cache );
+  var hasOptions = !anim8.isEmpty( options );
+  var attrimators = new anim8.AttrimatorMap();
+
+  if ( animation instanceof anim8.Animation )
+  {
+    attrimators.putMap( animation.newAttrimators() );
+
+    if ( hasOptions )
+    {
+      animation.merge( options, attrimators );
+    }
+  }
+  else if ( anim8.isObject( animation ) )
+  {
     var helper = new anim8.ParserHelper( animation, options );
-    
+
     for (var parserName in animation)
     {
       var parser = anim8.parser( parserName );
       
       if ( parser !== false )
       {
-        parser.parse( animation, options, attrimatorMap, helper );
+        parser.parse( animation, options, attrimators, helper );
       }
     }
-    
-    if (attrimatorMap.size())
+  }
+  else if ( anim8.isString( animation ) )
+  {
+    var key = animation.toLowerCase();
+    var saved = anim8.animation[ key ];
+    var cacheIt = anim8.coalesce( cache, anim8.defaults.cache );
+
+    if ( saved )
     {
-      return new anim8.Animation( false, animation, options, attrimatorMap );
+      attrimators.putMap( saved.newAttrimators() );
+
+      if ( hasOptions )
+      {
+        saved.merge( options, attrimators );
+      }
     }
     else
     {
-      throw 'Failed to create any attrimators in anim8.animation';
+      var animationsQueued = animation.split( ',' );
+
+      for (var k = 0; k < animationsQueued.length; k++)
+      {
+        var animationsMerged = animationsQueued[ k ].split( '&' );
+        var base = new anim8.AttrimatorMap();
+
+        for (var j = 0; j < animationsMerged.length; j++)
+        {
+          var animationString = anim8.trim( animationsMerged[ j ].toLowerCase() );
+          var animationSplit = animationString.split( ' ' );
+          var parsedAnimation = anim8.animation[ animationSplit[ 0 ] ];
+          
+          if ( parsedAnimation )
+          {
+            var parsedOptions = anim8.options( animationSplit.slice( 1 ), cache );
+            var hasParsedOptions = !anim8.isEmpty( parsedOptions );
+            var parsedAttrimators = parsedAnimation.newAttrimators();
+
+            if ( hasOptions && hasParsedOptions )
+            {
+              parsedAnimation.merge( anim8.extend( {}, options, parsedOptions ), parsedAttrimators );
+            }
+            else if ( hasParsedOptions )
+            {
+              parsedAnimation.merge( parsedOptions, parsedAttrimators );
+            }
+            else if ( hasOptions )
+            {
+              parsedAnimation.merge( options, parsedAttrimators );
+            }
+
+            base.putMap( parsedAttrimators );
+          }
+          else
+          {
+            throw animationString + ' is not a valid animation in "' + animationsQueued[ k ] + '"';
+          }
+        }
+
+        attrimators.queueMap( base );
+      }
+
+      if ( cacheIt && !hasOptions )
+      {
+        anim8.animation[ key ] = new anim8.Animation( animation, {}, {}, attrimators );
+      }
     }
   }
-  
-  return false;
+
+  return attrimators;
 };
 
 /**
@@ -6812,7 +6985,7 @@ anim8.animation = function(animation, options, cache)
  * @param {Animation|String|Object} animation
  * @param {String|Object} [options]
  */
-anim8.save = function(name, animation, options)
+anim8.save = function( name, animation, options )
 {
   var animation = anim8.animation( animation, options );
   var key = name.toLowerCase();
@@ -6865,30 +7038,10 @@ anim8.Animation = function(name, input, options, attrimators)
    * @property {AttrimatorMap} name
    */
   this.attrimators = attrimators;
-
-  /**
-   * The animation to play after this animation is finished playing.
-   *
-   * @property {Animation} [next]
-   */
-  this.next = null;
 };
 
 anim8.Animation.prototype = 
 {
-  
-  /**
-   * Returns true if this animation was a saved animation, otherwise it's an 
-   * anonymous one and false is returned. Anonymous animations are typically
-   * generated once and won't be used again.
-   *
-   * @method isSaved
-   * @return {Boolean} 
-   */
-  isSaved: function()
-  {
-    return (this.name !== false);
-  },
   
   /**
    * Generates an map of event instances from the attrimators in this animation.
@@ -6918,39 +7071,13 @@ anim8.Animation.prototype =
     {
       var parser = anim8.parser( parserName );
       
-      if ( parser !== false )
+      if ( parser !== false && parser.merge )
       {
         parser.merge( this.input, options, this.options, attrimatorMap, helper );
       }
     }
 
     return attrimatorMap;
-  },
-
-  /**
-   * Extends this animation and returns an anonymous animation modified with the 
-   * given options. If an empty set of options is given this animation instance
-   * may be returned. This can be overriden if the second argument is true.
-   *
-   * @method extend
-   * @param {Object} [options]
-   * @param {Boolean} [force]
-   * @return {Animation}
-   */
-  extend: function(options, force)
-  {
-    if ( anim8.isEmpty( options ) && !force )
-    {
-      return this;
-    }
-
-    var attrimatorMap = this.newAttrimators();
-
-    this.merge( options, attrimatorMap );
-
-    anim8.extend( options, this.options );
-
-    return new anim8.Animation( false, this.input, options, attrimatorMap );
   }
 
 };
@@ -7160,6 +7287,7 @@ anim8.options = (function()
   return function(options, cache)
   {
     var originalInput = options;
+    var cacheIt = anim8.coalesce( cache, anim8.defaults.cacheOptions );
 
     if ( anim8.isString( options ) )
     {
@@ -7226,7 +7354,7 @@ anim8.options = (function()
         }
       }
 
-      if ( anim8.isString( originalInput ) && anim8.coalesce( cache, anim8.defaults.cacheOptions ) )
+      if ( anim8.isString( originalInput ) && cacheIt )
       {
         anim8.options[ originalInput ] = parsed;
       }
@@ -7340,8 +7468,7 @@ anim8.fn = anim8.Animator.prototype =
     /**
      * The map of attrimators animating the subject.
      *
-     * @property attrimators
-     * @type {AttrimatorMap}
+     * @property {AttrimatorMap} attrimators
      */
     this.attrimators = new anim8.AttrimatorMap();
 
@@ -7656,7 +7783,7 @@ anim8.fn = anim8.Animator.prototype =
 
     return existing;
   },
-  
+
   /**
    * Applies all updated attributes to the subject. This method is invoked with 
    * all of the other animators at the end of the animation cycle.
@@ -7781,68 +7908,6 @@ anim8.fn = anim8.Animator.prototype =
   },
   
   /**
-   * Creates a map of attrimators based on the animation and options given. For
-   * each anim8.Animation instance thats being converted into attrimators,
-   * the onAnimation(animation, option, attrimatorMap) function is invoked.
-   *
-   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
-   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
-   * 
-   * @method createAttrimators
-   * @param {Animation|String|Object} animation
-   * @param {String|Object} [options]
-   * @param {Boolean} [cache=false]
-   * @return {AttrimatorMap}
-   * @protected
-   */
-  createAttrimators: function(animation, options, cache)
-  {
-    var options = anim8.options( options );    
-    var animation = anim8.animation( animation, options, cache );
-  
-    if (animation === false)
-    {
-      return false;
-    }
-    
-    var attrimators = animation.newAttrimators();
-    
-    if ( animation.isSaved() && !anim8.isEmpty( options ) )
-    { 
-      animation.merge( options, attrimators );
-    }
-    
-    this.onAnimation( animation, options, attrimators );
-
-    while ( animation.next !== null )
-    {
-      animation = animation.next;
-
-      var queueAttrimators = animation.newAttrimators();
-
-      this.onAnimation( animation, options, queueAttrimators );
-
-      attrimators.queueMap( queueAttrimators );
-    }
-
-    return attrimators;
-  },
-  
-  /**
-   * A method invoked when an animation is about to be played in the Animator.
-   * 
-   * @method onAnimation
-   * @param {Animation} animation
-   * @param {Object} options
-   * @param {AttrimatorMap} attrimatorMap
-   * @protected
-   */
-  onAnimation: function(animation, options, attrimatorMap)
-  {
-    
-  },
-  
-  /**
    * Adds a spring to this animator replacing any existing attrimator for the 
    * same attribute. A spring object can be given, an instance of anim8.Spring, 
    * or a name of a saved Spring. The spring added to the animator is returned.
@@ -7886,12 +7951,7 @@ anim8.fn = anim8.Animator.prototype =
    */
   play: function(animation, options, all, cache)
   {
-    var attrimatorMap = this.createAttrimators( animation, options, cache );
-    
-    if ( attrimatorMap === false )
-    {
-      return false;
-    }
+    var attrimatorMap = anim8.attrimatorsFor( animation, options, cache );
     
     this.newCycle( attrimatorMap );
     this.playAttrimators( attrimatorMap, all );
@@ -7946,13 +8006,8 @@ anim8.fn = anim8.Animator.prototype =
    */
   queue: function(animation, options, cache)
   {
-    var attrimatorMap = this.createAttrimators( animation, options, cache );
+    var attrimatorMap = anim8.attrimatorsFor( animation, options, cache );
     
-    if ( attrimatorMap === false )
-    {
-      return false;
-    }
-        
     this.newCycle( attrimatorMap );
     this.queueAttrimators( attrimatorMap );
 
@@ -8006,12 +8061,7 @@ anim8.fn = anim8.Animator.prototype =
   transition: function(transition, animation, options, all, cache)
   {
     var transition = anim8.transition( transition );
-    var attrimatorMap = this.createAttrimators( animation, options, cache );
-    
-    if ( attrimatorMap === false )
-    {
-      return false;
-    }
+    var attrimatorMap = anim8.attrimatorsFor( animation, options, cache );
 
     this.newCycle( attrimatorMap );
     this.transitionAttrimators( transition, attrimatorMap, all );
@@ -8261,11 +8311,12 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String} attr
    * @param {T} target
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  tweenTo: function(attr, target, options)
+  tweenTo: function(attr, target, options, cache)
   {
-    var options   = anim8.options( options );
+    var options   = anim8.options( options, cache );
     var attribute = this.getAttribute( attr );
     var end       = attribute.parse( target );
     var path      = new anim8.Tween( attr, attribute.calculator, anim8.computed.current, end );
@@ -8285,11 +8336,12 @@ anim8.fn = anim8.Animator.prototype =
    * @method tweenManyTo
    * @param {Object} targets
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  tweenManyTo: function(targets, options)
+  tweenManyTo: function(targets, options, cache)
   {
-    var options = anim8.options( options );
+    var options = anim8.options( options, cache );
 
     this.newCycle();
 
@@ -8316,11 +8368,12 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String} attr
    * @param {T} starting
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  tweenFrom: function(attr, starting, options)
+  tweenFrom: function(attr, starting, options, cache)
   {
-    var options   = anim8.options( options );
+    var options   = anim8.options( options, cache );
     var attribute = this.getAttribute( attr );
     var start     = attribute.parse( starting );
     var path      = new anim8.Tween( attr, attribute.calculator, start, anim8.computed.current );
@@ -8372,11 +8425,12 @@ anim8.fn = anim8.Animator.prototype =
    * @param {T} starts
    * @param {T} ends
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  tween: function(attr, starts, ends, options)
+  tween: function(attr, starts, ends, options, cache)
   {
-    var options   = anim8.options( options );
+    var options   = anim8.options( options, cache );
     var attribute = this.getAttribute( attr );
     var start     = attribute.parse( starts );
     var end       = attribute.parse( ends );
@@ -8398,11 +8452,12 @@ anim8.fn = anim8.Animator.prototype =
    * @param {Object} starts
    * @param {Object} ends
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  tweenMany: function(starts, ends, options)
+  tweenMany: function(starts, ends, options, cache)
   {
-    var options = anim8.options( options );
+    var options = anim8.options( options, cache );
 
     this.newCycle();
 
@@ -8430,11 +8485,12 @@ anim8.fn = anim8.Animator.prototype =
    * @param {String} attr
    * @param {T} amount
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  move: function(attr, amount, options)
+  move: function(attr, amount, options, cache)
   {
-    var options   = anim8.options( options );
+    var options   = anim8.options( options, cache );
     var attribute = this.getAttribute( attr );
     var relative  = attribute.parse( amount );
     var start     = anim8.computed.current;
@@ -8456,11 +8512,12 @@ anim8.fn = anim8.Animator.prototype =
    * @method moveMany
    * @param {Object} amounts
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  moveMany: function(amounts, options)
+  moveMany: function(amounts, options, cache)
   {
-    var options = anim8.options( options );
+    var options = anim8.options( options, cache );
 
     this.newCycle();
 
@@ -8523,12 +8580,13 @@ anim8.fn = anim8.Animator.prototype =
    * @method follow
    * @param {String} attr
    * @param {Path|Object|String} path
-   * @param {Object} [options]
+   * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @chainable
    */
-  follow: function(attr, path, options)
+  follow: function(attr, path, options, cache)
   {
-    var options = anim8.options( options );
+    var options = anim8.options( options, cache );
     var path    = anim8.path( path );
     var event   = anim8.Event.fromOptions( attr, path, options );
     
@@ -10203,9 +10261,9 @@ anim8.Sequence.prototype =
    * @param {Number} i
    * @return {AttrimatorMap}
    */
-  createAttrimators: function(animation, options, i)
+  createAttrimators: function(template, i)
   {
-    var attrimatorMap = animation.newAttrimators();
+    var attrimatorMap = template.clone();
     var attrimators = attrimatorMap.values;
     var delta = i / (this.animators.length() - 1);
     var delayOffset = this.easing( delta ) * this.maxDelay();
@@ -10214,8 +10272,6 @@ anim8.Sequence.prototype =
     {
       attrimators[ k ].delay += delayOffset;
     }
-
-    animation.merge( options, attrimatorMap );
     
     return attrimatorMap;
   },
@@ -10249,19 +10305,13 @@ anim8.Sequence.prototype =
    */
   play: function(animation, options, all, cache)
   {
-    var options = anim8.options( options );
-    var anim = anim8.animation( animation, options, cache );
-
-    if ( anim === false )
-    {
-      return this;
-    }
-
+    var template = anim8.attrimatorsFor( animation, options, cache );
     var sequence = this;
 
     this.animators.each(function(animator, i)
     {
-      var attrimators = sequence.createAttrimators( anim, options, i );
+      var attrimators = sequence.createAttrimators( template, i );
+      
       animator.newCycle( attrimators );
       animator.playAttrimators( attrimators, all );       
     });
@@ -10284,14 +10334,7 @@ anim8.Sequence.prototype =
    */
   queue: function(animation, options, cache)
   {
-    var options = anim8.options( options );
-    var anim = anim8.animation( animation, options, cache );
-
-    if ( anim === false )
-    {
-      return this;
-    }
-
+    var template = anim8.attrimatorsFor( animation, options, cache );
     var sequence = this;
     var maxRemaining = 0;
     var remaining = [];
@@ -10305,7 +10348,7 @@ anim8.Sequence.prototype =
     this.animators.each(function(animator, i)
     {
       var delayOffset = maxRemaining - remaining[i];
-      var attrimatorMap = sequence.createAttrimators( anim, options, i );
+      var attrimatorMap = sequence.createAttrimators( template, i );
       var attrimators = attrimatorMap.values;
 
       for (var k = attrimators.length - 1; k >= 0; k--)
@@ -10339,19 +10382,13 @@ anim8.Sequence.prototype =
   transition: function(transition, animation, options, all, cache)
   {
     var transition = anim8.transition( transition );
-    var options = anim8.options( options );
-    var anim = anim8.animation( animation, options, cache );
-
-    if ( anim === false )
-    {
-      return this;
-    }
-
+    var template = anim8.attrimatorsFor( animation, options, cache );
     var sequence = this;
 
     this.animators.each(function(animator, i)
     {
-      var attrimators = sequence.createAttrimators( anim, options, i );
+      var attrimators = sequence.createAttrimators( template, i );
+
       animator.newCycle( attrimators );
       animator.transitionAttrimators( transition, attrimators, all );
     });
@@ -10430,6 +10467,8 @@ anim8.Parser = function()
   
 };
 
+anim8.Parser.ID = 0;
+
 anim8.Parser.prototype = 
 {
   
@@ -10466,28 +10505,37 @@ anim8.Parser.prototype =
    */
   merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   { 
+    var parser = this;
     var factory = anim8.factory( animation.factory );
-    var attrimators = attrimatorMap.values;
 
-    for (var i = attrimators.length - 1; i >= 0; i--)
-    {
-      var e = attrimators[ i ];
-      var attr = e.attribute;
-      
-      if ( e.getParser() !== this )
+    attrimatorMap.iterate(function(e)
+    {      
+      if ( e.getParser() === parser )
       {
-        continue;
+        parser.mergeAttrimator( e, e.attribute, helper, factory );
       }
+    });
+  },
 
-      e.easing    = helper.mergeEasing( attr, e.easing );
-      e.repeat    = helper.mergeRepeat( attr, e.repeat );
-      e.delay     = helper.mergeDelay( attr, e.delay );
-      e.sleep     = helper.mergeSleep( attr, e.sleep );
-      e.duration  = helper.mergeDuration( attr, e.duration );
-      e.offset    = helper.mergeOffset( attr, e.offset );
-      e.scale     = helper.mergeScale( attr, e.scale );
-      e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
-    }
+  /**
+   * Merges new options contained in the helper into the given attrimator.
+   *
+   * @method mergeAttrimator
+   * @param {Attrimator} e
+   * @param {String} attr
+   * @param {ParserHelper} helper
+   * @param {Factory} factory
+   */
+  mergeAttrimator: function( e, attr, helper, factory )
+  {
+    e.easing    = helper.mergeEasing( attr, e.easing );
+    e.repeat    = helper.mergeRepeat( attr, e.repeat );
+    e.delay     = helper.mergeDelay( attr, e.delay );
+    e.sleep     = helper.mergeSleep( attr, e.sleep );
+    e.duration  = helper.mergeDuration( attr, e.duration );
+    e.offset    = helper.mergeOffset( attr, e.offset );
+    e.scale     = helper.mergeScale( attr, e.scale );
+    e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
   }
 };
 
@@ -10666,7 +10714,7 @@ anim8.ParserHelper.prototype =
     var offset     = this.parseOffset( attr );
     var scale      = this.parseScale( attr );
     var scaleBase  = this.parseScaleBase( attr );
-    var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, parser );
+    var event      = new anim8.Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, parser, null, this.input );
 
     return event;
   },
@@ -10800,6 +10848,7 @@ anim8.ParserHelper.prototype =
   mergeScaleBase: function(attr, current, factory)
   {
     var calc = factory.attribute( attr ).calculator;
+
     var parseFunction = function(value, defaultValue) {
       return calc.parse( value, defaultValue );
     };
@@ -10821,7 +10870,10 @@ anim8.ParserHelper.prototype =
    */
   mergeFirst: function(attr, current, parseOptionFunction, option, specifics)
   {
-    return parseOptionFunction( anim8.coalesce( this.input[ specifics ][ attr ], this.newOptions[ option ], this.oldOptions[ option ] ), current );
+    var specific = this.input[ specifics ][ attr ];
+    var value = anim8.coalesce( specific, this.newOptions[ option ], this.oldOptions[ option ] );
+
+    return parseOptionFunction( value, current );
   },
 
   /**
@@ -10851,6 +10903,62 @@ anim8.ParserHelper.prototype =
 };
 
 /**
+ * Instantiates a new parser for the 'and' animation type.
+ *
+ * @class ParserAnd
+ * @constructor
+ * @extends Parser
+ */
+anim8.ParserAnd = function()
+{
+  
+};
+
+// ParserAnd extends anim8.Parser()
+anim8.override( anim8.ParserAnd.prototype = new anim8.Parser(),
+{
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    attrimatorMap.putMap( anim8.attrimatorsFor( animation.and, options ) );
+  },
+  merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
+  {
+    var animation = input.and;
+    var helper = new anim8.ParserHelper( animation, oldOptions, newOptions );
+
+    for (var parserName in animation)
+    {
+      var parser = anim8.parser( parserName );
+      
+      if ( parser !== false && parser.merge )
+      {
+        parser.merge( animation, newOptions, oldOptions, attrimatorMap, helper );
+      }
+    }
+  }
+});
+
+/**
+ * A parser which generates attrimators which tween from the current value to 
+ * the given values.
+ *
+ * **Examples:**
+ * 
+ *     animator.play({
+ *      ... other parsers ...
+ *      and: {
+ *       ... more parsers ...
+ *      }
+ *     });
+ * 
+ *
+ * @property {ParserAnd} and
+ * @for anim8.parser
+ */
+anim8.parser['and'] = new anim8.ParserAnd();
+
+
+/**
  * Instantiates a new parser for the 'deltas' & 'values' animation type.
  *
  * @class ParserDeltas
@@ -10877,21 +10985,9 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
 
     if ( !anim8.isDefined( deltas ) )
     {
-      var valueCount = 0;
-      
-      for (var attr in values)
-      {
-        valueCount++; 
-      }
-      
-      deltas = [];
-      
-      for (var i = 0; i < valueCount; i++)
-      {
-        deltas[i] = i / (valueCount - 1);
-      }
+      deltas = {};
     }
-    if ( anim8.isArray( deltas ) )
+    else if ( anim8.isArray( deltas ) )
     {
       var deltaObject = {};
       
@@ -10906,14 +11002,26 @@ anim8.override( anim8.ParserDeltas.prototype = new anim8.Parser(),
     for (var attr in values)
     {
       var value = values[ attr ];
+      var valueMax = value.length - 1;
+      var delta = deltas[ attr ];
       var attribute = factory.attribute( attr );
       
-      for (var k = 0; k < value.length; k++)
+      for (var k = 0; k <= valueMax; k++)
       {
         value[k] = attribute.parse( value[k] );
       }
 
-      var path      = new anim8.PathDelta( attr, attribute.calculator, values[ attr ], deltas[ attr ] );
+      if ( !anim8.isArray( delta ) )
+      {
+        delta = [];
+        
+        for (var i = 0; i <= valueMax; i++)
+        {
+          delta[i] = i / valueMax;
+        }
+      }
+
+      var path      = new anim8.PathDelta( attr, attribute.calculator, value, delta );
       var event     = helper.parseEvent( attr, path, this, true );
       
       attrimatorMap.put( attr, event );
@@ -10955,28 +11063,15 @@ anim8.override( anim8.ParserFinal.prototype = new anim8.Parser(),
       var value      = attribute.parse( values[ attr ] );
       var delay      = anim8.delay( helper.parseDelay( attr ) );
       var duration   = anim8.duration( helper.parseDuration( attr ) );
-      var event      = new anim8.Oncer( attr, value, delay + duration, false, this );
+      var event      = new anim8.Oncer( attr, value, delay + duration, false, this, null, animation );
       
       attrimatorMap.put( attr, event );
     }
   },
-  merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
+  mergeAttrimator: function( e, attr, helper, factory )
   {
-    var factory = anim8.factory( animation.factory );
-    var attrimators = attrimatorMap.values;
-
-    for (var i = attrimators.length - 1; i >= 0; i--)
-    {
-      var e = attrimators[i];
-      var attr = e.attribute;
-        
-      if ( e.getParser() !== this )
-      {
-        continue;
-      }
-
-      e.delay     = helper.mergeDelay( attr, e.delay ) + helper.mergeDuration( attr, e.duration );
-    }
+    e.delay = helper.mergeDelay( attr, e.delay ) + 
+              helper.mergeDuration( attr, e.duration );
   }
 });
 
@@ -11014,28 +11109,14 @@ anim8.override( anim8.ParserInitial.prototype = new anim8.Parser(),
       var attribute  = factory.attribute( attr );
       var value      = attribute.parse( values[ attr ] ); 
       var delay      = helper.parseDelay( attr );
-      var oncer      = new anim8.Oncer( attr, value, delay, true, this );
+      var oncer      = new anim8.Oncer( attr, value, delay, true, this, null, animation );
       
       attrimatorMap.put( attr, oncer );
     }
   },
-  merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
+  mergeAttrimator: function( e, attr, helper, factory )
   {
-    var factory    = anim8.factory( animation.factory );
-    var attrimators = attrimatorMap.values;
-
-    for (var i = attrimators.length - 1; i >= 0; i--)
-    {
-      var e = attrimators[i];
-      var attr = e.attribute;
-        
-      if ( e.getParser() !== this )
-      {
-        continue;
-      }
-      
-      e.delay     = helper.mergeDelay( attr, e.delay );
-    }
+    e.delay = helper.mergeDelay( attr, e.delay );
   }
 });
 
@@ -11201,7 +11282,7 @@ anim8.override( anim8.ParserKeyframe.prototype = new anim8.Parser(),
       var scale     = helper.parseScale( attr );
       var scaleBase = helper.parseScaleBase( attr );
       var path      = new anim8.PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
-      var event     = new anim8.Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, true, this );
+      var event     = new anim8.Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, true, this, null, animation );
 
       attrimatorMap.put( attr, event );
     }
@@ -11349,6 +11430,62 @@ anim8.parser['move'] = new anim8.ParserMove();
 
 
 /**
+ * Instantiates a new parser for the 'and' animation type.
+ *
+ * @class ParserQueue
+ * @constructor
+ * @extends Parser
+ */
+anim8.ParserQueue = function()
+{
+  
+};
+
+// ParserQueue extends anim8.Parser()
+anim8.override( anim8.ParserQueue.prototype = new anim8.Parser(),
+{
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    attrimatorMap.queueMap( anim8.attrimatorsFor( animation.queue, options ) );
+  },
+  merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
+  {
+    var animation = input.queue;
+    var helper = new anim8.ParserHelper( animation, oldOptions, newOptions );
+
+    for (var parserName in animation)
+    {
+      var parser = anim8.parser( parserName );
+      
+      if ( parser !== false && parser.merge )
+      {
+        parser.merge( animation, newOptions, oldOptions, attrimatorMap, helper );
+      }
+    }
+  }
+});
+
+/**
+ * A parser which generates attrimators which tween from the current value to 
+ * the given values.
+ *
+ * **Examples:**
+ * 
+ *     animator.play({
+ *      ... other parsers ...
+ *      queue: {
+ *       ... more parsers to play after the others ...
+ *      }
+ *     });
+ * 
+ *
+ * @property {ParserQueue} queue
+ * @for anim8.parser
+ */
+anim8.parser['queue'] = new anim8.ParserQueue();
+
+
+/**
  * Instantiates a new parser for the 'springs' animation type.
  *
  * @class ParserSpring
@@ -11386,7 +11523,8 @@ anim8.override( anim8.ParseSpring.prototype = new anim8.Parser(),
         attrimatorMap.put( attr, parsed );  
       }
     }
-  }
+  },
+  merge: false
 });
 
 /**
@@ -11432,7 +11570,8 @@ anim8.override( anim8.ParsePhysics.prototype = new anim8.Parser(),
 
       attrimatorMap.put( attr, attrimator );
     }
-  }
+  },
+  merge: false
 });
 
 /**
@@ -11544,7 +11683,8 @@ anim8.override( anim8.ParserTravel.prototype = new anim8.Parser(),
       
       attrimatorMap.put( attr, traveler );
     }
-  }
+  },
+  merge: false
 });
 
 /**

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+      left: 100px;
+      top: 100px;
+    }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #0F0;
+      position: absolute;
+      background-color: #6F6;
+      left: 300px;
+      top: 100px;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1"></div>
+    <div id="box2"></div>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+
+    <script>
+
+      m8.save('anding1', {
+        values: {
+          rotate: [0, 360, 0]
+        },
+        and: {
+          values: {
+            scale: [1, 2, 1]
+          }
+        }
+      });
+
+      m8.save('anding2', {
+        values: {
+          borderWidth: [2, 10, 2],
+          borderColor: ['#0F0', '#F00']
+        },
+        and: 'anding1'
+      });
+
+      m8( window.box1 ).play('anding1 4s');
+      m8( window.box2 ).play('anding2 8s');
+      
+    </script>
+    
+  </body>
+</html>
+  
