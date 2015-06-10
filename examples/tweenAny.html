@@ -432,7 +432,7 @@
 
       $listen( p1_length_tween, 'click', function()
       {
-        anim8or.tweenTo( p1_length_attribute.value, p1_length.value, getOptions(), p1_length_unit.value );
+        anim8or.tweenTo( p1_length_attribute.value, p1_length.value, getOptions(), false, p1_length_unit.value );
       });
 
       var p1_angle_update = function()
@@ -468,7 +468,7 @@
 
       $listen( p1_angle_tween, 'click', function()
       {
-        anim8or.tweenTo( p1_angle_attribute.value, p1_angle.value, getOptions(), p1_angle_unit.value );
+        anim8or.tweenTo( p1_angle_attribute.value, p1_angle.value, getOptions(), false, p1_angle_unit.value );
       });
 
       var p2_length_update = function()
@@ -506,7 +506,7 @@
 
       $listen( p2_length_tween, 'click', function()
       {
-        anim8or.tweenTo( p2_length_attribute.value, [p2_length_x.value, p2_length_y.value], getOptions(), p2_length_unit.value );
+        anim8or.tweenTo( p2_length_attribute.value, [p2_length_x.value, p2_length_y.value], getOptions(), false, p2_length_unit.value );
       });
 
       var p3_length_update = function()
@@ -546,7 +546,7 @@
 
       $listen( p3_length_tween, 'click', function()
       {
-        anim8or.tweenTo( p3_length_attribute.value, [p3_length_x.value, p3_length_y.value, p3_length_z.value], getOptions(), p3_length_unit.value );
+        anim8or.tweenTo( p3_length_attribute.value, [p3_length_x.value, p3_length_y.value, p3_length_z.value], getOptions(), false, p3_length_unit.value );
       });
 
       var rgb_update = function()
