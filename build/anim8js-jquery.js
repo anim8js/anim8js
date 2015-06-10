@@ -14150,10 +14150,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {String} attr
    * @param {T} target
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {String} [unit]
    * @chainable
    */
-  tweenTo: function(attr, target, options, unit)
+  tweenTo: function(attr, target, options, cache, unit)
   {
     this.convertExisting( attr, unit );
     anim8.fn.tweenTo.apply( this, arguments );
@@ -14169,10 +14170,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @method tweenManyTo
    * @param {Object} targets
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {Object} [units]
    * @chainable
    */
-  tweenManyTo: function(targets, options, units)
+  tweenManyTo: function(targets, options, cache, units)
   {
     this.convertExistingMany( units );
     anim8.fn.tweenManyTo.apply( this, arguments );
@@ -14189,10 +14191,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {String} attr
    * @param {T} starting
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {String} [unit]
    * @chainable
    */
-  tweenFrom: function(attr, starting, options, unit)
+  tweenFrom: function(attr, starting, options, cache, unit)
   {
     this.convertExisting( attr, unit );
     anim8.fn.tweenFrom.apply( this, arguments );
@@ -14208,10 +14211,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @method tweenManyFrom
    * @param {Object} startings
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {Object} [units]
    * @chainable
    */
-  tweenManyFrom: function(startings, options, units)
+  tweenManyFrom: function(startings, options, cache, units)
   {
     this.convertExistingMany( units );
     anim8.fn.tweenManyFrom.apply( this, arguments );
@@ -14229,10 +14233,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {T} starts
    * @param {T} ends
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {String} [unit]
    * @chainable
    */
-  tween: function(attr, starts, ends, options, unit)
+  tween: function(attr, starts, ends, options, cache, unit)
   {
     this.convertExisting( attr, unit );
     anim8.fn.tween.apply( this, arguments );
@@ -14249,10 +14254,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {Object} starts
    * @param {Object} ends
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {Object} [units]
    * @chainable
    */
-  tweenMany: function(starts, ends, options, units)
+  tweenMany: function(starts, ends, options, cache, units)
   {
     this.convertExistingMany( units );
     anim8.fn.tweenMany.apply( this, arguments );
@@ -14269,10 +14275,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {String} attr
    * @param {T} amount
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {String} [unit]
    * @chainable
    */
-  move: function(attr, amount, options, unit)
+  move: function(attr, amount, options, cache, unit)
   {
     this.convertExisting( attr, unit );
     anim8.fn.move.apply( this, arguments );
@@ -14288,10 +14295,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @method moveMany
    * @param {Object} amounts
    * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {Object} [units]
    * @chainable
    */
-  moveMany: function(amounts, options, units)
+  moveMany: function(amounts, options, cache, units)
   {
     this.convertExistingMany( units );
     anim8.fn.moveMany.apply( this, arguments );
@@ -14308,10 +14316,11 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
    * @param {String} attr
    * @param {Path|Object|String} path
    * @param {Object} [options]
+   * @param {Boolean} [cache=false]
    * @param {String} [unit]
    * @chainable
    */
-  follow: function(attr, path, options, unit)
+  follow: function(attr, path, options, cache, unit)
   {
     this.convertExisting( attr, unit );
     anim8.fn.follow.apply( this, arguments );
