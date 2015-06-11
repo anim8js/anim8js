@@ -5314,10 +5314,37 @@ anim8.Attrimator.prototype =
       this.startTime = now - this.offset;
       this.elapsed = this.offset;
       this.finished = false;
+      this.prestartNext();
+    }
+  },
 
-      if ( this.next && !this.isInfinite() )
+  /**
+   * Calls {{#crossLink "Attrimator/prestart:method"}}{{/crossLink}} on the next
+   * attrimator if it can be called.
+   * 
+   * @method prestartNext
+   */
+  prestartNext: function( overrideNext )
+  {
+    // If there is a next attrimator and this attrimator has been prestarted...
+    if ( this.next && this.startTime !== 0 )
+    {
+      // If override next is specified, clear next's startTime
+      if ( overrideNext )
       {
-        this.next.prestart( now + this.timeRemaining() );
+        this.next.startTime = 0;
+      }
+
+      // We can only prestart next if it has no startTime.
+      if ( this.next.startTime === 0 )
+      {
+        var totalTime = this.totalTime();
+
+        // If this attrimator has a finite total amount of time, it's end can be calculated.
+        if ( !isNaN( totalTime ) )
+        {
+          this.next.prestart( this.startTime + totalTime );
+        }
       }
     }
   },
@@ -5612,19 +5639,7 @@ anim8.Attrimator.prototype =
     else
     {
       this.next = next;
-
-      // If this attrimator has been prestarted already...
-      if ( this.startTime !== 0 )
-      {
-        var totalTime = this.totalTime();
-
-        // And this attrimator has an end time...
-        if ( !isNaN( totalTime ) )
-        {
-          // Make sure the next attrimator "starts" when it should.
-          this.next.prestart( this.startTime + totalTime );          
-        }
-      }
+      this.prestartNext();
     }
 
     return this;
@@ -6052,7 +6067,13 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
 
   nopeat: function()
   {
-    this.repeat = anim8.clamp( Math.ceil( ( this.elapsed - this.delay ) / ( this.duration + this.sleep ) ), 0, this.repeat );
+    var newRepeat = anim8.clamp( Math.ceil( ( this.elapsed - this.delay ) / ( this.duration + this.sleep ) ), 0, this.repeat );
+
+    if ( newRepeat !== this.repeat )
+    {
+      this.repeat = newRepeat;
+      this.prestartNext( true );
+    }
     
     return this;
   },
