@@ -89,7 +89,7 @@
 87. [X] Modify anim8.computed.current for DomAnimator to convert the current value (if it exists) into the desired unit. We need to keep track of the previous unit.
 88. [X] Add attributes: textShadowX, textShadowY, textShadowBlur, textShadowColor, shadowX, shadowY, shadowBlur, shadowSpread, shadowColor, shadowInset,
 89. [X] IE8 Tweening
-90. [ ] Pass attributes to property.unset
+90. [X] Pass attributes to property.unset
 91. [X] Make anim8.Animators not extend Array
 92. [X] anim8.eventize.off should only accept events, or none at all to remove all listeners
 93. [X] queued animations applying initial state to early
@@ -101,3 +101,5 @@
 99. [ ] Add mergeId (Number) to attrimators which tells option merging
 100. [X] Add queue parser
 101. [X] Add and parser
+102. [X] Call start on attrimators in queue (or add prestart) 
+103. [ ] When duration is merged on attrimators, any queued need to be additionaly delayed by the difference

@@ -533,6 +533,52 @@ anim8.isEmpty = function(x)
 };
 
 /**
+ * Parses the given input and returns an array.
+ *
+ * **Examples:**
+ *
+ *     anim8.toArray();            // []
+ *     anim8.toArray('a b');       // ['a b']
+ *     anim8.toArray('a b', ' ');  // ['a', 'b']
+ *     anim8.toArray({a:0,b:0});   // ['a', 'b']
+ *     anim8.toArray(['a', 'b']);  // ['a', 'b']
+ *     anim8.toArray(3.2);         // [3.2]
+ *     anim8.toArray(true);        // [true]
+ * 
+ * @param  {Any} x
+ * @param  {String} [split]
+ * @return {Array}
+ */
+anim8.toArray = function( x, split )
+{
+  if ( anim8.isString( x ) )
+  {
+    return split ? x.split( split ) : [ x ];
+  }
+  else if ( anim8.isArray ( x ) )
+  {
+    return x;
+  }
+  else if ( anim8.isObject( x ) )
+  {
+    var props = [];
+
+    for ( var prop in x )
+    {
+      props.push( prop );
+    }
+
+    return props;
+  }
+  else if ( anim8.isDefined( x ) )
+  {
+    return [ x ];
+  }
+
+  return [];
+};
+
+/**
  * Performs a deep copy of the given variable. If the variable is an array or 
  * object a new instance of that type is created where the values are copied as 
  * well. All other types can't be copied (most likely because they're scalar) so
@@ -1078,7 +1124,7 @@ anim8.eventize = function(target)
   // Adds a listener to $this
   var onListeners = function($this, property, events, callback, context)
   {
-    events = events.split(' ');
+    var events = anim8.toArray( events, ' ' );
     
     if ( !anim8.isDefined( $this[ property ] ) )
     {
@@ -1102,9 +1148,9 @@ anim8.eventize = function(target)
    * 
    * @method on
    * @for anim8.eventize
-   * @param {String} events
+   * @param {String|Array|Object} events
    * @param {Function} callback
-   * @param {Object} context
+   * @param {Object} [context]
    * @chainable
    */
   target.on = function(events, callback, context)
@@ -1120,9 +1166,9 @@ anim8.eventize = function(target)
    * 
    * @method once
    * @for anim8.eventize
-   * @param {String} events
+   * @param {String|Array|Object} events
    * @param {Function} callback
-   * @param {Object} context
+   * @param {Object} [context]
    * @chainable
    */
   target.once = function(events, callback, context)
@@ -1161,23 +1207,30 @@ anim8.eventize = function(target)
   /**
    * Stops listening for a given callback for a given set of events.
    *
+   * **Examples:**
+   *
+   *     target.off();           // remove all listeners
+   *     target.off('a b');      // remove all listeners on events a & b
+   *     target.off(['a', 'b']); // remove all listeners on events a & b
+   *     target.off('a', x);     // remove listener x from event a
+   * 
    * @method off
    * @for anim8.eventize
-   * @param {String} [events]
+   * @param {String|Array|Object} [events]
    * @param {Function} [callback]
    * @chainable
    */
   target.off = function(events, callback)
   {
     // Remove ALL listeners
-    if ( !anim8.isString( events ) )
+    if ( !anim8.isDefined( events ) )
     {
       deleteProperty( this, '$on' );
       deleteProperty( this, '$once' );
     }
     else
     {
-      events = events.split(' ');
+      var events = anim8.toArray( events, ' ' );
 
       // Remove listeners for given events
       if ( !anim8.isFunction( callback ) )
@@ -1378,9 +1431,11 @@ anim8.FastMap.prototype =
    */
   remove: function(key)
   {
-    if ( key in this.indices )
+    var index = this.indices[ key ];
+
+    if ( anim8.isNumber( index ) )
     {
-      this.removeAt( this.indices[ key ] );
+      this.removeAt( index );
     }
 
     return this;
@@ -5245,6 +5300,29 @@ anim8.Attrimator.prototype =
   },
 
   /**
+   * Prepares this attrimator for animation on the given subject animator. This
+   * is called as early as possible to establish the start time of the 
+   * attrimator so when the user isn't on the page time can be kept accurately.
+   * 
+   * @param {Number} now
+   * @param {Animator} animator
+   */
+  prestart: function(now)
+  {
+    if ( this.startTime === 0 )
+    {
+      this.startTime = now - this.offset;
+      this.elapsed = this.offset;
+      this.finished = false;
+
+      if ( this.next && !this.isInfinite() )
+      {
+        this.next.prestart( now + this.timeRemaining() );
+      }
+    }
+  },
+
+  /**
    * Prepares this attrimator for animation on the given subject 
    * animator. This is called once in anim8.Animator.preupdate before the first 
    * time this attrimator is updated.
@@ -5255,9 +5333,7 @@ anim8.Attrimator.prototype =
    */
   start: function(now, animator)
   {
-    this.startTime = now - this.offset;
-    this.elapsed = this.offset;
-    this.finished = false;
+    this.prestart( now );
   },
 
   /**
@@ -5458,7 +5534,15 @@ anim8.Attrimator.prototype =
   {
     if ( this.paused )
     {
-      this.startTime += anim8.now() - this.pauseTime;
+      var totalPausedTime = anim8.now() - this.pauseTime;
+      var delay = this;
+
+      while ( delay && delay.startTime !== 0 )
+      {
+        delay.startTime += totalPausedTime;
+        delay = delay.next;
+      }
+
       this.paused = false;
     }
 
@@ -5528,6 +5612,19 @@ anim8.Attrimator.prototype =
     else
     {
       this.next = next;
+
+      // If this attrimator has been prestarted already...
+      if ( this.startTime !== 0 )
+      {
+        var totalTime = this.totalTime();
+
+        // And this attrimator has an end time...
+        if ( !isNaN( totalTime ) )
+        {
+          // Make sure the next attrimator "starts" when it should.
+          this.next.prestart( this.startTime + totalTime );          
+        }
+      }
     }
 
     return this;
@@ -5966,7 +6063,7 @@ anim8.override( anim8.Event.prototype = new anim8.Attrimator(),
   },
   start: function(now, animator)
   {
-    anim8.Attrimator.prototype.start.apply( this, arguments );
+    this.prestart( now );
     
     this.state = this.delay ? anim8.EventState.DELAYED : anim8.EventState.ANIMATING;
 
@@ -6165,7 +6262,7 @@ anim8.override( anim8.Oncer.prototype = new anim8.Attrimator(),
   },
   start: function(now, animator)
   {
-    anim8.Attrimator.prototype.start.apply( this, arguments );
+    this.prestart( now );
 
     this.value = animator.getAttribute( this.attribute ).parse( this.value );
     
@@ -6306,7 +6403,7 @@ anim8.override( anim8.Spring.prototype = new anim8.Attrimator(),
 
   start: function(now, animator)
   {
-    anim8.Attrimator.prototype.start.apply( this, arguments );
+    this.prestart( now );
 
     var attribute = animator.getAttribute( this.attribute );
     var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
@@ -6646,7 +6743,7 @@ anim8.override( anim8.Physics.prototype = new anim8.Attrimator(),
 
   start: function(now, animator)
   {
-    anim8.Attrimator.prototype.start.apply( this, arguments );
+    this.prestart( now );
 
     var attribute = animator.getAttribute( this.attribute );
     var calc = anim8.calculator( anim8.coalesce( this.calculator, attribute.calculator ) );
@@ -8603,56 +8700,31 @@ anim8.fn = anim8.Animator.prototype =
    * returned for each attrimator in this animator for the given attributes.
    *
    * @method attrimatorsFor
-   * @param {String|Array} attributes
+   * @param {String|Array|Object} attributes
    * @param {Function} callback
    * @return {this|Array}
    */
   attrimatorsFor: function(attributes, callback)
   {
-    if ( anim8.isString( attributes ) )
-    {
-      attributes = attributes.split( ' ' );
-    }
-   
     var attrimatorMap = this.attrimators; 
+    var attributes = anim8.toArray( anim8.coalesce( attributes, attrimatorMap.keys ), ' ' );
     var resulting = !anim8.isFunction( callback );
     var results = [];
     
-    if ( anim8.isArray( attributes ) )
+    for (var i = attributes.length - 1; i >= 0; i--)
     {
-      for (var i = 0; i < attributes.length; i++)
+      var attr = attributes[ i ];
+      var attrimator = attrimatorMap.get( attr );
+      
+      if ( attrimator )
       {
-        var attr = attributes[i];
-        var attrimator = attrimatorMap.get( attr );
-        
-        if ( attrimator )
-        {
-          if ( resulting )
-          {
-            results.push( attrimator );
-          }
-          else
-          {
-            callback.call( this, attrimator, attr );
-          }
-        }
-      }
-    }
-    else
-    {
-      var attrimators = attrimatorMap.values;
-
-      for (var i = attrimators.length - 1; i >= 0; i--)
-      {
-        var attrimator = attrimators[ i ];
-
         if ( resulting )
         {
           results.push( attrimator );
         }
         else
         {
-          callback.call( this, attrimator, attrimator.attribute );
+          callback.call( this, attrimator, attr );
         }
       }
     }
@@ -8666,7 +8738,7 @@ anim8.fn = anim8.Animator.prototype =
    * all attributes are assumed.
    *
    * @method stop
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   stop: function(attributes)
@@ -8685,7 +8757,7 @@ anim8.fn = anim8.Animator.prototype =
    * assumed.
    *
    * @method end
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   end: function(attributes)
@@ -8707,7 +8779,7 @@ anim8.fn = anim8.Animator.prototype =
    * attributes are given all attributes are assumed.
    *
    * @method finish
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   finish: function(attributes)
@@ -8726,7 +8798,7 @@ anim8.fn = anim8.Animator.prototype =
    * **See:** {{#crossLink "Attrimator/nopeat:method"}}Attrimator.nopeat{{/crossLink}}
    * 
    * @method nopeat
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   nopeat: function(attributes)
@@ -8743,7 +8815,7 @@ anim8.fn = anim8.Animator.prototype =
    * attributes are given all attributes are assumed.
    *
    * @method pause
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   pause: function(attributes)
@@ -8760,7 +8832,7 @@ anim8.fn = anim8.Animator.prototype =
    * attributes are given all attributes are assumed.
    *
    * @method resume
-   * @param {String|Array} [attributes]
+   * @param {String|Array|Object} [attributes]
    * @chainable
    */
   resume: function(attributes)
@@ -8802,25 +8874,15 @@ anim8.fn = anim8.Animator.prototype =
    */
   unset: function(attributes)
   {
-    if ( anim8.isString( attributes ) )
+    var attributes = anim8.toArray( anim8.coalesce( attributes, this.frame ), ' ' );
+
+    for (var i = attributes.length - 1; i >= 0; i--)
     {
-      this.attrimators.remove( attributes );
-      
-      delete this.frame[ attributes ];
-    }
-    else if ( anim8.isArray( attributes ) )
-    {
-      for (var i = 0; i < attributes.length; i++)
-      {
-        this.unset( attributes[ i ] );
-      }
-    }
-    else if ( anim8.isObject( attributes ) )
-    {
-      for (var attr in attributes)
-      {
-        this.unset( attr );
-      }
+      var attr = attributes[ i ];
+
+      this.attrimators.remove( attr );
+
+      delete this.frame[ attr ];
     }
 
     return this;
@@ -12419,6 +12481,22 @@ anim8.dom.convert = (function()
  * Properties for the DOM animator.
  */
 
+anim8.dom.unset = function( e, anim, attr, property, css, clearedValue )
+{
+  if ( attr === true )
+  {
+    e.style[ css ] = clearedValue; 
+  }
+  else
+  {
+    delete anim.frame[ attr ];
+
+    property.set( e, anim );
+
+    e.style[ css ] = anim.styles[ css ];  
+  }
+};
+
 anim8.dom.property.factory = function(nm, relativeTo) 
 {
   return {
@@ -12432,18 +12510,18 @@ anim8.dom.property.factory = function(nm, relativeTo)
         
         if ( converted !== false ) 
         {
-          anim.frame[nm] = converted;
-          anim.animating[nm] = true;
+          anim.frame[ nm ] = converted;
+          anim.animating[ nm ] = true;
         }
       }
     },
     set: function(e, anim) 
     { 
-      anim.styles[nm] = anim.value( nm );
+      anim.styles[ nm ] = anim.value( nm );
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[nm] = null;
+      e.style[ nm ] = null;
     }
   };
 };
@@ -12461,8 +12539,8 @@ anim8.dom.property.factoryDerivable = function(nm, relativeTo, deriver)
         
         if ( converted !== false ) 
         {
-          anim.frame[nm] = converted;
-          anim.animating[nm] = true;
+          anim.frame[ nm ] = converted;
+          anim.animating[ nm ] = true;
         }
         else if ( anim8.isFunction( deriver ) )
         {
@@ -12470,19 +12548,19 @@ anim8.dom.property.factoryDerivable = function(nm, relativeTo, deriver)
           
           if ( converted !== false )
           {
-            anim.frame[nm] = converted;
-            anim.animating[nm] = true;
+            anim.frame[ nm ] = converted;
+            anim.animating[ nm ] = true;
           }
         }
       }
     },
     set: function(e, anim) 
     { 
-      anim.styles[nm] = anim.value( nm );
+      anim.styles[ nm ] = anim.value( nm );
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[nm] = null;
+      e.style[ nm ] = null;
     }
   };
 };
@@ -12507,11 +12585,11 @@ anim8.dom.property.factoryColor = function(nm)
     },
     set: function(e, anim) 
     {
-      anim.styles[nm] = anim8.color.format( anim.frame[nm] );
+      anim.styles[ nm ] = anim8.color.format( anim.frame[nm] );
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[nm] = null;
+      e.style[ nm ] = null;
     }
   };
 };
@@ -12584,6 +12662,7 @@ anim8.dom.property.right                    = anim8.dom.property.factoryDerivabl
 anim8.dom.property.bottom                   = anim8.dom.property.factoryDerivable('bottom', 'parentHeight', function(e) { return (e.parentNode.scrollHeight - (e.offsetTop + e.offsetHeight)) + 'px'; });
 anim8.dom.property.left                     = anim8.dom.property.factoryDerivable('left', 'parentWidth', function(e) { return e.offsetLeft + 'px'; });
 
+
 anim8.dom.property.zIndex.set = function(e, anim)
 {
   anim.styles.zIndex = Math.floor( anim.frame.zIndex );
@@ -12637,7 +12716,7 @@ anim8.dom.property.backface = (function()
     },
     unset: function(e, anim)
     {
-      e.style[css] = null;
+      e.style[ css ] = null;
     }
     
   };
@@ -12741,9 +12820,9 @@ anim8.dom.property.transformOrigin = (function()
       
       anim.styles[css] = style;
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[css] = null;
+      anim8.dom.unset( e, anim, attr, this, css, null );
     }
   };
   
@@ -13056,9 +13135,9 @@ anim8.dom.property.transform = (function()
         anim.styles[ css ] = transforms.join( ' ' );
       }
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[ css ] = '';
+      anim8.dom.unset( e, anim, attr, this, css, '' );
     }
   };
   
@@ -13229,9 +13308,9 @@ anim8.dom.property.shadow = (function()
       anim.styles[ css ] = style;
     },
 
-    unset: function(e)
+    unset: function(e, anim, attr)
     {
-      e.style[ css ] = null;
+      anim8.dom.unset( e, anim, attr, this, css, null );
     }
 
   };
@@ -13346,9 +13425,9 @@ anim8.dom.property.textShadow = (function()
       anim.styles[ css ] = style;
     },
 
-    unset: function(e)
+    unset: function(e, anim, attr)
     {
-      e.style[ css ] = null;
+      anim8.dom.unset( e, anim, attr, this, css, null );
     }
 
   };
@@ -13427,9 +13506,9 @@ anim8.dom.property.filter = (function()
         anim.styles[ css ] = filters.join(' ');
       }
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style[ css ] = null;
+      anim8.dom.unset( e, anim, attr, this, css, null );
     }
   };
   
@@ -13503,6 +13582,10 @@ anim8.dom.property.center =
     {
       anim.styles.top = (anim.frame.centerY - rh) + anim.units.centerY;
     }
+  },
+  unset: function(e, anim, attr)
+  {
+
   }
 };
 
@@ -13583,6 +13666,11 @@ anim8.dom.property.orbit =
     
     anim.styles.left = (cox + cos - ox) + 'px';
     anim.styles.top = (coy + sin - oy) + 'px';
+  },
+
+  unset: function(e, anim, attr)
+  {
+
   }
 };
 
@@ -13878,16 +13966,39 @@ anim8.override( anim8.AnimatorDom.prototype = new anim8.Animator(),
   restore: function()
   {
     var props = this.properties.values;
+
     for (var i = props.length - 1; i >= 0; i--)
     {
-      props[ i ].unset( this.subject, this );
+      props[ i ].unset( this.subject, this, true );
     }
     
     this.frame = {};
 
     return this;
   },
-  set: function(attributes)
+  unset: function( attributes )
+  {
+    var attributes = anim8.toArray( anim8.coalesce( attributes, this.frame ) );
+
+    for (var i = attributes.length - 1; i >= 0; i--)
+    {
+      var attr = attributes[ i ];
+      var prop = this.attributeToProperty[ attr ];
+      var property = this.properties.get( prop );
+
+      if ( property )
+      {
+        property.unset( this.subject, this, attr ); 
+      }
+
+      this.attrimators.remove( attr );
+
+      delete this.frame[ attr ];
+    }
+
+    return this;
+  },
+  set: function( attributes )
   {
     var props = {};
     var updated = {};

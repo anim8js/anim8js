@@ -579,13 +579,16 @@ if ( anim8.browser.IE && anim8.browser.IE <= 8 )
 
       this.cacheConverted( e, anim, settings.blur );
     },
-    unset: function(e, anim)
+    unset: function(e, anim, attr)
     {
-      e.style.filter = '';
-      e.style.marginLeft = (anim.cached.baseMarginLeft || 0) + 'px';
-      e.style.marginTop = (anim.cached.baseMarginTop || 0) + 'px';
+      if ( attr === true )
+      {
+        e.style.filter = '';
+        e.style.marginLeft = (anim.cached.baseMarginLeft || 0) + 'px';
+        e.style.marginTop = (anim.cached.baseMarginTop || 0) + 'px'; 
 
-      anim.cached = {};
+        anim.cached = {};
+      }
     },
     set: function(e, anim)
     {
