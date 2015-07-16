@@ -103,3 +103,4 @@
 101. [X] Add and parser
 102. [X] Call start on attrimators in queue (or add prestart) 
 103. [ ] When duration is merged on attrimators, any queued need to be additionaly delayed by the difference
+104. [ ] If safari version < 7 or chrome version < 31, brightness is handled differently (0 being normal instead of 100). The math is also different, brightness is not additive - it scales between black (-100) and white (100).
