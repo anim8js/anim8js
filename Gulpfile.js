@@ -31,6 +31,7 @@ var core =
   './lib/anim8js-path-jump.js',
   './lib/anim8js-path-compiled.js',
   './lib/anim8js-path-keyframe.js',
+  './lib/anim8js-path-combo.js',
   './lib/anim8js-attrimator.js',
   './lib/anim8js-attrimator-map.js',
   './lib/anim8js-event.js',
@@ -59,6 +60,7 @@ var core =
   './lib/anim8js-parser-springs.js',
   './lib/anim8js-parser-physics.js',
   './lib/anim8js-parser-travel.js',
+  './lib/anim8js-parser-path.js',
   './lib/anim8js-factory.js',
   './lib/anim8js-object.js'
 ];

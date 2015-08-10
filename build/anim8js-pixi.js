@@ -4558,7 +4558,7 @@ anim8.path = function(path)
   }
   if ( anim8.isString( path ) && path in anim8.path )
   {
-    return anim8.path[ spring ];
+    return anim8.path[ path ];
   }
   if ( anim8.isObject( path ) && path.type in anim8.path )
   {
@@ -5193,6 +5193,104 @@ anim8.path['keyframe'] = function(point)
     path.points,
     path.deltas,
     path.easings
+  );
+};
+
+
+/**
+ * Instantiates a new PathCombo.
+ * 
+ * @param {String|false} name
+ * @param {Path[]} paths
+ * @param {Boolean} [uniform]
+ * @param {Number} [granularity]
+ * @class PathCombo
+ * @constructor
+ * @extends Path
+ */
+anim8.PathCombo = function(name, paths, uniform, granularity)
+{
+  var calc = paths[0].calculator;
+  var points = [];
+  var deltas = [];
+
+  for (var i = 0; i < paths.length; i++) 
+  {
+    points.push.apply( points, paths[ i ].points );
+    deltas[ i ] = ( i + 1 ) / paths.length;  
+  }
+
+  if ( uniform ) 
+  {
+    var lengthGranularity = anim8.coalesce( granularity, 100 );
+    var lengthTotal = 0;
+    var lengths = [];
+
+    for (var i = 0; i < paths.length; i++) 
+    {
+      lengths[ i ] = paths[ i ].length( lengthGranularity );
+      lengthTotal += lengths[ i ];
+    }
+
+    var lengthCurrent = 0;
+
+    for (var i = 0; i < paths.length; i++) 
+    {
+      lengthCurrent += lengths[ i ];
+      deltas[ i ] = lengthCurrent / lengthTotal;
+    }
+  }
+
+  this.reset( name, calc, points );
+  this.paths = paths;
+  this.deltas = deltas;
+  this.uniform = uniform;
+  this.granularity = granularity;
+};
+
+anim8.override( anim8.PathCompiled.prototype = new anim8.Path(),
+{
+  compute: function(out, delta)
+  {
+    var paths = this.paths;
+    var deltas = this.deltas;
+    var previousDelta = 0;
+    var i = 0;
+
+    while ( i < paths.length - 1 && deltas[ i ] < delta )
+    {
+      previousDelta = deltas[ i ];
+      i++;
+    }
+
+    return paths[ i ].compute( out, ( delta - previousDelta ) / ( deltas[ i ] - previousDelta ) );
+  },
+  copy: function() 
+  {
+    return new anim8.PathCombo( this.name, this.paths, this.uniform, this.granularity );
+  }
+});
+
+/**
+ * Parses an object for a combo path.
+ * 
+ * @param {Object} path
+ * @return {PathCombo}
+ */
+anim8.path['combo'] = function(path)
+{
+  var paths = path.paths;
+
+  for (var i = 0; i < paths.length; i++)
+  {
+    paths[ i ] = anim8.path( paths[ i ] );
+  }
+
+  return new anim8.PathCombo(
+    path.name,
+    paths,
+    path.uniform,
+    path.granularity
   );
 };
 
@@ -11774,6 +11872,68 @@ anim8.override( anim8.ParserTravel.prototype = new anim8.Parser(),
  * Register the parser.
  */
 anim8.parser['travel'] = new anim8.ParserTravel();
+
+
+/**
+ * Instantiates a new parser for the 'path' animation type.
+ *
+ * @class ParserPath
+ * @constructor
+ * @extends Parser
+ */
+anim8.ParserPath = function()
+{
+  
+};
+
+// ParserPath extends anim8.Parser()
+anim8.override( anim8.ParserPath.prototype = new anim8.Parser(),
+{
+  parse: function( animation, options, attrimatorMap, helper )
+  { 
+    var factory    = anim8.factory( animation.factory );
+    var path    = animation.path;
+
+    for (var attr in path)
+    {
+      var attribute  = factory.attribute( attr );
+      var pathDefinition = path[ attr ];
+
+      if ( !( pathDefinition instanceof anim8.Path ) )
+      {
+        pathDefinition.name = attr;
+        pathDefinition.calculator = attribute.calculator;
+      }
+
+      var parsedPath = anim8.path( pathDefinition );
+      var event      = helper.parseEvent( attr, parsedPath, this, true );
+      
+      attrimatorMap.put( attr, event );
+    }
+  }
+});
+
+/**
+ * A parser which generates attrimators which follow a given path.
+ *
+ * **Examples:**
+ * 
+ *     animator.play({
+ *      path: {
+ *       opacity: {
+ *        type: 'quadratic',
+ *        p0: 0,
+ *        p1: 0.4,
+ *        p2: 1.0  
+ *       }
+ *      }
+ *     });
+ * 
+ *
+ * @property {ParserPath} path
+ * @for anim8.parser
+ */
+anim8.parser['path'] = new anim8.ParserPath();
 
 
 
