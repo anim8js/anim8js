@@ -2672,7 +2672,25 @@ anim8.color.format = function(color)
  * 
  * @class anim8.computed
  */
-anim8.computed = {};
+anim8.computed = function(funcOrName, func)
+{
+  if ( anim8.isString( funcOrName ) && anim8.isFunction( func ) )
+  {
+    func.computed = true;
+
+    anim8.computed[ funcOrName ] = func;
+
+    return func;
+  }
+  else if ( anim8.isFunction( funcOrName ) )
+  {
+    funcOrName.computed = true;
+
+    return funcOrName;
+  }
+
+  throw funcOrName + ' and ' + func + ' are not valid parameters for creating a computed function.';
+};
 
 /**
  * Calculates and returns the current value for an 
@@ -2684,7 +2702,7 @@ anim8.computed = {};
  * @param {Animator} animator
  * @return {T}
  */
-anim8.computed.current = function(attrimator, animator)
+anim8.computed('current', function(attrimator, animator)
 {
   var attr = attrimator.attribute;
   var attribute = animator.getAttribute( attr );
@@ -2697,10 +2715,7 @@ anim8.computed.current = function(attrimator, animator)
   {
     return attribute.cloneDefault();
   }
-};
-
-// Marks the function as computed which is a signal to paths & events.
-anim8.computed.current.computed = true;
+});
 
 /**
  * Calculates a value relative to the attribute value currently in the animator.
@@ -2718,7 +2733,7 @@ anim8.computed.current.computed = true;
  * @param {T} mask
  * @return {Function}
  */
-anim8.computed.relative = function(relativeAmount, mask)
+anim8.computed('relative', function(relativeAmount, mask)
 {
   // If the relativeAmount is already a computed value, return it.
   if ( anim8.isComputed( relativeAmount ) )
@@ -2758,7 +2773,7 @@ anim8.computed.relative = function(relativeAmount, mask)
   relativeFunction.mask = mask;
 
   return relativeFunction;
-};
+});
 
 /**
  * Returns a random value based on the given random selection.
@@ -2825,13 +2840,10 @@ anim8.computed.random = function(randomSelection)
     throw 'Invalid random input: ' + randomSelection;
   }
 
-  // Marks the function as computed which is a signal to paths & events.
-  randomFunction.computed = true;
-
   // Place the input on the function if the user wants to modify it live
   randomFunction.randomSelection = randomSelection;
 
-  return randomFunction;
+  return anim8.computed( randomFunction );
 };
 
 /**
@@ -4712,7 +4724,7 @@ anim8.Path.prototype =
     else
     {
       var deltadelta = 1.0 / granularity;
-      var delta = delta;
+      var delta = deltadelta;
       var prev = calc.clone( this.resolvePoint( 0 ) );
       var temp = calc.create();
 
@@ -4721,6 +4733,7 @@ anim8.Path.prototype =
         var next = this.compute( temp, delta );
 
         distance += calc.distance( prev, next );
+        delta += deltadelta;
 
         temp = prev;
         prev = next;
@@ -4771,12 +4784,13 @@ anim8.override( anim8.Tween.prototype = new anim8.Path(),
 anim8.path['tween'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   return new anim8.Tween(
     path.name, 
     calc,
-    calc.parse( path.start, calc.ZERO ),
-    calc.parse( path.end, calc.ZERO )
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.end, defaultValue )
   );
 };
 
@@ -4837,14 +4851,15 @@ anim8.override( anim8.PathCubic.prototype = new anim8.Path(),
 anim8.path['cubic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   return new anim8.PathCubic(
     path.name,
     calc,
-    calc.parse( path.p0 ),
-    calc.parse( path.p1 ),
-    calc.parse( path.p2 ),
-    calc.parse( path.p3 )
+    calc.parse( path.p0, defaultValue ),
+    calc.parse( path.p1, defaultValue ),
+    calc.parse( path.p2, defaultValue ),
+    calc.parse( path.p3, defaultValue )
   );
 };
 
@@ -4902,13 +4917,14 @@ anim8.override( anim8.PathQuadratic.prototype = new anim8.Path(),
 anim8.path['quadratic'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   return new anim8.PathQuadratic(
     path.name,
     calc,
-    calc.parse( path.p0 ),
-    calc.parse( path.p1 ),
-    calc.parse( path.p2 )
+    calc.parse( path.p0, defaultValue ),
+    calc.parse( path.p1, defaultValue ),
+    calc.parse( path.p2, defaultValue )
   );
 };
 
@@ -4961,6 +4977,7 @@ anim8.override( anim8.PathDelta.prototype = new anim8.Path(),
 anim8.path['delta'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   if (!path.deltas)
   {
@@ -4974,7 +4991,7 @@ anim8.path['delta'] = function(path)
 
   for (var i = 0; i < path.points.length; i++)
   {
-    path.points[ i ] = calc.parse( path.points[i] );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
   
   return new anim8.PathDelta(
@@ -5025,10 +5042,11 @@ anim8.override( anim8.PathJump.prototype = new anim8.Path(),
 anim8.path['jump'] = function(path)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   for (var i = 0; i < path.points.length; i++)
   {
-    path.points[ i ] = calc.parse( path.points[i] );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
   
   return new anim8.PathJump(
@@ -5154,6 +5172,7 @@ anim8.override( anim8.PathKeyframe.prototype = new anim8.Path(),
 anim8.path['keyframe'] = function(point)
 {
   var calc = anim8.calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
   
   if (!path.deltas)
   {
@@ -5184,7 +5203,7 @@ anim8.path['keyframe'] = function(point)
   
   for (var i = 0; i < path.points.length; i++)
   {
-    path.points[ i ] = calc.parse( path.points[i] );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
   
   return new anim8.PathKeyframe(
@@ -5213,11 +5232,19 @@ anim8.PathCombo = function(name, paths, uniform, granularity)
   var calc = paths[0].calculator;
   var points = [];
   var deltas = [];
+  var linear = true;
+  var length = false;
 
   for (var i = 0; i < paths.length; i++) 
   {
     points.push.apply( points, paths[ i ].points );
+
     deltas[ i ] = ( i + 1 ) / paths.length;  
+
+    if ( !paths[ i ].isLinear() )
+    {
+      linear = false;
+    }
   }
 
   if ( uniform ) 
@@ -5239,6 +5266,8 @@ anim8.PathCombo = function(name, paths, uniform, granularity)
       lengthCurrent += lengths[ i ];
       deltas[ i ] = lengthCurrent / lengthTotal;
     }
+
+    length = lengthTotal;
   }
 
   this.reset( name, calc, points );
@@ -5246,10 +5275,20 @@ anim8.PathCombo = function(name, paths, uniform, granularity)
   this.deltas = deltas;
   this.uniform = uniform;
   this.granularity = granularity;
+  this.linear = linear;
+  this.cachedLength = length;
 };
 
-anim8.override( anim8.PathCompiled.prototype = new anim8.Path(),
+anim8.override( anim8.PathCombo.prototype = new anim8.Path(),
 {
+  isLinear: function()
+  {
+    return this.linear;
+  },
+  length: function(granularity)
+  {
+    return this.cachedLength !== false ? this.cachedLength : anim8.Path.length.apply( this, arguments );
+  },
   compute: function(out, delta)
   {
     var paths = this.paths;
@@ -11100,7 +11139,11 @@ anim8.override( anim8.ParserAnd.prototype = new anim8.Parser(),
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    attrimatorMap.putMap( anim8.attrimatorsFor( animation.and, options ) );
+    var and = animation.and;
+
+    and.factory = anim8.coalesce( and.factory, animation.factory );
+
+    attrimatorMap.putMap( anim8.attrimatorsFor( and, options ) );
   },
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
   {
@@ -11627,7 +11670,11 @@ anim8.override( anim8.ParserQueue.prototype = new anim8.Parser(),
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    attrimatorMap.queueMap( anim8.attrimatorsFor( animation.queue, options ) );
+    var queue = animation.queue;
+
+    queue.factory = anim8.coalesce( queue.factory, animation.factory );
+
+    attrimatorMap.queueMap( anim8.attrimatorsFor( queue, options ) );
   },
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
   {
