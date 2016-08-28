@@ -1,0 +1,21 @@
+{
+  "bitwise": false,
+  "curly": true,
+  "eqeqeq": true,
+  "esversion": 5,
+  "freeze": true,
+  "funcscope": true,
+  "loopfunc": false,
+  "maxdepth": 9,
+  "noarg": true,
+  "nocomma": true,
+  "nonbsp": true,
+  "nonew": true,
+  "notypeof": true,
+  "predef": [ "MY_GLOBAL" ],
+  "shadow": true,
+  "singleGroups": false,
+  "undef": true,
+  "unused": false,
+  "sub":true
+}

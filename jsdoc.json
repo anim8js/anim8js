@@ -1,0 +1,36 @@
+{
+  "source": {
+    "include": [
+      "src/modules/",
+      "src/",
+      "src/parsing/",
+      "src/calculators/",
+      "src/builders/",
+      "src/factories/",
+      "src/paths/",
+      "src/springs/"
+    ]
+  },
+  "templates": {
+    "applicationName": "anim8js",
+    "linenums": true,
+    "cleverLinks": true,
+    "default": {
+      "outputSourceFiles": true
+    }
+  },
+  "opts": {
+    "destination": "../anim8js-docs/docs/",
+    "recurse": "true",
+    "template": "./node_modules/jaguarjs-jsdoc",
+    "readme": "./README.md",
+    "pedantic": true,
+    "debug": true
+  },
+  "plugins": [
+    "plugins/markdown"
+  ],
+  "tags": {
+    "allowUnknownTags": true
+  }
+}
