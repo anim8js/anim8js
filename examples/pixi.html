@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #666;
+      }
+      #container {
+        position: relative;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+      }
+      #canvas {
+        position: relative;
+        left: -512px;
+        top: -336px;
+        background-color: black; 
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    
+    <div id="container">
+      
+    </div>
+
+    <script src="../3rd/pixi.js"></script>
+    <script src="../build/anim8js-pixi.js"></script>
+    <script src="examples.js"></script>
+  
+    <script>
+
+      function Mouse()
+      {
+        return {
+          x: Mouse.x,
+          y: Mouse.y
+        };
+      };
+      Mouse.x = Mouse.y = 0;
+
+      function init() 
+      {
+        var viewWidth = 1024;
+        var viewHeight = 672;
+
+        // Create a pixi renderer
+        var renderer = PIXI.autoDetectRenderer(viewWidth, viewHeight, null, false, true);
+        renderer.view.className = "rendererView";
+        renderer.view.id = 'canvas';
+
+        $listen( renderer.view, 'mousemove', function(mouse, ev)
+        {
+          var offset = getOffsetMouse( ev );
+
+          Mouse.x = offset.x;
+          Mouse.y = offset.y;
+        });
+
+        // add render view to DOM
+        container.appendChild( renderer.view );
+
+        // create an new instance of a pixi stage
+        var stage = new PIXI.Stage( 0x000000 );
+
+        // the object to animate
+        var circle = new PIXI.Circle(0, 0, 30);
+        var tinter = {tint: anim8.color.parse('#3333FF')};
+        var outliner = {lineWidth: 1, lineColor: 0xFFFFFF};
+        var graphics = new PIXI.Graphics();
+        stage.addChild( graphics );
+
+        anim8( graphics ).play({
+          springs: {
+            position: {
+              type: 'linear',
+              rest: Mouse,
+              damping: 2.5,
+              stiffness: -30
+            }
+          }
+        });
+
+        anim8( tinter ).tween('tint', 'red', 'blue', 'infinite yoyo 4s ~0.5s');
+        anim8( circle ).tween('radius', 30, 50, 'infinite yoyo');
+        anim8( outliner ).tween('lineWidth', 1, 5, 'infinite yoyo 2s');
+        
+        anim8.on('end', function() 
+        {
+          graphics.clear();
+          graphics.beginFill( tinter.tint, 1.0 );
+          graphics.lineStyle( outliner.lineWidth, outliner.lineColor );
+          graphics.drawShape( circle );
+          graphics.endFill();
+          
+          renderer.render( stage );
+        });
+      }
+
+    </script>
+  </body>
+</html>

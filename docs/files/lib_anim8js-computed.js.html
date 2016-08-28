@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/anim8js-computed.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: lib/anim8js-computed.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+
+/**
+ * The namespace for computed functions. Computed functions are functions that
+ * are invoked once at the start of an animation given the attrimator and 
+ * animator and the result replaces the function.
+ */
+anim8.computed = {};
+
+/**
+ * Calculates the current value for an animator.
+ * 
+ * @param {anim8.Attrimator} attrimator
+ * @param {anim8.Animator} animator
+ * @return {T}
+ */
+anim8.computed.current = function(attrimator, animator)
+{
+  var attr = attrimator.attribute;
+  var attribute = animator.getAttribute( attr );
+
+  if ( attr in animator.frame )
+  {
+    return attribute.calculator.clone( animator.frame[ attr ] );
+  }
+  else
+  {
+    return attribute.cloneDefault();
+  }
+};
+
+// Marks the function as computed which is a signal to paths &amp; events.
+anim8.computed.current.computed = true;
+
+/**
+ * Calculates a value relative to the attribute value currently in the animator.
+ * A mask can be used for mixed relative &amp; absolute values in a single value
+ * where 1 makes it relative and 0 makes it absolute.
+ * 
+ * @param {T} relativeAmount
+ * @param {T} mask
+ * @return {Function}
+ */
+anim8.computed.relative = function(relativeAmount, mask)
+{
+  // If the relativeAmount is already a computed value, return it.
+  if ( anim8.isComputed( relativeAmount ) )
+  {
+    return relativeAmount;
+  }
+
+  var relativeFunction = function(attrimator, animator)
+  { 
+    var attr = attrimator.attribute;
+    var attribute = animator.getAttribute( attr );
+    var calc = attribute.calculator;
+    var current = null;
+
+    if ( attr in animator.frame )
+    {
+      current = calc.clone( animator.frame[ attr ] );
+    }
+    else
+    {
+      current = attribute.cloneDefault();
+    }
+
+    if ( mask )
+    {
+      current = calc.mul( current, mask );
+    }
+
+    return calc.add( current, relativeAmount );
+  };
+
+  // Marks the function as computed which is a signal to paths &amp; events.
+  relativeFunction.computed = true;
+
+  // Place the input on the function if the user wants to modify it live
+  relativeFunction.relativeAmount = relativeAmount;
+  relativeFunction.mask = mask;
+
+  return relativeFunction;
+};
+
+/**
+ * Returns a random value based on the given random selection.
+ * 
+ * 1. If an array is given an item is randomly chosen from that array.
+ * 2. If an instance of anim8.Path is given a point is randomly computed and returned.
+ * 3. If an object with min &amp; max values is given a random value between them is returned.
+ * 
+ * @param  {Array|Object|anim8.Path} randomSelection
+ * @return {Function}
+ */
+anim8.computed.random = function(randomSelection)
+{
+  var randomFunction = null;
+
+  if ( anim8.isArray( randomSelection ) )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+      var selected = randomSelection[ Math.floor( Math.random() * randomSelection.length ) ];
+
+      return calc.parse( selected, calc.ZERO );
+    };
+  }
+  else if ( randomSelection instanceof anim8.Path )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+
+      return randomSelection.compute( calc.create(), Math.random() );
+    };
+  }
+  else if ( anim8.isObject( randomSelection ) &amp;&amp; anim8.isDefined( randomSelection.min ) &amp;&amp; anim8.isDefined( randomSelection.max ) )
+  {
+    randomFunction = function(attrimator, animator)
+    {
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calc = attribute.calculator;
+      var resolvedMin = anim8.resolve( randomSelection.min );
+      var resolvedMax = anim8.resolve( randomSelection.max );
+      var min = calc.parse( resolvedMin, calc.ZERO );
+      var max = calc.parse( resolvedMax, calc.ZERO );
+
+      return calc.random( calc.create(), min, max );
+    };
+  }
+  else
+  {
+    throw &#x27;Invalid random input: &#x27; + randomSelection;
+  }
+
+  // Marks the function as computed which is a signal to paths &amp; events.
+  randomFunction.computed = true;
+
+  // Place the input on the function if the user wants to modify it live
+  randomFunction.randomSelection = randomSelection;
+
+  return randomFunction;
+};
+
+/**
+ * Determines whether the given value is a computed value. A computed value is
+ * function with a variable &#x27;computed&#x27; set to a true value.
+ * 
+ * @param  {any} x
+ * @return {Boolean}
+ */
+anim8.isComputed = function(x)
+{
+  return anim8.isFunction( x ) &amp;&amp; x.computed;
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

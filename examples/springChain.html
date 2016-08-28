@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    .box {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+      left: 100px;
+      right: 100px;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div class="box" id="box1"></div>
+    <div class="box" id="box2"></div>
+    <div class="box" id="box3"></div>
+    <div class="box" id="box4"></div>
+    <div class="box" id="box5"></div>
+    <div class="box" id="box6"></div>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+    
+    <script>
+      
+      var previous = MousePosition;
+
+      for (var i = 1; i <= 6; i++)
+      {
+        var e = window[ 'box' + i ];
+
+        m8( e ).spring(
+        {
+          type: 'distance',
+          attribute: 'center',
+          rest: previous,
+          distance: 100,
+          damping: 20,
+          stiffness: -100
+        });
+
+        previous = m8( e ).ref( 'center' );
+      }
+      
+    </script>
+    
+  </body>
+</html>
+  

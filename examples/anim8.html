@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+  <head>    
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    #container {
+      width: 90%;
+      height: 300px;
+      position: relative;
+      left: 5%;
+      top: 5%;
+      border: 1px solid #ddd;
+      display: inline-block;
+      margin-bottom: 2%;
+    }
+    #container2 {
+      position: relative;
+      top: 5%;
+      left: 5%;
+      width: 90%;
+      border: 1px solid #ddd;
+      display: inline-block;
+    }
+    #container2 img {
+      width: 29%;
+      margin: 2%;
+    }
+    #box {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #0F0;
+      position: absolute;
+      background-color: #6F6;
+    }
+    #box3 {
+      width: 40px;
+      height: 40px;
+      left: 100px;
+      border: 2px solid #F00;
+      position: absolute;
+      background-color: #F66;
+    }
+    #box4 {
+      width: 40px;
+      height: 40px;
+      top: 100px;
+      border: 2px solid #FF0;
+      position: absolute;
+      background-color: #FF6;
+    }
+    #box5 {
+      width: 40px;
+      height: 40px;
+      right: 50px;
+      bottom: 50px;
+      border: 2px solid #F0F;
+      position: absolute;
+      background-color: #F6F;
+    }
+    #box6 {
+      width: 40px;
+      height: 40px;
+      left: 30px;
+      bottom: 30px;
+      border: 2px solid #000;
+      position: absolute;
+      background-color: #666;
+    }
+    #box7 {
+      width: 40px;
+      height: 40px;
+      right: 5px;
+      top: 5px;
+      border: 2px solid #F80;
+      position: absolute;
+      background-color: #FA6;
+      box-sizing: border-box;
+    }
+    #box8 {
+      width: 40px;
+      height: 40px;
+      left: 40%;
+      bottom: 5px;
+      border: 5px solid #DDD;
+      position: absolute;
+      background-color: #AAA;
+    }
+    
+    
+    </style>
+  </head>
+  <body>
+    
+    <div id="container">
+      <div id="box"></div>
+      <div id="box2"></div>
+      <div id="box3"></div>
+      <div id="box4"></div>
+      <div id="box5"></div>
+      <div id="box6"></div>
+      <div id="box7"></div>
+      <div id="box8"></div>
+    </div>
+    
+    <div id="container2">
+      <img id="img1" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+    <!--
+      <img id="img2" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      <img id="img3" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      <img id="img4" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      <img id="img5" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      <img id="img6" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      <img id="img7" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
+      -->
+    </div>
+			
+    <script src="../build/anim8js-dom.js"></script>
+    <script src="../build/anim8js-animate.css.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+		
+    <script>
+      	
+      anim8.save( 'bounceRotate', {
+        keyframe: {
+          '0.0': {
+            rotate: 0,
+            scale: {x:1.0, y:1.0}
+          },
+          '0.5': {
+            rotate: 90,
+            scale: {x:2.0, y:2.0}
+          },
+          '1.0': {
+            rotate: 360,
+            scale: {x:1.0, y:1.0}
+          }
+        }
+      }, {
+        repeat: 4
+      });
+    	
+      anim8(window.box2).play('bounceRotate');      
+      anim8(window.box5).play('bounce');
+      anim8(window.box6).play('rubberBand');
+			
+			anim8(window.box7).play({
+				deltas: [0.0, 0.8, 1.0],
+				values: {
+					rotate: [0, 360, 0]
+				}
+			});
+			
+      anim8(window.img1).play({
+				keyframe: {
+	        '0.0,1.0': {
+	          grayscale: 0
+	        },
+	        '0.5': {
+	          grayscale: 100
+	        }
+				}
+			}, {
+				repeat: 20
+			});
+      
+      /*
+      /* TODO remove after testing complete 
+      anim8.keyframe(window.box, {
+        '0.0': {
+          rotate: 0,
+          scale: 1.0
+        },
+        '0.5': {
+          rotate: 90,
+          scale: 2.0
+        },
+        '1.0': {
+          rotate: 360,
+          scale: 1.0
+        }
+      }, 1000, 50);
+      
+      anim8.keyframe(window.box2, {
+        '0.0': {
+          distance: 50,
+          angle: 0,
+          left: 130,
+          top: 130
+        },
+        '1.0': {
+          distance: 50,
+          angle: 360,
+          left: 130,
+          top: 130
+        }
+      }, 2000, 45);
+      
+      anim8.keyframe(window.box3, {
+        '0.0': {
+          opacity: 1.0
+        },
+        '0.8': {
+          opacity: 0.0
+        },
+        '1.0': {
+          opacity: 0.8
+        }
+      }, 1000, 10);
+      
+      anim8.keyframe(window.box4, {
+        '0.0': {
+          margin: 0
+        },
+        '0.8': {
+          margin: 10
+        },
+        '1.0': {
+          margin: 40
+        }
+      }, 1000, 10);
+      
+      anim8.keyframe(window.box7, {
+        '0.0,1.0': {
+          borderWidth: 1
+        },
+        '0.5': {
+          borderWidth: 10
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.box8, {
+        '0.0,1.0': {
+          blur: 0
+        },
+        '0.5': {
+          blur: 5
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img2, {
+        '0.0,1.0': {
+          sepia: 0
+        },
+        '0.5': {
+          sepia: 100
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img3, {
+        '0.0,1.0': {
+          saturate: 0
+        },
+        '0.5': {
+          saturate: 100
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img4, {
+        '0.0,1.0': {
+          hueRotate: 0
+        },
+        '0.5': {
+          hueRotate: 360
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img5, {
+        '0.0,1.0': {
+          invert: 0
+        },
+        '0.5': {
+          invert: 100
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img6, {
+        '0.0,1.0': {
+          brightness: 0
+        },
+        '0.5': {
+          brightness: 100
+        }
+      }, 1000, 20);
+      
+      anim8.keyframe(window.img7, {
+        '0.0,1.0': {
+          contrast: 0
+        },
+        '0.5': {
+          contrast: 100
+        }
+      }, 1000, 20);
+      
+      */
+      
+      
+      // ====== ATTRIBUTES ======
+      // width, minWidth, maxWidth
+      // height, minHeiht, maxHeight
+      // angle, distance
+      // centerX | left | right | translateX
+      // centerY | top | bottom | translateY
+      // scale, scaleX, scaleY
+      // scale3d, translate3d, rotate3d
+      // originX, originY
+      // opacity
+      // zIndex
+      // margin, marginTop, marginRight, marginBottom, marginLeft
+      // padding, paddingTop, paddingRight, paddingBottom, paddingLeft
+      // borderWidth, borderTopWidth, borderRightWidth, borderBottomWidth, borderLeftWidth
+      // outlineWidth
+      // borderRadius, borderTopLeftRadius, borderTopRightRadius, borderBottomLeftRadius, borderBottomRightRadius
+      // textIndent
+      // borderSpacing
+      // outlineWidth
+      // fontSize
+      // lineHeight
+      // ===== COLOR ======
+      // backgroundColor, color, borderTopColor, borderRightColor, borderBottomColor, borderLeftColor, outlineColor
+      
+      // Get animator based on object passed in
+      
+      // Paths, Keyframes, 
+      
+      // https://gist.githubusercontent.com/gre/1926947/raw/KeySpline.js
+    
+      
+    </script>
+    
+  </body>
+</html>
+  

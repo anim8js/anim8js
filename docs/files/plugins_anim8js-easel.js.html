@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>plugins/anim8js-easel.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: plugins/anim8js-easel.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+/**
+ * A factory for plain objects.
+ */
+anim8.FactoryEasel = function()
+{
+  this.priority = 3;
+  this.attributes = {};
+};
+
+anim8.override( anim8.FactoryEasel.prototype = new anim8.Factory(),
+{
+  is: function(subject)
+  {
+    return anim8.isObject( subject ) &amp;&amp; !anim8.isArray( subject );
+  },
+  animatorFor: function(subject)
+  {
+    var animator = subject.$animator;
+      
+    if ( !animator )
+    {
+      animator = new anim8.AnimatorEasel( subject );
+      animator.factory = this;      
+      
+      subject.$animator = animator;
+    }
+    
+    return animator;
+  },
+  destroy: function(animator)
+  {
+    delete animator.subject.$animator;
+  },
+  attribute: function(attr)
+  {
+    var attribute = this.attributes[ attr ];
+
+    if ( !attribute )
+    {
+      attribute = this.attributes[ attr ] = anim8.easel.attribute( attr );
+
+      var calculatorName = attribute.calculator;
+      var calculator = anim8.calculator( calculatorName );
+      var defaultValue = calculator.parse( attribute.defaultValue, calculator.ZERO );
+      var dynamicName = attribute.dynamic;
+      var dynamic = anim8.easel.dynamic( dynamicName );
+
+      attribute.calculatorName = calculatorName;
+      attribute.calculator = calculator;
+      attribute.defaultValue = defaultValue;
+      attribute.name = attr;
+      attribute.dynamicName = dynamicName;
+      attribute.dynamic = dynamic;
+      attribute.parse = function(value) {
+        return this.calculator.parse( value, this.defaultValue );
+      };
+      attribute.cloneDefault = function() {
+        return this.calculator.clone( this.defaultValue );
+      };
+    }
+
+    return attribute;
+  }
+});
+
+/**
+ * Registers the object factory.
+ */
+anim8.factory[&#x27;easeljs&#x27;] = new anim8.FactoryEasel();
+
+anim8.AnimatorEasel = function( subject )
+{
+  this.reset( subject );
+  this.dynamics = new anim8.FastMap();
+};
+
+anim8.override( anim8.AnimatorEasel.prototype = new anim8.Animator(),
+{
+  placeAttrimator: function( attrimator )
+  {
+    anim8.fn.placeAttrimator.apply( this, arguments );
+    
+    // Place any dynamic function on this animator.
+    var attr = attrimator.attribute;
+    var attribute = this.getAttribute( attr );
+    var dynamic = attribute.dynamic;
+
+    if ( dynamic )
+    {
+      this.dynamics.put( attr, dynamic );
+    }
+
+    return this;
+  },
+  apply: function()
+  {
+    // If a dynamic attribute has been updated, call the dynamic function and
+    // mark the attribute as not needing to be updated.
+    for (var attr in this.frame)
+    {
+      var dynamic = this.dynamics.get( attr );
+
+      if ( this.updated[ attr ] &amp;&amp; dynamic )
+      {
+        dynamic( this.frame[ attr ], this.subject );
+
+        this.updated[ attr ] = false;
+      }
+    }
+
+    // Call the parent apply
+    anim8.fn.apply.apply( this, arguments );
+
+    return this;
+  }
+});
+
+/**
+ * =============================================================================
+ * Attributes defined in EaselJS:
+ * =============================================================================
+ * DisplayObject:
+ *    alpha, regX, regY, rotation, scaleX, scaleY, skewX, 
+ *    skewY, x, y, 
+ * BitmapText (DisplayObject):
+ *    lineHeight, letterSpacing, spaceWidth
+ * BlurFilter:
+ *    blurX, blurY, quality
+ * ColorFilter:
+ *    redMultiplier, greenMultiplier, blueMultiplier, alphaMultiplier,
+ *    redOffset, greenOffset, blueOffset, alphaOffset    
+ * Graphics.Arc:
+ *    x, y, radius, startAngle, endAngle
+ * Graphics.BezierCurveTo:
+ *    cp1x, cp1y, cp2x, cp2y, x, y
+ * Graphics.Circle:
+ *    x, y, radius
+ * Graphics.Ellipse:
+ *    x, y, w, h
+ * Graphics.Fill:
+ *    style (color)
+ * Graphics.LineTo:
+ *    x, y
+ * Graphics.MoveTo:
+ *    x, y
+ * Graphics.PolyStar:
+ *    x, y, radius, sides, pointSize, angle
+ * Graphics.QuadraticCurveTo:
+ *    cpx, cpy, x, y
+ * Graphics.Rect:
+ *    x, y, w, h
+ * Graphics.RoundRect:
+ *    x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL
+ * Graphics.Stroke:
+ *    style (color)
+ * Graphics.StrokeStyle:
+ *    width, miterLimit
+ * Point:
+ *    x, y
+ * Rectangle:
+ *    x, y, width, height
+ * Shadow:
+ *    color, offsetX, offsetY, blur
+ * Sprite:
+ *    currentAnimationFrame, framerate
+ * SpriteSheet:
+ *    framerate
+ * Text:
+ *    color
+ */
+
+/**
+ * =============================================================================
+ * Dynamic Attributes defined in anim8js
+ * =============================================================================
+ * number: cornerRadius, ColorMatrix{brightness, contrast, saturation, hue}
+ * 2d: reg, position, offset, cp, cp1, cp2, filterBlur, size, scale, skew
+ * rgba: filterMultiplier, filterOffset
+ */
+
+anim8.easel = {};
+
+anim8.easel.attribute = function(attr)
+{
+  if ( anim8.isString( attr ) &amp;&amp; attr in anim8.easel.attribute )
+  {
+    return anim8.easel.attribute[ attr ];
+  }
+
+  return anim8.easel.attribute[&#x27;default&#x27;];
+}
+
+// Defined
+anim8.easel.attribute[&#x27;default&#x27;]      = {defaultValue: 0};
+anim8.easel.attribute.alpha           = {defaultValue: 1};
+anim8.easel.attribute.regX            = {defaultValue: 0};
+anim8.easel.attribute.regY            = {defaultValue: 0};
+anim8.easel.attribute.rotation        = {defaultValue: 0};
+anim8.easel.attribute.scaleX          = {defaultValue: 1};
+anim8.easel.attribute.scaleY          = {defaultValue: 1};
+anim8.easel.attribute.skewX           = {defaultValue: 0};
+anim8.easel.attribute.skewY           = {defaultValue: 0};
+anim8.easel.attribute.x               = {defaultValue: 0};
+anim8.easel.attribute.y               = {defaultValue: 0};
+anim8.easel.attribute.lineHeight      = {defaultValue: 0};
+anim8.easel.attribute.letterSpacing   = {defaultValue: 0};
+anim8.easel.attribute.spaceWidth      = {defaultValue: 0};
+anim8.easel.attribute.blurX           = {defaultValue: 0};
+anim8.easel.attribute.blurY           = {defaultValue: 0};
+anim8.easel.attribute.quality         = {defaultValue: 1};
+anim8.easel.attribute.redMultiplier   = {defaultValue: 1};
+anim8.easel.attribute.greenMultiplier = {defaultValue: 1};
+anim8.easel.attribute.blueMultiplier  = {defaultValue: 1};
+anim8.easel.attribute.alphaMultiplier = {defaultValue: 1};
+anim8.easel.attribute.redOffset       = {defaultValue: 0};
+anim8.easel.attribute.greenOffset     = {defaultValue: 0};
+anim8.easel.attribute.blueOffset      = {defaultValue: 0};
+anim8.easel.attribute.alphaOffset     = {defaultValue: 0};
+anim8.easel.attribute.radius          = {defaultValue: 0};
+anim8.easel.attribute.startAngle      = {defaultValue: 0};
+anim8.easel.attribute.endAngle        = {defaultValue: 0};
+anim8.easel.attribute.cp1x            = {defaultValue: 0};
+anim8.easel.attribute.cp1y            = {defaultValue: 0};
+anim8.easel.attribute.cp2x            = {defaultValue: 0};
+anim8.easel.attribute.cp2y            = {defaultValue: 0};
+anim8.easel.attribute.w               = {defaultValue: 0};
+anim8.easel.attribute.h               = {defaultValue: 0};
+anim8.easel.attribute.width           = {defaultValue: 0};
+anim8.easel.attribute.height          = {defaultValue: 0};
+anim8.easel.attribute.sides           = {defaultValue: 0};
+anim8.easel.attribute.pointSize       = {defaultValue: 0};
+anim8.easel.attribute.angle           = {defaultValue: 0};
+anim8.easel.attribute.cpx             = {defaultValue: 0};
+anim8.easel.attribute.cpy             = {defaultValue: 0};
+anim8.easel.attribute.radiusTL        = {defaultValue: 0};
+anim8.easel.attribute.radiusTR        = {defaultValue: 0};
+anim8.easel.attribute.radiusBL        = {defaultValue: 0};
+anim8.easel.attribute.radiusBR        = {defaultValue: 0};
+anim8.easel.attribute.miterLimit      = {defaultValue: 0};
+anim8.easel.attribute.offsetX         = {defaultValue: 0};
+anim8.easel.attribute.offsetY         = {defaultValue: 0};
+anim8.easel.attribute.blur            = {defaultValue: 0};
+anim8.easel.attribute.framerate       = {defaultValue: 0};
+anim8.easel.attribute.currentAnimationFrame = {defaultValue: 0};
+
+// Dynamic
+anim8.easel.attribute.style           = {defaultValue: anim8.color(), calculator:&#x27;rgba&#x27;};
+anim8.easel.attribute.color           = {defaultValue: anim8.color(), calculator:&#x27;rgba&#x27;};
+anim8.easel.attribute.cornerRadius    = {defaultValue: 0, dynamic: &#x27;cornerRadius&#x27;};
+anim8.easel.attribute.brightness      = {defaultValue: 0, dynamic: &#x27;brightness&#x27;};
+anim8.easel.attribute.contrast        = {defaultValue: 0, dynamic: &#x27;contrast&#x27;};
+anim8.easel.attribute.saturation      = {defaultValue: 0, dynamic: &#x27;saturation&#x27;};
+anim8.easel.attribute.hue             = {defaultValue: 0, dynamic: &#x27;hue&#x27;};
+anim8.easel.attribute.reg             = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;reg&#x27;};
+anim8.easel.attribute.position        = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;position&#x27;};
+anim8.easel.attribute.offset          = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;offset&#x27;};
+anim8.easel.attribute.cp              = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;cp&#x27;};
+anim8.easel.attribute.cp1             = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;cp1&#x27;};
+anim8.easel.attribute.cp2             = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;cp2&#x27;};
+anim8.easel.attribute.filterBlur      = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;filterBlur&#x27;};
+anim8.easel.attribute.size            = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;size&#x27;};
+anim8.easel.attribute.scale           = {defaultValue: {x:1, y:1}, calculator: &#x27;2d&#x27;, dynamic:&#x27;scale&#x27;};
+anim8.easel.attribute.skew            = {defaultValue: {x:0, y:0}, calculator: &#x27;2d&#x27;, dynamic:&#x27;skew&#x27;};
+anim8.easel.attribute.filterMultiplier= {defaultValue: anim8.color(), calculator: &#x27;rgba&#x27;, dynamic:&#x27;filterMultiplier&#x27;};
+anim8.easel.attribute.filterOffset    = {defaultValue: anim8.color(), calculator: &#x27;rgba&#x27;, dynamic:&#x27;filterOffset&#x27;};
+
+
+// Dynamic Fields
+anim8.easel.dynamic = function(nm)
+{
+  if ( anim8.isString( nm ) &amp;&amp; nm in anim8.easel.dynamic )
+  {
+    return anim8.easel.dynamic[ nm ];
+  }
+
+  return false;
+};
+
+anim8.easel.dynamic.style = function(attr, subject)
+{
+  subject.style = anim8.color.format( attr );
+};
+
+anim8.easel.dynamic.color = function(attr, subject)
+{
+  subject.color = anim8.color.format( attr );
+};
+
+anim8.easel.dynamic.cornerRadius = function(attr, subject)
+{
+  subject.radiusTL = attr;
+  subject.radiusTR = attr;
+  subject.radiusBL = attr;
+  subject.radiusBR = attr;
+};
+
+anim8.easel.dynamic.brightness = function(attr, subject)
+{
+  subject.adjustBrightness( attr );
+};
+
+anim8.easel.dynamic.contrast = function(attr, subject)
+{
+  subject.adjustContrast( attr );
+};
+
+anim8.easel.dynamic.saturation = function(attr, subject)
+{
+  subject.adjustSaturation( attr );
+};
+
+anim8.easel.dynamic.hue = function(attr, subject)
+{
+  subject.adjustHue( attr );
+};
+
+anim8.easel.dynamic.reg = function(attr, subject)
+{
+  subject.regX = attr.x;
+  subject.regY = attr.y;
+};
+
+anim8.easel.dynamic.position = function(attr, subject)
+{
+  subject.x = attr.x;
+  subject.y = attr.y;
+};
+
+anim8.easel.dynamic.offset = function(attr, subject)
+{
+  subject.offsetX = attr.x;
+  subject.offsetY = attr.y;
+};
+
+anim8.easel.dynamic.cp = function(attr, subject)
+{
+  subject.cpx = attr.x;
+  subject.cpy = attr.y;
+};
+
+anim8.easel.dynamic.cp1 = function(attr, subject)
+{
+  subject.cp1x = attr.x;
+  subject.cp1y = attr.y;
+};
+
+anim8.easel.dynamic.cp2 = function(attr, subject)
+{
+  subject.cp2x = attr.x;
+  subject.cp2y = attr.y;
+};
+
+anim8.easel.dynamic.filterBlur = function(attr, subject)
+{
+  subject.blurX = attr.x;
+  subject.blurY = attr.y;
+};
+
+anim8.easel.dynamic.size = function(attr, subject)
+{
+  subject.w = subject.width  = attr.x;
+  subject.h = subject.height = attr.y;
+};
+
+anim8.easel.dynamic.scale = function(attr, subject)
+{
+  subject.scaleX = attr.x;
+  subject.scaleY = attr.y;
+};
+
+anim8.easel.dynamic.skew = function(attr, subject)
+{
+  subject.skewX = attr.x;
+  subject.skewY = attr.y;
+};
+
+anim8.easel.dynamic.filterMultiplier = function(attr, subject)
+{
+  subject.redMultiplier   = attr.r;
+  subject.greenMultiplier = attr.g;
+  subject.blueMultiplier  = attr.b;
+  subject.alphaMultiplier = attr.a;
+};
+
+anim8.easel.dynamic.filterOffset = function(attr, subject)
+{
+  subject.redOffset   = attr.r;
+  subject.greenOffset = attr.g;
+  subject.blueOffset  = attr.b;
+  subject.alphaOffset = attr.a;
+};
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

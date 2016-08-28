@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/anim8js-calculator-2d.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: lib/anim8js-calculator-2d.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+/*
+ * A calculator for objects with an x and y component (number)
+ *
+ * @class Calculator2d
+ * @constructor
+ * @namespace anim8
+ */
+anim8.Calculator2d = function()
+{
+  this.createConstants();
+};
+
+anim8.override( anim8.Calculator2d.prototype = new anim8.Calculator(), 
+{
+  /**
+   * [parse description]
+   * @param  {Function|Number|Boolean}
+   * @param  {[type]}
+   * @return {[type]}
+   */
+  parse: function(x, defaultValue)
+  {
+    // Values computed live.
+    if ( anim8.isFunction( x ) )
+    {
+      return x;
+    }
+    // Value computed from current value on animator.
+    if ( x === true )
+    {
+      return anim8.computed.current;
+    }
+    // When a number is given a uniform point is returned.
+    if ( anim8.isNumber( x ) )
+    {
+      return {
+        x: x,
+        y: x
+      };
+    }
+    // When an object is given, check for relative values.
+    if ( anim8.isObject( x ) )
+    {
+      var cx = anim8.coalesce( x.x, defaultValue.x );
+      var cy = anim8.coalesce( x.y, defaultValue.y );
+      var rx = this.getRelativeAmount( cx );
+      var ry = this.getRelativeAmount( cy );
+
+      if ( rx !== false &amp;&amp; ry !== false )
+      {
+        var parsed = { x: rx, y: ry };
+        var ix = this.isRelative( cx );
+        var iy = this.isRelative( cy );
+
+        if ( ix || iy )
+        {
+          var mask = {
+            x: ix ? 1 : 0,
+            y: iy ? 1 : 0
+          };
+
+          return anim8.computed.relative( parsed, mask );
+        }
+
+        return parsed;
+      }
+    }
+    // Relative values &amp; left/right/middle/center/top/bottom aliases.
+    if ( anim8.isString( x ) )
+    {
+      // If only a relative value is given it will modify the X &amp; Y components evenly.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return anim8.computed.relative( { x: rx, y: rx } ); 
+        }
+      }
+
+      var aliases = {
+        &#x27;left&#x27;:   0,
+        &#x27;right&#x27;:  100,
+        &#x27;middle&#x27;: 50,
+        &#x27;center&#x27;: 50,
+        &#x27;top&#x27;:    0,
+        &#x27;bottom&#x27;: 100
+      };
+      
+      if ( x.indexOf(&#x27; &#x27;) === -1 )
+      {
+        var _x = parseFloat( x );
+        
+        if ( !isNaN(_x) || x in aliases )
+        {
+          return {
+            x: x in aliases ? aliases[x] : _x,
+            y: x in aliases ? aliases[x] : _x
+          };
+        }
+      }
+      else
+      {
+        var pair = x.split(&#x27; &#x27;);
+        var _x = parseFloat( pair[0] );
+        var _y = parseFloat( pair[1] );
+        
+        if ((!isNaN(_x) || pair[0] in aliases) &amp;&amp; (!isNaN(_y) || pair[1] in aliases))
+        {
+          return {
+            x: pair[0] in aliases ? aliases[pair[0]] : _x,
+            y: pair[1] in aliases ? aliases[pair[1]] : _y
+          };
+        }
+      }
+    }
+    
+    // If no value was given but the default value was given, clone it.
+    if ( anim8.isDefined( defaultValue ) )
+    {
+      return this.clone( defaultValue );      
+    }
+    
+    return false;
+  },
+  copy: function(out, copy) 
+  {
+    out.x = copy.x;
+    out.y = copy.y;
+    return out;
+  },
+  create: function() 
+  {
+    return {x: 0.0, y:0.0};
+  },
+  zero: function(out) 
+  {
+    out.x = 0.0;
+    out.y = 0.0;
+    return out;
+  },
+  adds: function(out, amount, amountScale) 
+  {
+    out.x += amount.x * amountScale;
+    out.y += amount.y * amountScale;
+    return out;
+  },
+  mul: function(out, scale) 
+  {
+    out.x *= scale.x;
+    out.y *= scale.y;
+    return out;
+  },
+  interpolate: function(out, start, end, delta) 
+  {
+    out.x = (end.x - start.x) * delta + start.x;
+    out.y = (end.y - start.y) * delta + start.y;
+    return out;
+  },
+  distanceSq: function(a, b) 
+  {
+    var dx = a.x - b.x;
+    var dy = a.y - b.y;    
+    return dx * dx + dy * dy;
+  },
+  isValid: function(a) 
+  {
+    return typeof a === &#x27;object&#x27; &amp;&amp; &#x27;x&#x27; in a &amp;&amp; &#x27;y&#x27; in a;
+  },
+  isNaN: function(a) 
+  {
+    return isNaN(a.x) || isNaN(a.y);
+  },
+  isZero: function(a, epsilon) 
+  {
+    return Math.abs(a.x) &lt; epsilon &amp;&amp; 
+           Math.abs(a.y) &lt; epsilon;
+  },
+  isEqual: function(a, b, epsilon) 
+  {
+    return Math.abs(a.x - b.x) &lt; epsilon &amp;&amp; 
+           Math.abs(a.y - b.y) &lt; epsilon;
+  },
+  min: function(out, a, b)
+  {
+    out.x = Math.min(a.x, b.x);
+    out.y = Math.min(a.y, b.y);
+    return out;
+  },
+  max: function(out, a, b)
+  {
+    out.x = Math.max(a.x, b.x);
+    out.y = Math.max(a.y, b.y);
+    return out;
+  },
+  random: function(out, min, max)
+  {
+    out.x = (max.x - min.x) * Math.random() + min.x;
+    out.y = (max.y - min.y) * Math.random() + min.y;
+    return out;
+  }
+});
+
+/**
+ * Register all calculators.
+ */
+anim8.calculator[&#x27;2d&#x27;] = new anim8.Calculator2d();
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

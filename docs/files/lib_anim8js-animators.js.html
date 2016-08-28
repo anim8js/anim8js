@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/anim8js-animators.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: lib/anim8js-animators.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+/**
+ * Instantiates an Array of anim8.Animator instances.
+ * 
+ * @param [Array]
+ * @class anim8.Animators
+ * @constructor
+ */
+anim8.Animators = function(input)
+{
+  if ( anim8.isArray( input ) )
+  {
+    this.fill( input );
+  }
+};
+
+/**
+ * Animators is an instance of Array. All array methods are supported.
+ */
+anim8.override( anim8s.fn = anim8.Animators.prototype = new Array(),
+{
+
+  /**
+   * Invokes a callback for each element in the array.
+   * 
+   * @param {Function} iterator
+   * @param {Object} context
+   * @return {this}
+   */
+  each: function(iterator, context) 
+  {
+    for (var i = 0; i &lt; this.length; i++) 
+    {
+      if ( iterator.call( context || this[i], this[i], i ) === false ) 
+      {
+        break;
+      }
+    }
+    
+    return this;
+  },
+
+  /**
+   * Appends the array of animators given to the end of this array.
+   *
+   * @param {Array} animators
+   * @return {this}
+   */
+  fill: function(animators)
+  {
+    for (var i = 0; i &lt; animators.length; i++)
+    {
+      this.push( animators[i] );
+    }
+
+    return this;
+  },
+
+  /**
+   * Invokes a callback for each element in the array and if a true value is
+   * returned  that element is removed from the array.
+   *
+   * @param {Function} filterer
+   * @return {this}
+   */
+  filter: function(filterer)
+  {  
+    var alive = 0;
+    
+    for (var i = 0; i &lt; this.length; i++)
+    {
+      var remove = filterer( this[i] );
+      
+      if ( !remove )
+      {
+        this[alive++] = this[i];
+      }
+    }
+    
+    this.length = alive;
+    
+    return this;
+  },
+
+  /**
+   * Returns the subjects of the Animators optionally passing them through a 
+   * wrapper function before it&#x27;s returned.
+   *
+   * @param [Function] wrapper
+   * @return {any}
+   */
+  getSubjects: function(wrapper)
+  {
+    var subjects = [];
+
+    for (var i = 0; i &lt; this.length; i++)
+    {
+      subjects.push( this[i].subject );
+    }
+
+    if ( anim8.isFunction( wrapper ) )
+    {
+      subjects = wrapper( subjects );
+    }
+    
+    return subjects;
+  },
+
+  /**
+   * Returns the first animator in the array.
+   *
+   * @return {anim8.Animator}
+   */
+  first: function()
+  {
+    return this[0];
+  },
+
+  /**
+   * Reverses the order of animators in the array.
+   *
+   * @return {this}
+   */
+  reverse: function()
+  {
+    var last = this.length - 1;
+    var mid = Math.floor( this.length / 2 );
+
+    for (var i = 0; i &lt; mid; i++)
+    {
+      var e0 = this[ i ];
+      var e1 = this[ last - i ];
+
+      this[ i ] = e1;
+      this[ last - i ] = e0;
+    }
+
+    return this;
+  },
+
+  /**
+   * Activates all Animators in the array if they aren&#x27;t active already.
+   * 
+   * @return {this}
+   */
+  activate: function()
+  {
+    for (var i = 0; i &lt; this.length; i++)
+    {
+      var animator = this[i];
+
+      if ( !animator.active )
+      {
+        animator.active = true;
+        anim8.animating.push( animator ); 
+      }
+    }
+    
+    if ( !anim8.running )
+    {
+      anim8.running = true;
+      anim8.trigger(&#x27;starting&#x27;);
+      anim8.requestRun( anim8.run );
+    }
+    
+    return this;
+  },
+
+  /**
+   * Plays a sequence of events separated by a delay.
+   *
+   * @param {String|Number} delay
+   * @param {String|Array|Function} easing
+   * @return {anim8.Sequence}
+   */
+  sequence: function(delay, easing)
+  {
+    return new anim8.Sequence( this, delay, easing );
+  },
+
+  /**
+   * Returns the maximum time remaining out of all Animators in the array.
+   * 
+   * @return {Number}
+   * @uses anim8.Animator.timeRemaining
+   */
+  timeRemaining: function()
+  {
+    var maxRemaining = 0;
+
+    for (var i = 0; i &lt; this.length; i++)
+    {
+      maxRemaining = Math.max( maxRemaining, this[ i ].timeRemaining() );
+    }
+
+    return maxRemaining;
+  },
+
+  /**
+   * Adds the following methods to make an array of Animators appear like a single Animator.
+   */
+  restore               : anim8.delegate( &#x27;restore&#x27;, anim8.delegate.RETURN_THIS ),
+  placeAttrimator       : anim8.delegate( &#x27;placeAttrimator&#x27;, anim8.delegate.RETURN_THIS ),
+  applyInitialState     : anim8.delegate( &#x27;applyInitialState&#x27;, anim8.delegate.RETURN_THIS ),
+  preupdate             : anim8.delegate( &#x27;preupdate&#x27;, anim8.delegate.RETURN_THIS ),
+  update                : anim8.delegate( &#x27;update&#x27;, anim8.delegate.RETURN_THIS ),
+  apply                 : anim8.delegate( &#x27;apply&#x27;, anim8.delegate.RETURN_THIS ),
+  trimAttrimators       : anim8.delegate( &#x27;trimAttrimators&#x27;, anim8.delegate.RETURN_THIS ),
+  activate              : anim8.delegate( &#x27;activate&#x27;, anim8.delegate.RETURN_THIS ),
+  deactivate            : anim8.delegate( &#x27;deactivate&#x27;, anim8.delegate.RETURN_THIS ),
+  destroy               : anim8.delegate( &#x27;destroy&#x27;, anim8.delegate.RETURN_THIS ),
+  spring                : anim8.delegate( &#x27;spring&#x27;, anim8.delegate.RETURN_RESULTS ),
+  play                  : anim8.delegate( &#x27;play&#x27;, anim8.delegate.RETURN_THIS ),
+  playAttrimators       : anim8.delegate( &#x27;playAttrimators&#x27;, anim8.delegate.RETURN_THIS ),
+  queue                 : anim8.delegate( &#x27;queue&#x27;, anim8.delegate.RETURN_THIS ),
+  queueAttrimators      : anim8.delegate( &#x27;queueAttrimators&#x27;, anim8.delegate.RETURN_THIS ),
+  transition            : anim8.delegate( &#x27;transition&#x27;, anim8.delegate.RETURN_THIS ),
+  transitionAttrimators : anim8.delegate( &#x27;transitionAttrimators&#x27;, anim8.delegate.RETURN_THIS ),
+  tween                 : anim8.delegate( &#x27;tween&#x27;, anim8.delegate.RETURN_THIS ),
+  tweenTo               : anim8.delegate( &#x27;tweenTo&#x27;, anim8.delegate.RETURN_THIS ),
+  tweenFrom             : anim8.delegate( &#x27;tweenFrom&#x27;, anim8.delegate.RETURN_THIS ),
+  tweenMany             : anim8.delegate( &#x27;tweenMany&#x27;, anim8.delegate.RETURN_THIS ),
+  tweenManyTo           : anim8.delegate( &#x27;tweenManyTo&#x27;, anim8.delegate.RETURN_THIS ),
+  tweenManyFrom         : anim8.delegate( &#x27;tweenManyFrom&#x27;, anim8.delegate.RETURN_THIS ),
+  move                  : anim8.delegate( &#x27;move&#x27;, anim8.delegate.RETURN_THIS ),
+  moveMany              : anim8.delegate( &#x27;moveMany&#x27;, anim8.delegate.RETURN_THIS ),
+  follow                : anim8.delegate( &#x27;follow&#x27;, anim8.delegate.RETURN_THIS ),
+  attrimatorsFor        : anim8.delegate( &#x27;attrimatorsFor&#x27;, anim8.delegate.RETURN_RESULTS ),
+  stop                  : anim8.delegate( &#x27;stop&#x27;, anim8.delegate.RETURN_THIS ),
+  end                   : anim8.delegate( &#x27;end&#x27;, anim8.delegate.RETURN_THIS ),
+  finish                : anim8.delegate( &#x27;finish&#x27;, anim8.delegate.RETURN_THIS ),
+  pause                 : anim8.delegate( &#x27;pause&#x27;, anim8.delegate.RETURN_THIS ),
+  resume                : anim8.delegate( &#x27;resume&#x27;, anim8.delegate.RETURN_THIS ),
+  set                   : anim8.delegate( &#x27;set&#x27;, anim8.delegate.RETURN_THIS ),
+  unset                 : anim8.delegate( &#x27;unset&#x27;, anim8.delegate.RETURN_THIS ),
+  get                   : anim8.delegate( &#x27;get&#x27;, anim8.delegate.RETURN_FIRST ),
+  hasAttrimators        : anim8.delegate( &#x27;hasAttrimators&#x27;, anim8.delegate.RETURN_TRUE ),
+  invoke                : anim8.delegate( &#x27;invoke&#x27;, anim8.delegate.RETURN_THIS ),
+  onCycleStart          : anim8.delegate( &#x27;onCycleStart&#x27;, anim8.delegate.RETURN_THIS ),
+  onCycleEnd            : anim8.delegate( &#x27;onCycleEnd&#x27;, anim8.delegate.RETURN_THIS ),
+  on                    : anim8.delegate( &#x27;on&#x27;, anim8.delegate.RETURN_THIS ),
+  once                  : anim8.delegate( &#x27;once&#x27;, anim8.delegate.RETURN_THIS ),
+  off                   : anim8.delegate( &#x27;off&#x27;, anim8.delegate.RETURN_THIS ),
+  trigger               : anim8.delegate( &#x27;trigger&#x27;, anim8.delegate.RETURN_THIS )
+
+});
+
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

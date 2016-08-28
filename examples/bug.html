@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      left: 100px;
+      top: 100px;
+      position: absolute;
+      background-color: #66F;
+    }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      left: 100px;
+      top: 200px;
+      border: 2px solid #F0F;
+      position: absolute;
+      background-color: #F6F;
+    }
+    #box3 {
+      width: 80px;
+      height: 80px;
+      left: 200px;
+      top: 100px;
+      border: 2px solid #F00;
+      position: absolute;
+      background-color: #F66;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1" data-intro="moveLeft"></div>
+    <div id="box2" data-intro="moveRight"></div>
+    <div id="box3" data-emphasis="pulse infinite"></div>
+    
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="../build/anim8js-jquery.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+    
+    <script>
+    
+      anim8.save('moveLeft', {
+        keyframe: {
+          from: {
+            translate: 0,
+            scale: 1,
+            opacity: 0
+          },
+          to: {
+            translate: {x:-100, y:100},
+            scale: 1.5,
+            opacity: 1
+          }
+        },
+        units: {
+          translate: '%'
+        }
+      });
+      
+      anim8.save('moveRight', {
+        keyframe: {
+          from: {
+            translate: 0,
+            scale: 1,
+            opacity: 0
+          },
+          to: {
+            translate: 100,
+            scale: 1.5,
+            opacity: 1
+          }
+        },
+        units: {
+          translate: '%'
+        }
+      });
+    
+      $('#box1, #box2') 
+        .play('rotateOut')
+        .dataQueue('intro')
+      ;
+      
+      $('#box3')
+        .dataPlay('emphasis')
+      ;
+      
+    </script>
+    
+  </body>
+</html>

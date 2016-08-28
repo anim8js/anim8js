@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/anim8js-attrimator.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: lib/anim8js-attrimator.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+/**
+ * Animates a single attribute over any period of time.
+ *
+ * @class Attrimator
+ * @constructor
+ * @namespace anim8
+ */
+anim8.Attrimator = function()
+{
+
+};
+
+anim8.Attrimator.prototype =
+{
+
+  /**
+   * Resets this attrimator for the given attribute created by the given parser.
+   *
+   * @method reset
+   * @param {String} attribute
+   * @param {anim8.Parser} parser
+   * @param {anim8.Attrimator} [next]
+   */
+  reset: function(attribute, parser, next)
+  {
+    this.attribute = attribute;
+    this.parser = parser;
+    this.next = next;
+
+    this.startTime = 0;
+    this.pauseTime = 0;
+    this.elapsed = 0;
+    this.stopTime = Number.POSITIVE_INFINITY;
+    this.paused = false;
+    this.cycle = 0;
+    this.delay = 0;
+    this.offset = 0;
+  },
+
+  /**
+   * Prepares this attrimator for animation on the given subject 
+   * animator. This is called once in anim8.Animator.preupdate before the first 
+   * time this attrimator is updated.
+   *
+   * @method start
+   * @param {Number} now
+   * @param {anim8.Animator} animator
+   */
+  start: function(now, animator)
+  {
+    this.startTime = now - this.offset;
+    this.elapsed = this.offset;
+    this.finished = false;
+  },
+
+  /**
+   * Invoked once when a new animation cycle is started on an Animator. If this
+   * attrimator updated the frame true must be returned.
+   *
+   * @method startCycle
+   * @param {Object} frame
+   * @return {Boolen}
+   */
+  startCycle: function(frame)
+  {
+    return false;
+  },
+
+  /**
+   * Updates this attrimator given a time to animate to and the frame to
+   * provide with a new value. This method will return true if the attribute
+   * this is animating has been updated and needs to be applied to the subject.
+   *
+   * @method setTime
+   * @param {Number} now
+   * @param {Object} frame
+   * @return {Boolean}
+   */
+  setTime: function(now, frame)
+  {
+    if ( this.paused )
+    {
+      return false;
+    }
+
+    var updated = false;
+    var elapsed = now - this.startTime;
+    var updated = false;
+
+    if ( elapsed &gt; this.stopTime )
+    {
+      updated = this.finish( frame );
+    }
+    else if ( elapsed &gt;= this.delay )
+    {
+      updated = this.update( elapsed, frame );
+    }
+
+    this.elapsed = elapsed;
+
+    return updated;
+  },
+
+  /**
+   * Updates the attrimator given elapsed time in milliseconds, the frame to 
+   * apply a value to, and returns whether the frame was updated or not.
+   *
+   * @method update
+   * @param {Number} elapsed
+   * @param {Object} frame
+   * @return {Boolean}
+   */
+  update: function(elapsed, frame)
+  {
+    throw &#x27;Attrimator.update not implemented&#x27;;
+  },
+
+  /**
+   * Returns the amount of time that has elapsed in milliseconds.
+   *
+   * @method getElapsed
+   * @return {Number}
+   */
+  getElapsed: function()
+  {
+    return this.elapsed;
+  },
+
+  /**
+   * Stops this attrimator in the given number of milliseconds.
+   *
+   * @method stopIn
+   * @param {Number} milliseconds
+   * @chainable
+   */
+  stopIn: function(milliseconds)
+  {
+    this.stopTime = this.getElapsed() + milliseconds;
+
+    return this;
+  },
+
+  /**
+   * Returns the value at the given time or returns false if it can&#x27;t be
+   * calculated.
+   *
+   * @method valueAt
+   * @param {Number} time
+   * @param {any} out
+   * @return {any|false}
+   */
+  valueAt: function(time, out)
+  {
+    return false;
+  },
+
+  /**
+   * The total amount of time this attrimator will take in milliseconds. This 
+   * may be an infinite number.
+   *
+   * @method totalTime
+   * @return {Number}
+   */
+  totalTime: function()
+  {
+    return this.stopTime;
+  },
+
+  /**
+   * The time remaining before this attrimator and any following will be 
+   * finished.
+   *
+   * @method timeRemaining
+   * @return {Number}
+   */
+  timeRemaining: function() 
+  {    
+    return this.totalTime() - this.elapsed + ( this.next ? this.next.timeRemaining() : 0 );
+  },
+
+  /**
+   * Clones this attrimator.
+   *
+   * @method clone
+   * @return {anim8.Attrimator}
+   */
+  clone: function()
+  {
+    throw &#x27;AttributeAnimator.clone not implemented&#x27;;
+  },
+
+  /**
+   * Returns whether this attrimator has computed values which need to be 
+   * resolved by the subject animator calling prepare on this attrimator.
+   *
+   * @method hasComputed
+   * @return {Boolean}
+   */
+  hasComputed: function()
+  {
+    return false;
+  },
+
+  /**
+   * Determines whether this attrimator will run infinitely.
+   *
+   * @method isInfinite
+   * @return {Boolean}
+   */
+  isInfinite: function()
+  {
+    return (this.stopTime === Number.POSITIVE_INFINITY);
+  },
+
+  /**
+   * Pauses this attrimator if it isn&#x27;t already paused.
+   *
+   * @method pause
+   * @chainable
+   */
+  pause: function()
+  {
+    if ( !this.paused )
+    {
+      this.pauseTime = anim8.now();
+      this.paused = true;
+    }
+
+    return this;
+  },
+
+  /**
+   * Resumes this attrimator if it&#x27;s paused. This involves resetting the start
+   * time of the attrimator.
+   *
+   * @method resume
+   * @chainable
+   */
+  resume: function()
+  {
+    if ( this.paused )
+    {
+      this.startTime += anim8.now() - this.pauseTime;
+      this.paused = false;
+    }
+  },
+
+  /**
+   * Whether this attrimator is paused.
+   *
+   * @method isPaused
+   * @return {Boolean}
+   */
+  isPaused: function()
+  {
+    return this.paused;
+  },
+
+  /**
+   * Sets the final state of the attrimator to the frame if one exists and 
+   * returns true, otherwise false is returned and frame remains unchanged.
+   *
+   * @method finish
+   * @param {Object} frame
+   * @return {Boolean}
+   */
+  finish: function(frame)
+  {
+    return false;
+  },
+
+  /**
+   * Whether this attrimator is finished.
+   *
+   * @method isFinished
+   * @return {Boolean}
+   */
+  isFinished: function()
+  {
+    return false;
+  },
+
+  /**
+   * Returns the parser that created this attrimator (if any).
+   *
+   * @method getParser
+   * @return {anim8.Parser}
+   */
+  getParser: function()
+  {
+    return this.parser;
+  },
+
+  /**
+   * Places the given attrimator on the end of the chain of attrimators starting
+   * with this attrimator.
+   *
+   * @method queue
+   * @param {anim8.Attrimator} next
+   * @chainable
+   */
+  queue: function(next)
+  {
+    if ( this.next )
+    {
+      this.next.queue( next );
+    }
+    else
+    {
+      this.next = next;
+    }
+
+    return this;
+  }
+
+};
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

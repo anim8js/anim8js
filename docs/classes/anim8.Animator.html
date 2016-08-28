@@ -1,0 +1,4435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>anim8.Animator - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>anim8.Animator Class</h1>
+<div class="box meta">
+
+
+        <div class="foundat">
+            Defined in: <a href="../files/lib_anim8js-animator.js.html#l2"><code>lib&#x2F;anim8js-animator.js:2</code></a>
+        </div>
+
+            Module: <a href="../modules/anim8.html">anim8</a>
+
+</div>
+
+
+<div class="box intro">
+    <p>Instantiates a new Animator given a subject to animate.</p>
+
+</div>
+
+    <div class="constructor">
+        <h2>Constructor</h2>
+        <div id="method_anim8.Animator" class="method item">
+            <h3 class="name"><code>anim8.Animator</code></h3>
+        
+                <div class="args">
+                    <span class="paren">(</span><ul class="args-list inline commas">
+                        <li class="arg">
+                                <code>e</code>
+                        </li>
+                    </ul><span class="paren">)</span>
+                </div>
+        
+        
+        
+        
+        
+        
+        
+        
+            <div class="meta">
+                        <p>
+                        Defined in
+                <a href="../files/lib_anim8js-animator.js.html#l2"><code>lib&#x2F;anim8js-animator.js:2</code></a>
+                </p>
+        
+        
+        
+            </div>
+        
+            <div class="description">
+                
+            </div>
+        
+                <div class="params">
+                    <h4>Parameters:</h4>
+        
+                    <ul class="params-list">
+                        <li class="param">
+                                <code class="param-name">e</code>
+                                <span class="type">Any</span>
+        
+        
+                            <div class="param-description">
+                                 
+                            </div>
+        
+                        </li>
+                    </ul>
+                </div>
+        
+        
+        
+        </div>
+    </div>
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab methods"><a href="#methods">Methods</a></li>
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+            <li class="api-class-tab events"><a href="#events">Events</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+                <div class="index-section methods">
+                    <h3>Methods</h3>
+
+                    <ul class="index-list methods">
+                            <li class="index-item method">
+                                <a href="#method_activate">activate</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_apply">apply</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_applyCurrentCycle">applyCurrentCycle</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_applyInitialState">applyInitialState</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_attrimatorsFor">attrimatorsFor</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_createAttrimators">createAttrimators</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_deactivate">deactivate</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_defer">defer</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_destroy">destroy</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_end">end</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_endCurrentCycle">endCurrentCycle</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_finish">finish</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_finishNotPresent">finishNotPresent</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_follow">follow</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_get">get</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getAttribute">getAttribute</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_getSubject">getSubject</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_hasAttrimators">hasAttrimators</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_invoke">invoke</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_move">move</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_moveMany">moveMany</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_newCycle">newCycle</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_onAnimation">onAnimation</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_onCycleEnd">onCycleEnd</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_onCycleStart">onCycleStart</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_pause">pause</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_placeAttrimator">placeAttrimator</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_play">play</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_playAttrimators">playAttrimators</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_preupdate">preupdate</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_queue">queue</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_queueAttrimators">queueAttrimators</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_ref">ref</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_reset">reset</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_restore">restore</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_resume">resume</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_set">set</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_setDefault">setDefault</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_spring">spring</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_stop">stop</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_timeRemaining">timeRemaining</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_transition">transition</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_transitionAttrimators">transitionAttrimators</a>
+
+                            </li>
+                            <li class="index-item method protected">
+                                <a href="#method_trimAttrimators">trimAttrimators</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tween">tween</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tweenFrom">tweenFrom</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tweenMany">tweenMany</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tweenManyFrom">tweenManyFrom</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tweenManyTo">tweenManyTo</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_tweenTo">tweenTo</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_unset">unset</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_update">update</a>
+
+                            </li>
+                            <li class="index-item method">
+                                <a href="#method_value">value</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                            <li class="index-item property">
+                                <a href="#property_active">active</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_attrimators">attrimators</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_attrimatorsAdded">attrimatorsAdded</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_cycleCurrent">cycleCurrent</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_cycleEnded">cycleEnded</a>
+
+                            </li>
+                            <li class="index-item property protected">
+                                <a href="#property_cycleNext">cycleNext</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_factory">factory</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_finished">finished</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_frame">frame</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_subject">subject</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_updated">updated</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+                <div class="index-section events">
+                    <h3>Events</h3>
+
+                    <ul class="index-list events">
+                            <li class="index-item event">
+                                <a href="#event_apply">apply</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_cycleEnd:#">cycleEnd:#</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_cycleStart:#">cycleStart:#</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_deactivate">deactivate</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_destroyed">destroyed</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_finished">finished</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_preupdate">preupdate</a>
+
+                            </li>
+                            <li class="index-item event">
+                                <a href="#event_update">update</a>
+
+                            </li>
+                    </ul>
+                </div>
+        </div>
+
+            <div id="methods" class="api-class-tabpanel">
+                <h2 class="off-left">Methods</h2>
+
+<div id="method_activate" class="method item">
+    <h3 class="name"><code>activate</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l500"><code>lib&#x2F;anim8js-animator.js:500</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Activates this Animator by adding it to the main loop if it isn't there
+already.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_apply" class="method item">
+    <h3 class="name"><code>apply</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l424"><code>lib&#x2F;anim8js-animator.js:424</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Applies all updated attributes to the subject. This method is invoked with
+all of the other animators at the end of the animation cycle.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_applyCurrentCycle" class="method item protected">
+    <h3 class="name"><code>applyCurrentCycle</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l208"><code>lib&#x2F;anim8js-animator.js:208</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Applies the current cycle. This involves finding all attrimators with the
+same cycle identifier and applying their initial state.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_applyInitialState" class="method item">
+    <h3 class="name"><code>applyInitialState</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l275"><code>lib&#x2F;anim8js-animator.js:275</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Applies the initial state of recently added attrimators immediately.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_attrimatorsFor" class="method item">
+    <h3 class="name"><code>attrimatorsFor</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attributes</code>
+                </li>
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">This | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1302"><code>lib&#x2F;anim8js-animator.js:1302</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Helper method that iterates over given attributes. If callback is specified
+it is invoked for each attrimator in this animator for the given
+attributes. If no callback is given an array of anim8.Attrimators is
+returned for each attrimator in this animator for the given attributes.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attributes</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">This | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_createAttrimators" class="method item protected">
+    <h3 class="name"><code>createAttrimators</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>animation</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[cache=false]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+        </span>
+
+
+        <span class="flag protected">protected</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l547"><code>lib&#x2F;anim8js-animator.js:547</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Creates a map of attrimators based on the animation and options given. For
+each anim8.Animation instance thats being converted into attrimators,
+the onAnimation(animation, option, attrimatorMap) function is invoked.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">animation</code>
+                        <span class="type"><a href="../classes/anim8.Animation.html" class="crosslink">anim8.Animation</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[cache=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_deactivate" class="method item">
+    <h3 class="name"><code>deactivate</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l514"><code>lib&#x2F;anim8js-animator.js:514</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>A method that is invoked when an animator is finished and is being removed
+from the list of currently animating Animators.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_defer" class="method item">
+    <h3 class="name"><code>defer</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>eventType</code>
+                </li>
+                <li class="arg">
+                        <code>event</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[callback]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/anim8.DeferAnimator.html" class="crosslink">anim8.DeferAnimator</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1597"><code>lib&#x2F;anim8js-animator.js:1597</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Defers the method calls following this one to when the given event type
+(on or once) and event. To return this animator you need to call undefer()
+as many times as you called defer().</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">eventType</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">event</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[callback]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="../classes/anim8.DeferAnimator.html" class="crosslink">anim8.DeferAnimator</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_destroy" class="method item">
+    <h3 class="name"><code>destroy</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l528"><code>lib&#x2F;anim8js-animator.js:528</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>A method that can be invoked to destroy an animator - removing any
+relationship between the subject and animator. The next time an animator is
+generated for the subject a new animator will be created.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_end" class="method item">
+    <h3 class="name"><code>end</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[attributes]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1383"><code>lib&#x2F;anim8js-animator.js:1383</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Ends all attributes for the specified attributes. If attributes are queued
+the last value of the last attribute is applied to this Animator before
+being completely removed. Attribute names can be given as an array or a
+space separated string. If no attributes are given all attributes are
+assumed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[attributes]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_endCurrentCycle" class="method item protected">
+    <h3 class="name"><code>endCurrentCycle</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l235"><code>lib&#x2F;anim8js-animator.js:235</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Ends the current cycle which calls any listening functions.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_finish" class="method item">
+    <h3 class="name"><code>finish</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[attributes]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1407"><code>lib&#x2F;anim8js-animator.js:1407</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Finishes all current attrimators for the specified attributes. Attribute
+names can be given as an array or a space separated string. If no
+attributes are given all attributes are assumed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[attributes]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_finishNotPresent" class="method item protected">
+    <h3 class="name"><code>finishNotPresent</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attrimatorMap</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[delay=0]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l988"><code>lib&#x2F;anim8js-animator.js:988</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Finishes any attrimators on this animator that are not present in the given
+map of attrimators. Optionally a delay in stopping them can be given.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attrimatorMap</code>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[delay=0]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_follow" class="method item">
+    <h3 class="name"><code>follow</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attribute</code>
+                </li>
+                <li class="arg">
+                        <code>path</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1269"><code>lib&#x2F;anim8js-animator.js:1269</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Follows the attribute along the given path definition.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attribute</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">path</code>
+                        <span class="type"><a href="../classes/anim8.Path.html" class="crosslink">anim8.Path</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_get" class="method item">
+    <h3 class="name"><code>get</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attributes</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1512"><code>lib&#x2F;anim8js-animator.js:1512</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Gets the current attribute values for all attributes specified. The
+argument must be an object where the key is the name of an attribute.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attributes</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getAttribute" class="method item">
+    <h3 class="name"><code>getAttribute</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l251"><code>lib&#x2F;anim8js-animator.js:251</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the attribute descriptor given the name of the attribute.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_getSubject" class="method item">
+    <h3 class="name"><code>getSubject</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[wrapper]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1556"><code>lib&#x2F;anim8js-animator.js:1556</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the subject of the Animator optionally passing it through a wrapper
+function before it's returned.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[wrapper]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_hasAttrimators" class="method item">
+    <h3 class="name"><code>hasAttrimators</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1545"><code>lib&#x2F;anim8js-animator.js:1545</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns true if there are any attrimators on this Animator.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_invoke" class="method item">
+    <h3 class="name"><code>invoke</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>func</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[context]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[args]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1576"><code>lib&#x2F;anim8js-animator.js:1576</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Invokes a function with the given context or the context of this Animator
+if none is given. This is particularly useful for having a function be
+called on deferred statements.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">func</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[context]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[args]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_move" class="method item">
+    <h3 class="name"><code>move</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+                <li class="arg">
+                        <code>amount</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1179"><code>lib&#x2F;anim8js-animator.js:1179</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Moves an attribute relative to its current value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">amount</code>
+                        <span class="type">T</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_moveMany" class="method item">
+    <h3 class="name"><code>moveMany</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>amounts</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1204"><code>lib&#x2F;anim8js-animator.js:1204</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Moves multiple attribute relative to their current value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">amounts</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_newCycle" class="method item protected">
+    <h3 class="name"><code>newCycle</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attrimators</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l183"><code>lib&#x2F;anim8js-animator.js:183</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Starts a new animation cycle. This is done before events &amp; springs are
+placed to group them together so we know when to apply their initial value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attrimators</code>
+                        <span class="type"><a href="../classes/anim8.Attrimator.html" class="crosslink">anim8.Attrimator</a> | <a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_onAnimation" class="method item protected">
+    <h3 class="name"><code>onAnimation</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>animation</code>
+                </li>
+                <li class="arg">
+                        <code>options</code>
+                </li>
+                <li class="arg">
+                        <code>attrimatorMap</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l593"><code>lib&#x2F;anim8js-animator.js:593</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>A method invoked when an animation is about to be played in the Animator.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">animation</code>
+                        <span class="type"><a href="../classes/anim8.Animation.html" class="crosslink">anim8.Animation</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">options</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">attrimatorMap</code>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_onCycleEnd" class="method item">
+    <h3 class="name"><code>onCycleEnd</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[context]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1629"><code>lib&#x2F;anim8js-animator.js:1629</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Invokes the given callback when the last animation that was
+played/queued/transitioned ends.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[context]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_onCycleStart" class="method item">
+    <h3 class="name"><code>onCycleStart</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>callback</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[context]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1613"><code>lib&#x2F;anim8js-animator.js:1613</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Invokes the given callback when the last animation that was
+played/queued/transitioned starts.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">callback</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[context]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_pause" class="method item">
+    <h3 class="name"><code>pause</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[attributes]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1424"><code>lib&#x2F;anim8js-animator.js:1424</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Pauses all current attrimators for the specified attributes. Attribute
+names can be given as an array or a space separated string. If no
+attributes are given all attributes are assumed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[attributes]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_placeAttrimator" class="method item">
+    <h3 class="name"><code>placeAttrimator</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attrimator</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="../classes/anim8.Attrimator.html" class="crosslink">anim8.Attrimator</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l401"><code>lib&#x2F;anim8js-animator.js:401</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Places the attribute animator in this animator replacing any existing
+animator for the same attribute. The next time the animator is updated the
+attribute animator will be started. The previous (if any) attrimator is
+returned.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attrimator</code>
+                        <span class="type"><a href="../classes/anim8.Attrimator.html" class="crosslink">anim8.Attrimator</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="../classes/anim8.Attrimator.html" class="crosslink">anim8.Attrimator</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_play" class="method item">
+    <h3 class="name"><code>play</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>animation</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[all=false]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[cache=false]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l633"><code>lib&#x2F;anim8js-animator.js:633</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Plays an animation. Attributes in the animation that are currently being
+animated will be stopped and replaced with the new attrimators. If <code>all</code> is
+true then any attrimators animating not specified in the given animation
+will be stopped.</p>
+<p><strong>See:</strong> Anim8/animation:method,
+Anim8/options:method</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">animation</code>
+                        <span class="type"><a href="../classes/anim8.Animation.html" class="crosslink">anim8.Animation</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[all=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[cache=false]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_playAttrimators" class="method item protected">
+    <h3 class="name"><code>playAttrimators</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>animatorMap</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[all]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l664"><code>lib&#x2F;anim8js-animator.js:664</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Plays a map of attrimators. Attributes in the attrimator map that are
+currently being animated will be stopped and replaced with the new
+attrimators. If &quot;all&quot; is true then any attrimators animating not specified
+in the given attrimator map will be stopped. This method will not activate
+the Animator, that has to be done manually.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">animatorMap</code>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[all]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_preupdate" class="method item">
+    <h3 class="name"><code>preupdate</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>now</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l292"><code>lib&#x2F;anim8js-animator.js:292</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>A method thats invoked along with all other animators before updates are
+called. This is used to make any necessary preparations before the animator
+is updated.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">now</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_queue" class="method item">
+    <h3 class="name"><code>queue</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>animation</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[cache]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l694"><code>lib&#x2F;anim8js-animator.js:694</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Queues an animation. The attrimators generated from the given animation
+will be started at the same time - as soon as all finite attrimators for
+the same attributes are finished. Any infinite attrimators will be
+automatically stopped when all queued attrimators are set to start.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">animation</code>
+                        <span class="type"><a href="../classes/anim8.Animation.html" class="crosslink">anim8.Animation</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[cache]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_queueAttrimators" class="method item protected">
+    <h3 class="name"><code>queueAttrimators</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attrimatorMap</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l723"><code>lib&#x2F;anim8js-animator.js:723</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Queues a map of attrimators. The map of attrimators will be started at the
+same time - as soon as all finished attrimators for the same attribute are
+finished. Any infinite attrimators will be automatically stopped when all
+queued attrimators are set to start.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attrimatorMap</code>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_ref" class="method item">
+    <h3 class="name"><code>ref</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1234"><code>lib&#x2F;anim8js-animator.js:1234</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns a function that returns the current value for the given attribute
+when invoked. The returned function can be given as values for paths &amp;
+springs that are evaluated every frame.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_reset" class="method item protected">
+    <h3 class="name"><code>reset</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>subject</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l78"><code>lib&#x2F;anim8js-animator.js:78</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Resets the animator given a subject to animate.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">subject</code>
+                        <span class="type">Any</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_restore" class="method item">
+    <h3 class="name"><code>restore</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l263"><code>lib&#x2F;anim8js-animator.js:263</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Restores any temporary state that may exist on this Animator that
+is a result from animations.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_resume" class="method item">
+    <h3 class="name"><code>resume</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[attributes]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1441"><code>lib&#x2F;anim8js-animator.js:1441</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Resumes all current attrimators for the specified attributes. Attribute
+names can be given as an array or a space separated string. If no
+attributes are given all attributes are assumed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[attributes]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_set" class="method item">
+    <h3 class="name"><code>set</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attributes</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1458"><code>lib&#x2F;anim8js-animator.js:1458</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Sets the given attributes to this Animator immediately.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attributes</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_setDefault" class="method item protected">
+    <h3 class="name"><code>setDefault</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l335"><code>lib&#x2F;anim8js-animator.js:335</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Sets the default value for the given attribute in the frame of this
+Animator if there's no value there.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_spring" class="method item">
+    <h3 class="name"><code>spring</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>spring</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">anim8.Spring</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l607"><code>lib&#x2F;anim8js-animator.js:607</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Adds a spring to this animator replacing any existing attrimator for the
+same attribute. A spring object can be given, an instance of anim8.Spring,
+or a name of a saved Spring. The spring added to the animator is returned.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">spring</code>
+                        <span class="type">anim8.Spring | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">anim8.Spring</span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_stop" class="method item">
+    <h3 class="name"><code>stop</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code class="optional">[attributes]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1366"><code>lib&#x2F;anim8js-animator.js:1366</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Stops all attributes for the specified attributes. Attribute names can be
+given as an array or a space separated string. If no attributes are given
+all attributes are assumed.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name optional">[attributes]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_timeRemaining" class="method item">
+    <h3 class="name"><code>timeRemaining</code></h3>
+
+        <span class="paren">()</span>
+
+        <span class="returns-inline">
+            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1532"><code>lib&#x2F;anim8js-animator.js:1532</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the amount of finite time remaining before the animator is done
+animating. Attrimators that don't have a known end time are not included.
+If there are no attrimators with end times then zero is returned.</p>
+
+    </div>
+
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>:
+            </div>
+        </div>
+
+
+</div>
+<div id="method_transition" class="method item">
+    <h3 class="name"><code>transition</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>transition</code>
+                </li>
+                <li class="arg">
+                        <code>animation</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[all]</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[cache]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l741"><code>lib&#x2F;anim8js-animator.js:741</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Transitions from the currently playing attrimators into the beginning of a
+new animation. Several parameters can be specified in the transition object
+which determine how the transition is made. If &quot;all&quot; is true then any
+attrimators animating not specified in the given animation will be stopped.</p>
+<p>time: the total time to take to transition into a new animation.
+outro: time to look into the future for the current attrimator to curve to.
+intro: time to look into the future for the next attrimator to curve into.
+lookup: time to look into the future to calculate velocity which is used
+for negative intros and maintaing consistent exit &amp; entrance velocity.
+granularity: when greater than 2 it activates smooth transitions where the
+velocity of the new &amp; old attrimators is maintained over the transition.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">transition</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">animation</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a> | <a href="../classes/anim8.Animation.html" class="crosslink">anim8.Animation</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[all]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[cache]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_transitionAttrimators" class="method item protected">
+    <h3 class="name"><code>transitionAttrimators</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>transition</code>
+                </li>
+                <li class="arg">
+                        <code>attrimatorMap</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[all]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l783"><code>lib&#x2F;anim8js-animator.js:783</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Transitions from the currently playing attrimators into the beginning of a
+new animation. Several parameters can be specified in the transition object
+which determine how the transition is made. If &quot;all&quot; is true then any
+attrimators animating not specified in the given attrimator map will be
+stopped.</p>
+<p>time: the total time to take to transition into a new animation.
+outro: time to look into the future for the current attrimator to curve to.
+intro: time to look into the future for the next attrimator to curve into.
+lookup: time to look into the future to calculate velocity which is used
+for negative intros and maintaing consistent exit &amp; entrance velocity.
+granularity: when greater than 2 it activates smooth transitions where the
+velocity of the new &amp; old attrimators is maintained over the transition.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">transition</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">attrimatorMap</code>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[all]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_trimAttrimators" class="method item protected">
+    <h3 class="name"><code>trimAttrimators</code></h3>
+
+        <span class="paren">()</span>
+
+
+
+        <span class="flag protected">protected</span>
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l449"><code>lib&#x2F;anim8js-animator.js:449</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Removes any finished attrimators and places any queued attrimators. If the
+animator previously wasn't finished but now is the 'finished' event will
+be triggered.</p>
+
+    </div>
+
+
+
+
+</div>
+<div id="method_tween" class="method item">
+    <h3 class="name"><code>tween</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+                <li class="arg">
+                        <code>starts</code>
+                </li>
+                <li class="arg">
+                        <code>ends</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1122"><code>lib&#x2F;anim8js-animator.js:1122</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens an attribute from a starting value to an ending value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">starts</code>
+                        <span class="type">T</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">ends</code>
+                        <span class="type">T</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_tweenFrom" class="method item">
+    <h3 class="name"><code>tweenFrom</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+                <li class="arg">
+                        <code>starting</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1069"><code>lib&#x2F;anim8js-animator.js:1069</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens a single attribute from a starting value to the current value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">starting</code>
+                        <span class="type">T</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_tweenMany" class="method item">
+    <h3 class="name"><code>tweenMany</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>starts</code>
+                </li>
+                <li class="arg">
+                        <code>ends</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1148"><code>lib&#x2F;anim8js-animator.js:1148</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens multiple attributes from starting values to ending values.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">starts</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">ends</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_tweenManyFrom" class="method item">
+    <h3 class="name"><code>tweenManyFrom</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>startings</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1093"><code>lib&#x2F;anim8js-animator.js:1093</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens multiple attributes from starting values to the current values.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">startings</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_tweenManyTo" class="method item">
+    <h3 class="name"><code>tweenManyTo</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>targets</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1040"><code>lib&#x2F;anim8js-animator.js:1040</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens multiple attributes to target values.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">targets</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_tweenTo" class="method item">
+    <h3 class="name"><code>tweenTo</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+                <li class="arg">
+                        <code>target</code>
+                </li>
+                <li class="arg">
+                        <code class="optional">[options]</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1016"><code>lib&#x2F;anim8js-animator.js:1016</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Tweens a single attribute to a target value.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name">target</code>
+                        <span class="type">T</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+                <li class="param">
+                        <code class="param-name optional">[options]</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                        <span class="flag optional" title="This parameter is optional.">optional</span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_unset" class="method item">
+    <h3 class="name"><code>unset</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attributes</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l1478"><code>lib&#x2F;anim8js-animator.js:1478</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Unsets the attribute, array of attributes, or object of attributes.
+Unsetting involves removing all attrimators and the current value in the
+frame,</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attributes</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array" class="crosslink external" target="_blank">Array</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_update" class="method item">
+    <h3 class="name"><code>update</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>now</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+
+
+
+
+
+        <span class="flag chainable">chainable</span>
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l351"><code>lib&#x2F;anim8js-animator.js:351</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Updates all attrimators in this animator with the given time.</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">now</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+
+
+</div>
+<div id="method_value" class="method item">
+    <h3 class="name"><code>value</code></h3>
+
+        <div class="args">
+            <span class="paren">(</span><ul class="args-list inline commas">
+                <li class="arg">
+                        <code>attr</code>
+                </li>
+            </ul><span class="paren">)</span>
+        </div>
+
+        <span class="returns-inline">
+            <span class="type">Any</span>
+        </span>
+
+
+
+
+
+
+
+    <div class="meta">
+                <p>
+                Defined in
+        <a href="../files/lib_anim8js-animator.js.html#l487"><code>lib&#x2F;anim8js-animator.js:487</code></a>
+        </p>
+
+
+
+    </div>
+
+    <div class="description">
+        <p>Returns the current value for the given attribute (or undefined if the
+attribute is not or has not animated).</p>
+
+    </div>
+
+        <div class="params">
+            <h4>Parameters:</h4>
+
+            <ul class="params-list">
+                <li class="param">
+                        <code class="param-name">attr</code>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a></span>
+
+
+                    <div class="param-description">
+                         
+                    </div>
+
+                </li>
+            </ul>
+        </div>
+
+        <div class="returns">
+            <h4>Returns:</h4>
+
+            <div class="returns-description">
+                        <span class="type">Any</span>:
+            </div>
+        </div>
+
+
+</div>
+            </div>
+
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                    <div id="property_active" class="property item">
+                        <h3 class="name"><code>active</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l145"><code>lib&#x2F;anim8js-animator.js:145</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Whether or not this animator is actively being updated.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_attrimators" class="property item">
+                        <h3 class="name"><code>attrimators</code></h3>
+                        <span class="type"><a href="../classes/anim8.AttrimatorMap.html" class="crosslink">anim8.AttrimatorMap</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l96"><code>lib&#x2F;anim8js-animator.js:96</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The map of attrimators animating the subject.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_attrimatorsAdded" class="property item protected">
+                        <h3 class="name"><code>attrimatorsAdded</code></h3>
+                        <span class="type">Unknown</span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l104"><code>lib&#x2F;anim8js-animator.js:104</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The array of attrimators recently added to the animator that
+                    are ready to be started.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_cycleCurrent" class="property item protected">
+                        <h3 class="name"><code>cycleCurrent</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l153"><code>lib&#x2F;anim8js-animator.js:153</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The current cycle being animated. Multiple cycles can be animated at once, this is the first one.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_cycleEnded" class="property item protected">
+                        <h3 class="name"><code>cycleEnded</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l171"><code>lib&#x2F;anim8js-animator.js:171</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The last cycle that was ended.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_cycleNext" class="property item protected">
+                        <h3 class="name"><code>cycleNext</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                            <span class="flag protected">protected</span>
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l162"><code>lib&#x2F;anim8js-animator.js:162</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The ID of the next cycle of animations to be added to this Animator.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_factory" class="property item">
+                        <h3 class="name"><code>factory</code></h3>
+                        <span class="type">anim8.Factory</span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l137"><code>lib&#x2F;anim8js-animator.js:137</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The factory which created this Animator given a subject.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_finished" class="property item">
+                        <h3 class="name"><code>finished</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l129"><code>lib&#x2F;anim8js-animator.js:129</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Whether or not this animator has completely finished animating it's subject.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_frame" class="property item">
+                        <h3 class="name"><code>frame</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l113"><code>lib&#x2F;anim8js-animator.js:113</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The object which stores the attribute values being animated.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_subject" class="property item">
+                        <h3 class="name"><code>subject</code></h3>
+                        <span class="type">Any</span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l88"><code>lib&#x2F;anim8js-animator.js:88</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The subject which is being animated.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="property_updated" class="property item">
+                        <h3 class="name"><code>updated</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l121"><code>lib&#x2F;anim8js-animator.js:121</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The object which stores the attributes last updated.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+            </div>
+
+
+            <div id="events" class="api-class-tabpanel">
+                <h2 class="off-left">Events</h2>
+
+                    <div id="event_apply" class="events item">
+                        <h3 class="name"><code>apply</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l30"><code>lib&#x2F;anim8js-animator.js:30</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered after the current values (frame) on the animator are
+                    applied to the subject.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_cycleEnd:#" class="events item">
+                        <h3 class="name"><code>cycleEnd:#</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l45"><code>lib&#x2F;anim8js-animator.js:45</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered when the given animation cycle ends which occurs when the
+                    last attrimator for an animation finishes or is interrupted by commands like
+                    play, queue, transition, end, finish, &amp; stop.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">cycleID</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                             
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    </div>
+                    <div id="event_cycleStart:#" class="events item">
+                        <h3 class="name"><code>cycleStart:#</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l37"><code>lib&#x2F;anim8js-animator.js:37</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered when the given animation cycle starts (and initial
+                    values are applied) for all attrimators in the cycle.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">cycleID</code>
+                                            <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                             
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    </div>
+                    <div id="event_deactivate" class="events item">
+                        <h3 class="name"><code>deactivate</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l61"><code>lib&#x2F;anim8js-animator.js:61</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered when an animator is deactivated which occurs when an
+                    animator has finished animating and is being taken off the list of live
+                    animators (anim8.animating).</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_destroyed" class="events item">
+                        <h3 class="name"><code>destroyed</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l69"><code>lib&#x2F;anim8js-animator.js:69</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered after the user calls destroy on an animator.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_finished" class="events item">
+                        <h3 class="name"><code>finished</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l54"><code>lib&#x2F;anim8js-animator.js:54</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered when all animations on the animator have finished.</p>
+                    
+                        </div>
+                    
+                            <div class="params">
+                                <h4>Event Payload:</h4>
+                    
+                                <ul class="params-list">
+                                    <li class="param">
+                                            <code class="param-name">animator</code>
+                                            <span class="type"><a href="../classes/anim8.Animator.html" class="crosslink">anim8.Animator</a></span>
+                    
+                    
+                                        <div class="param-description">
+                                             
+                                        </div>
+                    
+                                    </li>
+                                </ul>
+                            </div>
+                    
+                    
+                    </div>
+                    <div id="event_preupdate" class="events item">
+                        <h3 class="name"><code>preupdate</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l15"><code>lib&#x2F;anim8js-animator.js:15</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered after preupdate is called. Pre-update is used to run any
+                    preparations on the subject before updates are made and attributes are
+                    applied.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+                    <div id="event_update" class="events item">
+                        <h3 class="name"><code>update</code></h3>
+                        <span class="type"></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-animator.js.html#l23"><code>lib&#x2F;anim8js-animator.js:23</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The event triggered after all attrimators are updated and any new values
+                    have been applied to the current values (frame) on the animator.</p>
+                    
+                        </div>
+                    
+                    
+                    
+                    </div>
+            </div>
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

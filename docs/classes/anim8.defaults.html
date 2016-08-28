@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>anim8.defaults - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1>anim8.defaults Class</h1>
+<div class="box meta">
+
+
+
+            Module: <a href="../modules/anim8.html">anim8</a>
+
+</div>
+
+
+<div class="box intro">
+    
+</div>
+
+
+<div id="classdocs" class="tabview">
+    <ul class="api-class-tabs">
+        <li class="api-class-tab index"><a href="#index">Index</a></li>
+
+            <li class="api-class-tab properties"><a href="#properties">Properties</a></li>
+    </ul>
+
+    <div>
+        <div id="index" class="api-class-tabpanel index">
+            <h2 class="off-left">Item Index</h2>
+
+
+                <div class="index-section properties">
+                    <h3>Properties</h3>
+
+                    <ul class="index-list properties">
+                            <li class="index-item property">
+                                <a href="#property_cache">cache</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_cacheOptions">cacheOptions</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_cacheTransitions">cacheTransitions</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_delay">delay</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_duration">duration</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_easing">easing</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_noOptions">noOptions</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_noTransition">noTransition</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_repeat">repeat</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_scale">scale</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_sleep">sleep</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_teasing">teasing</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionEasing">transitionEasing</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionGranularity">transitionGranularity</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionIntro">transitionIntro</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionLookup">transitionLookup</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionOutro">transitionOutro</a>
+
+                            </li>
+                            <li class="index-item property">
+                                <a href="#property_transitionTime">transitionTime</a>
+
+                            </li>
+                    </ul>
+                </div>
+
+
+        </div>
+
+
+            <div id="properties" class="api-class-tabpanel">
+                <h2 class="off-left">Properties</h2>
+
+                    <div id="property_cache" class="property item">
+                        <h3 class="name"><code>cache</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l215"><code>lib&#x2F;anim8js-core.js:215</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Whether animtions are cached whenever possible. Animations that can be
+                    cached are strings with options specified in the string and without an
+                    option object given. For example 'tada ~1s 3s x3' is cacheable.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> false</p>
+                    
+                    
+                    </div>
+                    <div id="property_cacheOptions" class="property item">
+                        <h3 class="name"><code>cacheOptions</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l228"><code>lib&#x2F;anim8js-core.js:228</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Whether parsed options are cached whenever possible. Options that can be
+                    cached must be strings.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> false</p>
+                    
+                    
+                    </div>
+                    <div id="property_cacheTransitions" class="property item">
+                        <h3 class="name"><code>cacheTransitions</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Boolean" class="crosslink external" target="_blank">Boolean</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l240"><code>lib&#x2F;anim8js-core.js:240</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>Whether parsed transitions are cached whenever possible. Transitions that can be
+                    cached must be strings.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> false</p>
+                    
+                    
+                    </div>
+                    <div id="property_delay" class="property item">
+                        <h3 class="name"><code>delay</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l111"><code>lib&#x2F;anim8js-core.js:111</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default animation delay in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 0</p>
+                    
+                    
+                    </div>
+                    <div id="property_duration" class="property item">
+                        <h3 class="name"><code>duration</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l80"><code>lib&#x2F;anim8js-core.js:80</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default animation duration in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 1000</p>
+                    
+                    
+                    </div>
+                    <div id="property_easing" class="property item">
+                        <h3 class="name"><code>easing</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l90"><code>lib&#x2F;anim8js-core.js:90</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default easing.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> &#x27;ease&#x27;</p>
+                    
+                    
+                    </div>
+                    <div id="property_noOptions" class="property item">
+                        <h3 class="name"><code>noOptions</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l252"><code>lib&#x2F;anim8js-core.js:252</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The value to return when options could not be parsed from input.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> {}</p>
+                    
+                    
+                    </div>
+                    <div id="property_noTransition" class="property item">
+                        <h3 class="name"><code>noTransition</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Object" class="crosslink external" target="_blank">Object</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l262"><code>lib&#x2F;anim8js-core.js:262</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The value to return when a transition could not be parsed from input.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> {}</p>
+                    
+                    
+                    </div>
+                    <div id="property_repeat" class="property item">
+                        <h3 class="name"><code>repeat</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l131"><code>lib&#x2F;anim8js-core.js:131</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default number of repeats for an animation.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 1</p>
+                    
+                    
+                    </div>
+                    <div id="property_scale" class="property item">
+                        <h3 class="name"><code>scale</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l141"><code>lib&#x2F;anim8js-core.js:141</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default scale for an animation.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 1.0</p>
+                    
+                    
+                    </div>
+                    <div id="property_sleep" class="property item">
+                        <h3 class="name"><code>sleep</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l121"><code>lib&#x2F;anim8js-core.js:121</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default animation sleep in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 0</p>
+                    
+                    
+                    </div>
+                    <div id="property_teasing" class="property item">
+                        <h3 class="name"><code>teasing</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l100"><code>lib&#x2F;anim8js-core.js:100</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default &quot;total easing&quot; which is the overall easing
+                    for an animation which actually has easing values per frame.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> &#x27;linear&#x27;</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionEasing" class="property item">
+                        <h3 class="name"><code>transitionEasing</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/String" class="crosslink external" target="_blank">String</a> | <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function" class="crosslink external" target="_blank">Function</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l181"><code>lib&#x2F;anim8js-core.js:181</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default transition easing when none is specified.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> &#x27;linear&#x27;</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionGranularity" class="property item">
+                        <h3 class="name"><code>transitionGranularity</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l191"><code>lib&#x2F;anim8js-core.js:191</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default transition granularity. This is used for smooth transitions to
+                    provide a smooth transition from the outro velocity to the intro velocity,
+                    the cubic or quadratic path between the two is a curve with unknown length
+                    so the length needs to be calculated using a maximum number of points to
+                    calculate along the path - summing the distances between the consecutive points.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 0</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionIntro" class="property item">
+                        <h3 class="name"><code>transitionIntro</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l171"><code>lib&#x2F;anim8js-core.js:171</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default transition introduction time in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 100</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionLookup" class="property item">
+                        <h3 class="name"><code>transitionLookup</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l205"><code>lib&#x2F;anim8js-core.js:205</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>TODO</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 10</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionOutro" class="property item">
+                        <h3 class="name"><code>transitionOutro</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l161"><code>lib&#x2F;anim8js-core.js:161</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default transition outroduction time in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 100</p>
+                    
+                    
+                    </div>
+                    <div id="property_transitionTime" class="property item">
+                        <h3 class="name"><code>transitionTime</code></h3>
+                        <span class="type"><a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Number" class="crosslink external" target="_blank">Number</a></span>
+                    
+                    
+                    
+                    
+                    
+                        <div class="meta">
+                                    <p>
+                                    Defined in
+                            <a href="../files/lib_anim8js-core.js.html#l151"><code>lib&#x2F;anim8js-core.js:151</code></a>
+                            </p>
+                    
+                    
+                        </div>
+                    
+                        <div class="description">
+                            <p>The default transition time in milliseconds.</p>
+                    
+                        </div>
+                    
+                            <p><strong>Default:</strong> 500</p>
+                    
+                    
+                    </div>
+            </div>
+
+
+    </div>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

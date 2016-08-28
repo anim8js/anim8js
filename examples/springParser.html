@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+      left: 100px;
+      right: 100px;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1"></div>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+    
+    <script>
+
+      anim8.save('toMouse', {
+        springs: {
+          center: {
+            type: 'linear',
+            rest: MousePosition,
+            damping: 2.5,
+            stiffness: -30
+          }
+        }
+      });
+
+      m8( window.box1 ).play( 'toMouse' );
+      
+    </script>
+    
+  </body>
+</html>
+  

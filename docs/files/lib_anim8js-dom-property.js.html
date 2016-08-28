@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>lib/anim8js-dom-property.js - anim8js</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="icon" href="../assets/favicon.ico">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+                <h1><img src="../assets/css/logo.png" title="anim8js" width="117" height="52"></h1>
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.1.0</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+                    <h2 class="off-left">APIs</h2>
+                    <div id="api-tabview" class="tabview">
+                        <ul class="tabs">
+                            <li><a href="#api-classes">Classes</a></li>
+                            <li><a href="#api-modules">Modules</a></li>
+                        </ul>
+                
+                        <div id="api-tabview-filter">
+                            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+                        </div>
+                
+                        <div id="api-tabview-panel">
+                            <ul id="api-classes" class="apis classes">
+                                <li><a href="../classes/anim8.html">anim8</a></li>
+                                <li><a href="../classes/anim8.Animation.html">anim8.Animation</a></li>
+                                <li><a href="../classes/anim8.Animator.html">anim8.Animator</a></li>
+                                <li><a href="../classes/anim8.Animators.html">anim8.Animators</a></li>
+                                <li><a href="../classes/anim8.Attrimator.html">anim8.Attrimator</a></li>
+                                <li><a href="../classes/anim8.AttrimatorMap.html">anim8.AttrimatorMap</a></li>
+                                <li><a href="../classes/anim8.defaults.html">anim8.defaults</a></li>
+                                <li><a href="../classes/anim8.DeferAnimator.html">anim8.DeferAnimator</a></li>
+                                <li><a href="../classes/anim8.delegate.html">anim8.delegate</a></li>
+                                <li><a href="../classes/anim8.eventize.html">anim8.eventize</a></li>
+                                <li><a href="../classes/anim8.Path.html">anim8.Path</a></li>
+                                <li><a href="../classes/anim8.Tween.html">anim8.Tween</a></li>
+                            </ul>
+                
+                            <ul id="api-modules" class="apis modules">
+                                <li><a href="../modules/anim8.html">anim8</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+                    Show:
+                    <label for="api-show-inherited">
+                        <input type="checkbox" id="api-show-inherited" checked>
+                        Inherited
+                    </label>
+            
+                    <label for="api-show-protected">
+                        <input type="checkbox" id="api-show-protected">
+                        Protected
+                    </label>
+            
+                    <label for="api-show-private">
+                        <input type="checkbox" id="api-show-private">
+                        Private
+                    </label>
+                    <label for="api-show-deprecated">
+                        <input type="checkbox" id="api-show-deprecated">
+                        Deprecated
+                    </label>
+            
+                </div>
+            
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+<h1 class="file-heading">File: lib/anim8js-dom-property.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+
+/**
+ * Properties for the DOM animator.
+ */
+
+anim8.dom.property.factory = function(nm, relativeTo) 
+{
+  return {
+    
+    get: function(e, anim) 
+    {
+      if (anim.animating[nm] === false) 
+      {
+        var style = anim8.dom.style( e, nm );
+        var converted = anim8.dom.convert( e, style, anim.units[ nm ], relativeTo );
+        
+        if ( converted !== false ) 
+        {
+          anim.frame[nm] = converted;
+          anim.animating[nm] = true;
+        }
+      }
+    },
+    set: function(e, anim) 
+    { 
+      anim.styles[nm] = anim.value( nm );
+    },
+    unset: function(e, anim)
+    {
+      e.style[nm] = null;
+    }
+  };
+};
+
+anim8.dom.property.factoryDerivable = function(nm, relativeTo, deriver) 
+{
+  return {
+    
+    get: function(e, anim) 
+    {
+      if (anim.animating[nm] === false) 
+      {
+        var style = anim8.dom.style( e, nm );
+        var converted = anim8.dom.convert( e, style, anim.units[ nm ], relativeTo );
+        
+        if ( converted !== false ) 
+        {
+          anim.frame[nm] = converted;
+          anim.animating[nm] = true;
+        }
+        else if ( anim8.isFunction( deriver ) )
+        {
+          converted = anim8.dom.convert( e, deriver( e ), anim.units[ nm ], relativeTo );
+          
+          if ( converted !== false )
+          {
+            anim.frame[nm] = converted;
+            anim.animating[nm] = true;
+          }
+        }
+      }
+    },
+    set: function(e, anim) 
+    { 
+      anim.styles[nm] = anim.value( nm );
+    },
+    unset: function(e, anim)
+    {
+      e.style[nm] = null;
+    }
+  };
+};
+
+anim8.dom.property.factoryColor = function(nm) 
+{
+  return {
+    
+    get: function(e, anim) 
+    {
+      if (anim.animating[nm] === false) 
+      {
+        var parsed = anim8.color.parse( e.style[nm] );
+        
+        if (parsed !== false) 
+        {
+          anim.frame[nm] = parsed;
+          anim.animating[nm] = true;
+        }              
+      }
+    },
+    set: function(e, anim) 
+    {
+      anim.styles[nm] = anim8.color.format( anim.frame[nm] );
+    },
+    unset: function(e, anim)
+    {
+      e.style[nm] = null;
+    }
+  };
+};
+
+anim8.dom.property.padding                  = anim8.dom.property.factory( &#x27;padding&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.paddingTop               = anim8.dom.property.factory( &#x27;paddingTop&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.paddingRight             = anim8.dom.property.factory( &#x27;paddingRight&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.paddingBottom            = anim8.dom.property.factory( &#x27;paddingBottom&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.paddingLeft              = anim8.dom.property.factory( &#x27;paddingLeft&#x27;, &#x27;parentWidth&#x27; );
+
+anim8.dom.property.margin                   = anim8.dom.property.factory( &#x27;margin&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.marginTop                = anim8.dom.property.factory( &#x27;marginTop&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.marginRight              = anim8.dom.property.factory( &#x27;marginRight&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.marginBottom             = anim8.dom.property.factory( &#x27;marginBottom&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.marginLeft               = anim8.dom.property.factory( &#x27;marginLeft&#x27;, &#x27;parentWidth&#x27; );
+
+anim8.dom.property.borderRadius             = anim8.dom.property.factory( &#x27;borderRadius&#x27;, &#x27;width&#x27; );
+anim8.dom.property.borderTopLeftRadius      = anim8.dom.property.factory( &#x27;borderTopLeftRadius&#x27;, &#x27;width&#x27; );
+anim8.dom.property.borderTopRightRadius     = anim8.dom.property.factory( &#x27;borderTopRightRadius&#x27;, &#x27;width&#x27; );
+anim8.dom.property.borderBottomLeftRadius   = anim8.dom.property.factory( &#x27;borderBottomLeftRadius&#x27;, &#x27;width&#x27; );
+anim8.dom.property.borderBottomRightRadius  = anim8.dom.property.factory( &#x27;borderBottomRightRadius&#x27;, &#x27;width&#x27; );
+
+anim8.dom.property.borderWidth              = anim8.dom.property.factory( &#x27;borderWidth&#x27; );
+anim8.dom.property.borderTopWidth           = anim8.dom.property.factory( &#x27;borderTopWidth&#x27; );
+anim8.dom.property.borderRightWidth         = anim8.dom.property.factory( &#x27;borderRightWidth&#x27; );
+anim8.dom.property.borderBottomWidth        = anim8.dom.property.factory( &#x27;borderBottomWidth&#x27; );
+anim8.dom.property.borderLeftWidth          = anim8.dom.property.factory( &#x27;borderLeftWidth&#x27; );
+
+anim8.dom.property.outlineWidth             = anim8.dom.property.factory( &#x27;outlineWidth&#x27; );
+anim8.dom.property.textIndent               = anim8.dom.property.factory( &#x27;textIndent&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.borderSpacing            = anim8.dom.property.factory( &#x27;borderSpacing&#x27; );
+anim8.dom.property.fontSize                 = anim8.dom.property.factory( &#x27;fontSize&#x27;, &#x27;parentFontSize&#x27; );
+anim8.dom.property.lineHeight               = anim8.dom.property.factory( &#x27;lineHeight&#x27;, &#x27;fontSize&#x27; );
+anim8.dom.property.zIndex                   = anim8.dom.property.factory( &#x27;zIndex&#x27; );
+
+anim8.dom.property.color                    = anim8.dom.property.factoryColor( &#x27;color&#x27; );
+anim8.dom.property.backgroundColor          = anim8.dom.property.factoryColor( &#x27;backgroundColor&#x27; );
+anim8.dom.property.borderTopColor           = anim8.dom.property.factoryColor( &#x27;borderTopColor&#x27; );
+anim8.dom.property.borderRightColor         = anim8.dom.property.factoryColor( &#x27;borderRightColor&#x27; );
+anim8.dom.property.borderBottomColor        = anim8.dom.property.factoryColor( &#x27;borderBottomColor&#x27; );
+anim8.dom.property.borderLeftColor          = anim8.dom.property.factoryColor( &#x27;borderLeftColor&#x27; );
+anim8.dom.property.outlineColor             = anim8.dom.property.factoryColor( &#x27;outlineColor&#x27; );
+
+anim8.dom.property.minWidth                 = anim8.dom.property.factory( &#x27;minWidth&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.maxWidth                 = anim8.dom.property.factory( &#x27;maxWidth&#x27;, &#x27;parentWidth&#x27; );
+anim8.dom.property.minHeight                = anim8.dom.property.factory( &#x27;minHeight&#x27;, &#x27;parentHeight&#x27; );
+anim8.dom.property.maxHeight                = anim8.dom.property.factory( &#x27;maxHeight&#x27;, &#x27;parentHeight&#x27; );
+
+anim8.dom.property.width                    = anim8.dom.property.factoryDerivable(&#x27;width&#x27;, &#x27;parentWidth&#x27;, function(e) { return e.offsetWidth + &#x27;px&#x27;; });
+anim8.dom.property.height                   = anim8.dom.property.factoryDerivable(&#x27;height&#x27;, &#x27;parentHeight&#x27;, function(e) { return e.offsetHeight + &#x27;px&#x27;; });
+
+anim8.dom.property.top                      = anim8.dom.property.factoryDerivable(&#x27;top&#x27;, &#x27;parentHeight&#x27;, function(e) { return e.offsetTop + &#x27;px&#x27;; });
+anim8.dom.property.right                    = anim8.dom.property.factoryDerivable(&#x27;right&#x27;, &#x27;parentWidth&#x27;, function(e) { return (e.parentNode.scrollWidth - (e.offsetLeft + e.offsetWidth)) + &#x27;px&#x27;; });
+anim8.dom.property.bottom                   = anim8.dom.property.factoryDerivable(&#x27;bottom&#x27;, &#x27;parentHeight&#x27;, function(e) { return (e.parentNode.scrollHeight - (e.offsetTop + e.offsetHeight)) + &#x27;px&#x27;; });
+anim8.dom.property.left                     = anim8.dom.property.factoryDerivable(&#x27;left&#x27;, &#x27;parentWidth&#x27;, function(e) { return e.offsetLeft + &#x27;px&#x27;; });
+
+anim8.dom.property.visibility = 
+{
+  get: function(e, anim) 
+  {
+    if (anim.animating.visibility === false) 
+    {
+      var style = anim8.dom.style( e, &#x27;visibility&#x27; );
+      anim.frame.visibility = style === &#x27;hidden&#x27; ? 0.0 : 1.0;
+      anim.animating = true;
+    }
+  },
+  set: function(e, anim) 
+  {
+    anim.styles.visibility = anim.frame.visibility &lt; 0.5 ? &#x27;hidden&#x27; : &#x27;visible&#x27;
+  },
+  unset: function(e, anim)
+  {
+    e.style.visibility = null;
+  }
+}
+
+anim8.dom.property.backface = (function()
+{
+  var css = anim8.dom.prefix([&#x27;WebkitBackfaceVisibility&#x27;, &#x27;MozBackfaceVisibility&#x27;, &#x27;msBackfaceVisibility&#x27;, &#x27;BackfaceVisibility&#x27;]);
+  
+  if ( !css )
+  {
+    return false;
+  }
+  
+  return {
+    
+    get: function(e, anim)
+    {
+      if ( anim.animating.backface === false )
+      {
+        var style = anim8.dom.style( e, css ); 
+        
+        anim.frame.backface = (style === &#x27;visible&#x27;) ? 1.0 : 0.0;
+        anim.animating.backface = true;
+      }
+    },
+    set: function(e, anim)
+    {
+      anim.styles[css] = anim.frame.backface &lt; 0.5 ? &#x27;none&#x27; : &#x27;visible&#x27;;
+    },
+    unset: function(e, anim)
+    {
+      e.style[css] = null;
+    }
+    
+  };
+  
+})();
+
+anim8.dom.property.transformOrigin = (function() 
+{
+  var css = anim8.dom.prefix([&#x27;WebkitTransformOrigin&#x27;, &#x27;MozTransformOrigin&#x27;, &#x27;OTransformOrigin&#x27;, &#x27;msTransformOrigin&#x27;, &#x27;transformOrigin&#x27;]);
+  
+  if ( !css )
+  {
+    return false;
+  }
+  
+  var keywords = 
+  {
+    &#x27;left&#x27;:   &#x27;0%&#x27;,
+    &#x27;center&#x27;: &#x27;50%&#x27;,
+    &#x27;right&#x27;:  &#x27;100%&#x27;,
+    &#x27;top&#x27;:    &#x27;0%&#x27;,
+    &#x27;bottom&#x27;: &#x27;100%&#x27;
+  };
+  
+  var setOriginAttribute = function(e, value, anim, attr, relativeTo ) 
+  {
+    if (anim.animating[attr] === false) 
+    {
+      if ( value in keywords )
+      {        
+        value = keywords[ value ];
+      }
+
+      var converted = anim8.dom.convert( e, value, anim.units[ attr ], relativeTo );
+      
+      if ( converted !== false )
+      {
+        anim.frame[ attr ] = converted;
+        anim.animating[ attr ] = true;
+      }
+    }
+  };
+  
+  var setOrigin = function(e, split, anim) 
+  {
+    if (anim.animating.origin === false) 
+    {
+      if ((split.length === 1) || 
+          (split.length === 2 &amp;&amp; split[0] === split[1]) || 
+          (split.length === 3 &amp;&amp; split[0] === split[1] &amp;&amp; split[1] === split[2])) 
+      {     
+        setOriginAttribute( e, split[0], anim, &#x27;origin&#x27;, &#x27;width&#x27; );
+      }            
+    }
+  };
+  
+  return {
+    
+    get: function(e, anim) 
+    {
+      var style = anim8.dom.style( e, css );
+      
+      if (style) 
+      {
+        var origin = style.toLowerCase();
+        var split = origin.split(&#x27; &#x27;);
+        
+        switch (split.length) 
+        {
+        case 3:
+          setOriginAttribute( e, split[0], anim, &#x27;originX&#x27;, &#x27;width&#x27; );
+          setOriginAttribute( e, split[1], anim, &#x27;originY&#x27;, &#x27;height&#x27; );
+          setOriginAttribute( e, split[2], anim, &#x27;originZ&#x27; );
+          setOrigin( e, split, anim );
+          break;
+        case 2:
+          setOriginAttribute( e, split[0], anim, &#x27;originX&#x27;, &#x27;width&#x27; );
+          setOriginAttribute( e, split[1], anim, &#x27;originY&#x27;, &#x27;height&#x27; );
+          setOrigin( e, split, anim );
+          break;
+        case 1:
+          setOriginAttribute( e, split[0], anim, &#x27;originX&#x27;, &#x27;width&#x27; );
+          setOriginAttribute( e, split[0], anim, &#x27;originY&#x27;, &#x27;height&#x27; );
+          setOrigin( e, split, anim );
+          break;
+        }
+      }
+    },
+    set: function(e, anim) 
+    {      
+      var style = null;
+      
+      if ( anim8.isDefined( anim.frame.originZ ) )
+      {
+        style = anim.valueOr( &#x27;originX&#x27;, &#x27;origin&#x27;, &#x27;x&#x27; ) + &#x27; &#x27; + anim.valueOr( &#x27;originY&#x27;, &#x27;origin&#x27;, &#x27;y&#x27; ) + &#x27; &#x27; + anim.valueOr( &#x27;originZ&#x27;, &#x27;origin&#x27;, &#x27;z&#x27; );
+      } 
+      else 
+      {
+        style = anim.valueOr( &#x27;originX&#x27;, &#x27;origin&#x27;, &#x27;x&#x27; ) + &#x27; &#x27; + anim.valueOr( &#x27;originY&#x27;, &#x27;origin&#x27;, &#x27;y&#x27; );
+      }
+      
+      anim.styles[css] = style;
+    },
+    unset: function(e, anim)
+    {
+      e.style[css] = null;
+    }
+  };
+  
+})();
+
+anim8.dom.property.transform = (function() 
+{
+  var css = anim8.dom.prefix([&#x27;WebkitTransform&#x27;, &#x27;MozTransform&#x27;, &#x27;OTransform&#x27;, &#x27;msTransform&#x27;, &#x27;transform&#x27;]);
+   
+  if ( !css )
+  {
+    return false;
+  }
+  
+  var parse = function( e, value, anim, attr, relativeTo )
+  {
+    var desiredUnit = anim.units[ attr ];
+    var converted = anim8.dom.convert( e, value, desiredUnit, relativeTo );
+    
+    if ( converted !== false )
+    {
+      return converted;
+    }
+    
+    // TODO show convert this to desiredUnit, however defaultValue may be non-scalar.
+    return anim.getAttribute( attr ).defaultValue;    
+  };
+
+  var getter1d = function(e, anim, parsed, attr)
+  {
+    return parse( e, parsed[1], anim, attr, &#x27;width&#x27; )
+  };
+  var getter2d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, &#x27;width&#x27; ),
+      y: parse( e, parsed[2], anim, attr, &#x27;height&#x27; )
+    };
+  };
+  var getter3d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, &#x27;width&#x27; ),
+      y: parse( e, parsed[2], anim, attr, &#x27;height&#x27; ),
+      z: parse( e, parsed[3], anim, attr )
+    };
+  };
+  var getter4d = function(e, anim, parsed, attr)
+  {
+    return {
+      x: parse( e, parsed[1], anim, attr, &#x27;width&#x27; ),
+      y: parse( e, parsed[2], anim, attr, &#x27;height&#x27; ),
+      z: parse( e, parsed[3], anim, attr ),
+      angle: parse( e, parsed[4], anim, attr )
+    };
+  };
+
+  var setter1d = function(attr, value, unit)
+  {
+    return attr + &#x27;(&#x27; + value + unit + &#x27;)&#x27;;
+  };
+  var setter2d = function(attr, value, unit)
+  {
+    return attr + &#x27;(&#x27; + value.x + unit + &#x27;,&#x27; + value.y + unit + &#x27;)&#x27;;
+  };
+  var setter3d = function(attr, value, unit)
+  {
+    return attr + &#x27;(&#x27; + value.x + unit + &#x27;,&#x27; + value.y + unit + &#x27;,&#x27; + value.z + unit + &#x27;)&#x27;;
+  };
+  var setter4d = function(attr, value, unit)
+  {
+    return attr + &#x27;(&#x27; + value.x + &#x27;,&#x27; + value.y + &#x27;,&#x27; + value.z + &#x27;,&#x27; + value.angle + unit + &#x27;)&#x27;;
+  };
+    
+  var regexes = 
+  {
+    translate:    /translate\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    translate3d:  /translate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    translateX:   /translateX\(([^\)]+)\)/i,
+    translateY:   /translateY\(([^\)]+)\)/i,
+    translateZ:   /translateZ\(([^\)]+)\)/i,
+    scale:        /scale\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    scale3d:      /scale3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    scaleX:       /scaleX\(([^\)]+)\)/i,
+    scaleY:       /scaleY\(([^\)]+)\)/i,
+    scaleZ:       /scaleZ\(([^\)]+)\)/i,
+    rotate:       /rotate\(([^\)]+)\)/i,
+    rotate3d:     /rotate3d\(([^,]+)\s*,\s*([^,]+)\s*,\s*([^,]+)\s*,\s*([^\)]+)\)/i,
+    rotateX:      /rotateX\(([^\)]+)\)/i,
+    rotateY:      /rotateY\(([^\)]+)\)/i,
+    rotateZ:      /rotateZ\(([^\)]+)\)/i,
+    skew:         /skew\(([^,]+)\s*,\s*([^\)]+)\)/i,
+    skewX:        /skewX\(([^\)]+)\)/i,
+    skewY:        /skewY\(([^\)]+)\)/i
+  };
+
+  var getters = 
+  {
+    translate:    getter2d,
+    translate3d:  getter3d,
+    translateX:   getter1d,
+    translateY:   getter1d,
+    translateZ:   getter1d,
+    scale:        getter2d,
+    scale3d:      getter3d,
+    scaleX:       getter1d,
+    scaleY:       getter1d,
+    scaleZ:       getter1d,
+    rotate:       getter1d,
+    rotate3d:     getter4d,
+    rotateX:      getter1d,
+    rotateY:      getter1d,
+    rotateZ:      getter1d,
+    skew:         getter2d,
+    skewX:        getter1d,
+    skewY:        getter1d
+  };
+
+  var setters =
+  {
+    translate:    setter2d,
+    translate3d:  setter3d,
+    translateX:   setter1d,
+    translateY:   setter1d,
+    translateZ:   setter1d,
+    scale:        setter2d,
+    scale3d:      setter3d,
+    scaleX:       setter1d,
+    scaleY:       setter1d,
+    scaleZ:       setter1d,
+    rotate:       setter1d,
+    rotate3d:     setter4d,
+    rotateX:      setter1d,
+    rotateY:      setter1d,
+    rotateZ:      setter1d,
+    skew:         setter2d,
+    skewX:        setter1d,
+    skewY:        setter1d
+  };
+
+  var props = new anim8.FastMap( regexes );
+  var regex = props.values;
+  var attrs = props.keys;
+  props.setters = [];
+  props.getters = [];
+
+  for (var prop in getters)
+  {
+    var i = props.indexOf( prop );
+
+    props.getters[ i ] = getters[ prop ];
+    props.setters[ i ] = setters[ prop ];
+  }
+  
+  return {
+    
+    get: function(e, anim) 
+    {
+      var style = anim8.dom.style( e, css );
+      
+      for (var attr in anim.animating) 
+      {
+        var i = props.indexOf( attr );
+
+        if ( i !== -1 &amp;&amp; anim.animating[ attr ] === false ) 
+        {
+          var parsed = regex[ i ].exec( style );
+
+          if ( parsed ) 
+          {
+            anim.frame[ attr ] = props.getters[ i ]( e, anim, parsed, attr );
+            anim.animating[ attr ] = true;
+          }
+        }
+      }
+    },
+    set: function(e, anim) 
+    {      
+      var transforms = [];
+      
+      for (var i = 0; i &lt; regex.length; i++) 
+      {
+        var attr = attrs[ i ];
+
+        if (attr in anim.frame) 
+        {
+          transforms.push( props.setters[ i ]( attr, anim.frame[ attr ], anim.units[ attr ] ) );
+        }
+      }
+      
+      if (transforms.length) 
+      {
+        anim.styles[css] = transforms.join(&#x27; &#x27;);
+      }
+    },
+    unset: function(e, anim)
+    {
+      e.style[css] = null;
+    }
+  };
+  
+})();
+
+anim8.dom.property.opacity = (function() 
+{
+  var css = anim8.dom.prefix([&#x27;WebkitOpacity&#x27;, &#x27;MozOpacity&#x27;, &#x27;KhtmlOpacity&#x27;, &#x27;opacity&#x27;]);
+  
+  if ( !css )
+  {
+    return false;
+  }
+  
+  return {
+    
+    get: function(e, anim) 
+    {
+      if (anim.animating.opacity === false) 
+      {
+        var style = anim8.dom.style( e, css );
+        var opacity = parseFloat( style );
+        
+        if ( !isNaN(opacity) ) 
+        {
+          anim.frame.opacity = opacity
+          anim.animating.opacity = true;
+        }
+      }
+    },
+    set: function(e, anim) 
+    {
+      anim.styles[ css ] = anim8.clamp( anim.frame.opacity, 0, 1 );
+    },
+    unset: function(e, anim)
+    {
+      e.style[ css ] = null;
+    }
+  };
+  
+})();
+
+anim8.dom.property.filter = (function() 
+{
+  var css = anim8.dom.prefix([&#x27;WebkitFilter&#x27;, &#x27;MozFilter&#x27;, &#x27;OFilter&#x27;, &#x27;msFilter&#x27;, &#x27;filter&#x27;]);
+  
+  if ( !css )
+  {
+    return false;
+  }
+  
+  var methods = 
+  {
+    grayscale:   &#x27;grayscale&#x27;,
+    sepia:       &#x27;sepia&#x27;,
+    saturate:   &#x27;saturate&#x27;,
+    hueRotate:   &#x27;hue-rotate&#x27;,
+    invert:     &#x27;invert&#x27;,
+    brightness: &#x27;brightness&#x27;,
+    contrast:   &#x27;contrast&#x27;,
+    blur:       &#x27;blur&#x27;
+  };
+  
+  var patterns = {};
+  
+  for (var attr in methods) 
+  {
+    patterns[attr] = new RegExp( methods[attr] + &#x27;\(([^\)]+)\)&#x27;, &#x27;i&#x27;);
+  }
+  
+  return {
+    
+    get: function(e, anim) 
+    {
+      var style = anim8.dom.style( e, css );
+      
+      for (var attr in patterns) 
+      {
+        if ( anim.animating[attr] === false ) 
+        {
+          var parsed = patterns[attr].exec( style );
+          
+          if (parsed !== false) 
+          {
+            var converted = anim8.dom.convert( e, parsed[1], anim.units[ attr ] );
+            
+            if ( converted !== false )
+            {
+              anim.frame[ attr ] = converted;
+              anim.animating[ attr ] = true;
+            }
+          }
+        }
+      }
+    }, 
+    set: function(e, anim) 
+    {
+      // we don&#x27;t check anim.updated[attr] here since the current value of a transform property is important
+      
+      var filters = [];
+      
+      for (var attr in methods) 
+      {
+        if ( attr in anim.frame ) 
+        {
+          filters.push( methods[attr] + &#x27;(&#x27; + anim.value( attr ) + &#x27;)&#x27; );
+        }
+      }
+      
+      if (filters.length) 
+      {
+        anim.styles[ css ] = filters.join(&#x27; &#x27;);
+      }
+    },
+    unset: function(e, anim)
+    {
+      e.style[ css ] = null;
+    }
+  };
+  
+})();
+
+anim8.dom.property.center = 
+{
+  get: function(e, anim)
+  {
+    var cx = (e.offsetLeft + e.offsetWidth * 0.5) + &#x27;px&#x27;;
+    var cy = (e.offsetTop + e.offsetHeight * 0.5) + &#x27;px&#x27;;
+    
+    if ( anim.animating.center === false )
+    {
+      var desiredUnit = anim.units.center;
+      var ccx = anim8.dom.convert( e, cx, desiredUnit, &#x27;parentWidth&#x27; );
+      var ccy = anim8.dom.convert( e, cy, desiredUnit, &#x27;parentHeight&#x27; );
+    
+      if ( ccx !== false &amp;&amp; ccy !== false )
+      {
+        anim.frame.center = {
+          x: ccx,
+          y: ccy
+        };
+        anim.animating.center = true;
+      }
+    }
+    if ( anim.animating.centerX === false )
+    {
+      var desiredUnit = anim.units.centerX;
+      var ccx = anim8.dom.convert( e, cx, desiredUnit, &#x27;parentWidth&#x27; );
+      
+      if ( ccx !== false )
+      {
+        anim.frame.centerX = ccx;
+        anim.animating.centerX = true;
+      }
+    }
+    if ( anim.animating.centerY === false )
+    {
+      var desiredUnit = anim.units.centerY;
+      var ccy = anim8.dom.convert( e, cy, desiredUnit, &#x27;parentHeight&#x27; );
+      
+      if ( ccy !== false )
+      {
+        anim.frame.centerY = ccy;
+        anim.animating.centerY = true;
+      }
+    }
+  },
+  preset: function(e, anim)
+  {
+    anim.cached.width  = anim8.dom.convert( e, e.offsetWidth + &#x27;px&#x27;, anim.units.centerX || anim.units.center, &#x27;parentWidth&#x27; );
+    anim.cached.height = anim8.dom.convert( e, e.offsetHeight + &#x27;px&#x27;, anim.units.centerY || anim.units.center, &#x27;parentHeight&#x27; );
+  },
+  set: function(e, anim)
+  {
+    var rw = anim.cached.width * 0.5;
+    var rh = anim.cached.height * 0.5;
+        
+    if ( anim.updated.center )
+    {
+      anim.styles.left = (anim.frame.center.x - rw) + anim.units.center;
+      anim.styles.top = (anim.frame.center.y - rh) + anim.units.center;
+    }
+    if ( anim.updated.centerX )
+    {
+      anim.styles.left = (anim.frame.centerX - rw) + anim.units.centerX;
+    }
+    if ( anim.updated.centerY )
+    {
+      anim.styles.top = (anim.frame.centerY - rh) + anim.units.centerY;
+    }
+  }
+};
+
+anim8.dom.property.orbit = 
+{
+  DEGREE_TO_RADIAN: Math.PI / 180.0,
+  
+  RADIAN_TO_DEGREE: 180.0 / Math.PI,
+  
+  get: function(e, anim)
+  {
+    var ox = (e.parentNode.scrollWidth * 0.5);
+    var oy = (e.parentNode.scrollHeight * 0.5); 
+    var cx = (e.offsetLeft + e.offsetWidth * 0.5);
+    var cy = (e.offsetTop + e.offsetHeight * 0.5);
+    var dx = cx - ox;
+    var dy = cy - oy;
+  
+    if ( anim.animating.orbitOffset === false )
+    {
+      var cunit = anim.units.orbitOffset;
+      var cox = anim8.dom.convert( e, ox + &#x27;px&#x27;, cunit, &#x27;parentWidth&#x27; );
+      var coy = anim8.dom.convert( e, oy + &#x27;px&#x27;, cunit, &#x27;parentHeight&#x27; );
+      
+      if ( cox !== false &amp;&amp; coy !== false )
+      {
+        anim.frame.orbitOffset = {
+          x: cox,
+          y: coy
+        };
+        anim.animating.orbitOffset = false;
+      }
+    }
+    
+    if ( anim.animating.distance === false )
+    {
+      anim.frame.distance = Math.sqrt( dx * dx + dy * dy );
+      anim.animating.distance = true;
+    }
+    
+    if ( anim.animating.angle === false )
+    {
+      anim.frame.angle = Math.atan2( dy, dx ) * this.RADIAN_TO_DEGREE;
+      anim.animating.angle = true;
+    }
+  },
+  
+  preset: function(e, anim)
+  {  
+    anim.cached.parentWidth = e.parentNode.scrollWidth;
+    anim.cached.parentHeight = e.parentNode.scrollHeight;
+    anim.cached.width = e.offsetWidth;
+    anim.cached.height = e.offsetHeight;
+  },
+  
+  set: function(e, anim)
+  {
+    // TODO calculator this correctly
+    var cunit = anim.units.orbitOffset || &#x27;%&#x27;;
+    var orbitX = anim.frame.orbitOffset ? anim.frame.orbitOffset.x : 50;
+    var orbitY = anim.frame.orbitOffset ? anim.frame.orbitOffset.y : 50;
+    
+    var originUnit = anim.units.origin || &#x27;%&#x27;;
+    var originX = anim.frame.origin ? anim.frame.origin.x : 50;
+    var originY = anim.frame.origin ? anim.frame.origin.y : 50;
+    
+    var cox = anim8.dom.convert( e, orbitX + cunit, &#x27;px&#x27;, anim.cached.parentWidth / 100.0 );
+    var coy = anim8.dom.convert( e, orbitY + cunit, &#x27;px&#x27;, anim.cached.parentHeight / 100.0 );
+    
+    var ox = anim8.dom.convert( e, originX + originUnit, &#x27;px&#x27;, anim.cached.width / 100.0 );
+    var oy = anim8.dom.convert( e, originY + originUnit, &#x27;px&#x27;, anim.cached.height / 100.0 );
+    
+    var angle = (anim.frame.angle || 0.0) * this.DEGREE_TO_RADIAN;
+    var distance = anim.frame.distance || 0.0;
+        
+    var cos = Math.cos( angle ) * distance;
+    var sin = Math.sin( angle ) * distance;
+    
+    anim.styles.left = (cox + cos - ox) + &#x27;px&#x27;;
+    anim.styles.top = (coy + sin - oy) + &#x27;px&#x27;;
+  }
+};
+    </pre>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

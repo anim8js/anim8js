@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #666;
+      }
+      #container {
+        position: relative;
+        left: 50%;
+        top: 50%;
+        width: 0;
+        height: 0;
+      }
+      #canvas {
+        position: relative;
+        left: -512px;
+        top: -336px;
+        background-color: black; 
+      }
+    </style>
+  </head>
+  <body onload="init()">
+    
+    <div id="container">
+      <canvas id="canvas" width="1024" height="672"></canvas> 
+    </div>
+
+    <script src="../3rd/easeljs-0.8.0.min.js"></script>
+    <script src="../build/anim8js-easel.js"></script>
+    <script src="examples.js"></script>
+    
+    <script>
+
+      function Mouse()
+      {
+        return {
+          x: Mouse.x,
+          y: Mouse.y
+        };
+      }
+      Mouse.x = Mouse.y = 0;
+
+      function init() 
+      {
+        var stage = new createjs.Stage('canvas');
+
+        var circle = new createjs.Graphics.Circle(0,0,30);
+        var shape = new createjs.Shape();
+        shape.graphics.beginFill("DeepSkyBlue").append(circle);
+        shape.x = 100;
+        shape.y = 100;
+        stage.addChild(shape);
+
+        anim8( shape ).play({
+          springs: {   
+            position: {
+              type: 'linear',
+              rest: Mouse,
+              damping: 2.5,
+              stiffness: -30
+            }
+          }
+        });
+
+        anim8( circle ).tween('radius', 30, 50, 'infinite quad-yoyo');
+        
+        anim8.on('end', stage.update, stage);
+      }
+
+      $listen( window.canvas, 'mousemove', function(mouse, ev)
+      {
+        var offset = getOffsetMouse( ev );
+
+        Mouse.x = offset.x;
+        Mouse.y = offset.y;
+      });
+
+    </script>
+  </body>
+</html>

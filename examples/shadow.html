@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+      left: 100px;
+      top: 100px;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="box1"></div>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+
+    <script>
+
+      m8( window.box1 ).play({
+        keyframe: {
+          from: {
+            shadowPosition: 10, 
+            shadowColor: {r:0, g:0, b:0, a:0},
+            shadowBlur: 30
+          },
+          to: {
+            shadowPosition: 4, 
+            shadowColor: {r:0, g:0, b:0, a:255},
+            shadowBlur: 0
+          }
+        }
+      }, '4s');
+      
+    </script>
+    
+  </body>
+</html>
+  

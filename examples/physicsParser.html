@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #222;
+      overflow: hidden;
+    }
+    .box {
+      width: 10px;
+      height: 10px;
+      position: absolute;
+    }
+    </style>
+  </head>
+  <body>
+  
+    <script src="../build/anim8js-dom.js"></script>
+    <script src="examples.js"></script>
+    
+    <!--[if lte IE 8]>
+    <script src="../build/anim8js-ie.js"></script>
+    <![endif]-->
+    
+    <script>
+
+      MousePosition.computed = true;
+
+      anim8.save('shoot', {
+        physics: {
+          center: {
+            position: MousePosition,
+            // Random Velocity
+            velocity: anim8.computed.random({min:{x:-300,y:-900}, max:{x:300,y:-600}}),
+            acceleration: {x: 0, y: 600},
+            terminal: 1000,
+            stopAt: '3s'
+          }
+        },
+        initial: {
+          // Random Angle
+          rotate: anim8.computed.random({min:0, max:360})
+        },
+        tweenTo: {
+          // Random Angle
+          rotate: anim8.computed.random({min:0, max:360})
+        },
+        keyframe: {
+          '0': {
+            scale: 1,
+            backgroundColor: 'blue'
+          },
+          '50': {
+            // Random Scale
+            scale: anim8.computed.random([1, 1.5, 2, 2.5, 3]),
+            backgroundColor: 'red'
+          },
+          '75': {
+            opacity: 1
+          },
+          '100': {
+            scale: 0.1,
+            opacity: 0,
+            backgroundColor: 'yellow'
+          }
+        }
+      }, {
+        duration: '3s'
+      });
+
+      var toRemove = [];
+      var createBullet = function(mouse)
+      {
+        var bullet = document.createElement('div');
+        bullet.className = 'box';
+        document.body.appendChild( bullet );
+
+        m8( bullet )
+          .play( 'shoot' )
+          .once('finished', function() {
+            toRemove.push( bullet );
+            this.destroy();
+          }
+        );
+      };
+
+      $listen( document, 'mousemove', createBullet );
+      $listen( document, 'touchmove', createBullet );
+
+      m8.on('end', function()
+      {
+        var n = toRemove.length;
+
+        for (var i = n - 1; i >= 0; i--)
+        {
+          document.body.removeChild( toRemove[ i ] );
+        }
+
+        toRemove = toRemove.slice(n);
+      });
+      
+    </script>
+    
+  </body>
+</html>
+  
