@@ -76,6 +76,225 @@ var Class =
 
 
 /**
+ * The default values for anim8js properties.
+ *
+ * @property {Object} anim8.defaults
+ */
+var Defaults =
+{
+
+  /**
+   * The default animation duration in milliseconds.
+   *
+   * @property {Number} duration
+   * @for anim8.defaults
+   * @default 1000
+   */
+  duration: 1000,
+
+  /**
+   * The default easing.
+   *
+   * @property {String|Function|Array} easing
+   * @for anim8.defaults
+   * @default 'ease'
+   */
+  easing: 'ease',
+
+  /**
+   * The default "total easing" which is the overall easing
+   * for an animation which actually has easing values per frame.
+   *
+   * @property {String|Function|Array} teasing
+   * @for anim8.defaults
+   * @default 'linear'
+   */
+  teasing: 'linear',
+
+  /**
+   * The default animation delay in milliseconds.
+   *
+   * @property {Number} delay
+   * @for anim8.defaults
+   * @default 0
+   */
+  delay: 0,
+
+  /**
+   * The default animation sleep in milliseconds.
+   *
+   * @property {Number} sleep
+   * @for anim8.defaults
+   * @default 0
+   */
+  sleep: 0,
+
+  /**
+   * The default number of repeats for an animation.
+   *
+   * @property {Number} repeat
+   * @for anim8.defaults
+   * @default 1
+   */
+  repeat: 1,
+
+  /**
+   * The default scale for an animation.
+   *
+   * @property scale
+   * @for anim8.defaults
+   * @default 1.0
+   * @type {Number}
+   */
+  scale: 1.0,
+
+  /**
+   * The default animation offset in milliseconds.
+   *
+   * @property {Number} offset
+   * @for anim8.defaults
+   * @default 0
+   */
+  offset: 0,
+
+  /**
+   * The default transition time in milliseconds.
+   *
+   * @property {Number} transitionTime
+   * @for anim8.defaults
+   * @default 500
+   */
+  transitionTime: 500,
+
+  /**
+   * The default transition outroduction time in milliseconds.
+   *
+   * @property {Number} transitionOutro
+   * @for anim8.defaults
+   * @default 100
+   */
+  transitionOutro: 100,
+
+  /**
+   * The default transition introduction time in milliseconds.
+   *
+   * @property {Number} transitionIntro
+   * @for anim8.defaults
+   * @default 100
+   */
+  transitionIntro: 100,
+
+  /**
+   * The default transition easing when none is specified.
+   *
+   * @property {String|Function|Array} transitionEasing
+   * @for anim8.defaults
+   * @default 'linear'
+   */
+  transitionEasing: 'linear',
+
+  /**
+   * The default transition granularity. This is used for smooth transitions to
+   * provide a smooth transition from the outro velocity to the intro velocity,
+   * the cubic or quadratic path between the two is a curve with unknown length
+   * so the length needs to be calculated using a maximum number of points to
+   * calculate along the path - summing the distances between the consecutive points.
+   *
+   * @property {Number} transitionGranularity
+   * @for anim8.defaults
+   * @default 0
+   */
+  transitionGranularity: 0,
+
+  /**
+   * TODO
+   *
+   * @property {Number} transitionLookup
+   * @for anim8.defaults
+   * @default 10
+   */
+  transitionLookup: 10,
+
+  /**
+   * Whether animtions are cached whenever possible. Animations that can be
+   * cached are strings with options specified in the string and without an
+   * option object given. For example 'tada ~1s 3s x3' is cacheable.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}}
+   *
+   * @property {Boolean} cache
+   * @for anim8.defaults
+   * @default false
+   */
+  cache: false,
+
+  /**
+   * Whether parsed options are cached whenever possible. Options that can be
+   * cached must be strings.
+   *
+   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   *
+   * @property {Boolean} cacheOptions
+   * @for anim8.defaults
+   * @default false
+   */
+  cacheOptions: false,
+
+  /**
+   * Whether parsed transitions are cached whenever possible. Transitions that can be
+   * cached must be strings.
+   *
+   * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}}
+   *
+   * @property {Boolean} cacheTransitions
+   * @for anim8.defaults
+   * @default false
+   */
+  cacheTransitions: false,
+
+  /**
+   * The value to return when options could not be parsed from input.
+   *
+   * @property {Object} noOptions
+   * @for anim8.defaults
+   * @default {}
+   */
+  noOptions: {},
+
+  /**
+   * The value to return when a transition could not be parsed from input.
+   *
+   * @property {Object} noTransition
+   * @for anim8.defaults
+   * @default {}
+   */
+  noTransition: {},
+
+  /**
+   * The target number of milliseconds between frames. This only applies if the
+   * browser doesn't support any of the requestAnimationFrame variations.
+   *
+   * @property {Number} frameRate
+   * @for anim8.defaults
+   * @default 33
+   */
+  frameRate: 16,
+
+  /**
+   * The number of milliseconds to pause between looping to let the UI react
+   * to user events.
+   *
+   * @property {Number} pauseTime
+   * @for anim8.defaults
+   * @default 5
+   */
+  pauseTime: 5
+
+};
+
+
+
+/**
  * @class Core
  */
 
@@ -4485,225 +4704,6 @@ Class.define( Calculator,
   }
 
 });
-
-
-
-/**
- * The default values for anim8js properties.
- *
- * @property {Object} anim8.defaults
- */
-var Defaults =
-{
-
-  /**
-   * The default animation duration in milliseconds.
-   *
-   * @property {Number} duration
-   * @for anim8.defaults
-   * @default 1000
-   */
-  duration: 1000,
-
-  /**
-   * The default easing.
-   *
-   * @property {String|Function|Array} easing
-   * @for anim8.defaults
-   * @default 'ease'
-   */
-  easing: 'ease',
-
-  /**
-   * The default "total easing" which is the overall easing
-   * for an animation which actually has easing values per frame.
-   *
-   * @property {String|Function|Array} teasing
-   * @for anim8.defaults
-   * @default 'linear'
-   */
-  teasing: 'linear',
-
-  /**
-   * The default animation delay in milliseconds.
-   *
-   * @property {Number} delay
-   * @for anim8.defaults
-   * @default 0
-   */
-  delay: 0,
-
-  /**
-   * The default animation sleep in milliseconds.
-   *
-   * @property {Number} sleep
-   * @for anim8.defaults
-   * @default 0
-   */
-  sleep: 0,
-
-  /**
-   * The default number of repeats for an animation.
-   *
-   * @property {Number} repeat
-   * @for anim8.defaults
-   * @default 1
-   */
-  repeat: 1,
-
-  /**
-   * The default scale for an animation.
-   *
-   * @property scale
-   * @for anim8.defaults
-   * @default 1.0
-   * @type {Number}
-   */
-  scale: 1.0,
-
-  /**
-   * The default animation offset in milliseconds.
-   *
-   * @property {Number} offset
-   * @for anim8.defaults
-   * @default 0
-   */
-  offset: 0,
-
-  /**
-   * The default transition time in milliseconds.
-   *
-   * @property {Number} transitionTime
-   * @for anim8.defaults
-   * @default 500
-   */
-  transitionTime: 500,
-
-  /**
-   * The default transition outroduction time in milliseconds.
-   *
-   * @property {Number} transitionOutro
-   * @for anim8.defaults
-   * @default 100
-   */
-  transitionOutro: 100,
-
-  /**
-   * The default transition introduction time in milliseconds.
-   *
-   * @property {Number} transitionIntro
-   * @for anim8.defaults
-   * @default 100
-   */
-  transitionIntro: 100,
-
-  /**
-   * The default transition easing when none is specified.
-   *
-   * @property {String|Function|Array} transitionEasing
-   * @for anim8.defaults
-   * @default 'linear'
-   */
-  transitionEasing: 'linear',
-
-  /**
-   * The default transition granularity. This is used for smooth transitions to
-   * provide a smooth transition from the outro velocity to the intro velocity,
-   * the cubic or quadratic path between the two is a curve with unknown length
-   * so the length needs to be calculated using a maximum number of points to
-   * calculate along the path - summing the distances between the consecutive points.
-   *
-   * @property {Number} transitionGranularity
-   * @for anim8.defaults
-   * @default 0
-   */
-  transitionGranularity: 0,
-
-  /**
-   * TODO
-   *
-   * @property {Number} transitionLookup
-   * @for anim8.defaults
-   * @default 10
-   */
-  transitionLookup: 10,
-
-  /**
-   * Whether animtions are cached whenever possible. Animations that can be
-   * cached are strings with options specified in the string and without an
-   * option object given. For example 'tada ~1s 3s x3' is cacheable.
-   *
-   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}}
-   *
-   * @property {Boolean} cache
-   * @for anim8.defaults
-   * @default false
-   */
-  cache: false,
-
-  /**
-   * Whether parsed options are cached whenever possible. Options that can be
-   * cached must be strings.
-   *
-   * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
-   *
-   * @property {Boolean} cacheOptions
-   * @for anim8.defaults
-   * @default false
-   */
-  cacheOptions: false,
-
-  /**
-   * Whether parsed transitions are cached whenever possible. Transitions that can be
-   * cached must be strings.
-   *
-   * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}}
-   *
-   * @property {Boolean} cacheTransitions
-   * @for anim8.defaults
-   * @default false
-   */
-  cacheTransitions: false,
-
-  /**
-   * The value to return when options could not be parsed from input.
-   *
-   * @property {Object} noOptions
-   * @for anim8.defaults
-   * @default {}
-   */
-  noOptions: {},
-
-  /**
-   * The value to return when a transition could not be parsed from input.
-   *
-   * @property {Object} noTransition
-   * @for anim8.defaults
-   * @default {}
-   */
-  noTransition: {},
-
-  /**
-   * The target number of milliseconds between frames. This only applies if the
-   * browser doesn't support any of the requestAnimationFrame variations.
-   *
-   * @property {Number} frameRate
-   * @for anim8.defaults
-   * @default 33
-   */
-  frameRate: 16,
-
-  /**
-   * The number of milliseconds to pause between looping to let the UI react
-   * to user events.
-   *
-   * @property {Number} pauseTime
-   * @for anim8.defaults
-   * @default 5
-   */
-  pauseTime: 5
-
-};
 
 
 /**
@@ -12690,10 +12690,47 @@ function $transition(transition, cache)
   // Add events to the animation cycle: begin, end, finished, starting
   eventize( anim8 );
 
-  // Main
+  // anim8.js
   anim8.anim8s = anim8s;
   anim8.fn = Animator.prototype;
   anim8s.fn = Animators.prototype;
+  anim8.isRunning = isRunning;
+  anim8.isLive = isLive;
+  anim8.setLive = setLive;
+  anim8.animating = animating;
+  anim8.requestRun = requestRun;
+  anim8.activateAnimator = activateAnimator;
+  anim8.pushAnimator = pushAnimator;
+  anim8.activate = activate;
+  anim8.run = run;
+  anim8.pause = pause;
+  anim8.resume = resume;
+  anim8.stop = stop;
+  anim8.end = end;
+  anim8.finish = finish;
+  anim8.nopeat = nopeat;
+
+  // Core
+  anim8.noop = noop;
+  anim8.isDefined = isDefined;
+  anim8.isFunction = isFunction;
+  anim8.isNumber = isNumber;
+  anim8.isBoolean = isBoolean;
+  anim8.isString = isString;
+  anim8.isArray = isArray;
+  anim8.isObject = isObject;
+  anim8.isEmpty = isEmpty;
+  anim8.now = now;
+  anim8.trim = trim;
+  anim8.toArray = toArray;
+  anim8.copy = copy;
+  anim8.extend = extend;
+  anim8.coalesce = coalesce;
+  anim8.constant = constant;
+  anim8.resolve = resolve;
+  anim8.clamp = clamp;
+  anim8.id = id;
+  anim8.Class = Class;
   anim8.Defaults = Defaults;
 
   // Registries
@@ -12742,46 +12779,10 @@ function $transition(transition, cache)
   anim8.spread = spread;
   // - eventize.js
   anim8.eventize = eventize;
-  // - loop.js
-  anim8.isRunning = isRunning;
-  anim8.isLive = isLive;
-  anim8.setLive = setLive;
-  anim8.animating = animating;
-  anim8.requestRun = requestRun;
-  anim8.activateAnimator = activateAnimator;
-  anim8.pushAnimator = pushAnimator;
-  anim8.activate = activate;
-  anim8.run = run;
-  anim8.pause = pause;
-  anim8.resume = resume;
-  anim8.stop = stop;
-  anim8.end = end;
-  anim8.finish = finish;
-  anim8.nopeat = nopeat;
   // - save.js
   anim8.save = save;
-  // - utility.js
-  anim8.noop = noop;
-  anim8.isDefined = isDefined;
-  anim8.isFunction = isFunction;
-  anim8.isNumber = isNumber;
-  anim8.isBoolean = isBoolean;
-  anim8.isString = isString;
-  anim8.isArray = isArray;
-  anim8.isObject = isObject;
-  anim8.isEmpty = isEmpty;
-  anim8.now = now;
-  anim8.trim = trim;
-  anim8.toArray = toArray;
-  anim8.copy = copy;
-  anim8.extend = extend;
-  anim8.coalesce = coalesce;
-  anim8.constant = constant;
-  anim8.resolve = resolve;
-  anim8.clamp = clamp;
-  anim8.id = id;
 
-  // Core
+  // Classes
   anim8.Aninmation = Animation;
   anim8.Animator = Animator;
   anim8.Animators = Animators;

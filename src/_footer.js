@@ -2,10 +2,47 @@
   // Add events to the animation cycle: begin, end, finished, starting
   eventize( anim8 );
 
-  // Main
+  // anim8.js
   anim8.anim8s = anim8s;
   anim8.fn = Animator.prototype;
   anim8s.fn = Animators.prototype;
+  anim8.isRunning = isRunning;
+  anim8.isLive = isLive;
+  anim8.setLive = setLive;
+  anim8.animating = animating;
+  anim8.requestRun = requestRun;
+  anim8.activateAnimator = activateAnimator;
+  anim8.pushAnimator = pushAnimator;
+  anim8.activate = activate;
+  anim8.run = run;
+  anim8.pause = pause;
+  anim8.resume = resume;
+  anim8.stop = stop;
+  anim8.end = end;
+  anim8.finish = finish;
+  anim8.nopeat = nopeat;
+
+  // Core
+  anim8.noop = noop;
+  anim8.isDefined = isDefined;
+  anim8.isFunction = isFunction;
+  anim8.isNumber = isNumber;
+  anim8.isBoolean = isBoolean;
+  anim8.isString = isString;
+  anim8.isArray = isArray;
+  anim8.isObject = isObject;
+  anim8.isEmpty = isEmpty;
+  anim8.now = now;
+  anim8.trim = trim;
+  anim8.toArray = toArray;
+  anim8.copy = copy;
+  anim8.extend = extend;
+  anim8.coalesce = coalesce;
+  anim8.constant = constant;
+  anim8.resolve = resolve;
+  anim8.clamp = clamp;
+  anim8.id = id;
+  anim8.Class = Class;
   anim8.Defaults = Defaults;
 
   // Registries
@@ -54,46 +91,10 @@
   anim8.spread = spread;
   // - eventize.js
   anim8.eventize = eventize;
-  // - loop.js
-  anim8.isRunning = isRunning;
-  anim8.isLive = isLive;
-  anim8.setLive = setLive;
-  anim8.animating = animating;
-  anim8.requestRun = requestRun;
-  anim8.activateAnimator = activateAnimator;
-  anim8.pushAnimator = pushAnimator;
-  anim8.activate = activate;
-  anim8.run = run;
-  anim8.pause = pause;
-  anim8.resume = resume;
-  anim8.stop = stop;
-  anim8.end = end;
-  anim8.finish = finish;
-  anim8.nopeat = nopeat;
   // - save.js
   anim8.save = save;
-  // - utility.js
-  anim8.noop = noop;
-  anim8.isDefined = isDefined;
-  anim8.isFunction = isFunction;
-  anim8.isNumber = isNumber;
-  anim8.isBoolean = isBoolean;
-  anim8.isString = isString;
-  anim8.isArray = isArray;
-  anim8.isObject = isObject;
-  anim8.isEmpty = isEmpty;
-  anim8.now = now;
-  anim8.trim = trim;
-  anim8.toArray = toArray;
-  anim8.copy = copy;
-  anim8.extend = extend;
-  anim8.coalesce = coalesce;
-  anim8.constant = constant;
-  anim8.resolve = resolve;
-  anim8.clamp = clamp;
-  anim8.id = id;
 
-  // Core
+  // Classes
   anim8.Aninmation = Animation;
   anim8.Animator = Animator;
   anim8.Animators = Animators;
