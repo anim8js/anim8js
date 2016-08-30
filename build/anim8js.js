@@ -297,6 +297,44 @@ var Defaults =
 };
 
 
+var DelegateTypes =
+{
+
+  /**
+   * this is returned at the end.
+   *
+   * @property THIS
+   * @for DelegateTypes
+   */
+  THIS: 'this',
+
+  /**
+   * An array of results for each method call is returned.
+   *
+   * @property RESULTS
+   * @for DelegateTypes
+   */
+  RESULTS: 'results',
+
+  /**
+   * The result of the first element.
+   *
+   * @property RETURN_FIRST
+   * @for delegate
+   */
+  FIRST: 'first',
+
+  /**
+   * True if any of the methods return true, otherwise false.
+   *
+   * @property RETURN_TRUE
+   * @for delegate
+   */
+  TRUE: 'true'
+
+};
+
+
 
 /**
  * @class Core
@@ -2716,7 +2754,7 @@ Class.define( Animators,
    * @method restore
    * @chainable
    */
-  restore               : delegate( 'restore', delegate.RETURN_THIS ),
+  restore               : delegate( 'restore', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/placeAttrimator:method"}}{{/crossLink}} on
@@ -2725,7 +2763,7 @@ Class.define( Animators,
    * @method placeAttrimator
    * @chainable
    */
-  placeAttrimator       : delegate( 'placeAttrimator', delegate.RETURN_THIS ),
+  placeAttrimator       : delegate( 'placeAttrimator', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/applyInitialState:method"}}{{/crossLink}} on
@@ -2734,7 +2772,7 @@ Class.define( Animators,
    * @method applyInitialState
    * @chainable
    */
-  applyInitialState     : delegate( 'applyInitialState', delegate.RETURN_THIS ),
+  applyInitialState     : delegate( 'applyInitialState', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/trimAttrimators:method"}}{{/crossLink}} on
@@ -2743,7 +2781,7 @@ Class.define( Animators,
    * @method trimAttrimators
    * @chainable
    */
-  trimAttrimators       : delegate( 'trimAttrimators', delegate.RETURN_THIS ),
+  trimAttrimators       : delegate( 'trimAttrimators', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/deactivate:method"}}{{/crossLink}} on
@@ -2752,7 +2790,7 @@ Class.define( Animators,
    * @method deactivate
    * @chainable
    */
-  deactivate            : delegate( 'deactivate', delegate.RETURN_THIS ),
+  deactivate            : delegate( 'deactivate', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/destroy:method"}}{{/crossLink}} on
@@ -2761,7 +2799,7 @@ Class.define( Animators,
    * @method destroy
    * @chainable
    */
-  destroy               : delegate( 'destroy', delegate.RETURN_THIS ),
+  destroy               : delegate( 'destroy', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/spring:method"}}{{/crossLink}} on
@@ -2770,7 +2808,7 @@ Class.define( Animators,
    * @method spring
    * @chainable
    */
-  spring                : delegate( 'spring', delegate.RETURN_RESULTS ),
+  spring                : delegate( 'spring', DelegateTypes.RESULTS ),
 
   /**
    * Calls {{#crossLink "Animator/play:method"}}{{/crossLink}} on
@@ -2779,7 +2817,7 @@ Class.define( Animators,
    * @method play
    * @chainable
    */
-  play                  : delegate( 'play', delegate.RETURN_THIS ),
+  play                  : delegate( 'play', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/playAttrimators:method"}}{{/crossLink}} on
@@ -2789,7 +2827,7 @@ Class.define( Animators,
    * @chainable
    * @protected
    */
-  playAttrimators       : delegate( 'playAttrimators', delegate.RETURN_THIS ),
+  playAttrimators       : delegate( 'playAttrimators', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/queue:method"}}{{/crossLink}} on
@@ -2798,7 +2836,7 @@ Class.define( Animators,
    * @method queue
    * @chainable
    */
-  queue                 : delegate( 'queue', delegate.RETURN_THIS ),
+  queue                 : delegate( 'queue', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/queueAttrimators:method"}}{{/crossLink}} on
@@ -2808,7 +2846,7 @@ Class.define( Animators,
    * @chainable
    * @protected
    */
-  queueAttrimators      : delegate( 'queueAttrimators', delegate.RETURN_THIS ),
+  queueAttrimators      : delegate( 'queueAttrimators', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/transition:method"}}{{/crossLink}} on
@@ -2817,7 +2855,7 @@ Class.define( Animators,
    * @method transition
    * @chainable
    */
-  transition            : delegate( 'transition', delegate.RETURN_THIS ),
+  transition            : delegate( 'transition', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/transitionAttrimators:method"}}{{/crossLink}}
@@ -2827,7 +2865,7 @@ Class.define( Animators,
    * @chainable
    * @protected
    */
-  transitionAttrimators : delegate( 'transitionAttrimators', delegate.RETURN_THIS ),
+  transitionAttrimators : delegate( 'transitionAttrimators', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tween:method"}}{{/crossLink}} on
@@ -2836,7 +2874,7 @@ Class.define( Animators,
    * @method tween
    * @chainable
    */
-  tween                 : delegate( 'tween', delegate.RETURN_THIS ),
+  tween                 : delegate( 'tween', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tweenTo:method"}}{{/crossLink}} on
@@ -2845,7 +2883,7 @@ Class.define( Animators,
    * @method tweenTo
    * @chainable
    */
-  tweenTo               : delegate( 'tweenTo', delegate.RETURN_THIS ),
+  tweenTo               : delegate( 'tweenTo', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tweenFrom:method"}}{{/crossLink}} on
@@ -2854,7 +2892,7 @@ Class.define( Animators,
    * @method tweenFrom
    * @chainable
    */
-  tweenFrom             : delegate( 'tweenFrom', delegate.RETURN_THIS ),
+  tweenFrom             : delegate( 'tweenFrom', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tweenMany:method"}}{{/crossLink}} on
@@ -2863,7 +2901,7 @@ Class.define( Animators,
    * @method tweenMany
    * @chainable
    */
-  tweenMany             : delegate( 'tweenMany', delegate.RETURN_THIS ),
+  tweenMany             : delegate( 'tweenMany', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tweenManyTo:method"}}{{/crossLink}} on
@@ -2872,7 +2910,7 @@ Class.define( Animators,
    * @method tweenManyTo
    * @chainable
    */
-  tweenManyTo           : delegate( 'tweenManyTo', delegate.RETURN_THIS ),
+  tweenManyTo           : delegate( 'tweenManyTo', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/tweenManyFrom:method"}}{{/crossLink}} on
@@ -2881,7 +2919,7 @@ Class.define( Animators,
    * @method tweenManyFrom
    * @chainable
    */
-  tweenManyFrom         : delegate( 'tweenManyFrom', delegate.RETURN_THIS ),
+  tweenManyFrom         : delegate( 'tweenManyFrom', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/move:method"}}{{/crossLink}} on
@@ -2890,7 +2928,7 @@ Class.define( Animators,
    * @method move
    * @chainable
    */
-  move                  : delegate( 'move', delegate.RETURN_THIS ),
+  move                  : delegate( 'move', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/moveMany:method"}}{{/crossLink}} on
@@ -2899,7 +2937,7 @@ Class.define( Animators,
    * @method moveMany
    * @chainable
    */
-  moveMany              : delegate( 'moveMany', delegate.RETURN_THIS ),
+  moveMany              : delegate( 'moveMany', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/follow:method"}}{{/crossLink}} on
@@ -2908,7 +2946,7 @@ Class.define( Animators,
    * @method follow
    * @chainable
    */
-  follow                : delegate( 'follow', delegate.RETURN_THIS ),
+  follow                : delegate( 'follow', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/attrimatorsFor:method"}}{{/crossLink}} on
@@ -2917,7 +2955,7 @@ Class.define( Animators,
    * @method attrimatorsFor
    * @chainable
    */
-  attrimatorsFor        : delegate( 'attrimatorsFor', delegate.RETURN_RESULTS ),
+  attrimatorsFor        : delegate( 'attrimatorsFor', DelegateTypes.RESULTS ),
 
   /**
    * Calls {{#crossLink "Animator/stop:method"}}{{/crossLink}} on
@@ -2926,7 +2964,7 @@ Class.define( Animators,
    * @method stop
    * @chainable
    */
-  stop                  : delegate( 'stop', delegate.RETURN_THIS ),
+  stop                  : delegate( 'stop', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/end:method"}}{{/crossLink}} on
@@ -2935,7 +2973,7 @@ Class.define( Animators,
    * @method end
    * @chainable
    */
-  end                   : delegate( 'end', delegate.RETURN_THIS ),
+  end                   : delegate( 'end', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/finish:method"}}{{/crossLink}} on
@@ -2944,7 +2982,7 @@ Class.define( Animators,
    * @method finish
    * @chainable
    */
-  finish                : delegate( 'finish', delegate.RETURN_THIS ),
+  finish                : delegate( 'finish', DelegateTypes.THIS ),
 
 /**
    * Calls {{#crossLink "Animator/nopeat:method"}}{{/crossLink}} on
@@ -2953,7 +2991,7 @@ Class.define( Animators,
    * @method nopeat
    * @chainable
    */
-  nopeat                : delegate( 'nopeat', delegate.RETURN_THIS ),
+  nopeat                : delegate( 'nopeat', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/pause:method"}}{{/crossLink}} on
@@ -2962,7 +3000,7 @@ Class.define( Animators,
    * @method pause
    * @chainable
    */
-  pause                 : delegate( 'pause', delegate.RETURN_THIS ),
+  pause                 : delegate( 'pause', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/resume:method"}}{{/crossLink}} on
@@ -2971,7 +3009,7 @@ Class.define( Animators,
    * @method resume
    * @chainable
    */
-  resume                : delegate( 'resume', delegate.RETURN_THIS ),
+  resume                : delegate( 'resume', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/set:method"}}{{/crossLink}} on
@@ -2980,7 +3018,7 @@ Class.define( Animators,
    * @method set
    * @chainable
    */
-  set                   : delegate( 'set', delegate.RETURN_THIS ),
+  set                   : delegate( 'set', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/unset:method"}}{{/crossLink}} on
@@ -2989,7 +3027,7 @@ Class.define( Animators,
    * @method unset
    * @chainable
    */
-  unset                 : delegate( 'unset', delegate.RETURN_THIS ),
+  unset                 : delegate( 'unset', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/get:method"}}{{/crossLink}} on
@@ -2998,7 +3036,7 @@ Class.define( Animators,
    * @method get
    * @chainable
    */
-  get                   : delegate( 'get', delegate.RETURN_FIRST ),
+  get                   : delegate( 'get', DelegateTypes.FIRST ),
 
   /**
    * Calls {{#crossLink "Animator/hasAttrimators:method"}}{{/crossLink}} on
@@ -3007,7 +3045,7 @@ Class.define( Animators,
    * @method hasAttrimators
    * @chainable
    */
-  hasAttrimators        : delegate( 'hasAttrimators', delegate.RETURN_TRUE ),
+  hasAttrimators        : delegate( 'hasAttrimators', DelegateTypes.TRUE ),
 
   /**
    * Calls {{#crossLink "Animator/invoke:method"}}{{/crossLink}} on
@@ -3016,7 +3054,7 @@ Class.define( Animators,
    * @method invoke
    * @chainable
    */
-  invoke                : delegate( 'invoke', delegate.RETURN_THIS ),
+  invoke                : delegate( 'invoke', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/onCycleStart:method"}}{{/crossLink}} on
@@ -3025,7 +3063,7 @@ Class.define( Animators,
    * @method onCycleStart
    * @chainable
    */
-  onCycleStart          : delegate( 'onCycleStart', delegate.RETURN_THIS ),
+  onCycleStart          : delegate( 'onCycleStart', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/onCycleEnd:method"}}{{/crossLink}} on
@@ -3034,7 +3072,7 @@ Class.define( Animators,
    * @method onCycleEnd
    * @chainable
    */
-  onCycleEnd            : delegate( 'onCycleEnd', delegate.RETURN_THIS ),
+  onCycleEnd            : delegate( 'onCycleEnd', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/on:method"}}{{/crossLink}} on
@@ -3043,7 +3081,7 @@ Class.define( Animators,
    * @method on
    * @chainable
    */
-  on                    : delegate( 'on', delegate.RETURN_THIS ),
+  on                    : delegate( 'on', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/once:method"}}{{/crossLink}} on
@@ -3052,7 +3090,7 @@ Class.define( Animators,
    * @method once
    * @chainable
    */
-  once                  : delegate( 'once', delegate.RETURN_THIS ),
+  once                  : delegate( 'once', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/off:method"}}{{/crossLink}} on
@@ -3061,7 +3099,7 @@ Class.define( Animators,
    * @method off
    * @chainable
    */
-  off                   : delegate( 'off', delegate.RETURN_THIS ),
+  off                   : delegate( 'off', DelegateTypes.THIS ),
 
   /**
    * Calls {{#crossLink "Animator/trigger:method"}}{{/crossLink}} on
@@ -3070,7 +3108,7 @@ Class.define( Animators,
    * @method trigger
    * @chainable
    */
-  trigger               : delegate( 'trigger', delegate.RETURN_THIS )
+  trigger               : delegate( 'trigger', DelegateTypes.THIS )
 
 });
 
@@ -5814,14 +5852,17 @@ Class.extend( Event, Attrimator,
   {
     var value = baseValue;
 
-    if (this.path.calculator.isValid( baseValue ))
+    // TODO pull defaultValue from attribute
+    if (!this.path.calculator.isValid( baseValue ))
     {
-      value = this.computeValue( value, delta );
+      value = this.path.calculator.create();
+    }
 
-      if ( value !== false )
-      {
-        frame[ this.attribute ] = value;
-      }
+    value = this.computeValue( value, delta );
+
+    if ( value !== false )
+    {
+      frame[ this.attribute ] = value;
     }
 
     return value;
@@ -8122,7 +8163,7 @@ function delegate(functionName, returning)
 {
   switch (returning)
   {
-  case delegate.RETURN_THIS:
+  case DelegateTypes.THIS:
     return function()
     {
       var array = this.$ || this;
@@ -8135,7 +8176,7 @@ function delegate(functionName, returning)
       return this;
     };
 
-  case delegate.RETURN_RESULTS:
+  case DelegateTypes.RESULTS:
     return function()
     {
       var array = this.$ || this;
@@ -8149,7 +8190,7 @@ function delegate(functionName, returning)
       return results;
     };
 
-  case delegate.RETURN_FIRST:
+  case DelegateTypes.FIRST:
     return function()
     {
       var array = this.$ || this;
@@ -8157,7 +8198,7 @@ function delegate(functionName, returning)
       return array.length === 0 ? undefined : array[0][functionName].apply( array[0], arguments );
     };
 
-  case delegate.RETURN_TRUE:
+  case DelegateTypes.TRUE:
     return function()
     {
       var array = this.$ || this;
@@ -8177,38 +8218,6 @@ function delegate(functionName, returning)
 
   return noop;
 }
-
-/**
- * this is returned at the end.
- *
- * @property RETURN_THIS
- * @for delegate
- */
-delegate.RETURN_THIS = 'this';
-
-/**
- * An array of results for each method call is returned.
- *
- * @property RETURN_RESULTS
- * @for delegate
- */
-delegate.RETURN_RESULTS = 'results';
-
-/**
- * The result of the first element.
- *
- * @property RETURN_FIRST
- * @for delegate
- */
-delegate.RETURN_FIRST = 'first';
-
-/**
- * True if any of the methods return true, otherwise false.
- *
- * @property RETURN_TRUE
- * @for delegate
- */
-delegate.RETURN_TRUE = 'true';
 
 
 /**

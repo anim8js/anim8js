@@ -11,7 +11,7 @@ function delegate(functionName, returning)
 {
   switch (returning)
   {
-  case delegate.RETURN_THIS:
+  case DelegateTypes.THIS:
     return function()
     {
       var array = this.$ || this;
@@ -24,7 +24,7 @@ function delegate(functionName, returning)
       return this;
     };
 
-  case delegate.RETURN_RESULTS:
+  case DelegateTypes.RESULTS:
     return function()
     {
       var array = this.$ || this;
@@ -38,7 +38,7 @@ function delegate(functionName, returning)
       return results;
     };
 
-  case delegate.RETURN_FIRST:
+  case DelegateTypes.FIRST:
     return function()
     {
       var array = this.$ || this;
@@ -46,7 +46,7 @@ function delegate(functionName, returning)
       return array.length === 0 ? undefined : array[0][functionName].apply( array[0], arguments );
     };
 
-  case delegate.RETURN_TRUE:
+  case DelegateTypes.TRUE:
     return function()
     {
       var array = this.$ || this;
@@ -66,35 +66,3 @@ function delegate(functionName, returning)
 
   return noop;
 }
-
-/**
- * this is returned at the end.
- *
- * @property RETURN_THIS
- * @for delegate
- */
-delegate.RETURN_THIS = 'this';
-
-/**
- * An array of results for each method call is returned.
- *
- * @property RETURN_RESULTS
- * @for delegate
- */
-delegate.RETURN_RESULTS = 'results';
-
-/**
- * The result of the first element.
- *
- * @property RETURN_FIRST
- * @for delegate
- */
-delegate.RETURN_FIRST = 'first';
-
-/**
- * True if any of the methods return true, otherwise false.
- *
- * @property RETURN_TRUE
- * @for delegate
- */
-delegate.RETURN_TRUE = 'true';

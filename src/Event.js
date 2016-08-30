@@ -153,14 +153,17 @@ Class.extend( Event, Attrimator,
   {
     var value = baseValue;
 
-    if (this.path.calculator.isValid( baseValue ))
+    // TODO pull defaultValue from attribute
+    if (!this.path.calculator.isValid( baseValue ))
     {
-      value = this.computeValue( value, delta );
+      value = this.path.calculator.create();
+    }
 
-      if ( value !== false )
-      {
-        frame[ this.attribute ] = value;
-      }
+    value = this.computeValue( value, delta );
+
+    if ( value !== false )
+    {
+      frame[ this.attribute ] = value;
     }
 
     return value;
