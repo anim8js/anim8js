@@ -55,16 +55,16 @@ function $animation(animation, options, cache)
   {
     var key = animation.toLowerCase();
 
-    if ( key in animation && !hasOptions )
+    if ( key in Animations && !hasOptions )
     {
-      return animation[ key ];
+      return Animations[ key ];
     }
 
     var attrimators = $attrimatorsFor( animation, options, cache );
 
-    if ( key in animation && !hasOptions )
+    if ( key in Animations && !hasOptions )
     {
-      return animation[ key ];
+      return Animations[ key ];
     }
 
     return new Animation( false, {}, options, attrimators );
