@@ -191,7 +191,7 @@ Class.extend( Event, Attrimator,
   },
   startCycle: function(frame)
   {
-    if ( this.hasInitialState )
+    if ( this.hasInitialState && this.attribute in frame )
     {
       return this.applyValue( frame, frame[ this.attribute ], 0 );
     }
