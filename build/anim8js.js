@@ -5812,11 +5812,16 @@ Class.extend( Event, Attrimator,
    */
   applyValue: function(frame, baseValue, delta)
   {
-    var value = this.computeValue( baseValue, delta );
+    var value = baseValue;
 
-    if ( value !== false )
+    if (this.path.calculator.isValid( baseValue ))
     {
-      frame[ this.attribute ] = value;
+      value = this.computeValue( value, delta );
+
+      if ( value !== false )
+      {
+        frame[ this.attribute ] = value;
+      }
     }
 
     return value;
@@ -5852,7 +5857,7 @@ Class.extend( Event, Attrimator,
   },
   startCycle: function(frame)
   {
-    if ( this.hasInitialState && this.attribute in frame )
+    if ( this.hasInitialState )
     {
       return this.applyValue( frame, frame[ this.attribute ], 0 );
     }
