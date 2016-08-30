@@ -5,7 +5,11 @@ var Class =
 
   extend: function(construct, parentConstructor, properties)
   {
-    construct.prototype = new parentConstructor();
+    function F() {}
+
+    F.prototype = parentConstructor.prototype;
+
+    construct.prototype = new F();
 
     if ( isObject( properties ) )
     {
