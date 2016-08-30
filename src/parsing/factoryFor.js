@@ -15,7 +15,7 @@ function $factoryFor(subject, optional)
 
   for (var factoryName in Factories)
   {
-    var factory = factory[ factoryName ];
+    var factory = Factories[ factoryName ];
 
     if ( factory.is( subject ) && (highestPriorityFactory === false || highestPriorityFactory.priority < factory.priority) )
     {
