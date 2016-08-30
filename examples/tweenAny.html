@@ -324,7 +324,7 @@
       <button id="p2_length_tween" class="right">Tween</button>
 
     </div>
-    
+
     <div class="grouping">
 
       <select id="p3_length_attribute" class="attribute">
@@ -375,9 +375,11 @@
 
   </div>
 
-    <script src="../build/anim8js-dom.js"></script>
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <script src="examples.js"></script>
-    
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
@@ -417,7 +419,7 @@
       $listen( p1_length_attribute, 'change', function()
       {
         var attr = p1_length_attribute.value;
-        var definition = anim8.dom.attribute[ attr ];
+        var definition = anim8.dom.Attributes[ attr ];
 
         p1_length.value = definition.defaultValue;
         p1_length_unit.value = definition.defaultUnit;
@@ -453,7 +455,7 @@
       $listen( p1_angle_attribute, 'change', function()
       {
         var attr = p1_angle_attribute.value;
-        var definition = anim8.dom.attribute[ attr ];
+        var definition = anim8.dom.Attributes[ attr ];
 
         p1_angle.value = definition.defaultValue;
         p1_angle_unit.value = definition.defaultUnit;
@@ -490,7 +492,7 @@
       $listen( p2_length_attribute, 'change', function()
       {
         var attr = p2_length_attribute.value;
-        var definition = anim8.dom.attribute[ attr ];
+        var definition = anim8.dom.Attributes[ attr ];
 
         p2_length_x.value = definition.defaultValue.x;
         p2_length_y.value = definition.defaultValue.y;
@@ -529,7 +531,7 @@
       $listen( p3_length_attribute, 'change', function()
       {
         var attr = p3_length_attribute.value;
-        var definition = anim8.dom.attribute[ attr ];
+        var definition = anim8.dom.Attributes[ attr ];
 
         p3_length_x.value = definition.defaultValue.x;
         p3_length_y.value = definition.defaultValue.y;
@@ -560,16 +562,16 @@
 
         if ( attr in response )
         {
-          rgb_value.value = anim8.color.format( response[ attr ] );
+          rgb_value.value = anim8.Color.format( response[ attr ] );
         }
       };
 
       $listen( rgb_attribute, 'change', function()
       {
         var attr = rgb_attribute.value;
-        var definition = anim8.dom.attribute[ attr ];
+        var definition = anim8.dom.Attributes[ attr ];
 
-        rgb_value.value = anim8.color.format( definition.defaultValue );
+        rgb_value.value = anim8.Color.format( definition.defaultValue );
 
         rgb_update();
       });
@@ -579,7 +581,7 @@
         anim8or.tweenTo( rgb_attribute.value, rgb_value.value, getOptions() );
       });
 
-      for (var easing in anim8.easing)
+      for (var easing in anim8.Easings)
       {
         var o = document.createElement('option');
         o.value = easing;
@@ -587,9 +589,9 @@
         option_easing.appendChild( o );
       }
 
-      option_easing.value = anim8.defaults.easing;
+      option_easing.value = anim8.Defaults.easing;
 
-      for (var easingType in anim8.easingType)
+      for (var easingType in anim8.EasingsTypes)
       {
         var o = document.createElement('option');
         o.value = easingType;
@@ -602,9 +604,8 @@
       p2_length_update();
       p3_length_update();
       rgb_update();
-      
+
     </script>
-    
+
   </body>
 </html>
-  

@@ -20,11 +20,12 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box1">Hello</div>
-  
-    <script src="../build/anim8js-dom.js"></script>
-    
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
@@ -34,20 +35,19 @@
       m8( window.box1 ).play({
         keyframe: {
           from: {
-            textShadowPosition: 10, 
+            textShadowPosition: 10,
             textShadowColor: {r:0, g:0, b:0, a:0},
             textShadowBlur: 30
           },
           to: {
-            textShadowPosition: 4, 
+            textShadowPosition: 4,
             textShadowColor: {r:200, g:200, b:200, a:255},
             textShadowBlur: 0
           }
         }
       }, '4s');
-      
+
     </script>
-    
+
   </body>
 </html>
-  

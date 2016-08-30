@@ -12,10 +12,10 @@ function getRandomPoint()
 {
   return {
     x: Math.random() * (windowWidth() - 100) + 50,
-    y: Math.random() * (windowHeight() - 100) + 50 
+    y: Math.random() * (windowHeight() - 100) + 50
   };
 }
-getRandomPoint.computed = true;
+anim8.computed( getRandomPoint );
 
 function getPageMouse(e)
 {
@@ -29,7 +29,7 @@ function getPageMouse(e)
     };
   }
 
-  if ( typeof ev.pageX === 'undefined' ) 
+  if ( typeof ev.pageX === 'undefined' )
   {
     return {
       x: ev.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
@@ -70,7 +70,7 @@ function getOffsetMouse(e)
   var style = target.currentStyle || window.getComputedStyle(target, null);
   var borderLeftWidth = parseInt(style['borderLeftWidth'], 10);
   var borderTopWidth = parseInt(style['borderTopWidth'], 10);
-  
+
   return {
     x: client.x - borderLeftWidth - bounds.left,
     y: client.y - borderTopWidth - bounds.top
@@ -95,7 +95,7 @@ function $listen(object, type, callback)
   {
     try
     {
-      object.attachEvent( 'on' + type, listener ); 
+      object.attachEvent( 'on' + type, listener );
     }
     catch (ee)
     {
@@ -115,7 +115,7 @@ function $listen(object, type, callback)
 
 /* Mouse Movement, whether you want it or not */
 
-function MousePosition() 
+function MousePosition()
 {
   return {
     x: MousePosition.x,

@@ -36,22 +36,23 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box1"></div>
     <div id="box2"></div>
     <div id="center"></div>
-  
-    <script src="../build/anim8js-dom.js"></script>
-    
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
-    
+
       var sprite1 = m8( window.box1 );
       var sprite2 = m8( window.box2 );
-      
+
       sprite1.play({
         keyframe: {
           '0': {
@@ -79,7 +80,7 @@
         duration: '3s',
         repeat: 100
       });
-      
+
       sprite2.spring(
       {
         type: 'distance',
@@ -91,9 +92,8 @@
         stiffness: -30,
         gravity: {x: 0, y:1000}
       });
-      
+
     </script>
-    
+
   </body>
 </html>
-  

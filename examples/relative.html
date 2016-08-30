@@ -20,22 +20,23 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box1"></div>
   
-    <script src="../build/anim8js-dom.js"></script>
-    
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
 
       function HalfwayThere()
       {
         console.log('HalfwayThere!');
       }
-      
+
       m8( window.box1 )
         .tween('opacity', true, '-0.5', '2s ~1s')
         .defer('once', 'finished')
@@ -56,7 +57,6 @@
       ;
 
     </script>
-    
+
   </body>
 </html>
-  

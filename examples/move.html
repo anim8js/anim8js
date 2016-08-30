@@ -16,18 +16,20 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box1"></div>
-  
-    <script src="../build/anim8js-dom.js"></script>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <script src="examples.js"></script>
-    
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
-      
+
       anim8.save('moveLeft', {
         move: {
           left: -100,
@@ -84,12 +86,11 @@
         if ( ev.keyCode >= 37 && ev.keyCode <= 40 )
         {
           anim8or.onCycleStart( cycleStart );
-          anim8or.onCycleEnd( cycleEnd ); 
+          anim8or.onCycleEnd( cycleEnd );
         }
       });
-      
+
     </script>
-    
+
   </body>
 </html>
-  

@@ -19,28 +19,28 @@
     </style>
   </head>
   <body>
-    
-    <div id="box" data-intro="zoomInRight 2s" data-emphasis="pulse 2s x3 quad-out !5" data-outro="hinge" data-last="tada"></div>
-    
-		<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 
-    <script src="../build/anim8js-jquery.js"></script>
-    <script src="../build/anim8js-animate.css.js"></script>
-    
+    <div id="box" data-intro="zoomInRight 2s" data-emphasis="pulse 2s x3 quad-out !5" data-outro="hinge" data-last="tada"></div>
+
+    <script src="../assets/js/jquery.js"></script>
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+    <script src="../assets/js/anim8js-jquery.js"></script>
+    <script src="../assets/js/anim8js-animate.css.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
-      
+
       $('#box')
         .dataPlay('intro')
         .dataQueue('emphasis')
         .dataQueue('outro')
       ;
-      
+
     </script>
-    
+
   </body>
 </html>
-  

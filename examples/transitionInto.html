@@ -18,38 +18,39 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box"></div>
-		
-    <script src="../build/anim8js-dom.js"></script>
-    <script src="../build/anim8js-animate.css.js"></script>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <script src="examples.js"></script>
 
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-		
+
     <script>
-      
+
       anim8.save('randomPoint', {
         tweenTo: {
           center: getRandomPoint
         }
       });
-      
+
       var anim8or = m8( window.box );
-      
+
       anim8or.play('randomPoint');
-      
+
       setInterval( function()
-      {        
+      {
         if ( !anim8or.hasAttrimators() )
         {
           anim8or.play('randomPoint 3s');
         }
-        
+
       }, 2000);
-      
+
       var animateTo = function(mouse)
       {
         if (anim8or.hasAttrimators())
@@ -63,15 +64,14 @@
                 center: getRandomPoint()
               }
             }
-          }); 
+          });
         }
       };
 
       $listen( document, 'click', animateTo );
       $listen( document, 'touchstart', animateTo );
-            
+
     </script>
-    
+
   </body>
 </html>
-  

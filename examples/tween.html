@@ -18,18 +18,20 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box"></div>
-		
-    <script src="../build/anim8js-dom.js"></script>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <script src="examples.js"></script>
 
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-		
+
     <script>
-      
+
       var updateAnimation = function(mouse)
       {
         m8( window.box ).tween( 'center', mouse, getRandomPoint() );
@@ -37,9 +39,8 @@
 
       $listen( document, 'click', updateAnimation );
       $listen( document, 'touchstart', updateAnimation );
-      
+
     </script>
-    
+
   </body>
 </html>
-  

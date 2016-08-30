@@ -1,0 +1,41 @@
+{
+  "name": "anim8js-docs",
+  "homepage": "https://github.com/ClickerMonkey/anim8js",
+  "authors": [
+    "Philip Diffenderfer <pdiffenderfer@gmail.com>"
+  ],
+  "description": "anim8js website",
+  "main": "index.html",
+  "keywords": [
+    "anim8js",
+    "javascript",
+    "animation",
+    "pixi",
+    "easel",
+    "jquery",
+    "dom",
+    "animate",
+    "animate.css",
+    "easing",
+    "animator"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "anim8js": "master",
+    "anim8js-dom": "master",
+    "anim8js-animate.css": "^1.0.0",
+    "anim8js-jquery": "^1.0.0"
+  },
+  "resolutions": {
+    "anim8js": "master",
+    "anim8js-dom": "master"
+  }
+}

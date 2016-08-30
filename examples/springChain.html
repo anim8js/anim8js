@@ -18,23 +18,25 @@
     </style>
   </head>
   <body>
-    
+
     <div class="box" id="box1"></div>
     <div class="box" id="box2"></div>
     <div class="box" id="box3"></div>
     <div class="box" id="box4"></div>
     <div class="box" id="box5"></div>
     <div class="box" id="box6"></div>
-  
-    <script src="../build/anim8js-dom.js"></script>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <script src="examples.js"></script>
-    
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
-      
+
       var previous = MousePosition;
 
       for (var i = 1; i <= 6; i++)
@@ -46,16 +48,15 @@
           type: 'distance',
           attribute: 'center',
           rest: previous,
-          distance: 100,
+          distance: 50,
           damping: 20,
           stiffness: -100
         });
 
         previous = m8( e ).ref( 'center' );
       }
-      
+
     </script>
-    
+
   </body>
 </html>
-  

@@ -24,23 +24,24 @@
       -webkit-background-clip: text;
       background-image: -webkit-linear-gradient(92deg,#f35626,#feab3a);
     }
-    
+
     </style>
   </head>
   <body>
-    
+
     <div id="text">
       anim8js filters
     </div>
-  
-    <script src="../build/anim8js-dom.js"></script>
-    
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-    
+
     <script>
-    
+
       m8( window.text ).play({
         keyframe: {
           from: {
@@ -54,7 +55,7 @@
         duration: '20s',
         repeat: Number.POSITIVE_INFINITY
       });
-      
+
       m8( window.text ).play({
         keyframe: {
           '0': {
@@ -75,9 +76,8 @@
         teasing: 'quad-yoyo',
         repeat: Number.POSITIVE_INFINITY
       });
-      
+
     </script>
-    
+
   </body>
 </html>
-  

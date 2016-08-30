@@ -20,34 +20,30 @@
     </style>
   </head>
   <body>
-    
+
     <div id="box1"></div>
-  
-    <script src="../build/anim8js-dom.js"></script>
-    
-    <!--[if lte IE 8]>
-    <script src="../build/anim8js-ie.js"></script>
-    <![endif]-->
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
 
     <script>
 
       m8( window.box1 ).play({
         keyframe: {
           from: {
-            shadowPosition: 10, 
+            shadowPosition: 10,
             shadowColor: {r:0, g:0, b:0, a:0},
             shadowBlur: 30
           },
           to: {
-            shadowPosition: 4, 
+            shadowPosition: 4,
             shadowColor: {r:0, g:0, b:0, a:255},
             shadowBlur: 0
           }
         }
       }, '4s');
-      
+
     </script>
-    
+
   </body>
 </html>
-  

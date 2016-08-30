@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>    
+  <head>
     <style>
     body, html {
       padding: 0;
@@ -95,12 +95,12 @@
       position: absolute;
       background-color: #AAA;
     }
-    
-    
+
+
     </style>
   </head>
   <body>
-    
+
     <div id="container">
       <div id="box"></div>
       <div id="box2"></div>
@@ -111,7 +111,7 @@
       <div id="box7"></div>
       <div id="box8"></div>
     </div>
-    
+
     <div id="container2">
       <img id="img1" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/392/redwood-ukulele-top.jpg">
     <!--
@@ -124,15 +124,16 @@
       -->
     </div>
 			
-    <script src="../build/anim8js-dom.js"></script>
-    <script src="../build/anim8js-animate.css.js"></script>
-    
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+    <script src="../assets/js/anim8js-animate.css.js"></script>
+
     <!--[if lte IE 8]>
     <script src="../build/anim8js-ie.js"></script>
     <![endif]-->
-		
+
     <script>
-      	
+
       anim8.save( 'bounceRotate', {
         keyframe: {
           '0.0': {
@@ -151,18 +152,18 @@
       }, {
         repeat: 4
       });
-    	
-      anim8(window.box2).play('bounceRotate');      
+
+      anim8(window.box2).play('bounceRotate');
       anim8(window.box5).play('bounce');
       anim8(window.box6).play('rubberBand');
-			
+
 			anim8(window.box7).play({
 				deltas: [0.0, 0.8, 1.0],
 				values: {
 					rotate: [0, 360, 0]
 				}
 			});
-			
+
       anim8(window.img1).play({
 				keyframe: {
 	        '0.0,1.0': {
@@ -175,9 +176,9 @@
 			}, {
 				repeat: 20
 			});
-      
+
       /*
-      /* TODO remove after testing complete 
+      /* TODO remove after testing complete
       anim8.keyframe(window.box, {
         '0.0': {
           rotate: 0,
@@ -192,7 +193,7 @@
           scale: 1.0
         }
       }, 1000, 50);
-      
+
       anim8.keyframe(window.box2, {
         '0.0': {
           distance: 50,
@@ -207,7 +208,7 @@
           top: 130
         }
       }, 2000, 45);
-      
+
       anim8.keyframe(window.box3, {
         '0.0': {
           opacity: 1.0
@@ -219,7 +220,7 @@
           opacity: 0.8
         }
       }, 1000, 10);
-      
+
       anim8.keyframe(window.box4, {
         '0.0': {
           margin: 0
@@ -231,7 +232,7 @@
           margin: 40
         }
       }, 1000, 10);
-      
+
       anim8.keyframe(window.box7, {
         '0.0,1.0': {
           borderWidth: 1
@@ -240,7 +241,7 @@
           borderWidth: 10
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.box8, {
         '0.0,1.0': {
           blur: 0
@@ -249,7 +250,7 @@
           blur: 5
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img2, {
         '0.0,1.0': {
           sepia: 0
@@ -258,7 +259,7 @@
           sepia: 100
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img3, {
         '0.0,1.0': {
           saturate: 0
@@ -267,7 +268,7 @@
           saturate: 100
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img4, {
         '0.0,1.0': {
           hueRotate: 0
@@ -276,7 +277,7 @@
           hueRotate: 360
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img5, {
         '0.0,1.0': {
           invert: 0
@@ -285,7 +286,7 @@
           invert: 100
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img6, {
         '0.0,1.0': {
           brightness: 0
@@ -294,7 +295,7 @@
           brightness: 100
         }
       }, 1000, 20);
-      
+
       anim8.keyframe(window.img7, {
         '0.0,1.0': {
           contrast: 0
@@ -303,10 +304,10 @@
           contrast: 100
         }
       }, 1000, 20);
-      
+
       */
-      
-      
+
+
       // ====== ATTRIBUTES ======
       // width, minWidth, maxWidth
       // height, minHeiht, maxHeight
@@ -330,16 +331,15 @@
       // lineHeight
       // ===== COLOR ======
       // backgroundColor, color, borderTopColor, borderRightColor, borderBottomColor, borderLeftColor, outlineColor
-      
+
       // Get animator based on object passed in
-      
-      // Paths, Keyframes, 
-      
+
+      // Paths, Keyframes,
+
       // https://gist.githubusercontent.com/gre/1926947/raw/KeySpline.js
-    
-      
+
+
     </script>
-    
+
   </body>
 </html>
-  

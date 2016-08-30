@@ -1,0 +1,15 @@
+{
+  "name": "anim8js-docs",
+  "version": "1.0.0",
+  "description": "The ultimate animation library for javascript - animate everything!",
+  "author": "Philip Diffenderfer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ClickerMonkey/anim8js.git#gh-pages"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.10",
+    "wiredep": "^4.0.0"
+  }
+}

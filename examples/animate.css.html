@@ -10,7 +10,7 @@
   <link href="http://fonts.googleapis.com/css?family=Roboto:400,100,400italic,700italic,700" rel="stylesheet" type="text/css">
 
   <link rel="stylesheet" href="http://daneden.github.io/animate.css/style.css">
-  
+
   <style>
     #custom .input--dropdown {
       margin-left: 0px;
@@ -142,9 +142,9 @@
           <option value="slideOutDown">slideOutDown</option>
           <option value="slideOutLeft">slideOutLeft</option>
           <option value="slideOutRight">slideOutRight</option>
-          
+
         </optgroup>
-        
+
         <optgroup label="Zoom Entrances">
           <option value="zoomIn">zoomIn</option>
           <option value="zoomInDown">zoomInDown</option>
@@ -152,7 +152,7 @@
           <option value="zoomInRight">zoomInRight</option>
           <option value="zoomInUp">zoomInUp</option>
         </optgroup>
-        
+
         <optgroup label="Zoom Exits">
           <option value="zoomOut">zoomOut</option>
           <option value="zoomOutDown">zoomOutDown</option>
@@ -181,7 +181,7 @@
       <button class="butt js--triggerAnimation" type="button">Animate it</button>
       <button class="butt js--nextAnimation" type="button">&#8608;</button>
     </form>
-    
+
     <form id="custom">
       <select class="input input--dropdown js--action">
         <option value="slide">slide</option>
@@ -208,17 +208,16 @@
 
       <button class="butt js--triggerCustom" type="button">Custom Animate</button>
     </form>
-    
+
     <hr>
-    <p class="meta"><a href="https://raw.github.com/daneden/animate.css/master/animate.css" download="animate.css">Download Animate.css.js</a> or <a href="http://github.com/daneden/animate.css">View on GitHub</a></p>
   </div>
 </div><!-- /.site__content -->
 
-  <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-	
-  <script src="../build/anim8js-dom.js"></script>
-  <script src="../build/anim8js-animate.css.js"></script>
-    
+  <script src="../assets/js/jquery.js"></script>
+  <script src="../assets/js/anim8js.js"></script>
+  <script src="../assets/js/anim8js-dom.js"></script>
+  <script src="../assets/js/anim8js-animate.css.js"></script>
+
   <!--[if lte IE 8]>
   <script src="../build/anim8js-ie.js"></script>
   <![endif]-->
@@ -236,10 +235,10 @@
         .restore()
       .undefer()
     ;
-    
+
     return false;
   }
-  
+
   function playCustom()
   {
     m8( window.animationSandbox )
@@ -251,7 +250,7 @@
         .restore()
       .undefer()
     ;
-    
+
     return false;
   }
 
@@ -261,18 +260,18 @@
     $('.js--animations').change( playAnimation );
 
     $('.js--triggerCustom').click( playCustom );
-    
-    $('.js--nextAnimation').click( function() 
+
+    $('.js--nextAnimation').click( function()
     {
       var options = $('.js--animations option');
-      
+
       var i = options.index(options.filter(":selected"));
-      
-      if (i >= 0 && i < options.length - 1) 
+
+      if (i >= 0 && i < options.length - 1)
       {
         options.eq( i + 1 ).prop( "selected", true );
       }
-      
+
       options.closest( 'select' ).change();
     });
   });
