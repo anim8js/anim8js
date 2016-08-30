@@ -3,7 +3,7 @@ var Class =
 {
   superPrefix: '_',
 
-  create: function(construct, parentConstructor, properties)
+  extend: function(construct, parentConstructor, properties)
   {
     construct.prototype = new parentConstructor();
 
