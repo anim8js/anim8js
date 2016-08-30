@@ -45,7 +45,7 @@ Class.extend( FactoryObject, Factory,
       attribute = this.attributes[ attr ] = object.attribute( attr );
 
       var calculatorName = attribute.calculator;
-      var calculator = calculator( calculatorName );
+      var calculator = $calculator( calculatorName );
       var defaultValue = calculator.parse( attribute.defaultValue, calculator.ZERO );
 
       attribute.calculatorName = calculatorName;
