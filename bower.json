@@ -1,12 +1,12 @@
 {
   "name": "anim8js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage": "https://github.com/anim8js/anim8js",
   "authors": [
     "Philip Diffenderfer <pdiffenderfer@gmail.com>"
   ],
   "description": "A javascript REST ORM that is offline and real-time capable http://rekord.github.io/rekord/",
-  "main": "build/rekord.js",
+  "main": "build/anim8js.js",
   "keywords": [
     "javascript",
     "orm",
