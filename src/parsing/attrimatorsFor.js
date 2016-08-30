@@ -76,7 +76,7 @@ function $attrimatorsFor( animation, options, cache )
   else if ( isString( animation ) )
   {
     var key = animation.toLowerCase();
-    var saved = animation[ key ];
+    var saved = Animations[ key ];
     var cacheIt = coalesce( cache, Defaults.cache );
 
     if ( saved )
@@ -101,7 +101,7 @@ function $attrimatorsFor( animation, options, cache )
         {
           var animationString = trim( animationsMerged[ j ].toLowerCase() );
           var animationSplit = animationString.split( ' ' );
-          var parsedAnimation = animation[ animationSplit[ 0 ] ];
+          var parsedAnimation = Animations[ animationSplit[ 0 ] ];
 
           if ( parsedAnimation )
           {
@@ -135,7 +135,7 @@ function $attrimatorsFor( animation, options, cache )
 
       if ( cacheIt && !hasOptions )
       {
-        animation[ key ] = new Animation( animation, {}, {}, attrimators );
+        Animations[ key ] = new Animation( animation, {}, {}, attrimators );
       }
     }
   }
