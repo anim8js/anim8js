@@ -6,6 +6,12 @@ Inspired by the [animate.css](http://daneden.github.io/animate.css/) library - a
 It's as easy as `anim8( button ).play('tada ~0.5s 1.5s x4 z100ms ease-inout')` - which plays the `tada` animation
 in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between using the easing function `ease-inout`.
 
+### Installation
+
+- `bower install anim8js` (anim8js-dom, anim8js-jquery, & anim8js-animate.css packages are also available)
+- `npm install anim8js`
+- Direct Download [anim8js.js](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.js) or [anim8js.min.js](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.min.js) (with [anim8js.min.map](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.min.js.map))
+
 ### Features  
 1. Play animations by name, name & modifiers, or by custom definition.
 2. Queue animations.
