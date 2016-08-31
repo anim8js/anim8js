@@ -26,9 +26,7 @@ anim8.save('undoTada', {
 
 anim8.save('pulseWords', {
   values: {
-    scale: [1, 1.1, 1],
-    backgroundColor: ['#f3f6fa', '#383e41', '#f3f6fa'],
-    color: ['#383e41', '#f3f6fa', '#383e41']
+    scale: [1, 1.05, 1]
   }
 });
 
