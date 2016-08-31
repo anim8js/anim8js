@@ -1,0 +1,71 @@
+div.sequenced,
+code.inline {
+  position: relative;
+  display: inline-block;
+  white-space: pre;
+}
+.btn {
+  box-sizing: border-box;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+.page-header {
+  padding-bottom: 10px;
+  padding-top: 20px;
+}
+
+.main-control {
+  padding: 8px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+  background-color: #159957;
+  background-image: linear-gradient(120deg, #155799, #159957);
+}
+.main-control p {
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+body {
+  margin-bottom: 90px;
+}
+
+iframe[name=example] {
+  width: 100%;
+  height: 500px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+}
+
+.show-underlines {
+  text-align: center;
+}
+
+.active[target=example] {
+  background-color: #155799;
+  color: #fff;
+}
+.active[target=example]:hover {
+  background-color: #159957;
+}
+
+[target=example] {
+  display: inline-block;
+  color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 0.3rem;
+  text-decoration: none;
+  padding: 0.1rem 0.5rem;
+  margin-bottom: 2px;
+}
+[target=example]:hover {
+  text-decoration: none;
+  background-color: rgba(0, 0, 0, 0.08);
+}

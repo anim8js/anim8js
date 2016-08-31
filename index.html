@@ -10,6 +10,7 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="assets/css/docs.css" media="screen">
 
   </head>
   <body>
@@ -17,7 +18,7 @@
     <section class="page-header">
       <h1 class="project-name">anim8js</h1>
       <h2 class="project-tagline">The animation library for javascript - animate everything</h2>
-      <a href="examples.html" class="btn">Examples</a>
+      <a href="examples.html" class="btn example" data-lookatme="shake ~4s inf z6s">Examples</a>
       <a href="docs" class="btn">Docs</a>
       <a href="https://github.com/ClickerMonkey/anim8js" class="btn">View on GitHub</a>
       <a href="https://github.com/ClickerMonkey/anim8js/zipball/master" class="btn">Download .zip</a>
@@ -40,7 +41,32 @@
         You can animate single values, 2d &amp; 3d points, and colors out of the box.
       </p>
 
-      <pre>anim8( element ).play('tada 1s ~5s x2'); // play tada in 1 second twice delayed by 5 seconds</pre>
+      <pre>anim8( element ).play('tada 1s ~5s x2 slingshot');
+// play tada in 1 second twice delayed by 5 seconds using slingshot easing</pre>
+
+      <h3>
+        Features
+      </h3>
+      <p>
+        <ul>
+          <li>Animate properties independently from each other</li>
+          <li>An easy to understand format for specifying how an animation will play (see example above)</li>
+          <li>Smoothly transition from current animation to next animation</li>
+          <li>Sequentially animation a set of subjects</li>
+          <li>Event based system for listening when animations start or finish</li>
+          <li>Defer calling methods on an animator until an animation event has occurred</li>
+          <li>An extensive set of paths, springs, and animation types</li>
+          <li><b>Animation Controls</b>: play, queue, transition, pause, resume, stop, end, finish, nopeat</li>
+          <li><b>Animator[s] Controls</b>: (include above), tweenTo, tweenManyTo, tweenFrom, tweenManyFrom, tween, tweenMany, move, moveMany, follow, &amp; spring</li>
+          <li><b>Animation Types</b>: keyframe, spring, physics, path [following], move [relatively], travel, tweenFrom, tweenTo, initial, final, deltas/values, queue, &amp; and</li>
+          <li><b>Path Types</b>: Tween, Keyframe, Quadratic, Cubic, Delta, Jump, Compiled, &amp; Combo</li>
+          <li><b>Springs</b>: Linear &amp; Distance</li>
+          <li><b>Attribute Types</b>: Number, 2d [xy], 3d [xyz], quaternion [xyz theta] RGB, &amp; RGBA</li>
+          <li><b>Current Subject Types</b>: plain object, HTML element, jQuery object, EaselJS object, &amp; PIXI display object</li>
+          <li><b>Easing Types</b>: in, out, inout, yoyo, mirror, reverse, flip</li>
+          <li><b>Easings</b>: linear, quad, ease, cubic, quartic, quintic, back, sine, overshot, elastic, revisit, lasso, slowbounce, bounce, smallbounce, tinybounce, hesitant, sqrt, sqrtf, slingshot, gentle, bezier</li>
+        </ul>
+      </p>
 
       <h3>
         Extensions
@@ -75,117 +101,24 @@
 
     </section>
 
+    <section class="main-control">
+      <p>
+        Hover over the header to watch a random sequential animation.
+        Hover over the controls below to see an explanation.
+      </p>
+      <div class="btn pause" title="Pause all currently playing animations">Pause</div>
+      <div class="btn resume" title="Resume all currently paused animations">Resume</div>
+      <div class="btn stop" title="Stop all animations immediately - keep current values on subject">Stop</div>
+      <div class="btn finish" title="Stop current animations immediately - applying ending value to the subject">Finish</div>
+      <div class="btn end" title="Stop all animations immediately - applying ending value of the last animation on the queue to the subject">End</div>
+      <div class="btn nopeat" title="Stop current animation after its done its current cycle (disabling current repeating animations)">Nopeat</div>
+    </section>
+
     <script src="assets/js/jquery.js"></script>
     <script src="assets/js/anim8js.js"></script>
     <script src="assets/js/anim8js-dom.js"></script>
     <script src="assets/js/anim8js-jquery.js"></script>
     <script src="assets/js/anim8js-animate.css.js"></script>
-
-    <script>
-    $(function() {
-
-      var emphasis = ['bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble'];
-      var all = Object.keys(anim8.Animations);
-
-      function random(arr) {
-        return arr[ Math.floor( arr.length * Math.random() ) ];
-      }
-      function restoreMe() {
-        this.restore();
-      }
-      function restoreMeFadeIn() {
-        this.restore();
-        this.transition('fadeOut');
-        this.queue('fadeIn');
-        this.applyInitialState();
-      }
-      function getFinishedListener(animation) {
-        return /out/.test( animation ) ? restoreMeFadeIn : restoreMe;
-      }
-
-      // Buttons on enter/leave
-      anim8.save('bottomBorderGrow', {
-        tweenTo: {
-          borderBottomWidth: 10,
-          marginBottom: -9,
-          borderColor: '#155799'
-        },
-        easings: {
-          borderColor: 'linear'
-        }
-      });
-
-      anim8.save('bottomBorderShrink', {
-        tweenTo: {
-          borderBottomWidth: 1,
-          marginBottom: 0,
-          borderColor: 'rgba(255,255,255,0.2)'
-        }
-      });
-
-      anim8.save('undoTada', {
-        tweenTo: {
-          scale: 1,
-          rotate: 0
-        }
-      });
-
-      $('.btn').on('mouseenter', function() {
-        var animator = anim8( this );
-        animator.play('bottomBorderGrow 500, tada ~500 1.5s inf z3s linear');
-      });
-
-      $('.btn').on('mouseleave', function() {
-        var animator = anim8( this );
-        animator.stop().play('bottomBorderShrink 250 & undoTada');
-      });
-
-      // Title on hover
-      var projectName = $('.project-name').sequence().animators();
-      var projectNameSequence = projectName.sequence( 50, 'linear' );
-
-      $('.project-name').on('mouseenter click', function() {
-        if (!projectName.hasAttrimators()) {
-          var animation = random( all );
-          projectNameSequence.play( animation );
-          projectName.once( 'finished', getFinishedListener( animation ) );
-        }
-      });
-
-      // Subtitle
-      $('.project-tagline')
-        .sequence()
-        .animators()
-        .sequence(25, 'linear')
-        .play('fadeInDown')
-        .animators
-        .applyInitialState()
-      ;
-
-      // Intro
-      $('.intro .inline')
-        .animators()
-        .sequence('1s', 'linear')
-        .play('pulse !1.5 inf z7s linear')
-        .animators
-        .applyInitialState()
-      ;
-    });
-    </script>
-    <style>
-      div.sequenced,
-      code.inline {
-        position: relative;
-        display: inline-block;
-        white-space: pre;
-      }
-      .btn {
-        box-sizing: border-box;
-      }
-      .page-header {
-        padding-bottom: 10px;
-        padding-top: 20px;
-      }
-    </style>
+    <script src="assets/js/docs.js"></script>
   </body>
 </html>

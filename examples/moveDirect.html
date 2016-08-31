@@ -19,7 +19,7 @@
   <body>
 
     <div id="box1"></div>
-  
+
     <script src="../assets/js/anim8js.js"></script>
     <script src="../assets/js/anim8js-dom.js"></script>
 
@@ -35,10 +35,10 @@
 
       $listen( document, 'keydown', function(mouse, ev)
       {
-        if ( ev.keyCode === 37 ) anim8or.move('rotate', 90);
-        if ( ev.keyCode === 38 ) anim8or.move('rotate', -90);
+        if ( ev.keyCode === 38 ) anim8or.move('rotate', 90);
+        if ( ev.keyCode === 40 ) anim8or.move('rotate', -90);
+        if ( ev.keyCode === 37 ) anim8or.move('left', -100);
         if ( ev.keyCode === 39 ) anim8or.move('left', 100);
-        if ( ev.keyCode === 40 ) anim8or.move('left', -100);
       });
 
     </script>

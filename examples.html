@@ -10,6 +10,7 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="assets/css/docs.css" media="screen">
 
   </head>
 
@@ -31,6 +32,548 @@
       <p>
         Each of the following examples show off one or more features of anim8js.
       </p>
+      <p class="show-underlines">
+        <a href="examples/and.html" target="example">and</a>
+        <a href="examples/animate.css.html" target="example">animate.css</a>
+        <a href="examples/defer.html" target="example">defer</a>
+        <a href="examples/filters.html" target="example">filters</a>
+        <a href="examples/jquery.html" target="example">jquery</a>
+        <a href="examples/move.html" target="example">move</a>
+        <a href="examples/moveDirect.html" target="example">move direct</a>
+        <a href="examples/orbit.html" target="example">orbit</a>
+        <a href="examples/parserAnd.html" target="example">and builder</a>
+        <a href="examples/parserQueue.html" target="example">queue builder</a>
+        <a href="examples/physicsParser.html" target="example">physics builder</a>
+        <a href="examples/reference.html" target="example" class="active">reference</a>
+        <a href="examples/relative.html" target="example">relative</a>
+        <a href="examples/sequence.html" target="example">sequence</a>
+        <a href="examples/shadow.html" target="example">shadow</a>
+        <a href="examples/spring.html" target="example">spring</a>
+        <a href="examples/springChain.html" target="example">spring chain</a>
+        <a href="examples/springParser.html" target="example">spring builder</a>
+        <a href="examples/textShadow.html" target="example">text shadow</a>
+        <a href="examples/transformParse.html" target="example">transform parse</a>
+        <a href="examples/transition.html" target="example">transition</a>
+        <a href="examples/transitionBefore.html" target="example">transition before</a>
+        <a href="examples/transitionInto.html" target="example">transition into</a>
+        <a href="examples/transitionSmart.html" target="example">smart transition</a>
+        <a href="examples/transitionSmooth.html" target="example">smooth transition</a>
+        <a href="examples/travel.html" target="example">travel</a>
+        <a href="examples/tween.html" target="example">tween</a>
+        <a href="examples/tweenAny.html" target="example">tween tester</a>
+        <a href="examples/tweenParser.html" target="example">tween builder</a>
+        <a href="examples/tweenTo.html" target="example">tween to</a>
+      </p>
+      <iframe src="examples/reference.html" name="example"></iframe>
+      <div data-for="examples/and.html">
+        <p>This example shows using &amp; to combine multiple animations into one.</p>
+        <pre>anim8( window.box1 ).play( 'fadeIn & rubberBand, fadeOut & pulse !4');</pre>
+      </div>
+      <div data-for="examples/animate.css.html">
+        <p>This example shows the animate.css test page using anim8js instead of CSS animations.</p>
+      </div>
+      <div data-for="examples/defer.html">
+        <p>This example shows how you use the defer function to wait for an event to trigger before executing the following functions on the animator.</p>
+        <pre>anim8( window.box1 )
+  .play( 'fadeIn' )
+  .defer( 'once', 'finished' ) // 'on' could be used instead of 'once' which would cause the following chain to be called repeatedly
+    .play( 'tada' )
+    .defer( 'once', 'finished' )
+      .play( 'fadeOut' )
+      .defer( 'once', 'finished' )
+        .play( 'zoomIn' )
+      .undefer()
+    .undefer()
+  .undefer()
+;</pre>
+      </div>
+      <div data-for="examples/filters.html">
+        <p>This example shows the blur and hueRotate filters being used at the same time.</p>
+        <pre>m8( window.text ).play({
+  keyframe: {
+    from: {
+      hueRotate: 0,
+    },
+    to: {
+      hueRotate: -360
+    }
+  }
+}, {
+  duration: '20s',
+  repeat: 'inf'
+});
+
+m8( window.text ).play({
+  keyframe: {
+    '0': {
+      blur: 0
+    },
+    '50': {
+      blur: 5,
+      opacity: 1
+    },
+    '100': {
+      opacity: 0
+    }
+  }
+}, {
+  delay: '3s',
+  duration: '2s',
+  sleep: '3s',
+  teasing: 'quad-yoyo',
+  repeat: 'inf'
+});</pre>
+      </div>
+      <div data-for="examples/jquery.html">
+        <p>This example shows the jquery functions for playing animations in data attributes.</p>
+        <pre>&lt;div id="box"
+  data-intro="zoomInRight 2s"
+  data-emphasis="pulse 2s x3 quad-out !5"
+  data-outro="hinge"&gt;&lt;/div&gt;
+
+$('#box')
+  .dataPlay('intro')
+  .dataQueue('emphasis')
+  .dataQueue('outro')
+;</pre>
+      </div>
+      <div data-for="examples/move.html">
+        <p>This example shows using the <code>move</code> animation type. This animation type adds a value to the current value. Use the arrow keys to move the box around.</p>
+        <pre>m8.save('moveLeft', {
+  move: {
+    left: -100,
+    rotate: -90
+  }
+});
+
+m8.save('moveRight', {
+  move: {
+    left: 100,
+    rotate: 90
+  }
+});
+
+m8.save('moveUp', {
+  move: {
+    top: -100,
+    rotate: 90
+  }
+});
+
+m8.save('moveDown', {
+  move: {
+    top: 100,
+    rotate: -90
+  }
+});
+
+var anim8or = m8( window.box1 );
+
+$listen( document, 'keydown', function(mouse, ev)
+{
+  if ( ev.keyCode === 37 ) anim8or.queue('moveLeft linear 250');
+  if ( ev.keyCode === 38 ) anim8or.queue('moveUp linear 250');
+  if ( ev.keyCode === 39 ) anim8or.queue('moveRight linear 250');
+  if ( ev.keyCode === 40 ) anim8or.queue('moveDown linear 250');
+});</pre>
+      </div>
+      <div data-for="examples/moveDirect.html">
+        <p>This example shows directly calling the <code>move</code> function on the animator.</p>
+        <pre>var anim8or = m8( window.box1 );
+
+$listen( document, 'keydown', function(mouse, ev)
+{
+  if ( ev.keyCode === 38 ) anim8or.move('rotate', 90);
+  if ( ev.keyCode === 40 ) anim8or.move('rotate', -90);
+  if ( ev.keyCode === 37 ) anim8or.move('left', -100);
+  if ( ev.keyCode === 39 ) anim8or.move('left', 100);
+});</pre>
+      </div>
+      <div data-for="examples/orbit.html">
+        <p>This example shows the orbit functionality which combines two fake attributes: <code>angle</code> &amp; <code>distance</code>.</p>
+        <pre>m8( window.box1 ).play({
+  keyframe: {
+    '0': {
+      angle: 0,
+      rotate: 0,
+      distance: 100,
+      easing: 'linear'
+    },
+    '100': {
+      angle: 360,
+      rotate: -720,
+      distance: 100,
+      easing: 'linear'
+    },
+    '10,30,50,70,90': {
+      distance: 150,
+      easing: 'quad-inout'
+    },
+    '20,40,60,80': {
+      distance: 100,
+      easing: 'quad-inout'
+    }
+  }
+}, {
+  duration: '3s',
+  repeat: 100
+});</pre>
+      </div>
+      <div data-for="examples/parserAnd.html">
+        <p>This example shows <code>and</code> being used in an animation definition to include an entirely new animation definition or an existing animation.</p>
+        <pre>m8.save('anding1', {
+  values: {
+    rotate: [0, 360, 0]
+  },
+  and: {
+    values: {
+      scale: [1, 2, 1]
+    }
+  }
+});
+
+m8.save('anding2', {
+  values: {
+    borderWidth: [2, 10, 2],
+    borderColor: ['#0F0', '#F00']
+  },
+  and: 'anding1'
+});
+
+m8( window.box1 ).play('anding1 4s');
+m8( window.box2 ).play('anding2 8s');</pre>
+      </div>
+      <div data-for="examples/parserQueue.html">
+        <p>This example shows <code>queue</code> being used in an animation definition to include an entirely new animation definition or an existing animation.</p>
+        <pre>m8.save('q1', {
+  values: {
+    rotate: [0, 360, 0],
+    scale: [1, 2, 1]
+  },
+  queue: {
+    values: {
+      rotate: [0, -360, -360, 0]
+    }
+  }
+});
+
+m8.save('q2', {
+  values: {
+    translate: [0, 100, 0]
+  },
+  queue: 'q1 x3 2s'
+})
+
+m8( window.box1 ).play('q1 4s');
+m8( window.box2 ).play('q2 4s');</pre>
+      </div>
+      <div data-for="examples/physicsParser.html">
+        <p>This example shows the physics animation type being used to apply velocity and acceleration to the element. The elements are spawned from the mouse position - move your mouse around the example.</p>
+        <pre>anim8.save('shoot', {
+  physics: {
+    center: { // the attribute to apply physical forces to
+      position: MousePosition,
+      // Random Velocity
+      velocity: anim8.computed.random({min:{x:-300,y:-900}, max:{x:300,y:-600}}),
+      acceleration: {x: 0, y: 600},
+      terminal: 1000,
+      stopAt: '3s'
+    }
+  },
+  initial: {
+    // Random Angle
+    rotate: anim8.computed.random({min:0, max:360})
+  },
+  tweenTo: {
+    // Random Angle
+    rotate: anim8.computed.random({min:0, max:360})
+  },
+  keyframe: {
+    '0': {
+      scale: 1,
+      backgroundColor: 'blue'
+    },
+    '50': {
+      // Random Scale
+      scale: anim8.computed.random([1, 1.5, 2, 2.5, 3]),
+      backgroundColor: 'red'
+    },
+    '75': {
+      opacity: 1
+    },
+    '100': {
+      scale: 0.1,
+      opacity: 0,
+      backgroundColor: 'yellow'
+    }
+  }
+}, {
+  duration: '3s'
+});</pre>
+      </div>
+      <div data-for="examples/reference.html">
+        <p>This example shows using the reference to an attribute in another animation. The can be used as a point in an animation or a resting point for a spring. In this example a box is attached by a spring to another box orbitting around a point.</p>
+        <pre>sprite2.spring( // add a distance spring
+{
+  type: 'distance',
+  attribute: 'center',
+  rest: sprite1.ref( 'center' ),
+  position: {x: 100, y: 100},
+  distance: 100,
+  damping: 2.5,
+  stiffness: -30,
+  gravity: {x: 0, y:1000}
+});</pre>
+      </div>
+      <div data-for="examples/relative.html">
+        <p>Relative values can be used anywhere in an animation. Relative values like <code>-100</code> and <code>+25</code> add the given value to the existing value. This example also uses the <code>true</code> keyword in the start position which means "use the current value"</p>
+        <pre>m8( window.box1 )
+  .tween('opacity', true, '-0.5', '2s ~1s')
+  .defer('once', 'finished')
+    .tween('opacity', true, '+0.5', '2s')
+    .tween('left', true, '+200', '2s')
+    .tween('rotate', true, '+1080', '4s')
+    .defer('once', 'finished')
+      .tween('rotate', true, '-360', '500ms')
+      .defer('once', 'finished')
+        .tween('center', true, '+100', '2s')
+        .defer('once', 'finished')
+          .tween('center', true, {x:'-200', y:20})
+        .undefer()
+      .undefer()
+    .undefer()
+  .undefer()
+;</pre>
+      </div>
+      <div data-for="examples/sequence.html">
+        <p>This example shows the animate.css test page using anim8js sequence animations.</p>
+      </div>
+      <div data-for="examples/shadow.html">
+        <p>This example tests the shadow properties: <code>shadowPosition</code>, <code>shadowColor</code>, and <code>shadowBlur</code>.</p>
+        <pre>m8( window.box1 ).play({
+  keyframe: {
+    from: {
+      shadowPosition: 10,
+      shadowColor: {r:0, g:0, b:0, a:0},
+      shadowBlur: 30
+    },
+    to: {
+      shadowPosition: 4,
+      shadowColor: {r:0, g:0, b:0, a:255},
+      shadowBlur: 0
+    }
+  }
+}, '4s');</pre>
+      </div>
+      <div data-for="examples/spring.html">
+        <p>This example shows off the two different types of springs - an additional distance spring is added with a gravitational pull. Click in the example box to set the resting point for the springs.</p>
+        <pre>m8( window.box1 ).spring(
+{
+  type: 'linear',
+  attribute: 'center',
+  rest: MouseClicked,
+  damping: 2.5,
+  stiffness: -30
+});
+
+m8( window.box2 ).spring(
+{
+  type: 'distance',
+  attribute: 'center',
+  rest: MouseClicked,
+  distance: 100,
+  damping: 2.5,
+  stiffness: -30,
+  gravity: {x: 0, y:1000}
+});
+
+m8( window.box3 ).spring(
+{
+  type: 'distance',
+  attribute: 'center',
+  rest: MouseClicked,
+  distance: 100,
+  damping: 2.5,
+  stiffness: -30
+});</pre>
+      </div>
+      <div data-for="examples/springChain.html">
+        <p>This example shows distance springs which are attached to the previous springs current position and the mouse.</p>
+        <pre>var previous = MousePosition; // dynamic resting point
+
+for (var i = 1; i <= 6; i++)
+{
+  var e = window[ 'box' + i ];
+
+  m8( e ).spring(
+  {
+    type: 'distance',
+    attribute: 'center',
+    rest: previous,
+    distance: 50,
+    damping: 20,
+    stiffness: -100
+  });
+
+  previous = m8( e ).ref( 'center' ); // next dynamic resting point
+}</pre>
+      </div>
+      <div data-for="examples/springParser.html">
+        <p>This example shows using the <code>springs</code> animation type to create an animation which attaches an element to the mouse.</p>
+        <pre>m8.save('toMouse', {
+  springs: {
+    center: {
+      type: 'linear', // spring type (linear|distance)
+      rest: MousePosition,
+      damping: 2.5,
+      stiffness: -30
+    }
+  }
+});
+
+m8( window.box1 ).play( 'toMouse' );</pre>
+      </div>
+      <div data-for="examples/textShadow.html">
+        <p>This example tests the text shadow properties: <code>textShadowPosition</code>, <code>textShadowColor</code>, and <code>textShadowBlur</code>.</p>
+        <pre>m8( window.box1 ).play({
+  keyframe: {
+    from: {
+      textShadowPosition: 10,
+      textShadowColor: {r:0, g:0, b:0, a:0},
+      textShadowBlur: 30
+    },
+    to: {
+      textShadowPosition: 4,
+      textShadowColor: {r:200, g:200, b:200, a:255},
+      textShadowBlur: 0
+    }
+  }
+}, '4s');</pre>
+      </div>
+      <div data-for="examples/transformParse.html">
+        <p>This example shows anim8js ability to determine the current orientation/values of an element even when its defined in CSS.</p>
+        <pre>#box1 {
+  -webkit-transform: translateX(40px) translateY(10px) rotate(20deg) scale(1.2);
+}
+m8( window.box1 ).get({
+  rotate: 'deg', // 20
+  scale: false, // {1.2,1.2}
+  translate: 'px', // {40,10}
+  scaleX: false, // 1.2
+  rotate3d: 'rad', // {0,0,1} 0.349
+  skew: false, // {0,0}
+  translateX: '%' // 90.9
+});</pre>
+      </div>
+      <div data-for="examples/transition.html">
+        <p>This example shows how you can transition from one animation to the beginning of another through tweening.</p>
+        <pre>// 1s = spend 1 second transitioning
+// &gt;0 = spend 0ms smoothly transitioning from current value to path to next animation
+// &lt;0 = spend 0ms smoothly transitioning from the end of the transition path into the next animation
+// linear = easing for transitioning between the current and next animation
+anim8or.transition( '1s &gt;0 &lt;0 linear', {
+  keyframe: {
+    from: {
+      center: mouse
+    },
+    to: {
+      center: getRandomPoint()
+    }
+  }
+});</pre>
+      </div>
+      <div data-for="examples/transitionBefore.html">
+        <p>This example shows how you can transition from one animation to before another using a smooth curve which respects ending and starting animation velocity.</p>
+        <pre>// 500 = spend 500 ms transitioning
+// &gt;100 = spend 100ms smoothly transitioning from current value to path to next animation
+// &lt;-100 = look back 100ms in the next animation to smoothly transitioning into the next animation
+// linear = easing for transitioning between the current and next animation
+// /100 = specifies a number of points along the transition path to calculate to generate a transition path that maintains a consistent exit velocity from the current animation into the entrance velocity into the next animation
+anim8or.transition( '500 &gt;100 &lt;-100 linear /100', {
+  keyframe: {
+    from: {
+      center: mouse
+    },
+    to: {
+      center: getRandomPoint()
+    }
+  }
+});</pre>
+      </div>
+      <div data-for="examples/transitionInto.html">
+        <p>This example shows how you can transition smoothly out of the current animation into the beginning of the next animation.</p>
+        <pre>// 500 = spend 500 ms transitioning
+// &gt;250 = spend 250ms smoothly transitioning from current value to path to next animation
+// &lt;0 = spend 0ms smoothly transitioning from the end of the transition path into the next animation
+// linear = easing for transitioning between the current and next animation
+anim8or.transition( '500 &gt;250 &lt;0 linear', {
+  keyframe: {
+    from: {
+      center: mouse
+    },
+    to: {
+      center: getRandomPoint()
+    }
+  }
+});</pre>
+      </div>
+      <div data-for="examples/transitionSmart.html">
+        <p>This example shows how you can transition from one animation to another using a smooth curve which respects ending and starting animation velocity.</p>
+        <pre>// 500 = spend 500 ms transitioning
+// &gt;250 = spend 250ms smoothly transitioning from current value to path to next animation
+// &lt;250 = spend 250ms smoothly transitioning from the end of the transition path into the next animation
+// linear = easing for transitioning between the current and next animation
+// /100 = specifies a number of points along the transition path to calculate to generate a transition path that maintains a consistent exit velocity from the current animation into the entrance velocity into the next animation
+anim8or.transition( '500 &gt;250 &lt;250 linear /100', {
+  keyframe: {
+    from: {
+      center: mouse
+    },
+    to: {
+      center: getRandomPoint()
+    }
+  }
+});</pre>
+      </div>
+      <div data-for="examples/transitionSmooth.html">
+        <p>This example shows how you can transition from one animation to another using a smooth curve.</p>
+        <pre>// 500 = spend 500 ms transitioning
+// &gt;250 = spend 250ms smoothly transitioning from current value to path to next animation
+// &lt;250 = spend 250ms smoothly transitioning from the end of the transition path into the next animation
+// linear = easing for transitioning between the current and next animation
+anim8or.transition( '500 &gt;250 &lt;250 linear', {
+  keyframe: {
+    from: {
+      center: mouse
+    },
+    to: {
+      center: getRandomPoint()
+    }
+  }
+});</pre>
+      </div>
+      <div data-for="examples/travel.html">
+        <p>This example shows using the <code>travel</code> animation type. This animation type moves from point A to point B at a given velocity. You can click on the example box to see small boxes travel towards your mouse. Occassionally they will move pretty fast!</p>
+      </div>
+      <div data-for="examples/tween.html">
+        <p>This example shows calling the <code>tween</code> function directly on the animator. Click in the example to have the box tween from the mouse position to a random point.</p>
+        <pre>m8( window.box ).tween( 'center', mouse, getRandomPoint() );</pre>
+      </div>
+      <div data-for="examples/tweenAny.html">
+        <p>This example is a simple interface for testing out tweening of most of the available animatable HTML properties.</p>
+      </div>
+      <div data-for="examples/tweenTo.html">
+        <p>This example shows calling the <code>tweenTo</code> function directly on the animator. Click in the example to have the box tween from its current position to the mouse.</p>
+        <pre>m8( window.box1 ).tweenTo( 'center', mouse );</pre>
+      </div>
+      <div data-for="examples/tweenParser.html">
+        <p>This example shows using the <code>tweenTo</code> animation type. This animation tweens from the current value to the given value.</p>
+        <pre>m8( window.box1 ).play({
+  tweenTo: {
+    center: mouse
+  }
+});</pre>
+      </div>
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ClickerMonkey/anim8js">anim8js</a> is maintained by <a href="https://github.com/ClickerMonkey">ClickerMonkey</a>.</span>
 
@@ -38,107 +581,24 @@
       </footer>
     </section>
 
+    <section class="main-control">
+      <p>
+        Hover over the header to watch a random sequential animation.
+        Hover over the controls below to see an explanation.
+      </p>
+      <div class="btn pause" title="Pause all currently playing animations">Pause</div>
+      <div class="btn resume" title="Resume all currently paused animations">Resume</div>
+      <div class="btn stop" title="Stop all animations immediately - keep current values on subject">Stop</div>
+      <div class="btn finish" title="Stop current animations immediately - applying ending value to the subject">Finish</div>
+      <div class="btn end" title="Stop all animations immediately - applying ending value of the last animation on the queue to the subject">End</div>
+      <div class="btn nopeat" title="Stop current animation after its done its current cycle (disabling current repeating animations)">Nopeat</div>
+    </section>
 
     <script src="assets/js/jquery.js"></script>
     <script src="assets/js/anim8js.js"></script>
     <script src="assets/js/anim8js-dom.js"></script>
     <script src="assets/js/anim8js-jquery.js"></script>
     <script src="assets/js/anim8js-animate.css.js"></script>
-    <script>
-    $(function() {
-
-      var emphasis = ['bounce', 'flash', 'pulse', 'rubberBand', 'shake', 'swing', 'tada', 'wobble'];
-      var all = Object.keys(anim8.Animations);
-
-      function random(arr) {
-        return arr[ Math.floor( arr.length * Math.random() ) ];
-      }
-      function restoreMe() {
-        this.restore();
-      }
-      function restoreMeFadeIn() {
-        this.restore();
-        this.transition('fadeOut');
-        this.queue('fadeIn');
-        this.applyInitialState();
-      }
-      function getFinishedListener(animation) {
-        return /out/.test( animation ) ? restoreMeFadeIn : restoreMe;
-      }
-
-      // Buttons on enter/leave
-      anim8.save('bottomBorderGrow', {
-        tweenTo: {
-          borderBottomWidth: 10,
-          marginBottom: -9,
-          borderColor: '#155799'
-        },
-        easings: {
-          borderColor: 'linear'
-        }
-      });
-
-      anim8.save('bottomBorderShrink', {
-        tweenTo: {
-          borderBottomWidth: 1,
-          marginBottom: 0,
-          borderColor: 'rgba(255,255,255,0.2)'
-        }
-      });
-
-      anim8.save('undoTada', {
-        tweenTo: {
-          scale: 1,
-          rotate: 0
-        }
-      });
-
-      $('.btn').on('mouseenter', function() {
-        var animator = anim8( this );
-        animator.play('bottomBorderGrow 500, tada ~500 1.5s inf z3s linear');
-      });
-
-      $('.btn').on('mouseleave', function() {
-        var animator = anim8( this );
-        animator.stop().play('bottomBorderShrink 250 & undoTada');
-      });
-
-      // Title on hover
-      var projectName = $('.project-name').sequence().animators();
-      var projectNameSequence = projectName.sequence( 50, 'linear' );
-
-      $('.project-name').on('mouseenter click', function() {
-        if (!projectName.hasAttrimators()) {
-          var animation = random( all );
-          projectNameSequence.play( animation );
-          projectName.once( 'finished', getFinishedListener( animation ) );
-        }
-      });
-
-      // Subtitle
-      $('.project-tagline')
-        .sequence()
-        .animators()
-        .sequence(25, 'linear')
-        .play('fadeInDown')
-        .animators
-        .applyInitialState()
-      ;
-    });
-    </script>
-    <style>
-      div.sequenced, .inlined {
-        position: relative;
-        display: inline-block;
-        white-space: pre;
-      }
-      .btn {
-        box-sizing: border-box;
-      }
-      .page-header {
-        padding-bottom: 10px;
-        padding-top: 20px;
-      }
-    </style>
+    <script src="assets/js/docs.js"></script>
   </body>
 </html>
