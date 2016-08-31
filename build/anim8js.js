@@ -5919,7 +5919,7 @@ Class.extend( Event, Attrimator,
     elapsed -= delay;
 
     var cycle = duration + sleep;
-    var iteration = Math.floor( ( elapsed + sleep ) / cycle );
+    var iteration = Math.floor( elapsed / cycle );
 
     if ( iteration >= repeat )
     {
