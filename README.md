@@ -22,17 +22,19 @@ in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between 
 ### Concepts  
 - `Subject` = The thing being animated (an object, HTML element, etc).
 - `Attribute` = an animatable property on a subject.
+- `Attrimator` = animates an attribute.
 - `Calculator` = performs math operations for a data type (number, color, 2d/3d points, etc).
 - `Easing` = a function which controls the velocity of the animation over time.
 - `Path` = a set of points and an algorithm which computes a value at a given time.
-- `Event` = animates a single value along a path with a delay, duration, # of repeats, a pause in between repititions, an easing, and a scale.
-- `Spring` = a force which animates an attribute to a resting value.
-- `Animation` = a set of events which can be played on an Animator.
+- `Event` = an attrimator which animates an attribute along a path with a delay, duration, # of repeats, a pause in between repititions, an easing, and a scale.
+- `Spring` = an attrimator which applies a force which animates an attribute to a resting value.
+- `Physics` = an attrimator which applies velocity and acceleration to an attribute
+- `Animation` = a set of attrimators which can be played on an Animator.
 - `Defer` = defers calling functions on an object until a certain event occurs.
-- `Animator` = enables you to: play animations, queue animations, transition animations, tween attributes, add springs, and follow paths. 
+- `Animator` = enables you to: play animations, queue animations, transition animations, tween attributes, add springs, and follow paths.
 - `Animators` = a set of animators that can be used as it were a single Animator.
 - `Sequence` = animators where animations can be played at a delay between each animator creating a sequence of animations.
-- `Parser` = takes an animation definition and generates an Animation that can be played.
+- `Builder` = takes an animation definition and generates an Animation that can be played.
 - `Factory` = builds an Animator for a specific data type.
 
 ### Playing animations
@@ -66,17 +68,17 @@ You can pass these objects in the following formats to `anim8.save`, `anim8.anim
   }
 }
 { // sets the value when the animation starts
-  initial: { 
+  initial: {
     origin: 'left center'
   }
 }
 { // sets the value when the animation ends
-  final: { 
+  final: {
     visibility: 0
   }
 }
 { // animates along key frames at given percents - just like CSS keyframes!
-  keyframe: { 
+  keyframe: {
     '0,20,40,60,80,100': {
       opacity: 1,
       easing: 'linear'
@@ -94,15 +96,50 @@ You can pass these objects in the following formats to `anim8.save`, `anim8.anim
     scale: [1, 1.2, 1]
   }
 }
+{ // adds a spring between a rest point and the current value
+  springs: {
+    center: {
+      type: 'linear',
+      rest: [10, 10],
+      damping 2.5,
+      stiffness: -30
+    }
+  }
+}
+{ // move (add/remove) a value to an attributes existing value
+  move: {
+    left: 100
+  }
+}
+{ // apply a velocity and/or acceleration to an attribute
+  physics: {
+    center: {
+      calcluator: '2d',
+      velocity: [100, 0],
+      terminal: 200
+    }
+  }
+}
+{ // go from one point to another with a certain velocity
+  travel: {
+    center: {
+      from: true, // true = current value
+      to: [200, 40],
+      velocity: 200
+    }
+  }
+}
 ```
 
 You can actually join multiple types of animation definitions into a single object!
 
 ```javascript
 {
+  // Whatever the current opacity is - to 0
   tweenTo: {
     opacity: 0
   },
+  // Start at one scale and shrink to nothing
   keyframe: {
     from: {
       scale: {x:1, y:0.5}
@@ -111,34 +148,15 @@ You can actually join multiple types of animation definitions into a single obje
       scale: 0
     }
   },
+  // In the beginning of the animation set the transform origin
   initial: {
     origin: 'center top'
   },
+  // At the end of the animation, make invisible
   final: {
     visibility: 0
   }
 }
-```
-
-### jQuery Functions
-
-A few functions are available for jQuery which will help you animate jQuery objects:  
-- `m8/anim8/animator`: returns an animator instance for the first element in the jQuery object.
-- `m8s/anim8s/animators`: returns animators for all elements in the jQuery object.
-- `dataPlay`: plays the animation specified in the `data-...` attribute for all elements in the jQuery object and returns a jQuery object which contains only elements that had a valid animation to play.
-- `dataQueue`: queues the animation specified in the `data-...` attribute for all elements in the jQuery object and returns a jQuery object which contains only elements that had a valid animation to queue.
-- `dataTransition`: transitions into the animation specified in the `data-...` attribute for all elements in the jQuery object and returns a jQuery object which contains only elements that had a valid animation to transition into.
-
-For example if you have the following HTML:
-
-```html
-<div id="box" data-intro="fadeIn ~5s" data-outro="flipOutX 0.5s">Hello World!</div>
-```
-
-You can play the specified animations with...
-
-```javascript
-$('#box').dataPlay('intro').dataQueue('outro');
 ```
 
 ### FAQ  
@@ -153,24 +171,21 @@ A number or any of the following strings: inf, infinity, infinite, once, twice, 
 > What are valid easings?  
 
 - A function which accepts a delta value and returns a new delta value.
-- A string which is the name of an existing easing in `anim8.easing`.
-- A string in the format of `easing-easingType` where easing is an existing easing in `anim8.easing` and easingType is an existing type in `anim8.easingType` like *in*, *out*, *inout*, or *pong*. An example is 'sqrt-inout'.
+- A string which is the name of an existing easing in `anim8.Easings`.
+- A string in the format of `easing-easingType` where easing is an existing easing in `anim8.Easings` and easingType is an existing type in `anim8.EasingsTypes` like *in*, *out*, *inout*, or *pong*. An example is 'sqrt-inout'.
 - An array of 4 values which represent control points for a bezier curve.
 
 > How do I override any default values?  
 
-You can find the following defaults in `anim8.defaults`:  
-duration, easing, teasing, delay, sleep, repeat, scale, transitionTime, transitionDelta, transitionIntoDelta, 
+You can find the following defaults in `anim8.Defaults`:  
+duration, easing, teasing, delay, sleep, repeat, scale, transitionTime, transitionDelta, transitionIntoDelta,
 transitionEasing, cache
 
 > How do I add my own ______  
 
-- `Easing`: anim8.easing.myCustomEasing = function(x) { ... };
-- `Path`: anim8.path.myCustomPath = function(pathDefinition) { ... return *instance of anim8.Path* ... };
-- `Spring`: anim8.calculator.myCustomSpring = function(springDefinition) { ... return *instance of anim8.Spring* ... };
-- `Parser`: anim8.parser.myCustomParser = *instance of anim8.Parser*;
+- `Easing`: anim8.Easings.myCustomEasing = function(x) { ... };
+- `Path`: anim8.Paths.myCustomPath = function(pathDefinition) { ... return *instance of anim8.Path* ... };
+- `Spring`: anim8.Springs.myCustomSpring = function(springDefinition) { ... return *instance of anim8.Spring* ... };
+- `Builder`: anim8.Builders.myCustomParser = *instance of anim8.Parser*;
 - `Animation`: anim8.save( 'myAnimationName', *animation definition* );
-- `Calculator`: anim8.calculator.myCustomCalculator = *instance of anim8.Calculator*;
-
-
-
+- `Calculator`: anim8.Calculators.myCustomCalculator = *instance of anim8.Calculator*;
