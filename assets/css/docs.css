@@ -69,3 +69,21 @@ iframe[name=example] {
   text-decoration: none;
   background-color: rgba(0, 0, 0, 0.08);
 }
+
+@media screen and (max-width: 42em) {
+  .main-control p {
+    font-size: 11px;
+  }
+  .main-control .btn-group {
+    margin-top: -4px;
+  }
+  .main-control .btn-group .btn {
+    display: inline-block;
+    width: auto;
+    font-size: 10px;
+    margin-top: 4px;
+  }
+  iframe[name=example] {
+    height: 600px;
+  }
+}
