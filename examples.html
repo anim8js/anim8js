@@ -33,23 +33,25 @@
         Each of the following examples show off one or more features of anim8js.
       </p>
       <p class="show-underlines">
-        <a href="examples/and.html" target="example">and</a>
         <a href="examples/animate.css.html" target="example">animate.css</a>
+        <a href="examples/easeljs.html" target="example">easeljs</a>
+        <a href="examples/pixi.html" target="example">pixi</a>
+        <a href="examples/jquery.html" target="example">jquery</a>
+        <a href="examples/reference.html" target="example" class="active">reference</a>
+        <a href="examples/travel.html" target="example">travel</a>
+        <a href="examples/sequence.html" target="example">sequence</a>
+        <a href="examples/physicsParser.html" target="example">physics builder</a>
+        <a href="examples/and.html" target="example">and</a>
         <a href="examples/defer.html" target="example">defer</a>
         <a href="examples/filters.html" target="example">filters</a>
-        <a href="examples/jquery.html" target="example">jquery</a>
         <a href="examples/move.html" target="example">move</a>
         <a href="examples/moveDirect.html" target="example">move direct</a>
         <a href="examples/orbit.html" target="example">orbit</a>
         <a href="examples/parserAnd.html" target="example">and builder</a>
         <a href="examples/parserQueue.html" target="example">queue builder</a>
-        <a href="examples/physicsParser.html" target="example">physics builder</a>
-        <a href="examples/reference.html" target="example" class="active">reference</a>
         <a href="examples/relative.html" target="example">relative</a>
-        <a href="examples/sequence.html" target="example">sequence</a>
         <a href="examples/shadow.html" target="example">shadow</a>
         <a href="examples/spring.html" target="example">spring</a>
-        <a href="examples/springChain.html" target="example">spring chain</a>
         <a href="examples/springParser.html" target="example">spring builder</a>
         <a href="examples/textShadow.html" target="example">text shadow</a>
         <a href="examples/transformParse.html" target="example">transform parse</a>
@@ -58,7 +60,6 @@
         <a href="examples/transitionInto.html" target="example">transition into</a>
         <a href="examples/transitionSmart.html" target="example">smart transition</a>
         <a href="examples/transitionSmooth.html" target="example">smooth transition</a>
-        <a href="examples/travel.html" target="example">travel</a>
         <a href="examples/tween.html" target="example">tween</a>
         <a href="examples/tweenAny.html" target="example">tween tester</a>
         <a href="examples/tweenParser.html" target="example">tween builder</a>
@@ -68,6 +69,49 @@
       <div data-for="examples/and.html">
         <p>This example shows using &amp; to combine multiple animations into one.</p>
         <pre>anim8( window.box1 ).play( 'fadeIn & rubberBand, fadeOut & pulse !4');</pre>
+      </div>
+      <div data-for="examples/easeljs.html">
+        <p>This example shows using anim8js-easel to animate EaselJS objects.</p>
+        <pre>var circle = new createjs.Graphics.Circle(0,0,30);
+var shape = new createjs.Shape();
+shape.graphics.beginFill("DeepSkyBlue").append(circle);
+shape.x = 100;
+shape.y = 100;
+
+anim8( shape ).play({
+  springs: {
+    position: {
+      type: 'linear',
+      rest: Mouse,
+      damping: 2.5,
+      stiffness: -30
+    }
+  }
+});
+
+anim8( circle ).tween('radius', 30, 50, 'infinite quad-yoyo');</pre>
+      </div>
+      <div data-for="examples/pixi.html">
+        <p>This example shows using anim8js-pixi to animate PixiJS objects.</p>
+        <pre>var circle = new PIXI.Circle(0, 0, 30);
+var tinter = {tint: anim8.Color.parse('#3333FF')};
+var outliner = {lineWidth: 1, lineColor: 0xFFFFFF};
+var graphics = new PIXI.Graphics();
+
+anim8( graphics ).play({
+  springs: {
+    position: {
+      type: 'linear',
+      rest: Mouse,
+      damping: 2.5,
+      stiffness: -30
+    }
+  }
+});
+
+anim8( tinter ).tween('tint', 'red', 'blue', 'infinite yoyo 4s ~0.5s');
+anim8( circle ).tween('radius', 30, 50, 'infinite yoyo');
+anim8( outliner ).tween('lineWidth', 1, 5, 'infinite yoyo 2s');</pre>
       </div>
       <div data-for="examples/animate.css.html">
         <p>This example shows the animate.css test page using anim8js instead of CSS animations.</p>

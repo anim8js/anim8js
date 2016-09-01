@@ -1,40 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    
     <style>
       html, body {
         padding: 0;
         margin: 0;
-        width: 100%;
-        height: 100%;
         background-color: #666;
       }
-      #container {
-        position: relative;
-        left: 50%;
-        top: 50%;
-        width: 0;
-        height: 0;
-      }
       #canvas {
-        position: relative;
-        left: -512px;
-        top: -336px;
-        background-color: black; 
+        background-color: black;
       }
     </style>
   </head>
   <body onload="init()">
-    
+
     <div id="container">
-      <canvas id="canvas" width="1024" height="672"></canvas> 
+      <canvas id="canvas" width="832" height="500"></canvas>
     </div>
 
-    <script src="../3rd/easeljs-0.8.0.min.js"></script>
-    <script src="../build/anim8js-easel.js"></script>
+    <script src="../assets/js/easeljs-0.8.2.combined.js"></script>
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-easel.js"></script>
     <script src="examples.js"></script>
-    
+
     <script>
 
       function Mouse()
@@ -46,7 +34,7 @@
       }
       Mouse.x = Mouse.y = 0;
 
-      function init() 
+      function init()
       {
         var stage = new createjs.Stage('canvas');
 
@@ -58,7 +46,7 @@
         stage.addChild(shape);
 
         anim8( shape ).play({
-          springs: {   
+          springs: {
             position: {
               type: 'linear',
               rest: Mouse,
@@ -69,7 +57,7 @@
         });
 
         anim8( circle ).tween('radius', 30, 50, 'infinite quad-yoyo');
-        
+
         anim8.on('end', stage.update, stage);
       }
 

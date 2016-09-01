@@ -31,11 +31,17 @@
   "dependencies": {
     "anim8js": "master",
     "anim8js-dom": "master",
-    "anim8js-animate.css": "^1.0.0",
-    "anim8js-jquery": "^1.0.0"
+    "anim8js-animate.css": "master",
+    "anim8js-jquery": "master",
+    "anim8js-easel": "master",
+    "anim8js-pixi": "master"
   },
   "resolutions": {
     "anim8js": "master",
-    "anim8js-dom": "master"
+    "anim8js-dom": "master",
+    "anim8js-animate.css": "master",
+    "anim8js-jquery": "master",
+    "anim8js-easel": "master",
+    "anim8js-pixi": "master"
   }
 }

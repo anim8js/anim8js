@@ -1,26 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-
     <style>
       html, body {
         padding: 0;
         margin: 0;
-        width: 100%;
-        height: 100%;
         background-color: #666;
       }
-      #container {
-        position: relative;
-        left: 50%;
-        top: 50%;
-        width: 0;
-        height: 0;
-      }
       #canvas {
-        position: relative;
-        left: -512px;
-        top: -336px;
         background-color: black;
       }
     </style>
@@ -31,8 +18,9 @@
 
     </div>
 
-    <script src="../3rd/pixi.js"></script>
-    <script src="../build/anim8js-pixi.js"></script>
+    <script src="../assets/js/pixi.js"></script>
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-pixi.js"></script>
     <script src="examples.js"></script>
 
     <script>
@@ -48,13 +36,14 @@
 
       function init()
       {
-        var viewWidth = 1024;
-        var viewHeight = 672;
+        var viewWidth = 832;
+        var viewHeight = 500;
 
         // Create a pixi renderer
-        var renderer = PIXI.autoDetectRenderer(viewWidth, viewHeight, null, false, true);
+        var renderer = PIXI.autoDetectRenderer(viewWidth, viewHeight, {antialias: true});
         renderer.view.className = "rendererView";
         renderer.view.id = 'canvas';
+        renderer.backgroundColor = 0x000000;
 
         $listen( renderer.view, 'mousemove', function(mouse, ev)
         {
@@ -68,11 +57,11 @@
         container.appendChild( renderer.view );
 
         // create an new instance of a pixi stage
-        var stage = new PIXI.Stage( 0x000000 );
+        var stage = new PIXI.Container();
 
         // the object to animate
         var circle = new PIXI.Circle(0, 0, 30);
-        var tinter = {tint: anim8.color.parse('#3333FF')};
+        var tinter = {tint: anim8.Color.parse('#3333FF')};
         var outliner = {lineWidth: 1, lineColor: 0xFFFFFF};
         var graphics = new PIXI.Graphics();
         stage.addChild( graphics );
