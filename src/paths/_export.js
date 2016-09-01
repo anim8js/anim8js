@@ -219,14 +219,12 @@ Paths['tween'] = function(path)
 Paths['sub'] = function(path)
 {
   var parent = $path( path.path );
-  var calc = parent.calculator;
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
 
   return new PathSub(
     path.name,
     parent,
-    calc.parse( path.start, defaultValue ),
-    calc.parse( path.end, defaultValue )
+    coalesce( path.start, 0 ),
+    coalesce( path.end, 1 )
   );
 };
 
