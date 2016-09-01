@@ -1,10 +1,12 @@
 # anim8js
 The ultimate javascript animation library. Animate everything - from objects to HTML elements.
 
-Inspired by the [animate.css](http://daneden.github.io/animate.css/) library - anim8js includes all animations and allows you to leverage Javascript's power to animate in almost any imaginable way.
-
 It's as easy as `anim8( button ).play('tada ~0.5s 1.5s x4 z100ms ease-inout')` - which plays the `tada` animation
 in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between using the easing function `ease-inout`.
+
+Attributes can be animated along a path, by using spring forces, or physical forces.
+Attributes can be animated together or separately.
+The values that define the paths, spring, and physical forces can be a constant value (ex: 0, {x:2, y:5}), a function which is evaluated during animation, a function which is evaluated at the beginning of an animation, the current value, or a value relative to the current value.
 
 ### Installation
 
@@ -21,35 +23,40 @@ in 1.5 seconds after waiting 0.5 seconds 4 times with a 100 ms break in between 
 - [anim8js-easel](http://github.com/ClickerMonkey/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
 
 ### Features  
-1. Play animations by name, name & modifiers, or by custom definition.
-2. Queue animations.
-3. Transition into a new animation in 6 different ways.
-4. Play multiple animations at once over different attributes.
-5. Springs.
-6. Animation sequences.
-7. Defer commands until an event occurs.
-8. Save animations to be used later.
-9. Modify animations with a delay, duration, repeats, sleeping between repeats, scale, and easing.
-10. Relative Values
-11. Physics
+- Create your own animations
+- Play animations by name, name & modifiers, or by custom definition
+- Queue animations
+- Transition into a new animation in 6 different ways
+- Play multiple animations at once over different attributes
+- Springs forces on an attribute given some rest value
+- Sequential animations involving multiple subjects
+- Defer animation commands until an event occurs
+- Save animations to be used later
+- Modify animations with a delay, duration, repeats, sleeping between repeats, scale, and easing
+- Relative values (ex: '+20', '-100')
+- Apply physical forces (velocity and/or acceleration) to an attribute
+- An attribute can follow a path of points
+- Keyframe animations
+- Values used in paths, springs, and physics can be constants, functions that return a value at the beginning of the animation, functions that return a live value during the animation, or a value relative to the current value.
 
 ### Concepts  
-- `Subject` = The thing being animated (an object, HTML element, etc).
-- `Attribute` = an animatable property on a subject.
-- `Attrimator` = animates an attribute.
-- `Calculator` = performs math operations for a data type (number, color, 2d/3d points, etc).
-- `Easing` = a function which controls the velocity of the animation over time.
-- `Path` = a set of points and an algorithm which computes a value at a given time.
-- `Event` = an attrimator which animates an attribute along a path with a delay, duration, # of repeats, a pause in between repititions, an easing, and a scale.
-- `Spring` = an attrimator which applies a force which animates an attribute to a resting value.
+- `Subject` = The thing being animated (an object, HTML element, etc)
+- `Attribute` = an animatable property on a subject
+- `Attrimator` = animates an attribute
+- `Calculator` = performs math operations for a data type (number, color, 2d/3d points, etc)
+- `Easing` = a function which controls the velocity of the animation over time
+- `Path` = a set of points and an algorithm which computes a value at a given time
+- `Event` = an attrimator which animates an attribute along a path with a delay, duration, # of repeats, a pause in between repititions, an easing, and a scale
+- `Spring` = an attrimator which applies a force which animates an attribute to a resting value
 - `Physics` = an attrimator which applies velocity and acceleration to an attribute
-- `Animation` = a set of attrimators which can be played on an Animator.
-- `Defer` = defers calling functions on an object until a certain event occurs.
-- `Animator` = enables you to: play animations, queue animations, transition animations, tween attributes, add springs, and follow paths.
-- `Animators` = a set of animators that can be used as it were a single Animator.
-- `Sequence` = animators where animations can be played at a delay between each animator creating a sequence of animations.
-- `Builder` = takes an animation definition and generates an Animation that can be played.
-- `Factory` = builds an Animator for a specific data type.
+- `Animation` = a set of attrimators which can be played on an Animator
+- `Defer` = defers calling functions on an object until a certain event occurs
+- `Animator` = enables you to: play animations, queue animations, transition animations, tween attributes, add springs, and follow paths on a Subject
+- `Animators` = a set of animators that can be controlled as if it it were a single Animator
+- `Sequence` = animators where animations can be played at a delay between each animator creating a sequence of animations
+- `Builder` = takes an animation definition and generates an Animation that can be played
+- `Factory` = builds an Animator for a specific data type
+- `Point` = a value used in attrimators. Can be a constant, a function to evaluate live or at the beginning of an animation, or a relative value
 
 ### Playing animations
 
@@ -63,12 +70,13 @@ There are tons of different ways of playing animations.
 
 ### Animation Modifiers
 
-- `duration`: a number in the string that doesn't start with a special character, ex: `2s`.
-- `repeat`: a string or number starting with an x, ex: `x4`, `infinite`, `twice`.
-- `sleep`: a string starting with a z, ex: `z4.5s`.
-- `delay`: a string starting with a ~, ex: `~750ms`.
-- `easing`: a string specifying an easing function, ex: `linear`, `ease-out`, `sqrt-yoyo`.
-- `scale`: a string starting with !, ex: `!1.2`.
+- `duration`: a number in the string that doesn't start with a special character, ex: `2s`
+- `repeat`: a string or number starting with an x, ex: `x4`, `infinite`, `twice`
+- `sleep`: a string starting with a z, ex: `z4.5s`
+- `delay`: a string starting with a ~, ex: `~750ms`
+- `easing`: a string specifying an easing function, ex: `linear`, `ease-out`, `sqrt-yoyo`
+- `scale`: a string starting with !, ex: `!1.2`
+- `offset`: a string starting with @, ex: '@500ms'
 
 ### Animation Definitions
 
