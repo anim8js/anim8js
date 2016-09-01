@@ -2,6 +2,4 @@ src/
 test/
 images/
 docs/
-.jshintrc
-.travis.yml
-jsdoc.json
+**/.*
