@@ -11058,7 +11058,7 @@ PathLinear.getTimes = function(calc, points)
 		distances[ i ] *= invlength;
 	}
 
-  distances[ n ] = 0;
+  distances[ n ] = 1;
 
 	return distances;
 };
