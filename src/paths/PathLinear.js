@@ -32,12 +32,12 @@ Class.extend( PathLinear, PathDelta,
 
 PathLinear.getTimes = function(calc, points)
 {
-  var n = points.length;
+  var n = points.length - 1;
 	var distances = [];
 
 	distances[ 0 ] = 0;
 
-	for (var i = 1; i < n; i++)
+	for (var i = 1; i <= n; i++)
 	{
 		distances[ i ] = distances[ i - 1 ] + calc.distance( points[ i - 1 ], points[ i ] );
 	}
@@ -48,6 +48,8 @@ PathLinear.getTimes = function(calc, points)
 	{
 		distances[ i ] *= invlength;
 	}
+
+  distances[ n ] = 0;
 
 	return distances;
 };
