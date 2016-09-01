@@ -1,3 +1,3 @@
 # Getting Started & Installation
 
-< [Index](Index.md) | [Concepts](Concepts.md) >
+< [Index](README.md) | [Concepts](Concepts.md) >
