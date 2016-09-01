@@ -11046,7 +11046,7 @@ PathLinear.getTimes = function(calc, points)
 
 	distances[ 0 ] = 0;
 
-	for (var i = 1; i <= n; i++)
+	for (var i = 1; i < n; i++)
 	{
 		distances[ i ] = distances[ i - 1 ] + calc.distance( points[ i - 1 ], points[ i ] );
 	}
@@ -11057,8 +11057,6 @@ PathLinear.getTimes = function(calc, points)
 	{
 		distances[ i ] *= invlength;
 	}
-
-	distances[ n ] = 1.0;
 
 	return distances;
 };
@@ -11920,17 +11918,16 @@ Paths['quadratic-corner'] = function(path)
 {
   var calc = $calculator( path.calculator );
   var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-  var points = [];
 
   for (var i = 0; i < path.points.length; i++)
   {
-    points.push( calc.parse( path.points[ i ], defaultValue ) );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
 
   return new PathQuadraticCorner(
     path.name,
     calc,
-    points,
+    path.points,
     path.midpoint,
     path.loop
   );
@@ -11946,17 +11943,16 @@ Paths['linear'] = function(path)
 {
   var calc = $calculator( path.calculator );
   var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-  var points = [];
 
   for (var i = 0; i < path.points.length; i++)
   {
-    points.push( calc.parse( path.points[ i ], defaultValue ) );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
 
   return new PathLinear(
     path.name,
     calc,
-    points
+    path.points
   );
 };
 

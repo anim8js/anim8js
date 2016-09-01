@@ -240,17 +240,16 @@ Paths['quadratic-corner'] = function(path)
 {
   var calc = $calculator( path.calculator );
   var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-  var points = [];
 
   for (var i = 0; i < path.points.length; i++)
   {
-    points.push( calc.parse( path.points[ i ], defaultValue ) );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
 
   return new PathQuadraticCorner(
     path.name,
     calc,
-    points,
+    path.points,
     path.midpoint,
     path.loop
   );
@@ -266,17 +265,16 @@ Paths['linear'] = function(path)
 {
   var calc = $calculator( path.calculator );
   var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-  var points = [];
 
   for (var i = 0; i < path.points.length; i++)
   {
-    points.push( calc.parse( path.points[ i ], defaultValue ) );
+    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
   }
 
   return new PathLinear(
     path.name,
     calc,
-    points
+    path.points
   );
 };
 

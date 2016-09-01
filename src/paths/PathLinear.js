@@ -37,7 +37,7 @@ PathLinear.getTimes = function(calc, points)
 
 	distances[ 0 ] = 0;
 
-	for (var i = 1; i <= n; i++)
+	for (var i = 1; i < n; i++)
 	{
 		distances[ i ] = distances[ i - 1 ] + calc.distance( points[ i - 1 ], points[ i ] );
 	}
@@ -48,8 +48,6 @@ PathLinear.getTimes = function(calc, points)
 	{
 		distances[ i ] *= invlength;
 	}
-
-	distances[ n ] = 1.0;
 
 	return distances;
 };
