@@ -14,7 +14,7 @@
 function PathQuadratic(name, calculator, p0, p1, p2)
 {
   this.name = name;
-  this.set( calculator, [p0, p1, p2] );
+  this.set( calculator, p0, p1, p2 );
 }
 
 Class.extend( PathQuadratic, Path,

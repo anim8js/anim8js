@@ -43,6 +43,6 @@ Class.extend( PathDelta, Path,
 
   copy: function()
   {
-    return new PathDelta( this.name, copy(this.points), copy(this.deltas), this.calculator );
+    return new PathDelta( this.name, this.calculator, copy(this.points), copy(this.deltas) );
   }
 });

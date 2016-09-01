@@ -36,7 +36,7 @@ Paths['compiled'] = function(path)
   return new PathCompiled(
     path.name,
     $path( path.path ),
-    path.pointCount
+    path.n || path.pointCount
   );
 };
 
@@ -207,5 +207,114 @@ Paths['tween'] = function(path)
     calc,
     calc.parse( path.start, defaultValue ),
     calc.parse( path.end, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a sub path.
+ *
+ * @param {Object} path
+ * @return {PathSub}
+ */
+Paths['sub'] = function(path)
+{
+  var parent = $path( path.path );
+  var calc = parent.calculator;
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathSub(
+    path.name,
+    parent,
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.end, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a quadratic corner path.
+ *
+ * @param {Object} path
+ * @return {PathQuadraticCorner}
+ */
+Paths['quadratic-corner'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+  var points = [];
+
+  for (var i = 0; i < path.points.length; i++)
+  {
+    points.push( calc.parse( path.points[ i ], defaultValue ) );
+  }
+
+  return new PathQuadraticCorner(
+    path.name,
+    calc,
+    points,
+    path.midpoint,
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a linear path.
+ *
+ * @param {Object} path
+ * @return {PathLinear}
+ */
+Paths['linear'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+  var points = [];
+
+  for (var i = 0; i < path.points.length; i++)
+  {
+    points.push( calc.parse( path.points[ i ], defaultValue ) );
+  }
+
+  return new PathLinear(
+    path.name,
+    calc,
+    points
+  );
+};
+
+
+/**
+ * Parses an object for a uniform path.
+ *
+ * @param {Object} path
+ * @return {PathUniform}
+ */
+Paths['uniform'] = function(path)
+{
+  var parent = $path( path.path );
+
+  return new PathUniform(
+    path.name,
+    parent,
+    path.n || path.pointCount
+  );
+};
+
+/**
+ * Parses an object for a hermite path.
+ *
+ * @param {Object} path
+ * @return {PathHermite}
+ */
+Paths['hermite'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathHermite(
+    path.name,
+    calc,
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.startTangent, defaultValue ),
+    calc.parse( path.end, defaultValue ),
+    calc.parse( path.endTangent, defaultValue )
   );
 };

@@ -10710,20 +10710,18 @@ Class.extend( PathCompiled, Path,
   set: function(path, pointCount)
   {
     var calc = path.calculator;
-    var points = [];
+    var compiled = PathCompiled.compile( calc, path, pointCount );
 
-    for (var i = 0; i < pointCount; i++)
-    {
-      points.push( path.compute( calc.create(), i / (pointCount - 1) ) );
-    }
-
-    this.reset( calc, points );
+    this.reset( calc, compiled );
+    this.path = path;
+    this.pointCount = pointCount;
   },
 
   compute: function(out, delta)
   {
-    var a = Math.floor( delta * this.points.length );
-    var index = Math.min( a, this.points.length - 1 );
+    var n = this.points.length;
+    var a = Math.floor( delta * n );
+    var index = Math.min( a, n - 1 );
 
     return this.calculator.copy( out, this.resolvePoint( index ) );
   },
@@ -10733,6 +10731,23 @@ Class.extend( PathCompiled, Path,
     return new PathCompiled( this.name, this, this.points.length );
   }
 });
+
+PathCompiled.compile = function(calc, path, pointCount)
+{
+  if (path.points.length === pointCount)
+  {
+    return copy( path.points );
+  }
+
+  var points = [];
+
+  for (var i = 0; i < pointCount; i++)
+  {
+    points.push( path.compute( calc.create(), i / (pointCount - 1) ) );
+  }
+
+  return points;
+};
 
 
 /**
@@ -10835,7 +10850,62 @@ Class.extend( PathDelta, Path,
 
   copy: function()
   {
-    return new PathDelta( this.name, copy(this.points), copy(this.deltas), this.calculator );
+    return new PathDelta( this.name, this.calculator, copy(this.points), copy(this.deltas) );
+  }
+});
+
+
+/**
+ * Instantiates a new PathHermite.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {T} start
+ * @param {T} startTangent
+ * @param {T} end
+ * @param {T} endTangent
+ * @class PathHermite
+ * @constructor
+ * @extends Path
+ */
+function PathHermite(name, calculator, start, startTangent, end, endTangent)
+{
+  this.name = name;
+  this.set( calculator, start, startTangent, end, endTangent );
+}
+
+Class.extend( PathHermite, Path,
+{
+  set: function(calculator, start, startTangent, end, endTangent)
+  {
+    this.reset( calculator, [start, end] );
+    this.startTangent = startTangent;
+    this.endTangent = endTangent;
+  },
+
+  compute: function(out, d)
+  {
+    var calc = this.calculator;
+    var d2 = d * d;
+    var d3 = d2 * d;
+
+    out = calc.copy( out, calc.ZERO );
+    out = calc.adds( out, this.resolvePoint( 0 ), 2 * d3 - 3 * d2 + 1 );
+    out = calc.adds( out, this.resolvePoint( 1 ), -2 * d3 + 3 * d2 );
+    out = calc.adds( out, resolve( this.startTangent ), d3 - 2 * d2 + d );
+    out = calc.adds( out, resolve( this.endTangent ), d3 - d2 );
+
+    return out;
+  },
+
+  copy: function()
+  {
+    return new PathHermite( this.name, this.calculator, this.points[0], this.startTangent, this.points[1], this.endTangent );
+  },
+
+  isLinear: function()
+  {
+    return false;
   }
 });
 
@@ -10939,6 +11009,62 @@ Class.extend( PathKeyframe, Path,
 
 
 /**
+ * Instantiates a new PathLinear.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @class PathLinear
+ * @constructor
+ * @extends PathDelta
+ */
+function PathLinear(name, calculator, points)
+{
+  this.name = name;
+  this.set( calculator, points );
+}
+
+Class.extend( PathLinear, PathDelta,
+{
+  set: function(calculator, points)
+  {
+    var deltas = PathLinear.getTimes( calculator, points );
+
+    this._set( calculator, points, deltas );
+  },
+
+  copy: function()
+  {
+    return new PathLinear( this.name, this.calculator, copy(this.points) );
+  }
+});
+
+PathLinear.getTimes = function(calc, points)
+{
+  var n = points.length;
+	var distances = [];
+
+	distances[ 0 ] = 0;
+
+	for (var i = 1; i <= n; i++)
+	{
+		distances[ i ] = distances[ i - 1 ] + calc.distance( points[ i - 1 ], points[ i ] );
+	}
+
+	var invlength = 1.0 / distances[ n ];
+
+	for (var i = 1; i < n; i++)
+	{
+		distances[ i ] *= invlength;
+	}
+
+	distances[ n ] = 1.0;
+
+	return distances;
+};
+
+
+/**
  * Instantiates a new PathQuadratic.
  *
  * @param {String|false} name
@@ -10953,7 +11079,7 @@ Class.extend( PathKeyframe, Path,
 function PathQuadratic(name, calculator, p0, p1, p2)
 {
   this.name = name;
-  this.set( calculator, [p0, p1, p2] );
+  this.set( calculator, p0, p1, p2 );
 }
 
 Class.extend( PathQuadratic, Path,
@@ -10986,6 +11112,171 @@ Class.extend( PathQuadratic, Path,
   isLinear: function()
   {
     return false;
+  }
+});
+
+
+/**
+ * Instantiates a new PathQuadraticCorner.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Number} midpoint
+ * @param {Boolean} loop
+ * @class PathQuadraticCorner
+ * @constructor
+ * @extends Path
+ */
+function PathQuadraticCorner(name, calculator, points, midpoint, loop)
+{
+  this.name = name;
+  this.set( calculator, points, midpoint, loop );
+}
+
+Class.extend( PathQuadraticCorner, Path,
+{
+  set: function(calculator, points, midpoint, loop)
+  {
+    this.reset( calculator, points );
+    this.midpoint = midpoint;
+    this.loop = loop;
+    this.temp0 = calculator.create();
+    this.temp1 = calculator.create();
+  },
+
+  compute: function(out, delta)
+  {
+    var calc = this.calculator;
+    var temp0 = this.temp0;
+    var temp1 = this.temp1;
+    var midpoint = this.midpoint;
+    var negmidpoint = 1.0 - midpoint;
+    var halfmidpoint = midpoint * 0.5;
+    var n = this.points.length - (this.loops ? 0 : 1);
+    var a = delta * n;
+    var i = clamp( Math.floor( a ), 0, n - 1 );
+    var d = a - i;
+
+    var p0 = this.resolvePoint( this.getActualIndex( i - 1 ) );
+    var p1 = this.resolvePoint( this.getActualIndex( i ) );
+    var p2 = this.resolvePoint( this.getActualIndex( i + 1 ) );
+    var p3 = this.resolvePoint( this.getActualIndex( i + 2 ) );
+
+    if ( d < midpoint )
+    {
+      d = (d / midpoint);
+      temp0 = calc.interpolate( temp0, p0, p1, d * halfmidpoint + negmidpoint + halfmidpoint );
+      temp1 = calc.interpolate( temp1, p1, p2, d * halfmidpoint + halfmidpoint );
+      p1 = temp0;
+      p2 = temp1;
+      d = d * 0.5 + 0.5;
+    }
+    else if ( d > negmidpoint )
+    {
+      d = (d - negmidpoint) / midpoint;
+      temp0 = calc.interpolate( temp0, p1, p2, d * halfmidpoint + negmidpoint );
+      temp1 = calc.interpolate( temp1, p2, p3, d * halfmidpoint );
+      p1 = temp0;
+      p2 = temp1;
+      d = d * 0.5;
+    }
+
+    out = calc.interpolate( out, p1, p2, d );
+
+    return out;
+  },
+
+  getActualIndex: function(index)
+  {
+    var n = this.points.length;
+
+    return (this.loops ? (index + n) % n : clamp( index, 0, n - 1 ));
+  },
+
+  copy: function()
+  {
+    return new PathQuadraticCorner( this.name, this.calculator, copy(this.points), this.midpoint, this.loop );
+  },
+
+  isLinear: function()
+  {
+    return false;
+  }
+});
+
+
+/**
+ * Instantiates a new PathSub.
+ *
+ * @param {String|false} name
+ * @param {Path} path
+ * @param {Number} start
+ * @param {Number} end
+ * @class PathSub
+ * @constructor
+ * @extends Path
+ */
+function PathSub(name, path, start, end)
+{
+  this.name = name;
+  this.set( path, start, end );
+}
+
+Class.extend( PathSub, Path,
+{
+  set: function(path, start, end)
+  {
+    this.reset( path.calculator, path.points );
+    this.path = path;
+    this.start = start;
+    this.end = end;
+  },
+
+  compute: function(out, delta)
+  {
+    return this.path.compute( out, (this.end - this.start) * delta + this.start );
+  },
+
+  copy: function()
+  {
+    return new PathSub( this.name, this.path, this.start, this.end );
+  }
+});
+
+
+/**
+ * Instantiates a new PathLinear.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @class PathLinear
+ * @constructor
+ * @extends PathDelta
+ */
+function PathUniform(name, path, pointCount)
+{
+  this.name = name;
+  this.set( path, pointCount );
+}
+
+Class.extend( PathUniform, PathDelta,
+{
+  set: function(path, pointCount)
+  {
+    var calc = path.calculator;
+    var points = PathCompiled.compile( calc, path, pointCount );
+    var deltas = PathLinear.getTimes( calc, points );
+
+    this._set( calc, points, deltas );
+    this.path = path;
+    this.pointCount = pointCount;
+  },
+
+  copy: function()
+  {
+    return new PathUniform( this.name, this.path, this.pointCount );
   }
 });
 
@@ -11425,7 +11716,7 @@ Paths['compiled'] = function(path)
   return new PathCompiled(
     path.name,
     $path( path.path ),
-    path.pointCount
+    path.n || path.pointCount
   );
 };
 
@@ -11596,6 +11887,115 @@ Paths['tween'] = function(path)
     calc,
     calc.parse( path.start, defaultValue ),
     calc.parse( path.end, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a sub path.
+ *
+ * @param {Object} path
+ * @return {PathSub}
+ */
+Paths['sub'] = function(path)
+{
+  var parent = $path( path.path );
+  var calc = parent.calculator;
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathSub(
+    path.name,
+    parent,
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.end, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a quadratic corner path.
+ *
+ * @param {Object} path
+ * @return {PathQuadraticCorner}
+ */
+Paths['quadratic-corner'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+  var points = [];
+
+  for (var i = 0; i < path.points.length; i++)
+  {
+    points.push( calc.parse( path.points[ i ], defaultValue ) );
+  }
+
+  return new PathQuadraticCorner(
+    path.name,
+    calc,
+    points,
+    path.midpoint,
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a linear path.
+ *
+ * @param {Object} path
+ * @return {PathLinear}
+ */
+Paths['linear'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+  var points = [];
+
+  for (var i = 0; i < path.points.length; i++)
+  {
+    points.push( calc.parse( path.points[ i ], defaultValue ) );
+  }
+
+  return new PathLinear(
+    path.name,
+    calc,
+    points
+  );
+};
+
+
+/**
+ * Parses an object for a uniform path.
+ *
+ * @param {Object} path
+ * @return {PathUniform}
+ */
+Paths['uniform'] = function(path)
+{
+  var parent = $path( path.path );
+
+  return new PathUniform(
+    path.name,
+    parent,
+    path.n || path.pointCount
+  );
+};
+
+/**
+ * Parses an object for a hermite path.
+ *
+ * @param {Object} path
+ * @return {PathHermite}
+ */
+Paths['hermite'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathHermite(
+    path.name,
+    calc,
+    calc.parse( path.start, defaultValue ),
+    calc.parse( path.startTangent, defaultValue ),
+    calc.parse( path.end, defaultValue ),
+    calc.parse( path.endTangent, defaultValue )
   );
 };
 
@@ -12858,6 +13258,11 @@ function $transition(transition, cache)
   anim8.PathKeyframe = PathKeyframe;
   anim8.PathQuadratic = PathQuadratic;
   anim8.PathTween = Tween;
+  anim8.PathHermite = PathHermite;
+  anim8.PathLinear = PathLinear;
+  anim8.PathQuadraticCorner = PathQuadraticCorner;
+  anim8.PathSub = PathSub;
+  anim8.PathUniform = PathUniform;
 
   // Springs
   anim8.SpringDistance = SpringDistance;

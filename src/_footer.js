@@ -152,6 +152,11 @@
   anim8.PathKeyframe = PathKeyframe;
   anim8.PathQuadratic = PathQuadratic;
   anim8.PathTween = Tween;
+  anim8.PathHermite = PathHermite;
+  anim8.PathLinear = PathLinear;
+  anim8.PathQuadraticCorner = PathQuadraticCorner;
+  anim8.PathSub = PathSub;
+  anim8.PathUniform = PathUniform;
 
   // Springs
   anim8.SpringDistance = SpringDistance;
