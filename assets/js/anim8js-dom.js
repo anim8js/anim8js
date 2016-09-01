@@ -1,4 +1,4 @@
-/* anim8js-dom 1.0.0 - anim8 your HTML elements by Philip Diffenderfer */
+/* anim8js-dom 1.0.1 - anim8 your HTML elements by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {

@@ -64,6 +64,13 @@
         <a href="examples/tweenAny.html" target="example">tween tester</a>
         <a href="examples/tweenParser.html" target="example">tween builder</a>
         <a href="examples/tweenTo.html" target="example">tween to</a>
+        <a href="examples/pathCubic.html" target="example">cubic curve path</a>
+        <a href="examples/pathHermite.html" target="example">hermite path</a>
+        <a href="examples/pathLinear.html" target="example">linear path</a>
+        <a href="examples/pathQuadratic.html" target="example">quadratic curve path</a>
+        <a href="examples/pathQuadraticCorner.html" target="example">quadratic curve corner path</a>
+        <a href="examples/pathSub.html" target="example">subset path</a>
+        <a href="examples/pathTween.html" target="example">tween path</a>
       </p>
       <iframe src="examples/reference.html" name="example"></iframe>
       <div data-for="examples/and.html">
@@ -617,6 +624,92 @@ anim8or.transition( '500 &gt;250 &lt;250 linear', {
     center: mouse
   }
 });</pre>
+      </div>
+      <div data-for="examples/pathCubic.html">
+        <p>This example shows a box following a <code>cubic</code> curve path which consists of a starting and ending point and a control point.</p>
+        <pre>var myPath = m8.path({
+  type: 'cubic',
+  calculator: '2d',
+  p0: [20, 20],
+  p1: [300, 50],
+  p2: [300, 400],
+  p3: [50, 130]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathHermite.html">
+        <p>This example shows a box following a <code>hermite</code> path which consists of a starting and ending point and has two vectors which sit at the starting and ending points respectively and point in the direction the curve should follow.</p>
+        <pre>var myPath = m8.path({
+  type: 'hermite',
+  calculator: '2d',
+  start: [200, 40],
+  startTangent: [-1000, 0],
+  end: [100, 400],
+  endTangent: [-800, 100]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathLinear.html">
+        <p>This example shows a box following a <code>linear</code> path which consists of a series of points that are followed at a consistent speed.</p>
+        <pre>var myPath = m8.path({
+  type: 'linear',
+  calculator: '2d',
+  points: [[20, 20], [300, 50], [300, 400], [50, 130]]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathQuadratic.html">
+        <p>This example shows a box following a <code>quadratic</code> curve path which consists of a starting and ending point and two control points between the start and end.</p>
+        <pre>var myPath = m8.path({
+  type: 'quadratic',
+  calculator: '2d',
+  p0: [20, 20],
+  p1: [300, 50],
+  p2: [300, 400]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathQuadraticCorner.html">
+        <p>This example shows a box following a <code>quadratic-corner</code> curved path which is a linear path but with curves at each corner.</p>
+        <pre>var myPath = m8.path({
+  type: 'quadratic-corner',
+  calculator: '2d',
+  points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]],
+  midpoint: 0.3
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathSub.html">
+        <p>This example shows a box following a <code>sub</code> path which follows a subset of another path.</p>
+        <pre>var myPath = m8.path({
+  type: 'sub',
+  start: 0.3,
+  end: 0.85,
+  path: {
+    type: 'quadratic-corner',
+    calculator: '2d',
+    points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]],
+    midpoint: 0.3
+  }
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+      </div>
+      <div data-for="examples/pathTween.html">
+        <p>This example shows a box following a <code>tween</code> path which has a starting and ending points.</p>
+        <pre>var myPath = m8.path({
+  type: 'tween',
+  calculator: '2d',
+  start: [20, 20],
+  end: [120, 300]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
       </div>
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ClickerMonkey/anim8js">anim8js</a> is maintained by <a href="https://github.com/ClickerMonkey">ClickerMonkey</a>.</span>

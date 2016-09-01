@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+    body, html {
+      padding: 0;
+      margin: 0;
+    }
+    #box1 {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #00F;
+      position: absolute;
+      background-color: #66F;
+    }
+    </style>
+  </head>
+  <body>
+
+    <div id="box1"></div>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+
+    <script src="examples.js"></script>
+
+    <script>
+      var myPath = m8.path({
+        type: 'quadratic-corner',
+        calculator: '2d',
+        points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]],
+        midpoint: 0.3
+      });
+
+      m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');
+    </script>
+  </body>
+</html>
