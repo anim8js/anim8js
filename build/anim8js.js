@@ -1,4 +1,4 @@
-/* anim8js 1.0.4 - anim8js - Anim8 Everything by Philip Diffenderfer */
+/* anim8js 1.0.5 - anim8js - Anim8 Everything by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
