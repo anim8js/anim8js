@@ -148,19 +148,23 @@
   anim8.BuilderTweenTo = BuilderTweenTo;
 
   // Paths
+  anim8.PathBasisSpline = PathBasisSpline;
+  anim8.PathBezier = PathBezier;
+  anim8.PathCatmullRom = PathCatmullRom;
   anim8.PathCombo = PathCombo;
   anim8.PathCompiled = PathCompiled;
   anim8.PathCubic = PathCubic;
   anim8.PathDelta = PathDelta;
+  anim8.PathHermite = PathHermite;
   anim8.PathJump = PathJump;
   anim8.PathKeyframe = PathKeyframe;
-  anim8.PathQuadratic = PathQuadratic;
-  anim8.PathTween = Tween;
-  anim8.PathHermite = PathHermite;
   anim8.PathLinear = PathLinear;
+  anim8.PathParametric = PathParametric;
+  anim8.PathQuadratic = PathQuadratic;
   anim8.PathQuadraticCorner = PathQuadraticCorner;
   anim8.PathSub = PathSub;
   anim8.PathUniform = PathUniform;
+  anim8.PathTween = Tween;
 
   // Springs
   anim8.SpringDistance = SpringDistance;

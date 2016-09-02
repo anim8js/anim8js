@@ -11444,100 +11444,6 @@ PathLinear.getTimes = function(calc, points)
 
 
 /**
- * Instantiates a new PathParametricBezier.
- *
- * @param {String|false} name
- * @param {Calculator} calculator
- * @param {Array} points
- * @param {Boolean} loop
- * @class PathParametricBezier
- * @constructor
- * @extends PathParametric
- */
-function PathParametricBezier(name, calculator, points, loop)
-{
-  this.name = name;
-  this.set( calculator, points, loop );
-}
-
-Class.extend( PathParametricBezier, PathParametric,
-{
-  set: function(calculator, points, loop)
-  {
-    this._set( calculator, points, loop, PathParametricBezier.MATRIX, PathParametricBezier.WEIGHT, true );
-  },
-
-  copy: function()
-  {
-    return new PathParametricBezier( this.name, this.calculator, copy(this.points), this.loop );
-  }
-});
-
-/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
- *
- *                           [-1, 3,-3, 1]   [p-1]
- * f(t) = [t^3, t^2, t, 1] * [ 3,-6, 3, 0] * [ p ]
- *                           [-3, 3, 0, 0]   [p+1]
- *                           [ 1, 0, 0, 0]   [p+2]
- */
-
-PathParametricBezier.WEIGHT = 1.0;
-PathParametricBezier.MATRIX = [
-  [-1, 3,-3, 1],
-  [ 3,-6, 3, 0],
-  [-3, 3, 0, 0],
-  [ 1, 0, 0, 0]
-];
-
-
-/**
- * Instantiates a new PathParametricHermite.
- *
- * @param {String|false} name
- * @param {Calculator} calculator
- * @param {Array} points
- * @param {Boolean} loop
- * @class PathParametricHermite
- * @constructor
- * @extends PathParametric
- */
-function PathParametricHermite(name, calculator, points, loop)
-{
-  this.name = name;
-  this.set( calculator, points, loop );
-}
-
-Class.extend( PathParametricHermite, PathParametric,
-{
-  set: function(calculator, points, loop)
-  {
-    this._set( calculator, points, loop, PathParametricHermite.MATRIX, PathParametricHermite.WEIGHT, true );
-  },
-
-  copy: function()
-  {
-    return new PathParametricHermite( this.name, this.calculator, copy(this.points), this.loop );
-  }
-});
-
-/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
- *
- *                           [ 2,-2, 1, 2]   [p-1]
- * f(t) = [t^3, t^2, t, 1] * [-3, 3,-2,-1] * [ p ]
- *                           [ 0, 0, 1, 0]   [p+1]
- *                           [ 1, 0, 0, 0]   [p+2]
- */
-
-PathParametricHermite.WEIGHT = 1.0;
-PathParametricHermite.MATRIX = [
-  [ 2,-2, 1, 2],
-  [-3, 3,-2,-1],
-  [ 0, 0, 1, 0],
-  [ 1, 0, 0, 0]
-];
-
-
-/**
  * Instantiates a new PathQuadratic.
  *
  * @param {String|false} name
@@ -12509,42 +12415,6 @@ Paths['basis-spline'] = function(path)
   var calc = $calculator( path.calculator );
 
   return new PathBasisSpline(
-    path.name,
-    calc,
-    calc.parseArray( path.points, path.points, path.defaultValue ),
-    path.loop
-  );
-};
-
-/**
- * Parses an object for a parametric bezier path.
- *
- * @param {Object} path
- * @return {PathParametricBezier}
- */
-Paths['parametric-bezier'] = function(path)
-{
-  var calc = $calculator( path.calculator );
-
-  return new PathParametricBezier(
-    path.name,
-    calc,
-    calc.parseArray( path.points, path.points, path.defaultValue ),
-    path.loop
-  );
-};
-
-/**
- * Parses an object for a parametric hermite path.
- *
- * @param {Object} path
- * @return {PathParametricHermite}
- */
-Paths['parametric-hermite'] = function(path)
-{
-  var calc = $calculator( path.calculator );
-
-  return new PathParametricHermite(
     path.name,
     calc,
     calc.parseArray( path.points, path.points, path.defaultValue ),
@@ -13807,19 +13677,23 @@ function $transition(transition, cache)
   anim8.BuilderTweenTo = BuilderTweenTo;
 
   // Paths
+  anim8.PathBasisSpline = PathBasisSpline;
+  anim8.PathBezier = PathBezier;
+  anim8.PathCatmullRom = PathCatmullRom;
   anim8.PathCombo = PathCombo;
   anim8.PathCompiled = PathCompiled;
   anim8.PathCubic = PathCubic;
   anim8.PathDelta = PathDelta;
+  anim8.PathHermite = PathHermite;
   anim8.PathJump = PathJump;
   anim8.PathKeyframe = PathKeyframe;
-  anim8.PathQuadratic = PathQuadratic;
-  anim8.PathTween = Tween;
-  anim8.PathHermite = PathHermite;
   anim8.PathLinear = PathLinear;
+  anim8.PathParametric = PathParametric;
+  anim8.PathQuadratic = PathQuadratic;
   anim8.PathQuadraticCorner = PathQuadraticCorner;
   anim8.PathSub = PathSub;
   anim8.PathUniform = PathUniform;
+  anim8.PathTween = Tween;
 
   // Springs
   anim8.SpringDistance = SpringDistance;
