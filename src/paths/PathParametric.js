@@ -12,20 +12,21 @@
  * @constructor
  * @extends Path
  */
-function PathParametric(name, calculator, points, loop, matrix, weight)
+function PathParametric(name, calculator, points, loop, matrix, weight, invert)
 {
   this.name = name;
-  this.set( calculator, points, loop, matrix, weight );
+  this.set( calculator, points, loop, matrix, weight, invert );
 }
 
 Class.extend( PathParametric, Path,
 {
-  set: function(calculator, points, loop, matrix, weight)
+  set: function(calculator, points, loop, matrix, weight, invert)
   {
     this.reset( calculator, points );
     this.loop = loop;
     this.matrix = matrix;
     this.weight = weight;
+    this.invert = invert;
     this.temp = calculator.create();
   },
 
@@ -44,10 +45,18 @@ Class.extend( PathParametric, Path,
     var p2 = this.resolvePoint( i + 1 );
     var p3 = this.resolvePoint( i + 2 );
 
-    var d0 = 1;
-    var d1 = d;
-    var d2 = d * d1;
-    var d3 = d * d2;
+    var d0, d1, d2, d3;
+    if (this.invert) {
+      d3 = 1;
+      d2 = d;
+      d1 = d * d2;
+      d0 = d * d1;
+    } else {
+      d0 = 1;
+      d1 = d;
+      d2 = d * d1;
+      d3 = d * d2;
+    }
 
     out = calc.zero( out );
 

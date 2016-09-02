@@ -13,11 +13,16 @@
 function PathBasisSpline(name, calculator, points, loop)
 {
   this.name = name;
-  this.set( calculator, points, loop, PathBasisSpline.MATRIX, PathBasisSpline.WEIGHT );
+  this.set( calculator, points, loop );
 }
 
 Class.extend( PathBasisSpline, PathParametric,
 {
+  set: function(calculator, points, loop)
+  {
+    this._set( calculator, points, loop, PathBasisSpline.MATRIX, PathBasisSpline.WEIGHT, true );
+  },
+
   copy: function()
   {
     return new PathBasisSpline( this.name, this.calculator, copy(this.points), this.loop );

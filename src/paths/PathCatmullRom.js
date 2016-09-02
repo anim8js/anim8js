@@ -13,11 +13,16 @@
 function PathCatmullRom(name, calculator, points, loop)
 {
   this.name = name;
-  this.set( calculator, points, loop, PathCatmullRom.MATRIX, PathCatmullRom.WEIGHT );
+  this.set( calculator, points, loop );
 }
 
 Class.extend( PathCatmullRom, PathParametric,
 {
+  set: function(calculator, points, loop)
+  {
+    this._set( calculator, points, loop, PathCatmullRom.MATRIX, PathCatmullRom.WEIGHT, false );
+  },
+
   copy: function()
   {
     return new PathCatmullRom( this.name, this.calculator, copy(this.points), this.loop );
