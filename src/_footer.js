@@ -40,10 +40,14 @@
   anim8.coalesce = coalesce;
   anim8.constant = constant;
   anim8.resolve = resolve;
-  anim8.clamp = clamp;
   anim8.id = id;
   anim8.Class = Class;
   anim8.Defaults = Defaults;
+
+  // Math
+  anim8.clamp = clamp;
+  anim8.gcd = gcd;
+  anim8.choose = choose;
 
   // Registries
   anim8.Animations = Animations;

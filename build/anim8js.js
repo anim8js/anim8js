@@ -744,26 +744,6 @@ function resolve(variable)
 }
 
 /**
- * Returns a value between the given minimum and maximum.
- *
- * **Examples:**
- *
- *     anim8.clamp( 5, 1, 6 );   // 5
- *     anim8.clamp( 0, 1, 6 );   // 1
- *     anim8.clamp( 7, 1, 6 );   // 6
- *
- * @method anim8.clamp
- * @param  {Number} v
- * @param  {Number} min
- * @param  {Number} max
- * @return {Number}
- */
-function clamp(v, min, max)
-{
-  return (v < min) ? min : (v > max ? max : v);
-}
-
-/**
  * Returns a "unique" identifier.
  *
  * @method id
@@ -4391,6 +4371,31 @@ Class.define( Calculator,
   },
 
   /**
+   * Parses the given input for a value this calculator understands.
+   *
+   * @method parse
+   * @param  {T} x
+   * @param  {T} defaultValue
+   * @return {T|Function|False}
+   */
+  parseArray: function(input, output, defaultValue)
+  {
+    if (input.length !== output.length)
+    {
+      output.length = input.length;
+    }
+
+    var parsedDefault = this.parse( defaultValue, this.ZERO );
+
+    for (var i = 0; i < input.length; i++)
+    {
+      output[ i ] = this.parse( input[ i ], parsedDefault );
+    }
+
+    return output;
+  },
+
+  /**
    * Copies a value and places it in out and returns out.
    *
    * @method copy
@@ -4401,6 +4406,18 @@ Class.define( Calculator,
   copy: function(out, copy)
   {
     throw 'Calculator.copy not implemented';
+  },
+
+  /**
+   * Zeros out and returns it.
+   *
+   * @method zero
+   * @param {T} out
+   * @return {T}
+   */
+  zero: function(out)
+  {
+    throw 'Calculator.zero not implemented';
   },
 
   /**
@@ -8530,6 +8547,83 @@ function trigger(event, argument)
 }
 
 
+function gcd(a,b)
+{
+  if (a < 0)
+  {
+    a = -a;
+  }
+  if (b < 0)
+  {
+    b = -b;
+  }
+  if (b > a)
+  {
+    var temp = a;
+    a = b;
+    b = temp;
+  }
+
+  while (true)
+  {
+    if (b === 0)
+    {
+      return a;
+    }
+
+    a %= b;
+
+    if (a === 0)
+    {
+      return b;
+    }
+
+    b %= a;
+  }
+}
+
+function choose(n, m)
+{
+  var num = 1, den = 1, gcd;
+
+  if ( m > (n / 2) )
+  {
+    m = n - m;
+  }
+
+  while ( m >= 1 )
+  {
+    num *= n--;
+    den *= m--;
+    gcd = gcd( num, den );
+    num /= gcd;
+    den /= gcd;
+  }
+
+  return num;
+}
+
+/**
+ * Returns a value between the given minimum and maximum.
+ *
+ * **Examples:**
+ *
+ *     anim8.clamp( 5, 1, 6 );   // 5
+ *     anim8.clamp( 0, 1, 6 );   // 1
+ *     anim8.clamp( 7, 1, 6 );   // 6
+ *
+ * @method anim8.clamp
+ * @param  {Number} v
+ * @param  {Number} min
+ * @param  {Number} max
+ * @return {Number}
+ */
+function clamp(v, min, max)
+{
+  return (v < min) ? min : (v > max ? max : v);
+}
+
+
 var Animations = {};
 
 /**
@@ -10586,6 +10680,150 @@ Class.extend( BuilderTweenTo, Builder,
 
 
 /**
+ * Instantiates a new PathBasisSpline.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Boolean} loop
+ * @class PathBasisSpline
+ * @constructor
+ * @extends PathParametric
+ */
+function PathBasisSpline(name, calculator, points, loop)
+{
+  this.name = name;
+  this.set( calculator, points, loop, PathBasisSpline.MATRIX, PathBasisSpline.WEIGHT );
+}
+
+Class.extend( PathBasisSpline, PathParametric,
+{
+  copy: function()
+  {
+    return new PathBasisSpline( this.name, this.calculator, copy(this.points), this.loop );
+  }
+});
+
+PathBasisSpline.WEIGHT = 1.0 / 6.0;
+PathBasisSpline.MATRIX = [
+  [-1, 3,-3, 1 ],
+  [ 3,-6, 3, 0 ],
+  [-3, 0, 3, 0 ],
+  [ 1, 4, 1, 0 ]
+];
+
+
+/**
+ * Instantiates a new PathBezier.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @class PathBezier
+ * @constructor
+ * @extends Path
+ */
+function PathBezier(name, calculator, points, weights)
+{
+  this.name = name;
+  this.set( calculator, points, weights );
+}
+
+Class.extend( PathBezier, Path,
+{
+  set: function(calculator, points, weights)
+  {
+    this.reset( calculator, points );
+    this.weights = weights || PathBezier.computeWeights( points.length );
+    this.inverses = new Array( points.length );
+  },
+
+  compute: function(out, delta)
+  {
+    var calc = this.calculator;
+    var inverses = this.inverses;
+    var weights = this.weights;
+    var n = this.points.length;
+    var x = 1;
+
+    inverses[n - 1] = 1;
+
+    for (var i = n - 2; i >= 0; i--)
+    {
+      inverses[i] = inverses[i + 1] * (1 - delta);
+    }
+
+    out = calc.zero( out );
+
+    for (var i = 0; i < n; i++)
+    {
+      out = calc.adds( out, this.resolvePoint( i ), weights[ i ] * inverses[ i ] * x );
+
+      x *= delta;
+    }
+
+    return out;
+  },
+
+  copy: function()
+  {
+    return new PathBezier( this.name, this.calculator, copy(this.points), this.weights );
+  },
+
+  isLinear: function()
+  {
+    return false;
+  }
+});
+
+PathBezier.computeWeights = function(n)
+{
+  var w = new Array( n-- );
+
+  for (var i = 0; i <= n; i++)
+  {
+    w[ i ] = choose( n, i );
+  }
+
+  return w;
+};
+
+
+/**
+ * Instantiates a new PathCatmullRom.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Boolean} loop
+ * @class PathCatmullRom
+ * @constructor
+ * @extends PathParametric
+ */
+function PathCatmullRom(name, calculator, points, loop)
+{
+  this.name = name;
+  this.set( calculator, points, loop, PathCatmullRom.MATRIX, PathCatmullRom.WEIGHT );
+}
+
+Class.extend( PathCatmullRom, PathParametric,
+{
+  copy: function()
+  {
+    return new PathCatmullRom( this.name, this.calculator, copy(this.points), this.loop );
+  }
+});
+
+PathCatmullRom.WEIGHT = 0.5;
+PathCatmullRom.MATRIX = [
+  [ 0, 2, 0, 0],
+	[-1, 0, 1, 0],
+	[ 2,-5, 4,-1],
+	[-1, 3,-3, 1]
+];
+
+
+/**
  * Instantiates a new PathCombo.
  *
  * @param {String|false} name
@@ -10889,7 +11127,7 @@ Class.extend( PathHermite, Path,
     var d2 = d * d;
     var d3 = d2 * d;
 
-    out = calc.copy( out, calc.ZERO );
+    out = calc.zero( out );
     out = calc.adds( out, this.resolvePoint( 0 ), 2 * d3 - 3 * d2 + 1 );
     out = calc.adds( out, this.resolvePoint( 1 ), -2 * d3 + 3 * d2 );
     out = calc.adds( out, resolve( this.startTangent ), d3 - 2 * d2 + d );
@@ -11065,6 +11303,112 @@ PathLinear.getTimes = function(calc, points)
 
 
 /**
+ * Instantiates a new PathParametric.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Boolean} loop
+ * @param {Array} matrix
+ * @param {Number} weight
+ * @class PathParametric
+ * @constructor
+ * @extends Path
+ */
+function PathParametric(name, calculator, points, loop, matrix, weight)
+{
+  this.name = name;
+  this.set( calculator, points, loop, matrix, weight );
+}
+
+Class.extend( PathParametric, Path,
+{
+  set: function(calculator, points, loop, matrix, weight)
+  {
+    this.reset( calculator, points );
+    this.loop = loop;
+    this.matrix = matrix;
+    this.weight = weight;
+    this.temp = calculator.create();
+  },
+
+  compute: function(out, delta)
+  {
+    var calc = this.calculator;
+    var temp = this.temp;
+    var matrix = this.matrix;
+    var n = this.points.length;
+    var a = delta * n;
+    var i = clamp( Math.floor( a ), 0, n - 1 );
+    var d = a - i;
+
+    var p0 = this.resolvePoint( i - 1 );
+    var p1 = this.resolvePoint( i );
+    var p2 = this.resolvePoint( i + 1 );
+    var p3 = this.resolvePoint( i + 2 );
+
+    var d0 = 1;
+    var d1 = d;
+    var d2 = d * d1;
+    var d3 = d * d2;
+
+    out = calc.zero( out );
+
+    temp = calc.zero( temp );
+    temp = calc.adds( temp, p0, matrix[0][0] );
+    temp = calc.adds( temp, p1, matrix[0][1] );
+    temp = calc.adds( temp, p2, matrix[0][2] );
+    temp = calc.adds( temp, p3, matrix[0][3] );
+    out = calc.adds( out, temp, d0 );
+
+    temp = calc.zero( temp );
+    temp = calc.adds( temp, p0, matrix[1][0] );
+    temp = calc.adds( temp, p1, matrix[1][1] );
+    temp = calc.adds( temp, p2, matrix[1][2] );
+    temp = calc.adds( temp, p3, matrix[1][3] );
+    out = calc.adds( out, temp, d1 );
+
+    temp = calc.zero( temp );
+    temp = calc.adds( temp, p0, matrix[2][0] );
+    temp = calc.adds( temp, p1, matrix[2][1] );
+    temp = calc.adds( temp, p2, matrix[2][2] );
+    temp = calc.adds( temp, p3, matrix[2][3] );
+    out = calc.adds( out, temp, d2 );
+
+    temp = calc.zero( temp );
+    temp = calc.adds( temp, p0, matrix[3][0] );
+    temp = calc.adds( temp, p1, matrix[3][1] );
+    temp = calc.adds( temp, p2, matrix[3][2] );
+    temp = calc.adds( temp, p3, matrix[3][3] );
+    out = calc.adds( out, temp, d3 );
+
+    out = calc.scale( out, this.weight );
+
+    return out;
+  },
+
+  resolvePoint: function(i)
+  {
+    var points = this.points;
+    var n = points.length;
+    var k = (this.loops ? (i + n) % n : clamp( i, 0, n - 1 ));
+
+    return resolve( points[ k ] );
+  },
+
+  copy: function()
+  {
+    return new PathParametric( this.name, this.calculator, copy(this.points), this.loop, this.matrix, this.weight );
+  },
+
+  isLinear: function()
+  {
+    return false;
+  }
+});
+
+
+/**
  * Instantiates a new PathQuadratic.
  *
  * @param {String|false} name
@@ -11158,10 +11502,10 @@ Class.extend( PathQuadraticCorner, Path,
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;
 
-    var p0 = this.resolvePoint( this.getActualIndex( i - 1 ) );
-    var p1 = this.resolvePoint( this.getActualIndex( i ) );
-    var p2 = this.resolvePoint( this.getActualIndex( i + 1 ) );
-    var p3 = this.resolvePoint( this.getActualIndex( i + 2 ) );
+    var p0 = this.resolvePoint( i - 1 );
+    var p1 = this.resolvePoint( i );
+    var p2 = this.resolvePoint( i + 1 );
+    var p3 = this.resolvePoint( i + 2 );
 
     if ( d < midpoint )
     {
@@ -11187,11 +11531,13 @@ Class.extend( PathQuadraticCorner, Path,
     return out;
   },
 
-  getActualIndex: function(index)
+  resolvePoint: function(i)
   {
-    var n = this.points.length;
+    var points = this.points;
+    var n = points.length;
+    var k = (this.loops ? (i + n) % n : clamp( i, 0, n - 1 ));
 
-    return (this.loops ? (index + n) % n : clamp( index, 0, n - 1 ));
+    return resolve( points[ k ] );
   },
 
   copy: function()
@@ -11713,9 +12059,11 @@ Paths['combo'] = function(path)
  */
 Paths['compiled'] = function(path)
 {
+  var parent = $path( path.path );
+
   return new PathCompiled(
     path.name,
-    $path( path.path ),
+    parent,
     path.n || path.pointCount
   );
 };
@@ -11750,7 +12098,6 @@ Paths['cubic'] = function(path)
 Paths['delta'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
 
   if (!path.deltas)
   {
@@ -11762,15 +12109,10 @@ Paths['delta'] = function(path)
     }
   }
 
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
-
   return new PathDelta(
     path.name,
     calc,
-    path.points,
+    calc.parseArry( path.points, path.points, path.defaultValue ),
     path.deltas
   );
 };
@@ -11784,17 +12126,11 @@ Paths['delta'] = function(path)
 Paths['jump'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathJump(
     path.name,
     calc,
-    path.points
+    calc.parseArry( path.points, path.points, path.defaultValue )
   );
 };
 
@@ -11807,7 +12143,6 @@ Paths['jump'] = function(path)
 Paths['keyframe'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
 
   if (!path.deltas)
   {
@@ -11836,15 +12171,10 @@ Paths['keyframe'] = function(path)
     path.easings[ i ] = $easing( path.easings[ i ] );
   }
 
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
-
   return new PathKeyframe(
     path.name,
     calc,
-    path.points,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.deltas,
     path.easings
   );
@@ -11917,17 +12247,11 @@ Paths['sub'] = function(path)
 Paths['quadratic-corner'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathQuadraticCorner(
     path.name,
     calc,
-    path.points,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.midpoint,
     path.loop
   );
@@ -11942,17 +12266,11 @@ Paths['quadratic-corner'] = function(path)
 Paths['linear'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathLinear(
     path.name,
     calc,
-    path.points
+    calc.parseArray( path.points, path.points, path.defaultValue )
   );
 };
 
@@ -11992,6 +12310,80 @@ Paths['hermite'] = function(path)
     calc.parse( path.startTangent, defaultValue ),
     calc.parse( path.end, defaultValue ),
     calc.parse( path.endTangent, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a bezier path.
+ *
+ * @param {Object} path
+ * @return {PathBezier}
+ */
+Paths['bezier'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathBezier(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.weights
+  );
+};
+
+/**
+ * Parses an object for a parametric cubic curve path.
+ *
+ * @param {Object} path
+ * @return {PathParametric}
+ */
+Paths['parametric'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametric(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop,
+    path.matrix,
+    path.weight
+  );
+};
+
+/**
+ * Parses an object for a parametric cubic curve path.
+ *
+ * @param {Object} path
+ * @return {PathParametric}
+ */
+Paths['catmull-rom'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathCatmullRom(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a basis spline path.
+ *
+ * @param {Object} path
+ * @return {PathBasisSpline}
+ */
+Paths['basis-spline'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathBasisSpline(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
   );
 };
 
@@ -13142,10 +13534,14 @@ function $transition(transition, cache)
   anim8.coalesce = coalesce;
   anim8.constant = constant;
   anim8.resolve = resolve;
-  anim8.clamp = clamp;
   anim8.id = id;
   anim8.Class = Class;
   anim8.Defaults = Defaults;
+
+  // Math
+  anim8.clamp = clamp;
+  anim8.gcd = gcd;
+  anim8.choose = choose;
 
   // Registries
   anim8.Animations = Animations;

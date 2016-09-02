@@ -41,6 +41,31 @@ Class.define( Calculator,
   },
 
   /**
+   * Parses the given input for a value this calculator understands.
+   *
+   * @method parse
+   * @param  {T} x
+   * @param  {T} defaultValue
+   * @return {T|Function|False}
+   */
+  parseArray: function(input, output, defaultValue)
+  {
+    if (input.length !== output.length)
+    {
+      output.length = input.length;
+    }
+
+    var parsedDefault = this.parse( defaultValue, this.ZERO );
+
+    for (var i = 0; i < input.length; i++)
+    {
+      output[ i ] = this.parse( input[ i ], parsedDefault );
+    }
+
+    return output;
+  },
+
+  /**
    * Copies a value and places it in out and returns out.
    *
    * @method copy
@@ -51,6 +76,18 @@ Class.define( Calculator,
   copy: function(out, copy)
   {
     throw 'Calculator.copy not implemented';
+  },
+
+  /**
+   * Zeros out and returns it.
+   *
+   * @method zero
+   * @param {T} out
+   * @return {T}
+   */
+  zero: function(out)
+  {
+    throw 'Calculator.zero not implemented';
   },
 
   /**

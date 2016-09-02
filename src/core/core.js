@@ -408,26 +408,6 @@ function resolve(variable)
 }
 
 /**
- * Returns a value between the given minimum and maximum.
- *
- * **Examples:**
- *
- *     anim8.clamp( 5, 1, 6 );   // 5
- *     anim8.clamp( 0, 1, 6 );   // 1
- *     anim8.clamp( 7, 1, 6 );   // 6
- *
- * @method anim8.clamp
- * @param  {Number} v
- * @param  {Number} min
- * @param  {Number} max
- * @return {Number}
- */
-function clamp(v, min, max)
-{
-  return (v < min) ? min : (v > max ? max : v);
-}
-
-/**
  * Returns a "unique" identifier.
  *
  * @method id

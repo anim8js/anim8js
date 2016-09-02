@@ -33,7 +33,7 @@ Class.extend( PathHermite, Path,
     var d2 = d * d;
     var d3 = d2 * d;
 
-    out = calc.copy( out, calc.ZERO );
+    out = calc.zero( out );
     out = calc.adds( out, this.resolvePoint( 0 ), 2 * d3 - 3 * d2 + 1 );
     out = calc.adds( out, this.resolvePoint( 1 ), -2 * d3 + 3 * d2 );
     out = calc.adds( out, resolve( this.startTangent ), d3 - 2 * d2 + d );

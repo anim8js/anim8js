@@ -41,10 +41,10 @@ Class.extend( PathQuadraticCorner, Path,
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;
 
-    var p0 = this.resolvePoint( this.getActualIndex( i - 1 ) );
-    var p1 = this.resolvePoint( this.getActualIndex( i ) );
-    var p2 = this.resolvePoint( this.getActualIndex( i + 1 ) );
-    var p3 = this.resolvePoint( this.getActualIndex( i + 2 ) );
+    var p0 = this.resolvePoint( i - 1 );
+    var p1 = this.resolvePoint( i );
+    var p2 = this.resolvePoint( i + 1 );
+    var p3 = this.resolvePoint( i + 2 );
 
     if ( d < midpoint )
     {
@@ -70,11 +70,13 @@ Class.extend( PathQuadraticCorner, Path,
     return out;
   },
 
-  getActualIndex: function(index)
+  resolvePoint: function(i)
   {
-    var n = this.points.length;
+    var points = this.points;
+    var n = points.length;
+    var k = (this.loops ? (i + n) % n : clamp( i, 0, n - 1 ));
 
-    return (this.loops ? (index + n) % n : clamp( index, 0, n - 1 ));
+    return resolve( points[ k ] );
   },
 
   copy: function()

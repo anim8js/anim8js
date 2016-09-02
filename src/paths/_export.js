@@ -33,9 +33,11 @@ Paths['combo'] = function(path)
  */
 Paths['compiled'] = function(path)
 {
+  var parent = $path( path.path );
+
   return new PathCompiled(
     path.name,
-    $path( path.path ),
+    parent,
     path.n || path.pointCount
   );
 };
@@ -70,7 +72,6 @@ Paths['cubic'] = function(path)
 Paths['delta'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
 
   if (!path.deltas)
   {
@@ -82,15 +83,10 @@ Paths['delta'] = function(path)
     }
   }
 
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
-
   return new PathDelta(
     path.name,
     calc,
-    path.points,
+    calc.parseArry( path.points, path.points, path.defaultValue ),
     path.deltas
   );
 };
@@ -104,17 +100,11 @@ Paths['delta'] = function(path)
 Paths['jump'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathJump(
     path.name,
     calc,
-    path.points
+    calc.parseArry( path.points, path.points, path.defaultValue )
   );
 };
 
@@ -127,7 +117,6 @@ Paths['jump'] = function(path)
 Paths['keyframe'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
 
   if (!path.deltas)
   {
@@ -156,15 +145,10 @@ Paths['keyframe'] = function(path)
     path.easings[ i ] = $easing( path.easings[ i ] );
   }
 
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
-
   return new PathKeyframe(
     path.name,
     calc,
-    path.points,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.deltas,
     path.easings
   );
@@ -237,17 +221,11 @@ Paths['sub'] = function(path)
 Paths['quadratic-corner'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathQuadraticCorner(
     path.name,
     calc,
-    path.points,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.midpoint,
     path.loop
   );
@@ -262,17 +240,11 @@ Paths['quadratic-corner'] = function(path)
 Paths['linear'] = function(path)
 {
   var calc = $calculator( path.calculator );
-  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
-
-  for (var i = 0; i < path.points.length; i++)
-  {
-    path.points[ i ] = calc.parse( path.points[ i ], defaultValue );
-  }
 
   return new PathLinear(
     path.name,
     calc,
-    path.points
+    calc.parseArray( path.points, path.points, path.defaultValue )
   );
 };
 
@@ -312,5 +284,79 @@ Paths['hermite'] = function(path)
     calc.parse( path.startTangent, defaultValue ),
     calc.parse( path.end, defaultValue ),
     calc.parse( path.endTangent, defaultValue )
+  );
+};
+
+/**
+ * Parses an object for a bezier path.
+ *
+ * @param {Object} path
+ * @return {PathBezier}
+ */
+Paths['bezier'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathBezier(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.weights
+  );
+};
+
+/**
+ * Parses an object for a parametric cubic curve path.
+ *
+ * @param {Object} path
+ * @return {PathParametric}
+ */
+Paths['parametric'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametric(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop,
+    path.matrix,
+    path.weight
+  );
+};
+
+/**
+ * Parses an object for a parametric cubic curve path.
+ *
+ * @param {Object} path
+ * @return {PathParametric}
+ */
+Paths['catmull-rom'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathCatmullRom(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a basis spline path.
+ *
+ * @param {Object} path
+ * @return {PathBasisSpline}
+ */
+Paths['basis-spline'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathBasisSpline(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
   );
 };
