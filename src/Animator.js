@@ -635,6 +635,7 @@ Class.define( Animator,
    */
   unplay: function(animation, transition, options, all, cache)
   {
+    var transition = $transition( transition );
     var attrimatorMap = $attrimatorsFor( animation, options, cache );
 
     this.unplayAttrimators( attrimatorMap, transition, all );
@@ -651,7 +652,7 @@ Class.define( Animator,
    *
    * @method unplayAttrimators
    * @param {AttrimatorMap} attrimatorMap
-   * @param {String} transition
+   * @param {Object} transition
    * @param {Boolean} [all]
    * @chainable
    * @protected
