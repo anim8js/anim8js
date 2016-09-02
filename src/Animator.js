@@ -617,6 +617,69 @@ Class.define( Animator,
   },
 
   /**
+   * Unplays an animation. Attributes in the animation that are currently being
+   * animated will be transitioned to their starting values. If `all` is true
+   * then any attrimators animating not specified in the given animation will be
+   * stopped.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
+   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   *
+   * @method unplay
+   * @param {Animation|String|Object} animation
+   * @param {String|Array|Object} transition
+   * @param {String|Object} [options]
+   * @param {Boolean} [all=false]
+   * @param {Boolean} [cache=false]
+   * @chainable
+   */
+  unplay: function(animation, transition, options, all, cache)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+
+    this.unplayAttrimators( attrimatorMap, transition, all );
+
+    return this.activate();
+  },
+
+  /**
+   * Unplays a map of attrimators. Attributes in the attrimator map that are
+   * currently being animated will be transitioned to their starting values.
+   * If "all" is true then any attrimators animating not specified
+   * in the given attrimator map will be stopped. This method will not activate
+   * the Animator, that has to be done manually.
+   *
+   * @method unplayAttrimators
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {String} transition
+   * @param {Boolean} [all]
+   * @chainable
+   * @protected
+   */
+  unplayAttrimators: function(attrimatorMap, transition, all)
+  {
+    var unplayAttrimators = new AttrimatorMap();
+    var attrimators = attrimatorMap.values;
+    var startings = {};
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+
+      if ( attrimator.startCycle( startings ) )
+      {
+        unplayAttrimators.put( attr, new Oncer( attr, startings[ attr ], 0, true ) );
+      }
+    }
+
+    this.newCycle( unplayAttrimators );
+    this.transitionAttrimators( transition, unplayAttrimators, all );
+
+    return this;
+  },
+
+  /**
    * Queues an animation. The attrimators generated from the given animation
    * will be started at the same time - as soon as all finite attrimators for
    * the same attributes are finished. Any infinite attrimators will be
