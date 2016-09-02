@@ -392,6 +392,15 @@ Class.define( Animators,
   play                  : delegate( 'play', DelegateTypes.THIS ),
 
   /**
+   * Calls {{#crossLink "Animator/unplay:method"}}{{/crossLink}} on
+   * each animator in the array and returns this.
+   *
+   * @method unplay
+   * @chainable
+   */
+  unplay                : delegate( 'unplay', DelegateTypes.THIS ),
+
+  /**
    * Calls {{#crossLink "Animator/playAttrimators:method"}}{{/crossLink}} on
    * each animator in the array and returns this.
    *
