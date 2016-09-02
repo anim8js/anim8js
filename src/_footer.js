@@ -97,6 +97,8 @@
   anim8.eventize = eventize;
   // - save.js
   anim8.save = save;
+  anim8.saveGroup = saveGroup;
+  anim8.SaveOptions = SaveOptions;
 
   // Classes
   anim8.Aninmation = Animation;

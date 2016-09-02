@@ -8627,6 +8627,16 @@ function clamp(v, min, max)
 var Animations = {};
 
 /**
+ * Options to modify the properties of the animations being saved.
+ */
+var SaveOptions =
+{
+  prefix: '',
+  options: {},
+  cache: false
+};
+
+/**
  * Saves an animation under the given name. It can be played, queued, and
  * transitioned into at a later time providing the name and optionally options
  * to override with.
@@ -8642,12 +8652,66 @@ var Animations = {};
  */
 function save( name, animation, options )
 {
-  var animation = $animation( animation, options );
-  var key = name.toLowerCase();
+  var animation = $animation( animation, coalesce( options, SaveOptions.options ), SaveOptions.cache );
+  var qualifiedName = SaveOptions.prefix + name;
+  var key = qualifiedName.toLowerCase();
 
-  animation.name = name;
+  animation.name = qualifiedName;
 
   Animations[ key ] = animation;
+}
+
+/**
+ * Starts a save group with a prefix or an object containing a prefix and/or
+ * default options to pass to the animations. The animations passed can be
+ * an object or a function to call which contains save calls.
+ *
+ * @method anim8.saveGroup
+ * @param {String|Object} prefixOrOptions
+ * @param {Function|Object} animations
+ */
+function saveGroup( prefixOrOptions, animations )
+{
+  var previousOptions = copy( SaveOptions );
+
+  if ( isString( prefixOrOptions ) )
+  {
+    SaveOptions.prefix += prefixOrOptions;
+  }
+  else if ( isObject( prefixOrOptions ) )
+  {
+    if ( isString( prefixOrOptions.prefix ) )
+    {
+      SaveOptions.prefix += prefixOrOptions.prefix;
+    }
+    if ( isDefined( prefixOrOptions.cache ) )
+    {
+      SaveOptions.cache = prefixOrOptions.cache;
+    }
+    if ( isDefined( prefixOrOptions.options ) )
+    {
+      var parsedOptions = $options( prefixOrOptions.options, SaveOptions.cache );
+
+      if ( parsedOptions !== Defaults.noOptions )
+      {
+        extend( SaveOptions.options, parsedOptions );
+      }
+    }
+  }
+
+  if ( isObject( animations ) )
+  {
+    for (var animationName in animations)
+    {
+      save( animationName, animations[ animationName ] );
+    }
+  }
+  else if ( isFunction( animations ) )
+  {
+    animations();
+  }
+
+  SaveOptions = previousOptions;
 }
 
 
@@ -13047,7 +13111,7 @@ function $options(options, cache)
       return Options[ options ];
     }
 
-    options = options.toLowerCase().split(' ');
+    options = options.toLowerCase().split(/\s+/);
   }
 
   if ( isArray( options ) )
@@ -13626,6 +13690,8 @@ function $transition(transition, cache)
   anim8.eventize = eventize;
   // - save.js
   anim8.save = save;
+  anim8.saveGroup = saveGroup;
+  anim8.SaveOptions = SaveOptions;
 
   // Classes
   anim8.Aninmation = Animation;

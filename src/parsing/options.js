@@ -49,7 +49,7 @@ function $options(options, cache)
       return Options[ options ];
     }
 
-    options = options.toLowerCase().split(' ');
+    options = options.toLowerCase().split(/\s+/);
   }
 
   if ( isArray( options ) )
