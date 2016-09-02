@@ -71,6 +71,9 @@
         <a href="examples/pathQuadraticCorner.html" target="example">quadratic curve corner path</a>
         <a href="examples/pathSub.html" target="example">subset path</a>
         <a href="examples/pathTween.html" target="example">tween path</a>
+        <a href="examples/pathBezier.html" target="example">bezier path</a>
+        <a href="examples/pathBasisSpline.html" target="example">b-spline path</a>
+        <a href="examples/pathCatmullRom.html" target="example">catmull-rom spline path</a>
       </p>
       <iframe src="examples/reference.html" name="example"></iframe>
       <div data-for="examples/and.html">
@@ -626,7 +629,7 @@ anim8or.transition( '500 &gt;250 &lt;250 linear', {
 });</pre>
       </div>
       <div data-for="examples/pathCubic.html">
-        <p>This example shows a box following a <code>cubic</code> curve path which consists of a starting and ending point and a control point.</p>
+        <p>This example shows a circle following a <code>cubic</code> curve path which consists of a starting and ending point and a control point.</p>
         <pre>var myPath = m8.path({
   type: 'cubic',
   calculator: '2d',
@@ -637,9 +640,10 @@ anim8or.transition( '500 &gt;250 &lt;250 linear', {
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathHermite.html">
-        <p>This example shows a box following a <code>hermite</code> path which consists of a starting and ending point and has two vectors which sit at the starting and ending points respectively and point in the direction the curve should follow.</p>
+        <p>This example shows a circle following a <code>hermite</code> path which consists of a starting and ending point and has two vectors which sit at the starting and ending points respectively and point in the direction the curve should follow.</p>
         <pre>var myPath = m8.path({
   type: 'hermite',
   calculator: '2d',
@@ -650,9 +654,10 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathLinear.html">
-        <p>This example shows a box following a <code>linear</code> path which consists of a series of points that are followed at a consistent speed.</p>
+        <p>This example shows a circle following a <code>linear</code> path which consists of a series of points that are followed at a consistent speed.</p>
         <pre>var myPath = m8.path({
   type: 'linear',
   calculator: '2d',
@@ -660,9 +665,10 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathQuadratic.html">
-        <p>This example shows a box following a <code>quadratic</code> curve path which consists of a starting and ending point and two control points between the start and end.</p>
+        <p>This example shows a circle following a <code>quadratic</code> curve path which consists of a starting and ending point and two control points between the start and end.</p>
         <pre>var myPath = m8.path({
   type: 'quadratic',
   calculator: '2d',
@@ -672,9 +678,10 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathQuadraticCorner.html">
-        <p>This example shows a box following a <code>quadratic-corner</code> curved path which is a linear path but with curves at each corner.</p>
+        <p>This example shows a circle following a <code>quadratic-corner</code> curved path which is a linear path but with curves at each corner.</p>
         <pre>var myPath = m8.path({
   type: 'quadratic-corner',
   calculator: '2d',
@@ -683,6 +690,7 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathSub.html">
         <p>This example shows a box following a <code>sub</code> path which follows a subset of another path.</p>
@@ -699,6 +707,7 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <div data-for="examples/pathTween.html">
         <p>This example shows a box following a <code>tween</code> path which has a starting and ending points.</p>
@@ -710,6 +719,40 @@ m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
 });
 
 m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
+      </div>
+      <div data-for="examples/pathBasisSpline.html">
+        <p>This example shows a circle following a <code>basis-spline</code> curved path which is a path that curves inside corners.</p>
+        <pre>var myPath = m8.path({
+  type: 'basis-spline',
+  calculator: '2d',
+  points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
+      </div>
+      <div data-for="examples/pathBezier.html">
+        <p>This example shows a circle following a <code>bezier</code> curved path which is a path where all points affect the path at any point in the path.</p>
+        <pre>var myPath = m8.path({
+  type: 'bezier',
+  calculator: '2d',
+  points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
+      </div>
+      <div data-for="examples/pathCatmullRom.html">
+        <p>This example shows a circle following a <code>catmull-rom</code> curved path which is a path that travels through all the given points while making gentle curves for corners.</p>
+        <pre>var myPath = m8.path({
+  type: 'catmull-rom',
+  calculator: '2d',
+  points: [[20, 20], [300, 50], [300, 400], [50, 130], [400, 200]]
+});
+
+m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');</pre>
+        <p><b>Remember: you can also animate numbers, 3d points, and colors along any type of path.</b></p>
       </div>
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/ClickerMonkey/anim8js">anim8js</a> is maintained by <a href="https://github.com/ClickerMonkey">ClickerMonkey</a>.</span>

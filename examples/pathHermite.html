@@ -2,39 +2,86 @@
 <html>
   <head>
     <style>
-    body, html {
-      padding: 0;
-      margin: 0;
-    }
-    #box1 {
-      width: 40px;
-      height: 40px;
-      border: 2px solid #00F;
-      position: absolute;
-      background-color: #66F;
-    }
+      html, body {
+        padding: 0;
+        margin: 0;
+        background-color: #666;
+      }
+      #canvas {
+        background-color: black;
+      }
     </style>
   </head>
-  <body>
+  <body onload="init()">
 
-    <div id="box1"></div>
+    <div id="container">
+      <canvas id="canvas" width="832" height="500"></canvas>
+    </div>
 
+    <script src="../assets/js/easeljs-0.8.2.combined.js"></script>
     <script src="../assets/js/anim8js.js"></script>
-    <script src="../assets/js/anim8js-dom.js"></script>
-
+    <script src="../assets/js/anim8js-easel.js"></script>
     <script src="examples.js"></script>
 
     <script>
+      var calc = anim8.Calculators['2d'];
+      var bounds = {
+        min: {x: 20, y: 20},
+        max: {x: 812, y: 480}
+      };
+      var tangents = {
+        min: {x: -500, y: -500},
+        max: {x: 500, y: 500}
+      };
+      var rnd = function(range) {
+        return calc.random( calc.create(), range.min, range.max );
+      };
+
       var myPath = m8.path({
         type: 'hermite',
         calculator: '2d',
-        start: [200, 40],
-        startTangent: [-1000, 0],
-        end: [100, 400],
-        endTangent: [-800, 100]
+        start: rnd(bounds),
+        startTangent: rnd(tangents),
+        end: rnd(bounds),
+        endTangent: rnd(tangents)
       });
 
-      m8( window.box1 ).follow('center', myPath, '8s inf linear-yoyo');
+      function init()
+      {
+        var stage = new createjs.Stage( 'canvas' );
+
+        var points = myPath.points;
+        var p0 = points[ 0 ];
+        var p1 = points[ 1 ];
+        var t0 = myPath.startTangent;
+        var t1 = myPath.endTangent;
+        var path = new createjs.Shape();
+        path.graphics.setStrokeStyle( 1 );
+        path.graphics.beginStroke( 'red' );
+        path.graphics.moveTo( p0.x + t0.x, p0.y + t0.y );
+        path.graphics.lineTo( p0.x, p0.y );
+        path.graphics.endStroke();
+        path.graphics.beginStroke( 'white' );
+        path.graphics.moveTo( p0.x, p0.y );
+        path.graphics.lineTo( p1.x, p1.y );
+        path.graphics.endStroke();
+        path.graphics.beginStroke( 'blue' );
+        path.graphics.moveTo( p1.x, p1.y );
+        path.graphics.lineTo( p1.x - t1.x, p1.y - t1.y );
+        path.graphics.endStroke();
+        stage.addChild( path );
+
+        var shape = new createjs.Shape();
+        shape.graphics.beginFill( '#6495ED' );
+        shape.graphics.drawCircle( 0, 0, 15 );
+        shape.x = p0.x;
+        shape.y = p0.y;
+        stage.addChild( shape );
+
+        anim8( shape ).follow( 'position', myPath, '8s inf linear-yoyo' );
+
+        anim8.on('end', stage.update, stage);
+      }
     </script>
   </body>
 </html>
