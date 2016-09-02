@@ -99,6 +99,8 @@
   anim8.save = save;
   anim8.saveGroup = saveGroup;
   anim8.SaveOptions = SaveOptions;
+  // - translate.js
+  anim8.translate = translate;
 
   // Classes
   anim8.Aninmation = Animation;

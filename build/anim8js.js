@@ -6210,6 +6210,27 @@ Class.define( FastMap,
   },
 
   /**
+   * Changes the given key to another.
+   *
+   * @method rekey
+   * @param {String} fromKey
+   * @param {String} toKey
+   * @chainable
+   */
+  rekey: function(fromKey, toKey)
+  {
+    if ( fromKey in this.indices )
+    {
+      var index = this.indices[ fromKey ];
+      this.keys[ index ] = toKey;
+      this.indices[ toKey ] = index;
+      delete this.indices[ fromKey ];
+    }
+
+    return this;
+  },
+
+  /**
    * Puts all keys & values on the given map into this map overwriting any existing values mapped by similar keys.
    *
    * @method putMap
@@ -8712,6 +8733,30 @@ function saveGroup( prefixOrOptions, animations )
   }
 
   SaveOptions = previousOptions;
+}
+
+
+function translate(animation, mappings, saveAs, options, cache)
+{
+  var parsed = $animation(animation, options, cache);
+  var attrimators = parsed.newAttrimators();
+
+  for (var fromAttribute in mappings)
+  {
+    var toAttribute = mappings[ fromAttribute ];
+
+    attrimators.get( fromAttribute ).attribute = toAttribute;
+    attrimators.rekey( fromAttribute, toAttribute );
+  }
+
+  var translated = new Animation( saveAs, parsed.input, parsed.options, attrimators );
+
+  if ( isString( saveAs ) )
+  {
+    save( saveAs, translated );
+  }
+
+  return translated;
 }
 
 
@@ -13692,6 +13737,8 @@ function $transition(transition, cache)
   anim8.save = save;
   anim8.saveGroup = saveGroup;
   anim8.SaveOptions = SaveOptions;
+  // - translate.js
+  anim8.translate = translate;
 
   // Classes
   anim8.Aninmation = Animation;

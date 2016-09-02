@@ -86,6 +86,27 @@ Class.define( FastMap,
   },
 
   /**
+   * Changes the given key to another.
+   *
+   * @method rekey
+   * @param {String} fromKey
+   * @param {String} toKey
+   * @chainable
+   */
+  rekey: function(fromKey, toKey)
+  {
+    if ( fromKey in this.indices )
+    {
+      var index = this.indices[ fromKey ];
+      this.keys[ index ] = toKey;
+      this.indices[ toKey ] = index;
+      delete this.indices[ fromKey ];
+    }
+
+    return this;
+  },
+
+  /**
    * Puts all keys & values on the given map into this map overwriting any existing values mapped by similar keys.
    *
    * @method putMap
