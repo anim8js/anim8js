@@ -29,7 +29,7 @@ var build = {
     './src/builders/!(_)*.js',,
     './src/paths/PathDelta.js',
     './src/paths/PathParametric.js',
-    './src/paths/!(_|PathDelta|PathParametric)*.js',
+    './src/paths/!(_)*.js',
     './src/springs/!(_)*.js',
     './src/**/_export.js',
     './src/parsing/*.js',

@@ -29,10 +29,18 @@ Class.extend( PathBasisSpline, PathParametric,
   }
 });
 
+/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
+ *
+ *                                 [-1, 3,-3, 1]   [p-1]
+ * f(t) = [t^3, t^2, t, 1] * 1/6 * [ 3,-6, 3, 0] * [ p ]
+ *                                 [-3, 0, 3, 0]   [p+1]
+ *                                 [ 1, 4, 1, 0]   [p+2]
+ */
+
 PathBasisSpline.WEIGHT = 1.0 / 6.0;
 PathBasisSpline.MATRIX = [
-  [-1, 3,-3, 1 ],
-  [ 3,-6, 3, 0 ],
-  [-3, 0, 3, 0 ],
-  [ 1, 4, 1, 0 ]
+  [-1, 3,-3, 1],
+  [ 3,-6, 3, 0],
+  [-3, 0, 3, 0],
+  [ 1, 4, 1, 0]
 ];

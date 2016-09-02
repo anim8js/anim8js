@@ -360,3 +360,39 @@ Paths['basis-spline'] = function(path)
     path.loop
   );
 };
+
+/**
+ * Parses an object for a parametric bezier path.
+ *
+ * @param {Object} path
+ * @return {PathParametricBezier}
+ */
+Paths['parametric-bezier'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametricBezier(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a parametric hermite path.
+ *
+ * @param {Object} path
+ * @return {PathParametricHermite}
+ */
+Paths['parametric-hermite'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametricHermite(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};

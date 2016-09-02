@@ -35,7 +35,7 @@ Class.extend( PathParametric, Path,
     var calc = this.calculator;
     var temp = this.temp;
     var matrix = this.matrix;
-    var n = this.points.length;
+    var n = this.points.length - 1;
     var a = delta * n;
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;

@@ -10764,7 +10764,7 @@ Class.extend( PathParametric, Path,
     var calc = this.calculator;
     var temp = this.temp;
     var matrix = this.matrix;
-    var n = this.points.length;
+    var n = this.points.length - 1;
     var a = delta * n;
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;
@@ -10873,12 +10873,20 @@ Class.extend( PathBasisSpline, PathParametric,
   }
 });
 
+/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
+ *
+ *                                 [-1, 3,-3, 1]   [p-1]
+ * f(t) = [t^3, t^2, t, 1] * 1/6 * [ 3,-6, 3, 0] * [ p ]
+ *                                 [-3, 0, 3, 0]   [p+1]
+ *                                 [ 1, 4, 1, 0]   [p+2]
+ */
+
 PathBasisSpline.WEIGHT = 1.0 / 6.0;
 PathBasisSpline.MATRIX = [
-  [-1, 3,-3, 1 ],
-  [ 3,-6, 3, 0 ],
-  [-3, 0, 3, 0 ],
-  [ 1, 4, 1, 0 ]
+  [-1, 3,-3, 1],
+  [ 3,-6, 3, 0],
+  [-3, 0, 3, 0],
+  [ 1, 4, 1, 0]
 ];
 
 
@@ -10987,6 +10995,14 @@ Class.extend( PathCatmullRom, PathParametric,
     return new PathCatmullRom( this.name, this.calculator, copy(this.points), this.loop );
   }
 });
+
+/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
+ *
+ *                                 [-1, 3,-3, 1]   [p-1]
+ * f(t) = [1, t, t^2, t^3] * 1/2 * [ 3,-6, 3, 0] * [ p ]
+ *                                 [-3, 0, 3, 0]   [p+1]
+ *                                 [ 1, 4, 1, 0]   [p+2]
+ */
 
 PathCatmullRom.WEIGHT = 0.5;
 PathCatmullRom.MATRIX = [
@@ -11425,6 +11441,100 @@ PathLinear.getTimes = function(calc, points)
 
 	return distances;
 };
+
+
+/**
+ * Instantiates a new PathParametricBezier.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Boolean} loop
+ * @class PathParametricBezier
+ * @constructor
+ * @extends PathParametric
+ */
+function PathParametricBezier(name, calculator, points, loop)
+{
+  this.name = name;
+  this.set( calculator, points, loop );
+}
+
+Class.extend( PathParametricBezier, PathParametric,
+{
+  set: function(calculator, points, loop)
+  {
+    this._set( calculator, points, loop, PathParametricBezier.MATRIX, PathParametricBezier.WEIGHT, true );
+  },
+
+  copy: function()
+  {
+    return new PathParametricBezier( this.name, this.calculator, copy(this.points), this.loop );
+  }
+});
+
+/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
+ *
+ *                           [-1, 3,-3, 1]   [p-1]
+ * f(t) = [t^3, t^2, t, 1] * [ 3,-6, 3, 0] * [ p ]
+ *                           [-3, 3, 0, 0]   [p+1]
+ *                           [ 1, 0, 0, 0]   [p+2]
+ */
+
+PathParametricBezier.WEIGHT = 1.0;
+PathParametricBezier.MATRIX = [
+  [-1, 3,-3, 1],
+  [ 3,-6, 3, 0],
+  [-3, 3, 0, 0],
+  [ 1, 0, 0, 0]
+];
+
+
+/**
+ * Instantiates a new PathParametricHermite.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {Array} points
+ * @param {Boolean} loop
+ * @class PathParametricHermite
+ * @constructor
+ * @extends PathParametric
+ */
+function PathParametricHermite(name, calculator, points, loop)
+{
+  this.name = name;
+  this.set( calculator, points, loop );
+}
+
+Class.extend( PathParametricHermite, PathParametric,
+{
+  set: function(calculator, points, loop)
+  {
+    this._set( calculator, points, loop, PathParametricHermite.MATRIX, PathParametricHermite.WEIGHT, true );
+  },
+
+  copy: function()
+  {
+    return new PathParametricHermite( this.name, this.calculator, copy(this.points), this.loop );
+  }
+});
+
+/** http://www.cs.cornell.edu/Courses/cs4620/2013fa/lectures/16spline-curves.pdf
+ *
+ *                           [ 2,-2, 1, 2]   [p-1]
+ * f(t) = [t^3, t^2, t, 1] * [-3, 3,-2,-1] * [ p ]
+ *                           [ 0, 0, 1, 0]   [p+1]
+ *                           [ 1, 0, 0, 0]   [p+2]
+ */
+
+PathParametricHermite.WEIGHT = 1.0;
+PathParametricHermite.MATRIX = [
+  [ 2,-2, 1, 2],
+  [-3, 3,-2,-1],
+  [ 0, 0, 1, 0],
+  [ 1, 0, 0, 0]
+];
 
 
 /**
@@ -12399,6 +12509,42 @@ Paths['basis-spline'] = function(path)
   var calc = $calculator( path.calculator );
 
   return new PathBasisSpline(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a parametric bezier path.
+ *
+ * @param {Object} path
+ * @return {PathParametricBezier}
+ */
+Paths['parametric-bezier'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametricBezier(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.loop
+  );
+};
+
+/**
+ * Parses an object for a parametric hermite path.
+ *
+ * @param {Object} path
+ * @return {PathParametricHermite}
+ */
+Paths['parametric-hermite'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  return new PathParametricHermite(
     path.name,
     calc,
     calc.parseArray( path.points, path.points, path.defaultValue ),
