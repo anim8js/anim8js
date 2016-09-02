@@ -5989,7 +5989,9 @@ Class.extend( Event, Attrimator,
   {
     if ( this.hasInitialState )
     {
-      return this.applyValue( frame, frame[ this.attribute ], 0 );
+      this.applyValue( frame, frame[ this.attribute ], 0 );
+
+      return true;
     }
 
     return false;
