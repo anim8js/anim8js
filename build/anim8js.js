@@ -8584,7 +8584,7 @@ function gcd(a,b)
 
 function choose(n, m)
 {
-  var num = 1, den = 1, gcd;
+  var num = 1, den = 1, g;
 
   if ( m > (n / 2) )
   {
@@ -8595,9 +8595,9 @@ function choose(n, m)
   {
     num *= n--;
     den *= m--;
-    gcd = gcd( num, den );
-    num /= gcd;
-    den /= gcd;
+    g = gcd( num, den );
+    num /= g;
+    den /= g;
   }
 
   return num;
