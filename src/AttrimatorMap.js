@@ -179,7 +179,7 @@ Class.extend( AttrimatorMap, FastMap,
    * @method timeRemaining
    * @return {Number}
    */
-  timeRemaining: function()
+  timeRemaining: function(returnInfinity)
   {
     var maxRemaining = 0;
     var values = this.values;
@@ -191,6 +191,10 @@ Class.extend( AttrimatorMap, FastMap,
       if ( !attrimator.isInfinite() )
       {
         maxRemaining = Math.max( maxRemaining, attrimator.timeRemaining() );
+      }
+      else if ( returnInfinity )
+      {
+        return Number.Infinity;
       }
     }
 

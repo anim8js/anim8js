@@ -113,7 +113,7 @@ Class.extend( Physics, Attrimator,
 
     vel = calc.adds( vel, acc, dt );
 
-    if ( this.terminal !== Number.POSITIVE_INFINITY )
+    if ( isFinite( this.terminal ) )
     {
       vel = calc.clamp( vel, 0, this.terminal );
     }

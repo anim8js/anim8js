@@ -37,7 +37,7 @@ function $transition(transition, cache)
       return Transitions[ transition ];
     }
 
-    transition = transition.toLowerCase().split(' ');
+    transition = transition.toLowerCase().split(/\s+/);
   }
 
   if ( isArray( transition ) )

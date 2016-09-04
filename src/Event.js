@@ -297,7 +297,7 @@ Class.extend( Event, Attrimator,
   },
   isInfinite: function()
   {
-    return (this.repeat === Number.POSITIVE_INFINITY) && (this.stopTime === Number.POSITIVE_INFINITY);
+    return !isFinite( this.repeat ) && !isFinite( this.stopTime );
   },
   isFinished: function()
   {

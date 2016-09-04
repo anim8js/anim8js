@@ -332,7 +332,7 @@ Class.define( Attrimator,
    */
   isInfinite: function()
   {
-    return (this.stopTime === Number.POSITIVE_INFINITY);
+    return !isFinite( this.stopTime );
   },
 
   /**
