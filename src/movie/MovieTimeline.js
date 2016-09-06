@@ -9,23 +9,64 @@ function MovieTimeline(animator)
 Class.define( MovieTimeline,
 {
 
-  addAttrimators: function(attrimatorMap, all, time, intro)
+  playAttrimators: function(attrimatorMap, all, time, intro)
   {
     if ( this.attrimators.size() )
     {
       this.attrimators.playMapAt( attrimatorMap, all, time );
     }
-    else if ( intro )
-    {
-      this.attrimators.putMap( attrimatorMap );
-      this.attrimators.delay( time );
-    }
     else
     {
-      this.start = time;
       this.attrimators.putMap( attrimatorMap );
       this.attrimators.delay( time );
+
+      if ( !intro )
+      {
+        this.start = time;
+      }
     }
+  },
+
+  queueAttrimators: function(attrimatorMap, all, time)
+  {
+    if ( all )
+    {
+      this.attrimators.stopNotPresentAt( attrimatorMap, time );
+    }
+
+    this.attrimators.queueMap( attrimatorMap );
+  },
+
+  transitionAttrimators: function(attrimatorMap, all, time, transition)
+  {
+    if ( all )
+    {
+      this.attrimators.stopNotPresentAt( attrimatorMap, time + transition.time );
+    }
+
+    this.attrimators.transitionMap(
+      transition,
+      attrimatorMap,
+      function getValue(attr) {
+        var attrimator = this.attrimators.get( attr );
+        var attribute = this.animator.getAttribute( attr );
+
+        return attrimator ? attrimator.valueAtSearch( time, attribute.cloneDefault() ) : undefined;
+      },
+      function getAttribute(attr) {
+        return this.animator.getAttribute( attr );
+      },
+      function placeAttrimator(attrimator) {
+        this.attrimators.playAttrimatorAt( attrimator, time );
+      },
+      function getValueAt(attrimator, relativeTime, out) {
+        return attrimator.valueAtSearch( time + relativeTime, out );
+      },
+      function stopAttrimator(attrimator, relativeTime) {
+        attrimator.stopAt( time + relativeTime );
+      },
+      this
+    );
   },
 
   preupdate: function(time)

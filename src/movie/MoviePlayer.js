@@ -30,15 +30,25 @@ Class.define( MoviePlayer,
 
     return this;
   },
-  start: function()
+  start: function(applyNow, avoidApplyTrigger)
   {
     this.time = 0;
 
+    if ( applyNow )
+    {
+      this.apply( this.time, avoidApplyTrigger );
+    }
+
     return this;
   },
-  end: function()
+  end: function(applyNow, avoidApplyTrigger)
   {
     this.time = this.duration;
+
+    if ( applyNow )
+    {
+      this.apply( this.time, avoidApplyTrigger );
+    }
 
     return this;
   },

@@ -1660,13 +1660,30 @@ Class.define( Animator,
     // If granularity is given > 1 then compile the path, compute intro & outro velocities, and compute deltas for new
     //    compiled path based on interpolated velocity over the path (knowing it's length and transition time)
 
+    if ( all )
+    {
+      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
+    }
+
+    this.attrimators.transitionMap(
+      transition,
+      attrimatorMap,
+      this.value,
+      this.getAttribute,
+      this.placeAttrimator,
+      this.transitionGetValueAt,
+      this.transitionStopAttrimator,
+      this
+    );
+
+/*
     var current = this.attrimators;
     var attrimators = attrimatorMap.values;
 
     // If transition all attributes,
     if ( all )
     {
-      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
+      current.finishNotPresent( attrimatorMap, transition.time );
     }
 
     // Only transition if we need to
@@ -1677,6 +1694,11 @@ Class.define( Animator,
         var next = attrimators[ i ];
         var attr = next.attribute;
         var curr = current.get( attr );
+
+        if ( curr && isNumber( atTime ) )
+        {
+          curr = curr.attrimatorAt( atTime );
+        }
 
         if ( curr && isDefined( this.frame[ attr ] ) )
         {
@@ -1819,8 +1841,19 @@ Class.define( Animator,
         this.placeAttrimator( attrimators[ i ] );
       }
     }
+*/
 
     return this;
+  },
+
+  transitionGetValueAt: function(attrimator, relativeTime, out)
+  {
+    return attrimator.valueAt( attrimator.getElapsed() + relativeTime, out );
+  },
+
+  transitionStopAttrimator: function(attrimator, relativeTime)
+  {
+    attrimator.stopIn( relativeTime );
   },
 
   /**
@@ -3905,29 +3938,204 @@ Class.extend( AttrimatorMap, FastMap,
 
     for (var i = 0; i < attrimators.length; i++)
     {
-      var attrimator = attrimators[ i ];
-      var attr = attrimator.attribute;
-      var existing = this.get( attr );
-
-      if ( existing )
-      {
-        existing.nextAt( attrimator, time );
-      }
-      else
-      {
-        attrimator.delay += time;
-
-        this.put( attr, attrimator );
-      }
+      this.playAttrimatorAt( attrimators[ i ], time );
     }
 
     return this;
   },
 
-  // TODO
-  transitionMapAt: function(attrimatorMap, transition, all)
+  playAttrimatorAt: function(attrimator, time)
   {
+    var attr = attrimator.attribute;
+    var existing = this.get( attr );
 
+    if ( existing )
+    {
+      existing.nextAt( attrimator, time );
+    }
+    else
+    {
+      attrimator.delay += time;
+
+      this.put( attr, attrimator );
+    }
+  },
+
+  transitionMap: function(transition, attrimatorMap, getValue, getAttribute, placeAttrimator, getValueAt, stopAttrimator, context)
+  {
+    // TRANSITIONING:
+    // If the animator doesn't have an attrimator for the given attribute just add the attrimator adding the total delay
+    // If the animator has an attrimator currently...
+    //   If the current attrimator or new attrimator don't have values at the desired times...
+    //      Stop the current attrimator after the total delay (adding the delay of the new attrimator as well)
+    //      Queue the new attrimator
+    //   Else
+    //      Create a path using the methods detailed above
+    // If all is true and there's an attrimator left on the animator that isn't being transitioned, stop it after the total delay.
+
+    // CREATING A TRANSITION PATH:
+    // If intro & outro are 0, use Tween
+    // If intro is 0, use Quadratic Path between current value, outro point, and first point on new path.
+    // If outro is 0, use Quadratic Path between current value, first point on new path, and intro point.
+    // If intro & outro are not 0, use Cubic Path between current value, outro point, first point on new path, and intro point.
+    // If granularity is given > 1 then compile the path, compute intro & outro velocities, and compute deltas for new
+    //    compiled path based on interpolated velocity over the path (knowing it's length and transition time)
+
+    var attrimators = attrimatorMap.values;
+
+    if ( this.hasOverlap( attrimatorMap ) )
+    {
+      for (var i = attrimators.length - 1; i >= 0; i--)
+      {
+        var next = attrimators[ i ];
+        var attr = next.attribute;
+        var curr = this.get( attr );
+        var currValue = getValue.call( context, attr );
+
+        if ( curr && isDefined( currValue ) )
+        {
+          var attribute = getAttribute.call( context, attr );
+          var calc = attribute.calculator;
+
+          var p2 = next.valueAt( 0, calc.create() );
+
+          if ( p2 !== false )
+          {
+            var transitionTime = transition.time;
+            var p0 = calc.clone( currValue );
+            var p1 = transition.outro ? getValueAt.call( context, curr, transition.outro, calc.create() ) : false;
+            var p3 = transition.intro ? next.valueAt( transition.intro, calc.create() ) : false;
+            var path = null;
+
+            // If the intro is negative we can look into the past by looking a little bit into
+            // the future and assume the past is going in the same direction (only the opposite).
+            if ( p3 !== false && transition.intro < 0 && transition.lookup > 0 )
+            {
+              var pastLookahead = next.valueAt( transition.lookup, calc.create() );
+              var pastVelocity = calc.sub( pastLookahead, p2 );
+
+              if ( pastVelocity !== false )
+              {
+                var pastNegativeVelocity = calc.scale( pastVelocity, transition.intro / transition.lookup );
+                var past = calc.add( pastNegativeVelocity, p2 );
+
+                p3 = p2;
+                p2 = past;
+              }
+            }
+
+            // Build a path with as many of the points as possible.
+            if ( p1 === false && p3 === false )
+            {
+              path = new Tween( attr, calc, p0, p2 );
+            }
+            else if ( p1 === false )
+            {
+              path = new PathQuadratic( attr, calc, p0, p2, p3 );
+            }
+            else if ( p3 === false )
+            {
+              path = new PathQuadratic( attr, calc, p0, p1, p2 );
+            }
+            else
+            {
+              path = new PathCubic( attr, calc, p0, p1, p2, p3 );
+            }
+
+            // If granularity is specified we will try to make the transition
+            // smooth by maintaining exit (outro) velocity from the current attrimator
+            // and interpolating it to the entrance (intro) velocity for the
+            // attrimator we're transitioning into.
+            if ( transition.granularity > 2 && transition.lookup > 0 )
+            {
+              var outTime  = p1 === false ? 0 : transition.outro;
+              var outPoint = p1 === false ? p0 : p1;
+              var outNext  = getValueAt.call( context, curr, outTime + transition.lookup, calc.create() );
+
+              var inTime   = p3 === false ? 0 : transition.intro;
+              var inPoint  = p3 === false ? p2 : p3;
+              var inNext   = next.valueAt( inTime + transition.lookup, calc.create() );
+
+              // We can only proceed if we have reference points to calculate
+              // exit & entrance velocity.
+              if ( outNext !== false && inNext !== false )
+              {
+                var outVelocity  = calc.sub( calc.clone( outNext ), outPoint );
+                var outPerMillis = calc.length( outVelocity ) / transition.lookup;
+
+                var inVelocity   = calc.sub( calc.clone( inNext ), inPoint );
+                var inPerMillis  = calc.length( inVelocity ) / transition.lookup;
+
+                var compiled = new PathCompiled( attr, path, transition.granularity );
+                var points = compiled.points;
+                var lastPoint = points.length - 1;
+                var totalDistance = 0;
+                var distances = [];
+
+                for (var k = 0; k < lastPoint; k++)
+                {
+                  distances[ k ] = totalDistance;
+                  totalDistance += calc.distance( points[ k ], points[ k + 1 ] );
+                }
+                distances[ lastPoint ] = totalDistance;
+
+                if ( !isNaN( totalDistance ) )
+                {
+                  var requiredTime = 2.0 * totalDistance / (outPerMillis + inPerMillis);
+                  var acceleration = 0.5 * (inPerMillis - outPerMillis) / requiredTime;
+                  var timeDelta = requiredTime / lastPoint;
+                  var deltas = [];
+
+                  for (var k = 0; k < lastPoint; k++)
+                  {
+                    var time = k * timeDelta;
+                    var position = outPerMillis * time + acceleration * time * time;
+
+                    deltas[ k ] = position / totalDistance;
+                  }
+                  deltas[ lastPoint ] = 1.0;
+
+                  path = new PathDelta( attr, calc, points, deltas );
+                  transitionTime = requiredTime;
+                }
+              }
+            }
+
+            var transitionEvent = new Event( attr, path, transitionTime, transition.easing, 0, 0, 0, 1 );
+
+            transitionEvent.next = next;
+            transitionEvent.cycle = next.cycle;
+
+            next.offset = transition.intro;
+
+            placeAttrimator.call( context, transitionEvent );
+          }
+          else
+          {
+            stopAttrimator.call( context, curr, transition.time + next.delay );
+
+            curr.queue( next );
+            next.delay = 0;
+          }
+        }
+        else
+        {
+          next.delay += transition.time;
+
+          placeAttrimator.call( context, next );
+        }
+      }
+    }
+    // We don't need to transition, just play the events
+    else
+    {
+      for (var i = attrimators.length - 1; i >= 0; i--)
+      {
+        placeAttrimator.call( context, attrimators[ i ] );
+      }
+    }
+
+    return this;
   },
 
   /**
@@ -12181,6 +12389,8 @@ function Movie(name)
   this.name = name;
   this.currentTime = 0;
   this.currentTimelines = [];
+  this.sequenceDelay = 0;
+  this.sequenceEasing = Easings.linear;
   this.introduce = false;
   this.timelines = new FastMap();
   this.autoEnd = false;
@@ -12188,12 +12398,22 @@ function Movie(name)
 
 Class.define( Movie,
 {
+
   setAutoEnd: function(autoEnd)
   {
     this.autoEnd = autoEnd;
 
     return this;
   },
+
+  sequence: function(delay, easing)
+  {
+    this.sequenceDelay = $time( delay );
+    this.sequenceEasing = $easing( easing, Easings.linear );
+
+    return this;
+  },
+
   intro: function(subjects)
   {
     this.currentTimelines = this.getTimelines( subjects );
@@ -12201,12 +12421,14 @@ Class.define( Movie,
 
     return this;
   },
+
   with: function(subjects)
   {
     this.currentTimelines = this.getTimelines( subjects );
 
     return this;
   },
+
   add: function(subjects)
   {
     var additional = this.getTimelines( subjects );
@@ -12215,6 +12437,7 @@ Class.define( Movie,
 
     return this;
   },
+
   getTimeline: function(animator)
   {
     var timelineId = animator.$timelineId;
@@ -12231,6 +12454,7 @@ Class.define( Movie,
 
     return timeline;
   },
+
   getTimelines: function(subjects)
   {
     var animators = [];
@@ -12259,6 +12483,7 @@ Class.define( Movie,
 
     return animators;
   },
+
   at: function(time)
   {
     var at = $time( time, false );
@@ -12272,6 +12497,7 @@ Class.define( Movie,
 
     return this;
   },
+
   seek: function(time)
   {
     var by = $time( time, false );
@@ -12283,20 +12509,69 @@ Class.define( Movie,
 
     return this.at( this.currentTime + by );
   },
+
   end: function()
   {
     return this.at( this.duration() );
   },
+
   play: function(animation, options, all)
   {
     var attrimatorMap = $attrimatorsFor( animation, options );
-    var timelines = this.timelines.values;
+    var intro = this.introduce;
 
-    for (var i = 0; i < timelines.length; i++)
+    return this.eachCurrentTimeline(function(timeline, time)
     {
-      timelines[ i ].addAttrimators( attrimatorMap, all, this.currentTime, this.introduce );
+      timeline.playAttrimators( attrimatorMap, all, time, intro );
+    });
+  },
+
+  queue: function(animation, options, all)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options );
+
+    return this.eachCurrentTimeline(function(timeline, time)
+    {
+      timeline.queueAttrimators( attrimatorMap, all, time );
+    });
+  },
+
+  transition: function(transition, animation, options, all)
+  {
+    var transition = $transition( transition );
+    var attrimatorMap = $attrimatorsFor( animation, options );
+
+    return this.eachCurrentTimeline(function(timeline, time)
+    {
+      timeline.transitionAttrimators( attrimatorMap, all, time, transition );
+    });
+  },
+
+  eachCurrentTimeline: function(onTimeline)
+  {
+    var timelines = this.currentTimelines;
+    var n = timelines.length - 1;
+    var time = this.currentTime;
+
+    if ( this.sequenceDelay > 0 )
+    {
+      var timeGap = n * this.sequenceDelay;
+      var easing = this.sequenceEasing;
+
+      for (var i = 0; i <= n; i++)
+      {
+        onTimeline( timelines[ i ], time + easing( i / n ) * timeGap );
+      }
+    }
+    else
+    {
+      for (var i = 0; i <= n; i++)
+      {
+        onTimeline( timelines[ i ], time );
+      }
     }
 
+    this.sequenceDelay = 0;
     this.introduce = false;
 
     if ( this.autoEnd )
@@ -12306,6 +12581,7 @@ Class.define( Movie,
 
     return this;
   },
+
   duration: function()
   {
     var timelines = this.timelines.values;
@@ -12354,15 +12630,25 @@ Class.define( MoviePlayer,
 
     return this;
   },
-  start: function()
+  start: function(applyNow, avoidApplyTrigger)
   {
     this.time = 0;
 
+    if ( applyNow )
+    {
+      this.apply( this.time, avoidApplyTrigger );
+    }
+
     return this;
   },
-  end: function()
+  end: function(applyNow, avoidApplyTrigger)
   {
     this.time = this.duration;
+
+    if ( applyNow )
+    {
+      this.apply( this.time, avoidApplyTrigger );
+    }
 
     return this;
   },
@@ -12486,23 +12772,64 @@ function MovieTimeline(animator)
 Class.define( MovieTimeline,
 {
 
-  addAttrimators: function(attrimatorMap, all, time, intro)
+  playAttrimators: function(attrimatorMap, all, time, intro)
   {
     if ( this.attrimators.size() )
     {
       this.attrimators.playMapAt( attrimatorMap, all, time );
     }
-    else if ( intro )
-    {
-      this.attrimators.putMap( attrimatorMap );
-      this.attrimators.delay( time );
-    }
     else
     {
-      this.start = time;
       this.attrimators.putMap( attrimatorMap );
       this.attrimators.delay( time );
+
+      if ( !intro )
+      {
+        this.start = time;
+      }
     }
+  },
+
+  queueAttrimators: function(attrimatorMap, all, time)
+  {
+    if ( all )
+    {
+      this.attrimators.stopNotPresentAt( attrimatorMap, time );
+    }
+
+    this.attrimators.queueMap( attrimatorMap );
+  },
+
+  transitionAttrimators: function(attrimatorMap, all, time, transition)
+  {
+    if ( all )
+    {
+      this.attrimators.stopNotPresentAt( attrimatorMap, time + transition.time );
+    }
+
+    this.attrimators.transitionMap(
+      transition,
+      attrimatorMap,
+      function getValue(attr) {
+        var attrimator = this.attrimators.get( attr );
+        var attribute = this.animator.getAttribute( attr );
+
+        return attrimator ? attrimator.valueAtSearch( time, attribute.cloneDefault() ) : undefined;
+      },
+      function getAttribute(attr) {
+        return this.animator.getAttribute( attr );
+      },
+      function placeAttrimator(attrimator) {
+        this.attrimators.playAttrimatorAt( attrimator, time );
+      },
+      function getValueAt(attrimator, relativeTime, out) {
+        return attrimator.valueAtSearch( time + relativeTime, out );
+      },
+      function stopAttrimator(attrimator, relativeTime) {
+        attrimator.stopAt( time + relativeTime );
+      },
+      this
+    );
   },
 
   preupdate: function(time)

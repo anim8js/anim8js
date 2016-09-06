@@ -14,6 +14,8 @@ function Movie(name)
   this.name = name;
   this.currentTime = 0;
   this.currentTimelines = [];
+  this.sequenceDelay = 0;
+  this.sequenceEasing = Easings.linear;
   this.introduce = false;
   this.timelines = new FastMap();
   this.autoEnd = false;
@@ -21,12 +23,22 @@ function Movie(name)
 
 Class.define( Movie,
 {
+
   setAutoEnd: function(autoEnd)
   {
     this.autoEnd = autoEnd;
 
     return this;
   },
+
+  sequence: function(delay, easing)
+  {
+    this.sequenceDelay = $time( delay );
+    this.sequenceEasing = $easing( easing, Easings.linear );
+
+    return this;
+  },
+
   intro: function(subjects)
   {
     this.currentTimelines = this.getTimelines( subjects );
@@ -34,12 +46,14 @@ Class.define( Movie,
 
     return this;
   },
+
   with: function(subjects)
   {
     this.currentTimelines = this.getTimelines( subjects );
 
     return this;
   },
+
   add: function(subjects)
   {
     var additional = this.getTimelines( subjects );
@@ -48,6 +62,7 @@ Class.define( Movie,
 
     return this;
   },
+
   getTimeline: function(animator)
   {
     var timelineId = animator.$timelineId;
@@ -64,6 +79,7 @@ Class.define( Movie,
 
     return timeline;
   },
+
   getTimelines: function(subjects)
   {
     var animators = [];
@@ -92,6 +108,7 @@ Class.define( Movie,
 
     return animators;
   },
+
   at: function(time)
   {
     var at = $time( time, false );
@@ -105,6 +122,7 @@ Class.define( Movie,
 
     return this;
   },
+
   seek: function(time)
   {
     var by = $time( time, false );
@@ -116,20 +134,69 @@ Class.define( Movie,
 
     return this.at( this.currentTime + by );
   },
+
   end: function()
   {
     return this.at( this.duration() );
   },
+
   play: function(animation, options, all)
   {
     var attrimatorMap = $attrimatorsFor( animation, options );
-    var timelines = this.timelines.values;
+    var intro = this.introduce;
 
-    for (var i = 0; i < timelines.length; i++)
+    return this.eachCurrentTimeline(function(timeline, time)
     {
-      timelines[ i ].addAttrimators( attrimatorMap, all, this.currentTime, this.introduce );
+      timeline.playAttrimators( attrimatorMap, all, time, intro );
+    });
+  },
+
+  queue: function(animation, options, all)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options );
+
+    return this.eachCurrentTimeline(function(timeline, time)
+    {
+      timeline.queueAttrimators( attrimatorMap, all, time );
+    });
+  },
+
+  transition: function(transition, animation, options, all)
+  {
+    var transition = $transition( transition );
+    var attrimatorMap = $attrimatorsFor( animation, options );
+
+    return this.eachCurrentTimeline(function(timeline, time)
+    {
+      timeline.transitionAttrimators( attrimatorMap, all, time, transition );
+    });
+  },
+
+  eachCurrentTimeline: function(onTimeline)
+  {
+    var timelines = this.currentTimelines;
+    var n = timelines.length - 1;
+    var time = this.currentTime;
+
+    if ( this.sequenceDelay > 0 )
+    {
+      var timeGap = n * this.sequenceDelay;
+      var easing = this.sequenceEasing;
+
+      for (var i = 0; i <= n; i++)
+      {
+        onTimeline( timelines[ i ], time + easing( i / n ) * timeGap );
+      }
+    }
+    else
+    {
+      for (var i = 0; i <= n; i++)
+      {
+        onTimeline( timelines[ i ], time );
+      }
     }
 
+    this.sequenceDelay = 0;
     this.introduce = false;
 
     if ( this.autoEnd )
@@ -139,6 +206,7 @@ Class.define( Movie,
 
     return this;
   },
+
   duration: function()
   {
     var timelines = this.timelines.values;

@@ -802,13 +802,30 @@ Class.define( Animator,
     // If granularity is given > 1 then compile the path, compute intro & outro velocities, and compute deltas for new
     //    compiled path based on interpolated velocity over the path (knowing it's length and transition time)
 
+    if ( all )
+    {
+      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
+    }
+
+    this.attrimators.transitionMap(
+      transition,
+      attrimatorMap,
+      this.value,
+      this.getAttribute,
+      this.placeAttrimator,
+      this.transitionGetValueAt,
+      this.transitionStopAttrimator,
+      this
+    );
+
+/*
     var current = this.attrimators;
     var attrimators = attrimatorMap.values;
 
     // If transition all attributes,
     if ( all )
     {
-      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
+      current.finishNotPresent( attrimatorMap, transition.time );
     }
 
     // Only transition if we need to
@@ -819,6 +836,11 @@ Class.define( Animator,
         var next = attrimators[ i ];
         var attr = next.attribute;
         var curr = current.get( attr );
+
+        if ( curr && isNumber( atTime ) )
+        {
+          curr = curr.attrimatorAt( atTime );
+        }
 
         if ( curr && isDefined( this.frame[ attr ] ) )
         {
@@ -961,8 +983,19 @@ Class.define( Animator,
         this.placeAttrimator( attrimators[ i ] );
       }
     }
+*/
 
     return this;
+  },
+
+  transitionGetValueAt: function(attrimator, relativeTime, out)
+  {
+    return attrimator.valueAt( attrimator.getElapsed() + relativeTime, out );
+  },
+
+  transitionStopAttrimator: function(attrimator, relativeTime)
+  {
+    attrimator.stopIn( relativeTime );
   },
 
   /**
