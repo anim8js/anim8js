@@ -115,13 +115,17 @@
   anim8.EventState = EventState;
   anim8.Factory = Factory;
   anim8.FastMap = FastMap;
-  anim8.Movie = Movie;
   anim8.Oncer = Oncer;
   anim8.Builder = Builder;
   anim8.Path = Path;
   anim8.Physics = Physics;
   anim8.Sequence = Sequence;
   anim8.Spring = Spring;
+
+  // Movie
+  anim8.Movie = Movie;
+  anim8.MoviePlayer = MoviePlayer;
+  anim8.MovieTimeline = MovieTimeline;
 
   // Calculators
   anim8.Calculator2d = Calculator2d;
