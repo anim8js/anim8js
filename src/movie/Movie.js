@@ -16,10 +16,17 @@ function Movie(name)
   this.currentTimelines = [];
   this.introduce = false;
   this.timelines = new FastMap();
+  this.autoEnd = false;
 }
 
 Class.define( Movie,
 {
+  setAutoEnd: function(autoEnd)
+  {
+    this.autoEnd = autoEnd;
+
+    return this;
+  },
   intro: function(subjects)
   {
     this.currentTimelines = this.getTimelines( subjects );
@@ -111,15 +118,7 @@ Class.define( Movie,
   },
   end: function()
   {
-    var timelines = this.timelines.values;
-    var maxTime = this.currentTime;
-
-    for (var i = 0; i < timelines.length; i++)
-    {
-      maxTime = Math.max( maxTime, timelines[ i ].attrimators.timeRemaining() );
-    }
-
-    return this.at( maxTime );
+    return this.at( this.duration() );
   },
   play: function(animation, options, all)
   {
@@ -133,7 +132,24 @@ Class.define( Movie,
 
     this.introduce = false;
 
+    if ( this.autoEnd )
+    {
+      this.end();
+    }
+
     return this;
+  },
+  duration: function()
+  {
+    var timelines = this.timelines.values;
+    var maxTime = 0;
+
+    for (var i = 0; i < timelines.length; i++)
+    {
+      maxTime = Math.max( maxTime, timelines[ i ].attrimators.timeRemaining() );
+    }
+
+    return maxTime;
   }
 });
 

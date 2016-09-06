@@ -6,6 +6,7 @@ function MoviePlayer(movie)
   this.currentTime = 0;
   this.playing = false;
   this.movie = movie;
+  this.duration = movie.duration();
   this.run = this.runner( movie, this );
 }
 
@@ -29,6 +30,18 @@ Class.define( MoviePlayer,
 
     return this;
   },
+  start: function()
+  {
+    this.time = 0;
+
+    return this;
+  },
+  end: function()
+  {
+    this.time = this.duration;
+
+    return this;
+  },
   play: function()
   {
     if ( !this.playing )
@@ -38,6 +51,8 @@ Class.define( MoviePlayer,
 
       requestRun( this.run );
     }
+
+    return this;
   },
   pause: function()
   {
@@ -45,18 +60,18 @@ Class.define( MoviePlayer,
 
     return this;
   },
-  goto: function(time, applyNow)
+  goto: function(time, applyNow, avoidApplyTrigger)
   {
     this.time = $time( time );
 
     if ( applyNow )
     {
-      this.apply();
+      this.apply( this.time, avoidApplyTrigger );
     }
 
     return this;
   },
-  apply: function(applyTime)
+  apply: function(applyTime, avoidApplyTrigger)
   {
     var time = coalesce( applyTime, this.time );
     var timelines = this.movie.timelines.values;
@@ -87,6 +102,31 @@ Class.define( MoviePlayer,
       active[ i ].apply();
     }
 
+    if ( !avoidApplyTrigger )
+    {
+      this.trigger( 'apply', [this, time] );
+    }
+
+    return this;
+  },
+  evaluatePlaying: function()
+  {
+    if ( this.playing )
+    {
+      if ( this.time < 0 )
+      {
+        this.time = 0;
+        this.playing = false;
+        this.trigger( 'start', [this] );
+      }
+      else if ( this.time > this.duration )
+      {
+        this.time = this.duration;
+        this.playing = false;
+        this.trigger( 'end', [this] );
+      }
+    }
+
     return this;
   },
   runner: function(movie, player)
@@ -99,6 +139,7 @@ Class.define( MoviePlayer,
       player.time += elapsed * player.speed;
       player.currentTime = currentTime;
       player.apply();
+      player.evaluatePlaying();
 
       if ( player.playing )
       {
@@ -107,3 +148,5 @@ Class.define( MoviePlayer,
     };
   }
 });
+
+eventize( MoviePlayer.prototype );
