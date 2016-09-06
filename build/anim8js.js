@@ -12444,11 +12444,11 @@ Class.define( MovieTimeline,
       {
         if ( attrimatorAt )
         {
-          animator.attrimators.remove( attr );
+          animator.placeAttrimator( attrimatorAt );
         }
         else
         {
-          animator.placeAttrimator( attrimatorAt );
+          animator.attrimators.remove( attr );
         }
       }
     }
@@ -12467,30 +12467,17 @@ Class.define( MovieTimeline,
       var attr = attrimator.attribute;
       var attribute = animator.getAttribute( attr );
       var calculator = attribute.calculator;
+      var currentValue = animator.frame[ attr ];
 
-      if ( !calculator.isValid( animator.frame[ attr ] ) )
+      if ( calculator.isValid( currentValue ) )
       {
-        var gotten = {};
-        gotten[ attr ] = '';
+        var valueAt = attrimator.valueAtSearch( time, currentValue );
 
-        animator.get( gotten );
-
-        if ( !calculator.isValid( gotten[ attr ] ) )
+        if ( valueAt !== false )
         {
-          animator.frame[ attr ] = attribute.cloneDefault();
+          animator.frame[ attr ] = valueAt;
+          animator.updated[ attr ] = true;
         }
-        else
-        {
-          animator.frame[ attr ] = gotten[ attr ];
-        }
-      }
-
-      var valueAt = attrimator.valueAtSearch( time, animator.frame[ attr ] );
-
-      if ( valueAt !== false )
-      {
-        animator.frame[ attr ] = valueAt;
-        animator.updated[ attr ] = true;
       }
     }
   },
