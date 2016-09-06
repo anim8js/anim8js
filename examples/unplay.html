@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      html, body {
+        padding: 0;
+        margin: 0;
+        background-color: #666;
+      }
+      #canvas {
+        background-color: black;
+      }
+    </style>
+  </head>
+  <body onload="init()">
+
+    <div id="container">
+      <canvas id="canvas" width="832" height="500"></canvas>
+    </div>
+
+    <script src="../assets/js/easeljs-0.8.2.combined.js"></script>
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-easel.js"></script>
+    <script src="examples.js"></script>
+
+    <script>
+      var calc = anim8.Calculators['2d'];
+      var bounds = {
+        min: {x: 20, y: 20},
+        max: {x: 812, y: 480}
+      };
+      var rnd = function(bounds) {
+        return calc.random( calc.create(), bounds.min, bounds.max);
+      };
+
+      anim8.save('followPath', {
+        factory: 'easel',
+        path: {
+          position: {
+            type: 'catmull-rom',
+            points: [
+              rnd(bounds), rnd(bounds), rnd(bounds), rnd(bounds),
+              rnd(bounds), rnd(bounds), rnd(bounds), rnd(bounds)
+            ]
+          }
+        }
+      });
+
+      var myPath = anim8.Animations.followpath.attrimators.values[0].path;
+
+      function init()
+      {
+        var stage = new createjs.Stage( 'canvas' );
+
+        var points = myPath.points;
+        var first = points[ 0 ];
+        var path = new createjs.Shape();
+        path.graphics.setStrokeStyle( 1 );
+        path.graphics.beginStroke( 'white' );
+        path.graphics.moveTo( first.x, first.y );
+        for (var i = 1; i < points.length; i++) {
+          path.graphics.lineTo( points[i].x, points[i].y );
+        }
+        path.graphics.endStroke();
+        stage.addChild( path );
+
+        var shape = new createjs.Shape();
+        shape.graphics.beginFill( '#6495ED' );
+        shape.graphics.drawCircle( 0, 0, 15 );
+        shape.x = first.x;
+        shape.y = first.y;
+        stage.addChild( shape );
+
+        anim8( shape ).play( 'followPath 8s inf linear-yoyo' );
+
+        anim8.on('end', stage.update, stage);
+
+        setTimeout(function() {
+          anim8( shape ).unplay( 'followPath', '4s >500ms /100' );
+        }, 10 * 1000);
+      }
+    </script>
+  </body>
+</html>

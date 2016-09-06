@@ -37,16 +37,18 @@
         <a href="examples/easeljs.html" target="example">easeljs</a>
         <a href="examples/pixi.html" target="example">pixi</a>
         <a href="examples/jquery.html" target="example">jquery</a>
+        <a href="examples/movie.html" target="example">movie</a>
         <a href="examples/reference.html" target="example" class="active">reference</a>
         <a href="examples/travel.html" target="example">travel</a>
         <a href="examples/sequence.html" target="example">sequence</a>
         <a href="examples/physicsParser.html" target="example">physics builder</a>
         <a href="examples/and.html" target="example">and</a>
         <a href="examples/defer.html" target="example">defer</a>
+        <a href="examples/unplay.html" target="example">unplay</a>
         <a href="examples/filters.html" target="example">filters</a>
+        <a href="examples/orbit.html" target="example">orbit</a>
         <a href="examples/move.html" target="example">move</a>
         <a href="examples/moveDirect.html" target="example">move direct</a>
-        <a href="examples/orbit.html" target="example">orbit</a>
         <a href="examples/parserAnd.html" target="example">and builder</a>
         <a href="examples/parserQueue.html" target="example">queue builder</a>
         <a href="examples/relative.html" target="example">relative</a>
@@ -79,6 +81,29 @@
       <div data-for="examples/and.html">
         <p>This example shows using &amp; to combine multiple animations into one.</p>
         <pre>anim8( window.box1 ).play( 'fadeIn & rubberBand, fadeOut & pulse !4');</pre>
+      </div>
+      <div data-for="examples/unplay.html">
+        <p>This example shows using the <code>Animator.unplay</code> function which transitions to the starting values of a given animation.</p>
+        <pre>anim8( window.box1 ).unplay( 'fadeIn', '2s >500ms /100' );</pre>
+      </div>
+      <div data-for="examples/movie.html">
+        <p>This example shows using the <code>Movie</code> and <code>MoviePlayer</code> classes. You can setup any number of animation sequences with any number &amp; type of subjects and you can play through the sequences at any speed and direction and jump to any point in the movie.</p>
+        <pre>var mov = new anim8.Movie();
+mov
+  .setAutoEnd( true )
+  .at( '1s' )
+  .intro( window.box )
+  .play( 'fadeIn' )
+  .play( 'wiggle' )
+  .play( 'bounceOut')
+  .seek( '1s' )
+  .play( 'zoomIn' )
+  .play( 'tada' )
+;
+
+var ply = new anim8.MoviePlayer( mov );
+
+ply.play();</pre>
       </div>
       <div data-for="examples/easeljs.html">
         <p>This example shows using anim8js-easel to animate EaselJS objects.</p>
