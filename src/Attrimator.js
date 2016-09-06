@@ -319,10 +319,29 @@ Class.define( Attrimator,
 
     if ( time > totalTime )
     {
-      return this.next ? this.next.valueAt( time - totalTime, out ) : false;
+      return this.next ? this.next.valueAtSearch( time - totalTime, out ) : false;
     }
 
     return this.valueAt( time, out );
+  },
+
+  /**
+   * Returns the attrimator at the given time.
+   *
+   * @method attrimatorAt
+   * @param {Number} time
+   * @return {Attrimator}
+   */
+  attrimatorAt: function(time)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time > totalTime )
+    {
+      return this.next ? this.next.attrimatorAt( time - totalTime ) : null;
+    }
+
+    return this;
   },
 
   /**
