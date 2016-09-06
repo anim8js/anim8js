@@ -603,7 +603,7 @@ Class.define( Animator,
   {
     if ( all )
     {
-      this.finishNotPresent( attrimatorMap, 0 );
+      this.attrimators.finishNotPresent( attrimatorMap, 0 );
     }
 
     var attrimators = attrimatorMap.values;
@@ -718,7 +718,7 @@ Class.define( Animator,
    */
   queueAttrimators: function(attrimatorMap)
   {
-    this.attrimators.queueMap( attrimatorMap, this.placeAttrimator, this );
+    this.attrimators.queueMap( attrimatorMap, 0, this.placeAttrimator, this );
 
     return this;
   },
@@ -808,7 +808,7 @@ Class.define( Animator,
     // If transition all attributes,
     if ( all )
     {
-      this.finishNotPresent( attrimatorMap, transition.time );
+      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
     }
 
     // Only transition if we need to
@@ -959,34 +959,6 @@ Class.define( Animator,
       for (var i = attrimators.length - 1; i >= 0; i--)
       {
         this.placeAttrimator( attrimators[ i ] );
-      }
-    }
-
-    return this;
-  },
-
-  /**
-   * Finishes any attrimators on this animator that are not present in the given
-   * map of attrimators. Optionally a delay in stopping them can be given.
-   *
-   * @method finishNotPresent
-   * @param {AttrimatorMap} attrimatorMap
-   * @param {Number} [delay=0]
-   * @chainable
-   * @protected
-   */
-  finishNotPresent: function(attrimatorMap, delay)
-  {
-    var attrimators = this.attrimators.values;
-    var stopIn = delay || 0;
-
-    for (var i = attrimators.length - 1; i >= 0; i--)
-    {
-      var attrimator = attrimators[ i ];
-
-      if ( !attrimatorMap.has( attrimator.attribute ) )
-      {
-        attrimator.stopIn( stopIn );
       }
     }
 

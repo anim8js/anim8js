@@ -269,7 +269,7 @@ Class.extend( Event, Attrimator,
     {
       var cycle = (this.duration + this.sleep);
       var elapsed = (time - this.delay);
-      var iteration = Math.floor( ( elapsed + this.sleep ) / cycle );
+      var iteration = Math.floor( elapsed / cycle );
 
       if ( iteration >= this.repeat )
       {

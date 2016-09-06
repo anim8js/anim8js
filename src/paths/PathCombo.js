@@ -20,17 +20,18 @@ Class.extend( PathCombo, Path,
 {
   set: function(paths, uniform, granularity)
   {
+    var pathCount = paths.length;
     var calc = paths[0].calculator;
     var points = [];
     var deltas = [];
     var linear = true;
     var length = false;
 
-    for (var i = 0; i < paths.length; i++)
+    for (var i = 0; i < pathCount; i++)
     {
       points.push.apply( points, paths[ i ].points );
 
-      deltas[ i ] = ( i + 1 ) / paths.length;
+      deltas[ i ] = ( i + 1 ) / pathCount;
 
       if ( !paths[ i ].isLinear() )
       {
@@ -40,11 +41,11 @@ Class.extend( PathCombo, Path,
 
     if ( uniform )
     {
-      var lengthGranularity = coalesce( granularity, 100 );
+      var lengthGranularity = coalesce( granularity, Defaults.comboPathUniformGranularity );
       var lengthTotal = 0;
       var lengths = [];
 
-      for (var i = 0; i < paths.length; i++)
+      for (var i = 0; i < pathCount; i++)
       {
         lengths[ i ] = paths[ i ].length( lengthGranularity );
         lengthTotal += lengths[ i ];
@@ -52,7 +53,7 @@ Class.extend( PathCombo, Path,
 
       var lengthCurrent = 0;
 
-      for (var i = 0; i < paths.length; i++)
+      for (var i = 0; i < pathCount; i++)
       {
         lengthCurrent += lengths[ i ];
         deltas[ i ] = lengthCurrent / lengthTotal;
@@ -93,7 +94,11 @@ Class.extend( PathCombo, Path,
       i++;
     }
 
-    return paths[ i ].compute( out, ( delta - previousDelta ) / ( deltas[ i ] - previousDelta ) );
+    var deltaDistance = delta - previousDelta;
+    var deltaGap = deltas[ i ] - previousDelta;
+    var pathDelta = deltaDistance / deltaGap;
+
+    return paths[ i ].compute( out, pathDelta );
   },
 
   copy: function()

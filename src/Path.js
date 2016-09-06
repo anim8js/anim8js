@@ -25,6 +25,7 @@ Class.define( Path,
     this.calculator = $calculator( calculator );
     this.points = points;
     this.computed = this.hasComputed();
+    this.deterministic = this.isDeterministic();
   },
 
   /**
@@ -45,22 +46,51 @@ Class.define( Path,
    *
    * **See:** {{#crossLink "anim8.computed"}}{{/crossLink}}
    *
-   * @method reset
+   * @method hasComputed
    * @return {Boolean}
    */
   hasComputed: function()
+  {
+    return this.examinePoints( isComputed, true, false );
+  },
+
+  /**
+   * Determines if this path has at least one computed value.
+   *
+   * **See:** {{#crossLink "anim8.computed"}}{{/crossLink}}
+   *
+   * @method isDeterministic
+   * @return {Boolean}
+   */
+  isDeterministic: function()
+  {
+    return this.examinePoints( isFunction, false, true );
+  },
+
+  /**
+   * Examines the points in the path by passing each point to the examiner
+   * function. If the examiner function returns true then `returnOnTrue` true
+   * is returned immediately, otherwise `returnOnFalse` is returned.
+   *
+   * @method examinePoints
+   * @param {Function} examiner
+   * @param {Any} returnOnTrue
+   * @param {Any} returnOnFalse
+   * @return {Any}
+   */
+  examinePoints: function(examiner, returnOnTrue, returnOnFalse)
   {
     var ps = this.points;
 
     for (var i = 0; i < ps.length; i++)
     {
-      if ( isComputed( ps[i] ) )
+      if ( examiner( ps[ i ] ) )
       {
-        return true;
+        return returnOnTrue;
       }
     }
 
-    return false;
+    return returnOnFalse;
   },
 
   /**

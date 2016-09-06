@@ -197,7 +197,6 @@ Class.define( Attrimator,
 
     var updated = false;
     var elapsed = now - this.startTime;
-    var updated = false;
 
     if ( elapsed > this.stopTime )
     {
@@ -253,6 +252,33 @@ Class.define( Attrimator,
   },
 
   /**
+   * Stops this attrimator at the given time. If the given time is outside this
+   * attrimator and has a next attrimator that stopAt will be called.
+   *
+   * @method stopAt
+   * @param {Number} time
+   * @chainable
+   */
+  stopAt: function(time)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time > totalTime )
+    {
+      if ( this.next )
+      {
+        this.next.stopAt( time - totalTime );
+      }
+    }
+    else
+    {
+      this.stopTime = time;
+    }
+
+    return this;
+  },
+
+  /**
    * If this attrimator repeats its animation this method will stop repitition
    * after the next animation cycle.
    *
@@ -275,6 +301,28 @@ Class.define( Attrimator,
   valueAt: function(time, out)
   {
     return false;
+  },
+
+  /**
+   * Returns the value at the given time or returns false if it can't be
+   * calculated. If the time is outside this attrimator, the next attrimator
+   * is checked.
+   *
+   * @method valueAt
+   * @param {Number} time
+   * @param {Any} out
+   * @return {Any|False}
+   */
+  valueAtSearch: function(time, out)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time > totalTime )
+    {
+      return this.next ? this.next.valueAt( time - totalTime, out ) : false;
+    }
+
+    return this.valueAt( time, out );
   },
 
   /**
@@ -442,6 +490,31 @@ Class.define( Attrimator,
     {
       this.next = next;
       this.prestartNext();
+    }
+
+    return this;
+  },
+
+  /**
+   * Places the given attrimator at the given time.
+   */
+  nextAt: function(next, time)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time < totalTime )
+    {
+      this.stopTime = time;
+      this.next = next;
+    }
+    else if ( this.next )
+    {
+      this.next.nextAt( next, time - totalTime );
+    }
+    else
+    {
+      next.delay += time - totalTime;
+      this.next = next;
     }
 
     return this;

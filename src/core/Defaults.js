@@ -3,7 +3,7 @@
 /**
  * The default values for anim8js properties.
  *
- * @property {Object} anim8.defaults
+ * @property {Object} anim8.Defaults
  */
 var Defaults =
 {
@@ -12,7 +12,7 @@ var Defaults =
    * The default animation duration in milliseconds.
    *
    * @property {Number} duration
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1000
    */
   duration: 1000,
@@ -21,7 +21,7 @@ var Defaults =
    * The default easing.
    *
    * @property {String|Function|Array} easing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'ease'
    */
   easing: 'ease',
@@ -31,7 +31,7 @@ var Defaults =
    * for an animation which actually has easing values per frame.
    *
    * @property {String|Function|Array} teasing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'linear'
    */
   teasing: 'linear',
@@ -40,7 +40,7 @@ var Defaults =
    * The default animation delay in milliseconds.
    *
    * @property {Number} delay
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   delay: 0,
@@ -49,7 +49,7 @@ var Defaults =
    * The default animation sleep in milliseconds.
    *
    * @property {Number} sleep
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   sleep: 0,
@@ -58,7 +58,7 @@ var Defaults =
    * The default number of repeats for an animation.
    *
    * @property {Number} repeat
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1
    */
   repeat: 1,
@@ -67,7 +67,7 @@ var Defaults =
    * The default scale for an animation.
    *
    * @property scale
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1.0
    * @type {Number}
    */
@@ -77,7 +77,7 @@ var Defaults =
    * The default animation offset in milliseconds.
    *
    * @property {Number} offset
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   offset: 0,
@@ -86,7 +86,7 @@ var Defaults =
    * The default transition time in milliseconds.
    *
    * @property {Number} transitionTime
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 500
    */
   transitionTime: 500,
@@ -95,7 +95,7 @@ var Defaults =
    * The default transition outroduction time in milliseconds.
    *
    * @property {Number} transitionOutro
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 100
    */
   transitionOutro: 100,
@@ -104,7 +104,7 @@ var Defaults =
    * The default transition introduction time in milliseconds.
    *
    * @property {Number} transitionIntro
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 100
    */
   transitionIntro: 100,
@@ -113,7 +113,7 @@ var Defaults =
    * The default transition easing when none is specified.
    *
    * @property {String|Function|Array} transitionEasing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'linear'
    */
   transitionEasing: 'linear',
@@ -126,7 +126,7 @@ var Defaults =
    * calculate along the path - summing the distances between the consecutive points.
    *
    * @property {Number} transitionGranularity
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   transitionGranularity: 0,
@@ -135,7 +135,7 @@ var Defaults =
    * TODO
    *
    * @property {Number} transitionLookup
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 10
    */
   transitionLookup: 10,
@@ -148,7 +148,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}}
    *
    * @property {Boolean} cache
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cache: false,
@@ -160,7 +160,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
    *
    * @property {Boolean} cacheOptions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cacheOptions: false,
@@ -172,7 +172,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}}
    *
    * @property {Boolean} cacheTransitions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cacheTransitions: false,
@@ -181,7 +181,7 @@ var Defaults =
    * The value to return when options could not be parsed from input.
    *
    * @property {Object} noOptions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default {}
    */
   noOptions: {},
@@ -190,7 +190,7 @@ var Defaults =
    * The value to return when a transition could not be parsed from input.
    *
    * @property {Object} noTransition
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default {}
    */
   noTransition: {},
@@ -200,7 +200,7 @@ var Defaults =
    * browser doesn't support any of the requestAnimationFrame variations.
    *
    * @property {Number} frameRate
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 33
    */
   frameRate: 16,
@@ -210,9 +210,19 @@ var Defaults =
    * to user events.
    *
    * @property {Number} pauseTime
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 5
    */
-  pauseTime: 5
+  pauseTime: 5,
+
+  /**
+   * The granularity for uniform combo paths used to calculate path lengths.
+   *
+   * @property {Number} comboPathUniformGranularity
+   * @for anim8.Defaults
+   * @default 100
+   */
+
+  comboPathUniformGranularity: 100
 
 };

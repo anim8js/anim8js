@@ -31,7 +31,7 @@ Class.extend( PathCompiled, Path,
   {
     var n = this.points.length;
     var a = Math.floor( delta * n );
-    var index = Math.min( a, n - 1 );
+    var index = clamp( a, 0, n - 1 );
 
     return this.calculator.copy( out, this.resolvePoint( index ) );
   },

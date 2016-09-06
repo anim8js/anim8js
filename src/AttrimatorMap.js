@@ -47,6 +47,25 @@ Class.extend( AttrimatorMap, FastMap,
   },
 
   /**
+   * Adds a delay to all attrimators in this map.
+   *
+   * @method delay
+   * @param {Number} time
+   * @return {AttrimatorMap}
+   */
+  delay: function(time)
+  {
+    var attrimators = this.values;
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      attrimators[ i ].delay += time;
+    }
+
+    return this;
+  },
+
+  /**
    * Queues the attrimator on this map. If the attribute is already on this map
    * this is placed on the end of the Attrimator chain, otherwise the attrimator
    * is added to the map. If there is an attrimator already on the map it's
@@ -85,11 +104,13 @@ Class.extend( AttrimatorMap, FastMap,
    * @param {Object} [context]
    * @chainable   188703090
    */
-  queueMap: function(map, onNewAttribute, context)
+  queueMap: function(map, offset, onNewAttribute, context)
   {
     var maxRemaining = this.timeRemaining();
     var attrimators = map.values;
     var hasCallback = isFunction( onNewAttribute );
+    var mapOffset = coalesce( offset, 0 );
+    var timeOffset = maxRemaining + mapOffset;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
@@ -101,18 +122,18 @@ Class.extend( AttrimatorMap, FastMap,
       {
         if ( existing.isInfinite() )
         {
-          existing.stopIn( attrimator.delay + maxRemaining );
+          existing.stopIn( attrimator.delay + timeOffset );
         }
         else
         {
-          attrimator.delay += (maxRemaining - existing.timeRemaining());
+          attrimator.delay += (timeOffset - existing.timeRemaining());
         }
 
         existing.queue( attrimator );
       }
       else
       {
-        attrimator.delay += maxRemaining;
+        attrimator.delay += timeOffset;
 
         this.put( attr, attrimator );
 
@@ -145,6 +166,108 @@ Class.extend( AttrimatorMap, FastMap,
     else
     {
       this.removeAt( index );
+    }
+
+    return this;
+  },
+
+  /**
+   * Plays the given attrimators at the given time. This performs the necessary
+   * stopping, queueing, and delaying of attrimators that may need to be done.
+   *
+   * @method playMapAt
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Boolean} all
+   * @param {Number} time
+   * @chainable
+   */
+  playMapAt: function(attrimatorMap, all, time)
+  {
+    if ( all )
+    {
+      this.stopNotPresentAt( attrimatorMap, time );
+    }
+
+    var attrimators = attrimatorMap.values;
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var existing = this.get( attr );
+
+      if ( existing )
+      {
+        existing.nextAt( attrimator, time );
+      }
+      else
+      {
+        attrimator.delay += time;
+
+        this.put( attr, attrimator );
+      }
+    }
+
+    return this;
+  },
+
+  // TODO
+  transitionMapAt: function(attrimatorMap, transition, all)
+  {
+
+  },
+
+  /**
+   * Finishes any attrimators on this animator that are not present in the given
+   * map of attrimators. Optionally a delay in stopping them can be given.
+   *
+   * @method finishNotPresent
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Number} [delay=0]
+   * @chainable
+   * @protected
+   */
+  finishNotPresent: function(attrimatorMap, delay)
+  {
+    var attrimators = this.values;
+    var stopIn = delay || 0;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+
+      if ( !attrimatorMap.has( attrimator.attribute ) )
+      {
+        attrimator.stopIn( stopIn );
+      }
+    }
+
+    return this;
+  },
+
+  /**
+   * Finishes any attrimators on this animator that are not present in the given
+   * map of attrimators. Optionally a delay in stopping them can be given.
+   *
+   * @method stopNotPresentAt
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Number} time
+   * @chainable
+   * @protected
+   */
+  stopNotPresentAt: function(attrimatorMap, time)
+  {
+    var attrimators = this.values;
+    var stopIn = delay || 0;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+
+      if ( !attrimatorMap.has( attrimator.attribute ) )
+      {
+        attrimator.stopAt( time );
+      }
     }
 
     return this;
