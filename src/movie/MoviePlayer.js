@@ -45,42 +45,60 @@ Class.define( MoviePlayer,
 
     return this;
   },
+  goto: function(time, applyNow)
+  {
+    this.time = $time( time );
+
+    if ( applyNow )
+    {
+      this.apply();
+    }
+
+    return this;
+  },
+  apply: function(applyTime)
+  {
+    var time = coalesce( applyTime, this.time );
+    var timelines = this.movie.timelines.values;
+    var active = [];
+
+    for (var i = 0; i < timelines.length; i++)
+    {
+      var timeline = timelines[ i ];
+
+      if ( time >= timeline.start )
+      {
+        active.push( timeline );
+      }
+    }
+
+    for (var i = 0; i < active.length; i++)
+    {
+      active[ i ].preupdate( time );
+    }
+
+    for (var i = 0; i < active.length; i++)
+    {
+      active[ i ].update( time );
+    }
+
+    for (var i = 0; i < active.length; i++)
+    {
+      active[ i ].apply();
+    }
+
+    return this;
+  },
   runner: function(movie, player)
   {
     return function run()
     {
       var currentTime = now();
       var elapsed = currentTime - player.currentTime;
-      var timelines = player.movie.timelines.values;
-      var active = [];
 
       player.time += elapsed * player.speed;
       player.currentTime = currentTime;
-
-      for (var i = 0; i < timelines.length; i++)
-      {
-        var timeline = timelines[ i ];
-
-        if ( player.time >= timeline.start )
-        {
-          active.push( timeline );
-        }
-      }
-
-      for (var i = 0; i < active.length; i++)
-      {
-        active[ i ].preupdate( player.time );
-      }
-
-      for (var i = 0; i < active.length; i++)
-      {
-        active[ i ].update( player.time );
-      }
-
-      for (var i = 0; i < active.length; i++)
-      {
-        active[ i ].apply();
-      }
+      player.apply();
 
       if ( player.playing )
       {
