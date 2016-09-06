@@ -258,7 +258,6 @@ Class.extend( AttrimatorMap, FastMap,
   stopNotPresentAt: function(attrimatorMap, time)
   {
     var attrimators = this.values;
-    var stopIn = delay || 0;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {

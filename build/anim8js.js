@@ -82,7 +82,7 @@ var Class =
 /**
  * The default values for anim8js properties.
  *
- * @property {Object} anim8.defaults
+ * @property {Object} anim8.Defaults
  */
 var Defaults =
 {
@@ -91,7 +91,7 @@ var Defaults =
    * The default animation duration in milliseconds.
    *
    * @property {Number} duration
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1000
    */
   duration: 1000,
@@ -100,7 +100,7 @@ var Defaults =
    * The default easing.
    *
    * @property {String|Function|Array} easing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'ease'
    */
   easing: 'ease',
@@ -110,7 +110,7 @@ var Defaults =
    * for an animation which actually has easing values per frame.
    *
    * @property {String|Function|Array} teasing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'linear'
    */
   teasing: 'linear',
@@ -119,7 +119,7 @@ var Defaults =
    * The default animation delay in milliseconds.
    *
    * @property {Number} delay
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   delay: 0,
@@ -128,7 +128,7 @@ var Defaults =
    * The default animation sleep in milliseconds.
    *
    * @property {Number} sleep
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   sleep: 0,
@@ -137,7 +137,7 @@ var Defaults =
    * The default number of repeats for an animation.
    *
    * @property {Number} repeat
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1
    */
   repeat: 1,
@@ -146,7 +146,7 @@ var Defaults =
    * The default scale for an animation.
    *
    * @property scale
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 1.0
    * @type {Number}
    */
@@ -156,7 +156,7 @@ var Defaults =
    * The default animation offset in milliseconds.
    *
    * @property {Number} offset
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   offset: 0,
@@ -165,7 +165,7 @@ var Defaults =
    * The default transition time in milliseconds.
    *
    * @property {Number} transitionTime
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 500
    */
   transitionTime: 500,
@@ -174,7 +174,7 @@ var Defaults =
    * The default transition outroduction time in milliseconds.
    *
    * @property {Number} transitionOutro
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 100
    */
   transitionOutro: 100,
@@ -183,7 +183,7 @@ var Defaults =
    * The default transition introduction time in milliseconds.
    *
    * @property {Number} transitionIntro
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 100
    */
   transitionIntro: 100,
@@ -192,7 +192,7 @@ var Defaults =
    * The default transition easing when none is specified.
    *
    * @property {String|Function|Array} transitionEasing
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 'linear'
    */
   transitionEasing: 'linear',
@@ -205,7 +205,7 @@ var Defaults =
    * calculate along the path - summing the distances between the consecutive points.
    *
    * @property {Number} transitionGranularity
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 0
    */
   transitionGranularity: 0,
@@ -214,7 +214,7 @@ var Defaults =
    * TODO
    *
    * @property {Number} transitionLookup
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 10
    */
   transitionLookup: 10,
@@ -227,7 +227,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}}
    *
    * @property {Boolean} cache
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cache: false,
@@ -239,7 +239,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
    *
    * @property {Boolean} cacheOptions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cacheOptions: false,
@@ -251,7 +251,7 @@ var Defaults =
    * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}}
    *
    * @property {Boolean} cacheTransitions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default false
    */
   cacheTransitions: false,
@@ -260,7 +260,7 @@ var Defaults =
    * The value to return when options could not be parsed from input.
    *
    * @property {Object} noOptions
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default {}
    */
   noOptions: {},
@@ -269,7 +269,7 @@ var Defaults =
    * The value to return when a transition could not be parsed from input.
    *
    * @property {Object} noTransition
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default {}
    */
   noTransition: {},
@@ -279,7 +279,7 @@ var Defaults =
    * browser doesn't support any of the requestAnimationFrame variations.
    *
    * @property {Number} frameRate
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 33
    */
   frameRate: 16,
@@ -289,10 +289,20 @@ var Defaults =
    * to user events.
    *
    * @property {Number} pauseTime
-   * @for anim8.defaults
+   * @for anim8.Defaults
    * @default 5
    */
-  pauseTime: 5
+  pauseTime: 5,
+
+  /**
+   * The granularity for uniform combo paths used to calculate path lengths.
+   *
+   * @property {Number} comboPathUniformGranularity
+   * @for anim8.Defaults
+   * @default 100
+   */
+
+  comboPathUniformGranularity: 100
 
 };
 
@@ -1451,7 +1461,7 @@ Class.define( Animator,
   {
     if ( all )
     {
-      this.finishNotPresent( attrimatorMap, 0 );
+      this.attrimators.finishNotPresent( attrimatorMap, 0 );
     }
 
     var attrimators = attrimatorMap.values;
@@ -1566,7 +1576,7 @@ Class.define( Animator,
    */
   queueAttrimators: function(attrimatorMap)
   {
-    this.attrimators.queueMap( attrimatorMap, this.placeAttrimator, this );
+    this.attrimators.queueMap( attrimatorMap, 0, this.placeAttrimator, this );
 
     return this;
   },
@@ -1656,7 +1666,7 @@ Class.define( Animator,
     // If transition all attributes,
     if ( all )
     {
-      this.finishNotPresent( attrimatorMap, transition.time );
+      this.attrimators.finishNotPresent( attrimatorMap, transition.time );
     }
 
     // Only transition if we need to
@@ -1807,34 +1817,6 @@ Class.define( Animator,
       for (var i = attrimators.length - 1; i >= 0; i--)
       {
         this.placeAttrimator( attrimators[ i ] );
-      }
-    }
-
-    return this;
-  },
-
-  /**
-   * Finishes any attrimators on this animator that are not present in the given
-   * map of attrimators. Optionally a delay in stopping them can be given.
-   *
-   * @method finishNotPresent
-   * @param {AttrimatorMap} attrimatorMap
-   * @param {Number} [delay=0]
-   * @chainable
-   * @protected
-   */
-  finishNotPresent: function(attrimatorMap, delay)
-  {
-    var attrimators = this.attrimators.values;
-    var stopIn = delay || 0;
-
-    for (var i = attrimators.length - 1; i >= 0; i--)
-    {
-      var attrimator = attrimators[ i ];
-
-      if ( !attrimatorMap.has( attrimator.attribute ) )
-      {
-        attrimator.stopIn( stopIn );
       }
     }
 
@@ -3364,7 +3346,6 @@ Class.define( Attrimator,
 
     var updated = false;
     var elapsed = now - this.startTime;
-    var updated = false;
 
     if ( elapsed > this.stopTime )
     {
@@ -3420,6 +3401,33 @@ Class.define( Attrimator,
   },
 
   /**
+   * Stops this attrimator at the given time. If the given time is outside this
+   * attrimator and has a next attrimator that stopAt will be called.
+   *
+   * @method stopAt
+   * @param {Number} time
+   * @chainable
+   */
+  stopAt: function(time)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time > totalTime )
+    {
+      if ( this.next )
+      {
+        this.next.stopAt( time - totalTime );
+      }
+    }
+    else
+    {
+      this.stopTime = time;
+    }
+
+    return this;
+  },
+
+  /**
    * If this attrimator repeats its animation this method will stop repitition
    * after the next animation cycle.
    *
@@ -3442,6 +3450,28 @@ Class.define( Attrimator,
   valueAt: function(time, out)
   {
     return false;
+  },
+
+  /**
+   * Returns the value at the given time or returns false if it can't be
+   * calculated. If the time is outside this attrimator, the next attrimator
+   * is checked.
+   *
+   * @method valueAt
+   * @param {Number} time
+   * @param {Any} out
+   * @return {Any|False}
+   */
+  valueAtSearch: function(time, out)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time > totalTime )
+    {
+      return this.next ? this.next.valueAt( time - totalTime, out ) : false;
+    }
+
+    return this.valueAt( time, out );
   },
 
   /**
@@ -3499,7 +3529,7 @@ Class.define( Attrimator,
    */
   isInfinite: function()
   {
-    return (this.stopTime === Number.POSITIVE_INFINITY);
+    return !isFinite( this.stopTime );
   },
 
   /**
@@ -3615,6 +3645,31 @@ Class.define( Attrimator,
   },
 
   /**
+   * Places the given attrimator at the given time.
+   */
+  nextAt: function(next, time)
+  {
+    var totalTime = this.totalTime();
+
+    if ( time < totalTime )
+    {
+      this.stopTime = time;
+      this.next = next;
+    }
+    else if ( this.next )
+    {
+      this.next.nextAt( next, time - totalTime );
+    }
+    else
+    {
+      next.delay += time - totalTime;
+      this.next = next;
+    }
+
+    return this;
+  },
+
+  /**
    * Parses a value with the calculator given a default value to fallback on.
    *
    * @method parseValue
@@ -3686,6 +3741,25 @@ Class.extend( AttrimatorMap, FastMap,
   },
 
   /**
+   * Adds a delay to all attrimators in this map.
+   *
+   * @method delay
+   * @param {Number} time
+   * @return {AttrimatorMap}
+   */
+  delay: function(time)
+  {
+    var attrimators = this.values;
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      attrimators[ i ].delay += time;
+    }
+
+    return this;
+  },
+
+  /**
    * Queues the attrimator on this map. If the attribute is already on this map
    * this is placed on the end of the Attrimator chain, otherwise the attrimator
    * is added to the map. If there is an attrimator already on the map it's
@@ -3724,11 +3798,13 @@ Class.extend( AttrimatorMap, FastMap,
    * @param {Object} [context]
    * @chainable   188703090
    */
-  queueMap: function(map, onNewAttribute, context)
+  queueMap: function(map, offset, onNewAttribute, context)
   {
     var maxRemaining = this.timeRemaining();
     var attrimators = map.values;
     var hasCallback = isFunction( onNewAttribute );
+    var mapOffset = coalesce( offset, 0 );
+    var timeOffset = maxRemaining + mapOffset;
 
     for (var i = attrimators.length - 1; i >= 0; i--)
     {
@@ -3740,18 +3816,18 @@ Class.extend( AttrimatorMap, FastMap,
       {
         if ( existing.isInfinite() )
         {
-          existing.stopIn( attrimator.delay + maxRemaining );
+          existing.stopIn( attrimator.delay + timeOffset );
         }
         else
         {
-          attrimator.delay += (maxRemaining - existing.timeRemaining());
+          attrimator.delay += (timeOffset - existing.timeRemaining());
         }
 
         existing.queue( attrimator );
       }
       else
       {
-        attrimator.delay += maxRemaining;
+        attrimator.delay += timeOffset;
 
         this.put( attr, attrimator );
 
@@ -3790,6 +3866,107 @@ Class.extend( AttrimatorMap, FastMap,
   },
 
   /**
+   * Plays the given attrimators at the given time. This performs the necessary
+   * stopping, queueing, and delaying of attrimators that may need to be done.
+   *
+   * @method playMapAt
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Boolean} all
+   * @param {Number} time
+   * @chainable
+   */
+  playMapAt: function(attrimatorMap, all, time)
+  {
+    if ( all )
+    {
+      this.stopNotPresentAt( attrimatorMap, time );
+    }
+
+    var attrimators = attrimatorMap.values;
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var existing = this.get( attr );
+
+      if ( existing )
+      {
+        existing.nextAt( attrimator, time );
+      }
+      else
+      {
+        attrimator.delay += time;
+
+        this.put( attr, attrimator );
+      }
+    }
+
+    return this;
+  },
+
+  // TODO
+  transitionMapAt: function(attrimatorMap, transition, all)
+  {
+
+  },
+
+  /**
+   * Finishes any attrimators on this animator that are not present in the given
+   * map of attrimators. Optionally a delay in stopping them can be given.
+   *
+   * @method finishNotPresent
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Number} [delay=0]
+   * @chainable
+   * @protected
+   */
+  finishNotPresent: function(attrimatorMap, delay)
+  {
+    var attrimators = this.values;
+    var stopIn = delay || 0;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+
+      if ( !attrimatorMap.has( attrimator.attribute ) )
+      {
+        attrimator.stopIn( stopIn );
+      }
+    }
+
+    return this;
+  },
+
+  /**
+   * Finishes any attrimators on this animator that are not present in the given
+   * map of attrimators. Optionally a delay in stopping them can be given.
+   *
+   * @method stopNotPresentAt
+   * @param {AttrimatorMap} attrimatorMap
+   * @param {Number} time
+   * @chainable
+   * @protected
+   */
+  stopNotPresentAt: function(attrimatorMap, time)
+  {
+    var attrimators = this.values;
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+
+      if ( !attrimatorMap.has( attrimator.attribute ) )
+      {
+        attrimator.stopAt( time );
+      }
+    }
+
+    return this;
+  },
+
+  /**
    * Clones this map returning a deep clone where all attrimators are cloned.
    *
    * @method clone
@@ -3818,7 +3995,7 @@ Class.extend( AttrimatorMap, FastMap,
    * @method timeRemaining
    * @return {Number}
    */
-  timeRemaining: function()
+  timeRemaining: function(returnInfinity)
   {
     var maxRemaining = 0;
     var values = this.values;
@@ -3830,6 +4007,10 @@ Class.extend( AttrimatorMap, FastMap,
       if ( !attrimator.isInfinite() )
       {
         maxRemaining = Math.max( maxRemaining, attrimator.timeRemaining() );
+      }
+      else if ( returnInfinity )
+      {
+        return Number.Infinity;
       }
     }
 
@@ -6058,7 +6239,7 @@ Class.extend( Event, Attrimator,
     {
       var cycle = (this.duration + this.sleep);
       var elapsed = (time - this.delay);
-      var iteration = Math.floor( ( elapsed + this.sleep ) / cycle );
+      var iteration = Math.floor( elapsed / cycle );
 
       if ( iteration >= this.repeat )
       {
@@ -6086,7 +6267,7 @@ Class.extend( Event, Attrimator,
   },
   isInfinite: function()
   {
-    return (this.repeat === Number.POSITIVE_INFINITY) && (this.stopTime === Number.POSITIVE_INFINITY);
+    return !isFinite( this.repeat ) && !isFinite( this.stopTime );
   },
   isFinished: function()
   {
@@ -6457,105 +6638,6 @@ Class.define( FastMap,
 });
 
 
-// TODO
-
-function Movie()
-{
-  this.events = [];
-  this.currentTime = 0;
-  this.subjects = new Animators();
-  this.index = 0;
-}
-
-Class.define( Movie,
-{
-  select: function(subjects)
-  {
-
-  },
-  at: function(time)
-  {
-    var at = $time( time, false );
-
-    if ( at === false )
-    {
-      throw 'Invalid time in Movie.at: ' + time;
-    }
-
-    this.currentTime = at;
-  },
-  move: function(time)
-  {
-    var by = $time( time, false );
-
-    if ( by === false )
-    {
-      throw 'Invalid time in Movie.move: ' + time;
-    }
-
-    this.at( this.currentTime + by );
-  },
-  wait: function(time)
-  {
-
-  },
-  after: function(callback, context)
-  {
-
-  },
-  invoke: function(callback, context)
-  {
-
-  },
-  play: function(animation, options, all)
-  {
-    var attr = this.getAttrimators( animation, options );
-    var dura = attr.timeRemaining();
-
-  },
-  queue: function(animation, options)
-  {
-
-  },
-  transition: function(transition, animation, options, all)
-  {
-    var tran = $transition( transition );
-    var attr = this.getAttrimators( animation, options );
-
-  },
-  sequence: function(delay)
-  {
-
-  },
-  _add: function(event)
-  {
-
-  },
-  getAttrimators: function(animation, options)
-  {
-    return $attrimatorsFor( animation, options );
-  }
-});
-
-eventize( Movie.prototype );
-
-function MovieEvent(time, type, parameters)
-{
-  this.time = time;
-  this.type = type;
-  this.parameters = parameters;
-}
-
-function MoviePlayer(movie)
-{
-  this.movie = movie;
-  this.startTime = 0;
-  this.referenceTime = 0;
-  this.direction = 1;
-  this.currentIndex = 0;
-}
-
-
 /**
  * Instantiates a new Oncer which extends Attrimator.
  *
@@ -6709,6 +6791,7 @@ Class.define( Path,
     this.calculator = $calculator( calculator );
     this.points = points;
     this.computed = this.hasComputed();
+    this.deterministic = this.isDeterministic();
   },
 
   /**
@@ -6729,22 +6812,51 @@ Class.define( Path,
    *
    * **See:** {{#crossLink "anim8.computed"}}{{/crossLink}}
    *
-   * @method reset
+   * @method hasComputed
    * @return {Boolean}
    */
   hasComputed: function()
+  {
+    return this.examinePoints( isComputed, true, false );
+  },
+
+  /**
+   * Determines if this path has at least one computed value.
+   *
+   * **See:** {{#crossLink "anim8.computed"}}{{/crossLink}}
+   *
+   * @method isDeterministic
+   * @return {Boolean}
+   */
+  isDeterministic: function()
+  {
+    return this.examinePoints( isFunction, false, true );
+  },
+
+  /**
+   * Examines the points in the path by passing each point to the examiner
+   * function. If the examiner function returns true then `returnOnTrue` true
+   * is returned immediately, otherwise `returnOnFalse` is returned.
+   *
+   * @method examinePoints
+   * @param {Function} examiner
+   * @param {Any} returnOnTrue
+   * @param {Any} returnOnFalse
+   * @return {Any}
+   */
+  examinePoints: function(examiner, returnOnTrue, returnOnFalse)
   {
     var ps = this.points;
 
     for (var i = 0; i < ps.length; i++)
     {
-      if ( isComputed( ps[i] ) )
+      if ( examiner( ps[ i ] ) )
       {
-        return true;
+        return returnOnTrue;
       }
     }
 
-    return false;
+    return returnOnFalse;
   },
 
   /**
@@ -6963,7 +7075,7 @@ Class.extend( Physics, Attrimator,
 
     vel = calc.adds( vel, acc, dt );
 
-    if ( this.terminal !== Number.POSITIVE_INFINITY )
+    if ( isFinite( this.terminal ) )
     {
       vel = calc.clamp( vel, 0, this.terminal );
     }
@@ -11218,17 +11330,18 @@ Class.extend( PathCombo, Path,
 {
   set: function(paths, uniform, granularity)
   {
+    var pathCount = paths.length;
     var calc = paths[0].calculator;
     var points = [];
     var deltas = [];
     var linear = true;
     var length = false;
 
-    for (var i = 0; i < paths.length; i++)
+    for (var i = 0; i < pathCount; i++)
     {
       points.push.apply( points, paths[ i ].points );
 
-      deltas[ i ] = ( i + 1 ) / paths.length;
+      deltas[ i ] = ( i + 1 ) / pathCount;
 
       if ( !paths[ i ].isLinear() )
       {
@@ -11238,11 +11351,11 @@ Class.extend( PathCombo, Path,
 
     if ( uniform )
     {
-      var lengthGranularity = coalesce( granularity, 100 );
+      var lengthGranularity = coalesce( granularity, Defaults.comboPathUniformGranularity );
       var lengthTotal = 0;
       var lengths = [];
 
-      for (var i = 0; i < paths.length; i++)
+      for (var i = 0; i < pathCount; i++)
       {
         lengths[ i ] = paths[ i ].length( lengthGranularity );
         lengthTotal += lengths[ i ];
@@ -11250,7 +11363,7 @@ Class.extend( PathCombo, Path,
 
       var lengthCurrent = 0;
 
-      for (var i = 0; i < paths.length; i++)
+      for (var i = 0; i < pathCount; i++)
       {
         lengthCurrent += lengths[ i ];
         deltas[ i ] = lengthCurrent / lengthTotal;
@@ -11291,7 +11404,11 @@ Class.extend( PathCombo, Path,
       i++;
     }
 
-    return paths[ i ].compute( out, ( delta - previousDelta ) / ( deltas[ i ] - previousDelta ) );
+    var deltaDistance = delta - previousDelta;
+    var deltaGap = deltas[ i ] - previousDelta;
+    var pathDelta = deltaDistance / deltaGap;
+
+    return paths[ i ].compute( out, pathDelta );
   },
 
   copy: function()
@@ -11333,7 +11450,7 @@ Class.extend( PathCompiled, Path,
   {
     var n = this.points.length;
     var a = Math.floor( delta * n );
-    var index = Math.min( a, n - 1 );
+    var index = clamp( a, 0, n - 1 );
 
     return this.calculator.copy( out, this.resolvePoint( index ) );
   },
@@ -12025,6 +12142,320 @@ Class.extend( SpringLinear, Spring,
     this.temp0 = calc.sub( this.temp0, this.temp1 );
 
     this.velocity = calc.adds( this.velocity, this.temp0, dt );
+  }
+
+});
+
+
+var nextTimeline = (function()
+{
+  var id = 0;
+
+  return function() {
+    return ++id;
+  };
+
+})();
+
+function Movie(name)
+{
+  this.name = name;
+  this.currentTime = 0;
+  this.currentTimelines = [];
+  this.introduce = false;
+  this.timelines = new FastMap();
+}
+
+Class.define( Movie,
+{
+  intro: function(subjects)
+  {
+    this.currentTimelines = this.getTimelines( subjects );
+    this.introduce = true;
+
+    return this;
+  },
+  with: function(subjects)
+  {
+    this.currentTimelines = this.getTimelines( subjects );
+
+    return this;
+  },
+  add: function(subjects)
+  {
+    var additional = this.getTimelines( subjects );
+
+    this.currentTimelines.push.apply( this.currentTimelines, additional );
+
+    return this;
+  },
+  getTimeline: function(animator)
+  {
+    var timelineId = animator.$timelineId;
+    var timeline = this.timelines.get( timelineId );
+
+    if ( !isDefined( timeline ) )
+    {
+      timelineId = nextTimeline();
+      timeline = new MovieTimeline( animator );
+      animator.$timelineId = timelineId;
+
+      this.timelines.put( timelineId, timeline );
+    }
+
+    return timeline;
+  },
+  getTimelines: function(subjects)
+  {
+    var animators = [];
+
+    if ( isArray( subjects ) )
+    {
+      for (var i = 0; i < subjects.length; i++)
+      {
+        var animator = anim8( subjects[ i ] );
+
+        if ( animator !== false )
+        {
+          animators.push( this.getTimeline( animator ) );
+        }
+      }
+    }
+    else
+    {
+      var animator = anim8( subjects );
+
+      if ( animator !== false )
+      {
+        animators.push( this.getTimeline( animator ) );
+      }
+    }
+
+    return animators;
+  },
+  at: function(time)
+  {
+    var at = $time( time, false );
+
+    if ( at === false )
+    {
+      throw 'Invalid time in Movie.at: ' + time;
+    }
+
+    this.currentTime = at;
+
+    return this;
+  },
+  seek: function(time)
+  {
+    var by = $time( time, false );
+
+    if ( by === false )
+    {
+      throw 'Invalid time in Movie.seek: ' + time;
+    }
+
+    return this.at( this.currentTime + by );
+  },
+  end: function()
+  {
+    var timelines = this.timelines.values;
+    var maxTime = this.currentTime;
+
+    for (var i = 0; i < timelines.length; i++)
+    {
+      maxTime = Math.max( maxTime, timelines[ i ].attrimators.timeRemaining() );
+    }
+
+    return this.at( maxTime );
+  },
+  play: function(animation, options, all)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options );
+    var timelines = this.timelines.values;
+
+    for (var i = 0; i < timelines.length; i++)
+    {
+      timelines[ i ].addAttrimators( attrimatorMap, all, this.currentTime, this.introduce );
+    }
+
+    this.introduce = false;
+
+    return this;
+  }
+});
+
+eventize( Movie.prototype );
+
+
+function MoviePlayer(movie)
+{
+  this.speed = 1.0;
+  this.time = 0;
+  this.currentTime = 0;
+  this.playing = false;
+  this.movie = movie;
+  this.run = this.runner( movie, this );
+}
+
+Class.define( MoviePlayer,
+{
+  reverse: function()
+  {
+    this.speed = -this.speed;
+
+    return this;
+  },
+  backward: function()
+  {
+    this.speed = -Math.abs( this.speed );
+
+    return this;
+  },
+  forward: function()
+  {
+    this.speed = Math.abs( this.speed );
+
+    return this;
+  },
+  play: function()
+  {
+    if ( !this.playing )
+    {
+      this.currentTime = now();
+      this.playing = true;
+
+      requestRun( this.run );
+    }
+  },
+  pause: function()
+  {
+    this.playing = false;
+
+    return this;
+  },
+  runner: function(movie, player)
+  {
+    return function run()
+    {
+      var currentTime = now();
+      var elapsed = currentTime - player.currentTime;
+      var timelines = player.movie.timelines.values;
+      var active = [];
+
+      player.time += elapsed * player.speed;
+      player.currentTime = currentTime;
+
+      for (var i = 0; i < timelines.length; i++)
+      {
+        var timeline = timelines[ i ];
+
+        if ( player.time >= timeline.start )
+        {
+          active.push( timeline );
+        }
+      }
+
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].preupdate( player.time );
+      }
+
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].update( player.time );
+      }
+
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].apply();
+      }
+
+      if ( player.playing )
+      {
+        requestRun( player.run );
+      }
+    };
+  }
+});
+
+
+function MovieTimeline(animator)
+{
+  this.animator = animator;
+  this.attrimators = new AttrimatorMap();
+  this.start = 0;
+}
+
+Class.define( MovieTimeline,
+{
+
+  addAttrimators: function(attrimatorMap, all, time, intro)
+  {
+    if ( this.attrimators.size() )
+    {
+      this.attrimatorMap.playMapAt( attrimatorMap, all, time );
+    }
+    else if ( intro )
+    {
+      this.attrimatorMap.putMap( attrimatorMap );
+      this.attrimatorMap.delay( time );
+    }
+    else
+    {
+      this.start = time;
+      this.attrimatorMap.putMap( attrimatorMap );
+      this.attrimatorMap.delay( time );
+    }
+  },
+
+  preupdate: function(time)
+  {
+    this.animator.preupdate( time );
+  },
+
+  update: function(time)
+  {
+    var animator = this.animator;
+    var attrimators = this.attrimators.values;
+
+    for (var i = 0; i < attrimators.length; i++)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var attribute = animator.getAttribute( attr );
+      var calculator = attribute.calculator;
+
+      if ( !calculator.isValid( animator.frame[ attr ] ) )
+      {
+        var gotten = {};
+        gotten[ attr ] = '';
+
+        animator.get( gotten );
+
+        if ( !calculator.isValid( gotten[ attr ] ) )
+        {
+          animator.frame[ attr ] = attribute.cloneDefault();
+        }
+        else
+        {
+          animator.frame[ attr ] = gotten[ attr ];
+        }
+      }
+
+      var valueAt = attrimator.valueAtSearch( time, animator.frame[ attr ] );
+
+      if ( valueAt !== false )
+      {
+        animator.frame[ attr ] = valueAt;
+        animator.updated[ attr ] = true;
+      }
+    }
+  },
+
+  apply: function()
+  {
+    this.animator.apply();
   }
 
 });
@@ -13616,7 +14047,7 @@ function $transition(transition, cache)
       return Transitions[ transition ];
     }
 
-    transition = transition.toLowerCase().split(' ');
+    transition = transition.toLowerCase().split(/\s+/);
   }
 
   if ( isArray( transition ) )

@@ -31,6 +31,7 @@ var build = {
     './src/paths/PathParametric.js',
     './src/paths/!(_)*.js',
     './src/springs/!(_)*.js',
+    './src/movie/*.js',
     './src/**/_export.js',
     './src/parsing/*.js',
     './src/_footer.js'

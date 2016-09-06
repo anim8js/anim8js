@@ -5,9 +5,7 @@ function MoviePlayer(movie)
   this.time = 0;
   this.currentTime = 0;
   this.playing = false;
-  this.animating = {};
   this.movie = movie;
-  this.node = movie.head;
   this.run = this.runner( movie, this );
 }
 
@@ -21,13 +19,13 @@ Class.define( MoviePlayer,
   },
   backward: function()
   {
-    this.speed = -Math.abs( speed );
+    this.speed = -Math.abs( this.speed );
 
     return this;
   },
   forward: function()
   {
-    this.speed = Math.abs( speed );
+    this.speed = Math.abs( this.speed );
 
     return this;
   },
@@ -52,33 +50,41 @@ Class.define( MoviePlayer,
     return function run()
     {
       var currentTime = now();
-      var elapsed = currenTime - player.currentTime;
+      var elapsed = currentTime - player.currentTime;
+      var timelines = player.movie.timelines.values;
+      var active = [];
 
       player.time += elapsed * player.speed;
       player.currentTime = currentTime;
 
-      var node = player.node;
-      if (player.speed > 0) {
-        while (player.time > node.end) {
-          var actions = node.actions;
-          for (var i = 0; i < actions.length; i++) {
-            var action = actions[ i ];
-            var animators = action.animators;
-            var attrimators = action.attrimators;
+      for (var i = 0; i < timelines.length; i++)
+      {
+        var timeline = timelines[ i ];
 
-            for (var k = 0; k < animators.length; k++) {
-
-            }
-          }
-          node = node.next;
+        if ( player.time >= timeline.start )
+        {
+          active.push( timeline );
         }
       }
 
-      // APPLY ATTRIMATORS
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].preupdate( player.time );
+      }
+
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].update( player.time );
+      }
+
+      for (var i = 0; i < active.length; i++)
+      {
+        active[ i ].apply();
+      }
 
       if ( player.playing )
       {
-        requestRun( run );
+        requestRun( player.run );
       }
     };
   }

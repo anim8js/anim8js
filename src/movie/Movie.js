@@ -12,10 +12,8 @@ var nextTimeline = (function()
 function Movie(name)
 {
   this.name = name;
-  this.head = new MovieNode( 0, 0 );
   this.currentTime = 0;
   this.currentTimelines = [];
-  this.currentNode = this.head;
   this.introduce = false;
   this.timelines = new FastMap();
 }
@@ -96,19 +94,7 @@ Class.define( Movie,
       throw 'Invalid time in Movie.at: ' + time;
     }
 
-    var node = this.currentNode;
-
-    while (node.start > at)
-    {
-      node = node.prev;
-    }
-    while (node.start < a && node.next.start >= a)
-    {
-      node = node.next;
-    }
-
     this.currentTime = at;
-    this.currentNode = node.start === at ? node : MovieNode.insertAfter( node, at );
 
     return this;
   },
@@ -118,73 +104,34 @@ Class.define( Movie,
 
     if ( by === false )
     {
-      throw 'Invalid time in Movie.move: ' + time;
+      throw 'Invalid time in Movie.seek: ' + time;
     }
 
     return this.at( this.currentTime + by );
   },
   end: function()
   {
-    return this.seekEndOf( this.head.prev );
-  },
-  next: function()
-  {
-    return this.seekEndOf( this.currentNode );
-  },
-  seekEndOf: function(node)
-  {
-    var head = this.head;
-    var next = curr.next;
-    var endTime = curr.end;
+    var timelines = this.timelines.values;
+    var maxTime = this.currentTime;
 
-    while (next.start < endTime && next !== head)
+    for (var i = 0; i < timelines.length; i++)
     {
-      node = next;
-      next = node.next;
+      maxTime = Math.max( maxTime, timelines[ i ].attrimators.timeRemaining() );
     }
 
-    if (node.start !== endTime)
-    {
-      node = MovieNode.insertAfter( node );
-    }
-
-    this.currentTime = endTime;
-    this.currentNode = node;
-
-    return this;
-  },
-  call: function(callback, context)
-  {
-    this.currentNode.callbacks.push( callback );
-
-    return this;
+    return this.at( maxTime );
   },
   play: function(animation, options, all)
   {
     var attrimatorMap = $attrimatorsFor( animation, options );
+    var timelines = this.timelines.values;
 
-    if ( this.introduce )
+    for (var i = 0; i < timelines.length; i++)
     {
-      attrimatorMap.delay( this.currentTime );
-      this.head.addAction( this.currentSubjects, attrimatorMap, all, );
-      this.introduce = false;
-    }
-    else
-    {
-      this.currentNode.addAction( this.currentSubjects, attrimatorMap, all );
+      timelines[ i ].addAttrimators( attrimatorMap, all, this.currentTime, this.introduce );
     }
 
-    return this;
-  },
-  queue: function(animation, options, all)
-  {
-    var attrimatorMap = $attrimatorsFor( animation, options );
-    var action = this.currentNode.findActionFor( this.currentSubjects );
-
-    if ( action )
-    {
-      action.attrimators.queueMap( attrimatorMap );
-    }
+    this.introduce = false;
 
     return this;
   }
