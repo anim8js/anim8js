@@ -142,33 +142,33 @@ Class.define( Movie,
 
   play: function(animation, options, all)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options );
+    var parsed = $animation( animation, options );
     var intro = this.introduce;
 
     return this.eachCurrentTimeline(function(timeline, time)
     {
-      timeline.playAttrimators( attrimatorMap, all, time, intro );
+      timeline.playAttrimators( parsed.newAttrimators(), all, time, intro );
     });
   },
 
   queue: function(animation, options, all)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options );
+    var parsed = $animation( animation, options );
 
     return this.eachCurrentTimeline(function(timeline, time)
     {
-      timeline.queueAttrimators( attrimatorMap, all, time );
+      timeline.queueAttrimators( parsed.newAttrimators(), all, time );
     });
   },
 
   transition: function(transition, animation, options, all)
   {
     var transition = $transition( transition );
-    var attrimatorMap = $attrimatorsFor( animation, options );
+    var parsed = $animation( animation, options );
 
     return this.eachCurrentTimeline(function(timeline, time)
     {
-      timeline.transitionAttrimators( attrimatorMap, all, time, transition );
+      timeline.transitionAttrimators( parsed.newAttrimators(), all, time, transition );
     });
   },
 

@@ -143,7 +143,7 @@ Class.define( Attrimator,
         var totalTime = this.totalTime();
 
         // If this attrimator has a finite total amount of time, it's end can be calculated.
-        if ( !isNaN( totalTime ) )
+        if ( isFinite( totalTime ) )
         {
           this.next.prestart( this.startTime + totalTime );
         }
