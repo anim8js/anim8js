@@ -99,6 +99,19 @@ mov
   .seek( '1s' )
   .play( 'zoomIn' )
   .play( 'tada' )
+
+  .setAutoEnd( false )
+  .at( '1s' )
+  .intro( $( window.sequence ).sequence().get() )
+  .sequence( '50ms' )
+  .play( 'fadeInDown 2s' )
+  .queue( 'zoomOut !2 ~1s 2s quad' )
+
+  .at( '0s' )
+  .with( window.box2 )
+  .play( 'pathUpAndDown linear-yoyo inf' )
+  .seek( '1.4s' )
+  .transition( '1s &gt;500 &lt;100 /0', 'pathLeftAndRight x3 linear-yoyo' )
 ;
 
 var ply = new anim8.MoviePlayer( mov );
