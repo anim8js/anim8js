@@ -15,6 +15,25 @@
       position: absolute;
       background-color: #66F;
     }
+    #box2 {
+      width: 40px;
+      height: 40px;
+      left: 300px;
+      top: 150px;
+      border: 2px solid #0F0;
+      position: absolute;
+      background-color: #6F6;
+    }
+    #sequence {
+      left: 80px;
+      top: 60px;
+      position: absolute;
+      white-space: pre;
+    }
+    #sequence div.sequenced {
+      position: relative;
+      display: inline-block;
+    }
     </style>
   </head>
   <body>
@@ -30,9 +49,13 @@
     <span id="playerStatus"></span>
 
     <div id="box"></div>
+    <div id="sequence">Movie Sequences</div>
+    <div id="box2"></div>
 
+    <script src="../assets/js/jquery.js"></script>
     <script src="../assets/js/anim8js.js"></script>
     <script src="../assets/js/anim8js-dom.js"></script>
+    <script src="../assets/js/anim8js-jquery.js"></script>
     <script src="../assets/js/anim8js-animate.css.js"></script>
 
     <script src="examples.js"></script>
@@ -42,6 +65,24 @@
     <![endif]-->
 
     <script>
+
+      anim8.save('pathUpAndDown', {
+        path: {
+          center: {
+            type: 'linear',
+            points: [[300,150], [300,350]]
+          }
+        }
+      });
+
+      anim8.save('pathLeftAndRight', {
+        path: {
+          center: {
+            type: 'linear',
+            points: [[50,250], [400,250]]
+          }
+        }
+      });
 
       var mov = new anim8.Movie();
 
@@ -55,6 +96,19 @@
         .seek( '1s' )
         .play( 'zoomIn' )
         .play( 'tada' )
+
+        .setAutoEnd( false )
+        .at( '1s' )
+        .intro( $( window.sequence ).sequence().get() )
+        .sequence( '50ms' )
+        .play( 'fadeInDown 2s' )
+        .queue( 'zoomOut !2 ~1s 2s quad' )
+
+        .at( '0s' )
+        .with( window.box2 )
+        .play( 'pathUpAndDown linear-yoyo inf' )
+        .seek( '1.4s' )
+        .transition( '1s >500 <100 /0', 'pathLeftAndRight x3 linear-yoyo' )
       ;
 
       window.currentTime.max = mov.duration();
