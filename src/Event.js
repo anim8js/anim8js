@@ -258,6 +258,8 @@ Class.extend( Event, Attrimator,
   },
   valueAt: function(time, out)
   {
+    time += this.offset;
+
     if ( time < this.delay && !this.hasInitialState )
     {
       return false;
@@ -288,7 +290,7 @@ Class.extend( Event, Attrimator,
     var sleepTime = this.sleep ? ((this.repeat - 1) * this.sleep) : 0;
     var animateTime = (this.repeat * this.duration);
 
-    return Math.min( this.stopTime, this.delay + animateTime + sleepTime );
+    return Math.min( this.stopTime, this.delay + animateTime + sleepTime - this.offset );
   },
   clone: function()
   {
