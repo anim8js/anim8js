@@ -285,7 +285,10 @@ Class.extend( Event, Attrimator,
   },
   totalTime: function()
   {
-    return Math.min( this.stopTime, this.delay + (this.repeat * this.duration) + ((this.repeat - 1) * this.sleep) );
+    var sleepTime = this.sleep ? ((this.repeat - 1) * this.sleep) : 0;
+    var animateTime = (this.repeat * this.duration);
+
+    return Math.min( this.stopTime, this.delay + animateTime + sleepTime );
   },
   clone: function()
   {
