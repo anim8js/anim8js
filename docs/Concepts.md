@@ -37,6 +37,14 @@ Animates a single [attribute](#attribute). Has the following implementations: [O
 
 A set of [attrimator](#attrimator)s which is normally named to be referred to later.
 
+#### Animation Definition
+
+An object which contains [builder](#builder) names to use to generate [attrimator](#attrimator)s when creating an [animation](#animation).
+
+#### Animation Input
+
+A variable which can be parsed into an animation. A reference to an [Animation](#animation) instance can be used, a string containing one or more animation names & options, or an [animation definition](#animation-definition).
+
 #### Options
 
 Modifiers to change how an animation plays:
