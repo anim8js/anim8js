@@ -16,7 +16,7 @@ A class which performs mathematical operations for a single [data type](#data-ty
 
 #### Attribute
 
-A variable on an object which can be animated. An attribute has a specified [data type](#data-type) and default value.
+A variable on a subject which can be animated. An attribute has a specified [data type](#data-type) and default value.
 
 #### Attrimator
 
