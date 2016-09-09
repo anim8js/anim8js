@@ -81,3 +81,5 @@ Here's a list of the extensions you can install via `bower` or `npm`:
 - [anim8js-animate.css](http://github.com/ClickerMonkey/anim8js-animate.css)
 - [anim8js-pixi](http://github.com/ClickerMonkey/anim8js-pixi)
 - [anim8js-easel](http://github.com/ClickerMonkey/anim8js-easel)
+
+< [Index](README.md) | [Concepts](Concepts.md) >

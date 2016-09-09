@@ -127,3 +127,5 @@ Takes a [subject](#subject) and returns an [animator](#animator) that can handle
 #### Defer
 
 To wait to invoke functions on an object until that object triggers a specific event.
+
+< [Getting Started & Installation](Getting-Started.md) | [Points](Points.md) >
