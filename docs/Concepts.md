@@ -45,17 +45,33 @@ An object which contains [builder](#builder) names to use to generate [attrimato
 
 A variable which can be parsed into an animation. A reference to an [Animation](#animation) instance can be used, a string containing one or more animation names & options, or an [animation definition](#animation-definition).
 
+For example, the following inputs are all valid:
+
+```javascript
+var input0 = 'animationName';
+var input1 = 'animationName ~1s 2s';
+var input2 = 'animationName & concurrentAnimation, queuedAnimation';
+var input3 = anim8.animation( input2 ); // Animation instance
+var input4 = {
+  values: {
+    opacity: [1, 0, 1] // blink
+  }
+};
+```
+
 #### Options
 
 Modifiers to change how an animation plays:
 
-- delay: The amount of time the animation is delayed before playing (default 0ms)
-- duration: How long to play the animation for (default 1s)
-- repeat: How many times to play the animation (default 1)
-- sleep: How long to wait between repeating plays (default 0ms)
-- scaling: Multiply the values of the animation by this value (default 1.0)
-- easing: An [easing](#easing) to use for the animation (default ease)
-- offset: An amount of time to fast-forward into the animation when playing it (default 0ms)
+- `delay`: The amount of time the animation is delayed before playing (default ~0ms)
+- `duration`: How long to play the animation for (default 1s)
+- `repeat`: How many times to play the animation (default x1)
+- `sleep`: How long to wait between repeating plays (default z0ms)
+- `scaling`: Multiply the values of the animation by this value (default !1.0)
+- `easing`: An [easing](#easing) to use for the animation (default ease)
+- `offset`: An amount of time to fast-forward into the animation when playing it (default @0ms)
+
+For example: `~500ms 2s x3 z1s !1.5 linear-yoyo` (delay animation by 500ms, play it over 2 seconds, 3 times, wait 1 second in between repeating plays, scale animation values by 1.5, and use [easing](#easing) linear combined with [type](#easing-type) yoyo)
 
 #### Animator
 
@@ -105,12 +121,14 @@ A set of [attrimator](#attrimator)s to apply to a set of [subject](#subject)s at
 
 Modifiers to describe how an animation transitions into another:
 
-- time: How much time to spend transitioning from the current animation to the next
-- intro: The amount of time to transition into the next animation. A negative value will create a curve before the next animation and smoothly transition into it
-- outro: The amount of time to transition out of the current animation. A positive value will create a curve out of the current animation
-- granularity: How many points to calculate along the transition to use to create a transition which respects the outro and intro animation velocity
-- lookup: How far into & out of the next & current animations to look when calculating their velocity. This is a delta value (0-1)
-- easing: The [easing](#easing) to use for the transition path
+- `time`: How much time to spend transitioning from the current animation to the next
+- `intro`: The amount of time to transition into the next animation. A negative value will create a curve before the next animation and smoothly transition into it
+- `outro`: The amount of time to transition out of the current animation. A positive value will create a curve out of the current animation
+- `granularity`: How many points to calculate along the transition to use to create a transition which respects the outro and intro animation velocity
+- `lookup`: How far into & out of the next & current animations to look when calculating their velocity. This is a delta value (0-1)
+- `easing`: The [easing](#easing) to use for the transition path
+
+For example: `2s <500ms >100ms linear ^0.1 /100` (transition over 2 seconds, 500ms smoothly into the next animation, 100ms smoothly out of the current animation, using the linear [easing](#easing), with a smooth velocity transition using 100 data points and 0.1 of the current/next animations to calculate the exit/entrance velocity)
 
 #### Easing
 
