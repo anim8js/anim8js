@@ -21,11 +21,13 @@ Class.extend( CalculatorRGB, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given a grayscale color is returned.
     if ( isNumber( x ) )
     {
@@ -35,17 +37,29 @@ Class.extend( CalculatorRGB, Calculator,
         b: x
       };
     }
+
     // When an array is given, assume [r, g, b]
     if ( isArray( x ) )
     {
       x = { r: x[0], g: x[1], b: x[2] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cr = coalesce( x.r, defaultValue.r );
-      var cg = coalesce( x.g, defaultValue.g );
-      var cb = coalesce( x.b, defaultValue.b );
+      // Default when there is none given
+      var dr = 0, dg = 0, db = 0;
+
+      if ( defaultValue )
+      {
+        dr = defaultValue.r;
+        dg = defaultValue.g;
+        db = defaultValue.b;
+      }
+      
+      var cr = coalesce( x.r, dr );
+      var cg = coalesce( x.g, dg );
+      var cb = coalesce( x.b, db );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );

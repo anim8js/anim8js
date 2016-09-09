@@ -20,11 +20,13 @@ Class.extend( CalculatorQuaternion, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When only a number is given assume it's an angle around the Z-axis.
     if ( isNumber( x ) )
     {
@@ -35,18 +37,31 @@ Class.extend( CalculatorQuaternion, Calculator,
         angle: x
       };
     }
+
     // When an array is given, assume [x, y, z, angle]
     if ( isArray( x ) )
     {
       x = { x: x[0], y: x[1], z: x[2], angle: x[3] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cx = coalesce( x.x, defaultValue.x );
-      var cy = coalesce( x.y, defaultValue.y );
-      var cz = coalesce( x.z, defaultValue.z );
-      var ca = coalesce( x.angle, defaultValue.angle );
+      // Default when there is none given
+      var dx = 0, dy = 0, dz = 0, da = 0;
+
+      if ( defaultValue )
+      {
+        dx = defaultValue.x;
+        dy = defaultValue.y;
+        dz = defaultValue.z;
+        da = defaultValue.angle;
+      }
+      
+      var cx = coalesce( x.x, dx );
+      var cy = coalesce( x.y, dy );
+      var cz = coalesce( x.z, dz );
+      var ca = coalesce( x.angle, da );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -75,6 +90,7 @@ Class.extend( CalculatorQuaternion, Calculator,
         return parsed;
       }
     }
+
     // When a relative value is given, assume it's for an angle around the Z-axis.
     if ( this.isRelative( x ) )
     {

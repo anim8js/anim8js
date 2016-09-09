@@ -21,16 +21,19 @@ Class.extend( CalculatorNumber, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // A raw number
     if ( isNumber( x ) )
     {
       return x;
     }
+    
     // A number in a string or a relative number.
     if ( isString( x ) )
     {

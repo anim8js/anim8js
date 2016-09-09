@@ -9020,11 +9020,13 @@ Class.extend( Calculator2d, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given a uniform point is returned.
     if ( isNumber( x ) )
     {
@@ -9033,16 +9035,27 @@ Class.extend( Calculator2d, Calculator,
         y: x
       };
     }
+
     // When an array is given, assume [x, y]
     if ( isArray( x ) )
     {
       x = { x: x[0], y: x[1] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cx = coalesce( x.x, defaultValue.x );
-      var cy = coalesce( x.y, defaultValue.y );
+      // Default when there is none given
+      var dx = 0, dy = 0;
+
+      if ( defaultValue )
+      {
+        dx = defaultValue.x;
+        dy = defaultValue.y;
+      }
+
+      var cx = coalesce( x.x, dx );
+      var cy = coalesce( x.y, dy );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
 
@@ -9065,6 +9078,7 @@ Class.extend( Calculator2d, Calculator,
         return parsed;
       }
     }
+
     // Relative values & left/right/middle/center/top/bottom aliases.
     if ( isString( x ) )
     {
@@ -9228,11 +9242,13 @@ Class.extend( Calculator3d, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given a uniform point is returned.
     if ( isNumber( x ) )
     {
@@ -9242,17 +9258,29 @@ Class.extend( Calculator3d, Calculator,
         z: x
       };
     }
+
     // When an array is given, assume [x, y, z]
     if ( isArray( x ) )
     {
       x = { x: x[0], y: x[1], z: x[2] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cx = coalesce( x.x, defaultValue.x );
-      var cy = coalesce( x.y, defaultValue.y );
-      var cz = coalesce( x.z, defaultValue.z );
+      // Default when there is none given
+      var dx = 0, dy = 0, dz = 0;
+
+      if ( defaultValue )
+      {
+        dx = defaultValue.x;
+        dy = defaultValue.y;
+        dz = defaultValue.z;
+      }
+
+      var cx = coalesce( x.x, dx );
+      var cy = coalesce( x.y, dy );
+      var cz = coalesce( x.z, dz );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -9412,16 +9440,19 @@ Class.extend( CalculatorNumber, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // A raw number
     if ( isNumber( x ) )
     {
       return x;
     }
+    
     // A number in a string or a relative number.
     if ( isString( x ) )
     {
@@ -9535,11 +9566,13 @@ Class.extend( CalculatorQuaternion, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When only a number is given assume it's an angle around the Z-axis.
     if ( isNumber( x ) )
     {
@@ -9550,18 +9583,31 @@ Class.extend( CalculatorQuaternion, Calculator,
         angle: x
       };
     }
+
     // When an array is given, assume [x, y, z, angle]
     if ( isArray( x ) )
     {
       x = { x: x[0], y: x[1], z: x[2], angle: x[3] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cx = coalesce( x.x, defaultValue.x );
-      var cy = coalesce( x.y, defaultValue.y );
-      var cz = coalesce( x.z, defaultValue.z );
-      var ca = coalesce( x.angle, defaultValue.angle );
+      // Default when there is none given
+      var dx = 0, dy = 0, dz = 0, da = 0;
+
+      if ( defaultValue )
+      {
+        dx = defaultValue.x;
+        dy = defaultValue.y;
+        dz = defaultValue.z;
+        da = defaultValue.angle;
+      }
+      
+      var cx = coalesce( x.x, dx );
+      var cy = coalesce( x.y, dy );
+      var cz = coalesce( x.z, dz );
+      var ca = coalesce( x.angle, da );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -9590,6 +9636,7 @@ Class.extend( CalculatorQuaternion, Calculator,
         return parsed;
       }
     }
+
     // When a relative value is given, assume it's for an angle around the Z-axis.
     if ( this.isRelative( x ) )
     {
@@ -9736,11 +9783,13 @@ Class.extend( CalculatorRGB, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given a grayscale color is returned.
     if ( isNumber( x ) )
     {
@@ -9750,17 +9799,29 @@ Class.extend( CalculatorRGB, Calculator,
         b: x
       };
     }
+
     // When an array is given, assume [r, g, b]
     if ( isArray( x ) )
     {
       x = { r: x[0], g: x[1], b: x[2] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cr = coalesce( x.r, defaultValue.r );
-      var cg = coalesce( x.g, defaultValue.g );
-      var cb = coalesce( x.b, defaultValue.b );
+      // Default when there is none given
+      var dr = 0, dg = 0, db = 0;
+
+      if ( defaultValue )
+      {
+        dr = defaultValue.r;
+        dg = defaultValue.g;
+        db = defaultValue.b;
+      }
+      
+      var cr = coalesce( x.r, dr );
+      var cg = coalesce( x.g, dg );
+      var cb = coalesce( x.b, db );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -9929,11 +9990,13 @@ Class.extend( CalculatorRGBA, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given an opaque grayscale color is returned.
     if ( isNumber( x ) )
     {
@@ -9944,18 +10007,31 @@ Class.extend( CalculatorRGBA, Calculator,
         a: 1.0
       };
     }
+
     // When an array is given, assume [r, g, b, a]
     if ( isArray( x ) )
     {
       x = { r: x[0], g: x[1], b: x[2], a: x[3] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cr = coalesce( x.r, defaultValue.r );
-      var cg = coalesce( x.g, defaultValue.g );
-      var cb = coalesce( x.b, defaultValue.b );
-      var ca = coalesce( x.a, defaultValue.a );
+      // Default when there is none given
+      var dr = 0, dg = 0, db = 0, da = 1;
+
+      if ( defaultValue )
+      {
+        dr = defaultValue.r;
+        dg = defaultValue.g;
+        db = defaultValue.b;
+        da = defaultValue.a;
+      }
+
+      var cr = coalesce( x.r, dr );
+      var cg = coalesce( x.g, dg );
+      var cb = coalesce( x.b, db );
+      var ca = coalesce( x.a, da );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -9984,6 +10060,7 @@ Class.extend( CalculatorRGBA, Calculator,
         return parsed;
       }
     }
+
     // If only a relative value is given it will modify the R, G, & B components.
     if ( this.isRelative( x ) )
     {

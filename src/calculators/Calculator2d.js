@@ -20,11 +20,13 @@ Class.extend( Calculator2d, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given a uniform point is returned.
     if ( isNumber( x ) )
     {
@@ -33,16 +35,27 @@ Class.extend( Calculator2d, Calculator,
         y: x
       };
     }
+
     // When an array is given, assume [x, y]
     if ( isArray( x ) )
     {
       x = { x: x[0], y: x[1] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cx = coalesce( x.x, defaultValue.x );
-      var cy = coalesce( x.y, defaultValue.y );
+      // Default when there is none given
+      var dx = 0, dy = 0;
+
+      if ( defaultValue )
+      {
+        dx = defaultValue.x;
+        dy = defaultValue.y;
+      }
+
+      var cx = coalesce( x.x, dx );
+      var cy = coalesce( x.y, dy );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
 
@@ -65,6 +78,7 @@ Class.extend( Calculator2d, Calculator,
         return parsed;
       }
     }
+
     // Relative values & left/right/middle/center/top/bottom aliases.
     if ( isString( x ) )
     {

@@ -21,11 +21,13 @@ Class.extend( CalculatorRGBA, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
     // When a number is given an opaque grayscale color is returned.
     if ( isNumber( x ) )
     {
@@ -36,18 +38,31 @@ Class.extend( CalculatorRGBA, Calculator,
         a: 1.0
       };
     }
+
     // When an array is given, assume [r, g, b, a]
     if ( isArray( x ) )
     {
       x = { r: x[0], g: x[1], b: x[2], a: x[3] };
     }
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      var cr = coalesce( x.r, defaultValue.r );
-      var cg = coalesce( x.g, defaultValue.g );
-      var cb = coalesce( x.b, defaultValue.b );
-      var ca = coalesce( x.a, defaultValue.a );
+      // Default when there is none given
+      var dr = 0, dg = 0, db = 0, da = 1;
+
+      if ( defaultValue )
+      {
+        dr = defaultValue.r;
+        dg = defaultValue.g;
+        db = defaultValue.b;
+        da = defaultValue.a;
+      }
+
+      var cr = coalesce( x.r, dr );
+      var cg = coalesce( x.g, dg );
+      var cb = coalesce( x.b, db );
+      var ca = coalesce( x.a, da );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -76,6 +91,7 @@ Class.extend( CalculatorRGBA, Calculator,
         return parsed;
       }
     }
+
     // If only a relative value is given it will modify the R, G, & B components.
     if ( this.isRelative( x ) )
     {
