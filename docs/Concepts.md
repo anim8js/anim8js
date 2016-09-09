@@ -10,6 +10,17 @@ The object to animate. Has one or more [attribute](#attribute)s
 
 A variable type which has a defined [calculator](#calculator). One of: number, 2d, 3d, string, rgb, rgba, & quaternion.
 
+#### Data Point
+
+A value that can be used in an [animation](#animation) and be parsed by a [calculator](#calculator). Valid formats:
+
+- `true`: represents the current value on the [subject](#subject)
+- `2.5`: a constant value
+- `"-20"`: a value relative to the current value on the subject
+- `anim8.computed(func)`: a function which is invoked at the start of an animation which should return a value to be used in its place
+- `func`: a function that should be called each frame which returns a value to be used in its place
+- `anim8.computed.random({min: 1, max: 5})`: a function which generates a random value between the min & max at the start of an animation
+
 #### Calculator
 
 A class which performs mathematical operations for a single [data type](#data-type). A calculator also takes user entered values and parses them into the expected data type format.
@@ -28,14 +39,14 @@ A set of [attrimator](#attrimator)s which is normally named to be referred to la
 
 #### Options
 
-Modifiers to change how an animation plays: 
+Modifiers to change how an animation plays:
 
 - delay: The amount of time the animation is delayed before playing (default 0ms)
-- duration: How long to play the animation for (default 1s) 
+- duration: How long to play the animation for (default 1s)
 - repeat: How many times to play the animation (default 1)
 - sleep: How long to wait between repeating plays (default 0ms)
 - scaling: Multiply the values of the animation by this value (default 1.0)
-- easing: A function which determines the "velocity" of an animation (default ease)
+- easing: An [easing](#easing) to use for the animation (default ease)
 - offset: An amount of time to fast-forward into the animation when playing it (default 0ms)
 
 #### Animator
@@ -81,3 +92,30 @@ A function which returns a value given a number between 0 and 1. This could be a
 #### Movie
 
 A set of [attrimator](#attrimator)s to apply to a set of [subject](#subject)s at specific times. A movie can be played at any speed, in any direction, and can jump around to any time in the movie.
+
+#### Transition Options
+
+Modifiers to describe how an animation transitions into another:
+
+- time: How much time to spend transitioning from the current animation to the next
+- intro: The amount of time to transition into the next animation. A negative value will create a curve before the next animation and smoothly transition into it
+- outro: The amount of time to transition out of the current animation. A positive value will create a curve out of the current animation
+- granularity: How many points to calculate along the transition to use to create a transition which respects the outro and intro animation velocity
+- lookup: How far into & out of the next & current animations to look when calculating their velocity. This is a delta value (0-1)
+- easing: The [easing](#easing) to use for the transition path
+
+#### Easing
+
+A function which determines the "velocity" of an animation. It takes a delta value between 0 and 1 and returns a new value typically between the same range.
+
+#### Easing Type
+
+A function which takes an easing function and a delta value between 0 and 1 and returns a new value. Easing types are used using a hyphen after an easing. These types are another layer on easings providing more control.
+
+#### Factory
+
+Takes a [subject](#subject) and returns an [animator](#animator) that can handle animating the subject and provides the animator with [attribute](#attribute) definitions.
+
+#### Defer
+
+To wait to invoke functions on an object until that object triggers a specific event.
