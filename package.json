@@ -9,7 +9,7 @@
     "url": "git://github.com/ClickerMonkey/anim8js.git"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "nodeunit test"
   },
   "devDependencies": {
     "gulp": "^3.8.10",
@@ -28,6 +28,7 @@
     "jaguarjs-jsdoc": "^1.0.1",
     "jsdoc": "^3.4.0",
     "jshint": "^2.9.2",
-    "merge-stream": "^1.0.0"
+    "merge-stream": "^1.0.0",
+    "nodeunit": "^0.10.2"
   }
 }
