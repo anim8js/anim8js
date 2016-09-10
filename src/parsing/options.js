@@ -60,9 +60,23 @@ function $options(options, cache)
     {
       var part = options[i];
       var first = part.charAt( 0 );
+      var paramSplit = part.indexOf( '=' );
 
+      // Parameters
+      if ( paramSplit !== -1 )
+      {
+        var paramName = part.substring( 0, paramSplit );
+        var paramValue = part.substring( paramSplit + 1 );
+
+        if ( !parsed.parameters )
+        {
+          parsed.parameters = {};
+        }
+
+        parsed.parameters[ paramName ] = paramValue;
+      }
       // Repeats
-      if ( first === 'x' )
+      else if ( first === 'x' )
       {
         parseOptionProperty( part.substring(1), parsed, $repeat, 'repeat', 'repeatAdd', 'repeatScale' );
       }

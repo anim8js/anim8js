@@ -44,22 +44,15 @@ Class.extend( CalculatorRGB, Calculator,
       x = { r: x[0], g: x[1], b: x[2] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorRGB );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dr = 0, dg = 0, db = 0;
-
-      if ( defaultValue )
-      {
-        dr = defaultValue.r;
-        dg = defaultValue.g;
-        db = defaultValue.b;
-      }
-      
-      var cr = coalesce( x.r, dr );
-      var cg = coalesce( x.g, dg );
-      var cb = coalesce( x.b, db );
+      var cr = coalesce( x.r, def.r );
+      var cg = coalesce( x.g, def.g );
+      var cb = coalesce( x.b, def.b );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -85,16 +78,6 @@ Class.extend( CalculatorRGB, Calculator,
         return parsed;
       }
     }
-    // If only a relative value is given it will modify the R, G, & B components.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
-      {
-        return computed.relative( { r: rx, g: rx, b: rx } );
-      }
-    }
 
     // Try to parse the color.
     var parsed = Color.parse( x );
@@ -104,13 +87,30 @@ Class.extend( CalculatorRGB, Calculator,
       return parsed;
     }
 
-    // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
+    if ( isString( x ) )
     {
-      return this.clone( defaultValue );
+      // If only a relative value is given it will modify the R, G, & B components.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { r: rx, g: rx, b: rx } );
+        }
+      }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        r: $number( pair[0], def.r ),
+        g: $number( pair[1], def.g ),
+        b: $number( pair[2], def.b )
+      };
     }
 
-    return false;
+    // If no value was given but the default value was given, clone it.
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -130,6 +130,13 @@ Class.extend( CalculatorRGB, Calculator,
     out.b = 0;
     return out;
   },
+  abs: function(out)
+  {
+    out.r = Math.abs( out.r );
+    out.g = Math.abs( out.g );
+    out.b = Math.abs( out.b );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.r += amount.r * amountScale;
@@ -142,6 +149,13 @@ Class.extend( CalculatorRGB, Calculator,
     out.r *= scale.r;
     out.g *= scale.g;
     out.b *= scale.b;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.r = denominator.r ? out.r / denominator.r : 0;
+    out.g = denominator.g ? out.g / denominator.g : 0;
+    out.b = denominator.b ? out.b / denominator.b : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)

@@ -91,6 +91,18 @@ Class.define( Calculator,
   },
 
   /**
+   * Modifies out into the absolute value of it self.
+   *
+   * @method abs
+   * @param {T} out
+   * @return {T}
+   */
+  abs: function(out)
+  {
+    throw 'Calculator.abs not implemented';
+  },
+
+  /**
    * Clones the value and returns the clone.
    *
    * @method clone
@@ -177,6 +189,19 @@ Class.define( Calculator,
   mul: function(out, scale)
   {
     throw 'Calculator.mul not implemented';
+  },
+
+  /**
+   * Divides out by some amount and returns out.
+   *
+   * @method div
+   * @param {T} out
+   * @param {T} denominator
+   * @return {T}
+   */
+  div: function(out, denominator)
+  {
+    throw 'Calculator.div not implemented';
   },
 
   /**
@@ -413,7 +438,7 @@ Class.define( Calculator,
    */
   isRelative: function(x)
   {
-    return isString( x ) && ( x[0] === '-' || x[0] === '+' );
+    return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
   },
 
   /**

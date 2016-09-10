@@ -31,7 +31,7 @@ Class.extend( CalculatorString, Calculator,
       return x;
     }
 
-    return defaultValue;
+    return coalesce( defaultValue, Defaults.calculatorString );
   },
   copy: function(out, copy)
   {
@@ -45,6 +45,10 @@ Class.extend( CalculatorString, Calculator,
   {
     return '';
   },
+  abs: function(out)
+  {
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     return amount;
@@ -52,6 +56,10 @@ Class.extend( CalculatorString, Calculator,
   mul: function(out, scale)
   {
     return scale;
+  },
+  div: function(out, denominator)
+  {
+    return out;
   },
   interpolate: function(out, start, end, delta)
   {

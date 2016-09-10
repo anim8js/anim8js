@@ -302,8 +302,21 @@ var Defaults =
    * @default 100
    */
 
-  comboPathUniformGranularity: 100
+  comboPathUniformGranularity: 100,
 
+  calculatorNumber: 0,
+
+  calculator2d: {x: 0, y: 0},
+
+  calculator3d: {x: 0, y: 0, z: 0},
+
+  calculatorQuaternion: {x: 0, y: 0, z: 0, angle: 0},
+
+  calculatorRGB: {r: 0, g: 0, b: 0},
+
+  calculatorRGBA: {r: 0, g: 0, b: 0, a: 1},
+
+  calculatorString: ''
 };
 
 
@@ -4230,14 +4243,15 @@ Class.define( Builder,
    */
   mergeAttrimator: function( e, attr, helper, factory )
   {
-    e.easing    = helper.mergeEasing( attr, e.easing );
-    e.repeat    = helper.mergeRepeat( attr, e.repeat );
-    e.delay     = helper.mergeDelay( attr, e.delay );
-    e.sleep     = helper.mergeSleep( attr, e.sleep );
-    e.duration  = helper.mergeDuration( attr, e.duration );
-    e.offset    = helper.mergeOffset( attr, e.offset );
-    e.scale     = helper.mergeScale( attr, e.scale );
-    e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
+    e.easing      = helper.mergeEasing( attr, e.easing );
+    e.repeat      = helper.mergeRepeat( attr, e.repeat );
+    e.delay       = helper.mergeDelay( attr, e.delay );
+    e.sleep       = helper.mergeSleep( attr, e.sleep );
+    e.duration    = helper.mergeDuration( attr, e.duration );
+    e.offset      = helper.mergeOffset( attr, e.offset );
+    e.scale       = helper.mergeScale( attr, e.scale );
+    e.scaleBase   = helper.mergeScaleBase( attr, e.scaleBase, factory );
+    e.parameters  = helper.mergeParameters( e.parameters );
   },
 
   /**
@@ -4290,6 +4304,7 @@ function BuilderHelper( input, oldOptions, newOptions )
   this.prepareSpecifics( 'offsets' );
   this.prepareSpecifics( 'scales' );
   this.prepareSpecifics( 'scaleBases' );
+  this.prepareSpecifics( 'parameters' );
 }
 
 Class.define( BuilderHelper,
@@ -4441,7 +4456,8 @@ Class.define( BuilderHelper,
     var offset     = this.parseOffset( attr );
     var scale      = this.parseScale( attr );
     var scaleBase  = this.parseScaleBase( attr );
-    var event      = new Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, builder, null, this.input );
+    var parameters = this.parseParameters();
+    var event      = new Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, parameters, hasInitialState, builder, null, this.input );
 
     return event;
   },
@@ -4467,6 +4483,17 @@ Class.define( BuilderHelper,
     var scale = coalesce( this.oldOptions[ optionScale ], 1 );
 
     return (add === 0 && scale === 1) ? baseRaw : (base + add) * scale;
+  },
+
+  /**
+   * Parses parameters from input and the given options.
+   *
+   * @method parseParameters
+   * @return {Object}
+   */
+  parseParameters: function()
+  {
+    return extend( {}, this.input.parameters, this.oldOptions );
   },
 
   /* MERGING */
@@ -4581,6 +4608,18 @@ Class.define( BuilderHelper,
     };
 
     return this.mergeFirst( attr, current, parseFunction, 'scaleBase', 'scaleBases' );
+  },
+
+  /**
+   * Merges parameters from across the input and options.
+   *
+   * @method mergeParameters
+   * @param {Object} current
+   * @return {Object}
+   */
+  mergeParameters: function(current)
+  {
+    return extend( {}, this.newOptions.parameters, current );
   },
 
   /**
@@ -4722,6 +4761,18 @@ Class.define( Calculator,
   },
 
   /**
+   * Modifies out into the absolute value of it self.
+   *
+   * @method abs
+   * @param {T} out
+   * @return {T}
+   */
+  abs: function(out)
+  {
+    throw 'Calculator.abs not implemented';
+  },
+
+  /**
    * Clones the value and returns the clone.
    *
    * @method clone
@@ -4808,6 +4859,19 @@ Class.define( Calculator,
   mul: function(out, scale)
   {
     throw 'Calculator.mul not implemented';
+  },
+
+  /**
+   * Divides out by some amount and returns out.
+   *
+   * @method div
+   * @param {T} out
+   * @param {T} denominator
+   * @return {T}
+   */
+  div: function(out, denominator)
+  {
+    throw 'Calculator.div not implemented';
   },
 
   /**
@@ -5044,7 +5108,7 @@ Class.define( Calculator,
    */
   isRelative: function(x)
   {
-    return isString( x ) && ( x[0] === '-' || x[0] === '+' );
+    return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
   },
 
   /**
@@ -6051,7 +6115,7 @@ var EventState =
  * @constructor
  * @extends Attrimator
  */
-function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, builder, next, input, mergeId)
+function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, parameters, hasInitialState, builder, next, input, mergeId)
 {
   this.reset( attribute, builder, next );
 
@@ -6114,6 +6178,13 @@ function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, 
    * @property {T} scaleBase
    */
   this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.ZERO );
+
+  /**
+   * The properties on the attrimator.
+   *
+   * @property {Object} parameters
+   */
+  this.parameters       = parameters;
 
   /**
    * Whether or not this event has an initial value which can be applied at the
@@ -6311,7 +6382,7 @@ Class.extend( Event, Attrimator,
   },
   clone: function()
   {
-    return new Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.builder, this.next ? this.next.clone() : null, this.input );
+    return new Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.parameters, this.hasInitialState, this.builder, this.next ? this.next.clone() : null, this.input );
   },
   hasComputed: function()
   {
@@ -6342,7 +6413,7 @@ Class.extend( Event, Attrimator,
  */
 Event.fromOptions = function(attr, path, options)
 {
-  return new Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.offset, options.repeat, options.scale, options.scaleBase );
+  return new Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.offset, options.repeat, options.scale, options.scaleBase, options.parameters );
 };
 
 
@@ -8884,6 +8955,418 @@ function clamp(v, min, max)
 }
 
 
+function param(paramName, paramCalculator, paramDefaultValue)
+{
+  var getCalculator, parseValue;
+
+  if ( paramCalculator )
+  {
+    var calculator = $calculator( paramCalculator );
+    var defaultValue = calculator.parse( paramDefaultValue );
+
+    getCalculator = function(attrimator, animator)
+    {
+      return calculator;
+    };
+    parseValue = function(attrimator, animator, value)
+    {
+      return calculator.parse( value, defaultValue );
+    };
+  }
+  else
+  {
+    getCalculator = function(attrimator, animator)
+    {
+      return animator.getAttribute( attrimator.attribute ).calculator;
+    };
+    parseValue = function(attrimator, animator, value)
+    {
+      return animator.getAttribute( attrimator.attribute ).parse( value );
+    };
+  }
+
+  return paramFactory(getCalculator, parseValue, function(attrimator, animator)
+  {
+    return paramResolve( attrimator, animator, attrimator.parameters[ paramName ], parseValue );
+  });
+}
+
+function paramFactory(getCalculator, parseValue, computer)
+{
+  extend( computer, Parameters );
+
+  computer.getCalculator = getCalculator;
+  computer.parseValue = parseValue;
+
+  return computed( computer );
+}
+
+function paramCalculator(parent, handleCalculation)
+{
+  return paramFactory(parent.getCalculator, parent.parseValue, function(attrimator, animator)
+  {
+    var calc = parent.getCalculator( attrimator, animator );
+
+    return handleCalculation( attrimator, animator, parent, calc );
+  });
+}
+
+function paramResolve(attrimator, animator, value, parser)
+{
+  if ( parser instanceof Calculator )
+  {
+    value = parser.parse( value );
+  }
+  else if ( isFunction( parser ) )
+  {
+    value = parser( attrimator, animator, value );
+  }
+
+  if ( isComputed( value ) )
+  {
+    return value( attrimator, animator );
+  }
+
+  return resolve( value );
+}
+
+var Parameters =
+{
+  add: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.add( out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  sub: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.sub( out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  mul: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.mul( out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  div: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.div( out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  scale: function(scalar)
+  {
+    var calcScalar = $calculator('number');
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var scalarResolve = paramResolve( attrimator, animator, scalar, calcScalar );
+
+      return calc.scale( out, scalarResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  adds: function(value, scalar)
+  {
+    var calcScalar = $calculator('number');
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var scalarResolve = paramResolve( attrimator, animator, scalar, calcScalar );
+
+      return calc.adds( out, valueResolve, scalarResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  abs: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return calc.abs( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  neg: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return calc.scale( out, -1 );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  sqrt: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.sqrt( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  min: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.min( out, out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  max: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.max( out, out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  floor: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.floor( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  ceil: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.ceil( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  round: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.round( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  truncate: function(denominator)
+  {
+    var calcDenominator = $calculator('number');
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var denominatorResolve = paramResolve( attrimator, animator, denominator, calcDenominator );
+
+      return Math.floor( out * denominatorResolve ) / denominatorResolve;
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  mod: function(divisor)
+  {
+    var calcDivisor = $calculator('number');
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var divisorResolve = paramResolve( attrimator, animator, divisor, calcDivisor );
+
+      return out % divisorResolve;
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  toDegrees: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return out * 180 / Math.PI;
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  toRadians: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return out / 180 * Math.PI;
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  cos: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.cos( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  sin: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.sin( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  tan: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.tan( out );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  cosDegrees: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.cos( out / 180 * Math.PI );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  sinDegrees: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.sin( out / 180 * Math.PI );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  tanDegrees: function()
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return Math.tan( out / 180 * Math.PI );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  distance: function(value)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+
+      return calc.distance( out, valueResolve );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  property: function(propertyName, defaultValue)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return isObject( out ) ? out[ propertyName ] : defaultValue;
+    };
+
+    return paramCalculator( this, handleCalculation );
+  }
+
+};
+
+
 var Animations = {};
 
 /**
@@ -9013,6 +9496,14 @@ function Calculator2d()
 
 Class.extend( Calculator2d, Calculator,
 {
+  aliases: {
+    'left':   0,
+    'right':  100,
+    'middle': 50,
+    'center': 50,
+    'top':    0,
+    'bottom': 100
+  },
   parse: function(x, defaultValue)
   {
     // Values computed live.
@@ -9042,20 +9533,14 @@ Class.extend( Calculator2d, Calculator,
       x = { x: x[0], y: x[1] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculator2d );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-      }
-
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
 
@@ -9093,50 +9578,20 @@ Class.extend( Calculator2d, Calculator,
         }
       }
 
-      var aliases = {
-        'left':   0,
-        'right':  100,
-        'middle': 50,
-        'center': 50,
-        'top':    0,
-        'bottom': 100
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x: this.parseString( pair[0], def.x ),
+        y: this.parseString( coalesce(pair[1], pair[0]), def.y )
       };
-
-      if ( x.indexOf(' ') === -1 )
-      {
-        var _x = parseFloat( x );
-
-        if ( !isNaN(_x) || x in aliases )
-        {
-          return {
-            x: x in aliases ? aliases[x] : _x,
-            y: x in aliases ? aliases[x] : _x
-          };
-        }
-      }
-      else
-      {
-        var pair = x.split(' ');
-        var _x = parseFloat( pair[0] );
-        var _y = parseFloat( pair[1] );
-
-        if ((!isNaN(_x) || pair[0] in aliases) && (!isNaN(_y) || pair[1] in aliases))
-        {
-          return {
-            x: pair[0] in aliases ? aliases[pair[0]] : _x,
-            y: pair[1] in aliases ? aliases[pair[1]] : _y
-          };
-        }
-      }
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
+  },
+  parseString: function(x, defaultValue)
+  {
+    return x in this.aliases ? this.aliases[ x ] : $number( x, defaultValue );
   },
   copy: function(out, copy)
   {
@@ -9146,12 +9601,18 @@ Class.extend( Calculator2d, Calculator,
   },
   create: function()
   {
-    return {x: 0.0, y:0.0};
+    return {x: 0.0, y: 0.0};
   },
   zero: function(out)
   {
     out.x = 0.0;
     out.y = 0.0;
+    return out;
+  },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
     return out;
   },
   adds: function(out, amount, amountScale)
@@ -9164,6 +9625,12 @@ Class.extend( Calculator2d, Calculator,
   {
     out.x *= scale.x;
     out.y *= scale.y;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)
@@ -9265,22 +9732,15 @@ Class.extend( Calculator3d, Calculator,
       x = { x: x[0], y: x[1], z: x[2] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculator3d );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0, dz = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-        dz = defaultValue.z;
-      }
-
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
-      var cz = coalesce( x.z, dz );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
+      var cz = coalesce( x.z, def.z );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -9306,24 +9766,31 @@ Class.extend( Calculator3d, Calculator,
         return parsed;
       }
     }
-    // If only a relative value is given it will modify the X, Y, & Z components evenly.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
 
-      if ( rx !== false )
+    if ( isString( x ) )
+    {
+      // If only a relative value is given it will modify the X, Y, & Z components evenly.
+      if ( this.isRelative( x ) )
       {
-        return computed.relative( { x: rx, y: rx, z: rx } );
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { x: rx, y: rx, z: rx } );
+        }
       }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x: $number( pair[0], def.x ),
+        y: $number( pair[1], def.y ),
+        z: $number( pair[2], def.z )
+      };
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -9343,6 +9810,13 @@ Class.extend( Calculator3d, Calculator,
     out.z = 0.0;
     return out;
   },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
+    out.z = Math.abs( out.z );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.x += amount.x * amountScale;
@@ -9355,6 +9829,13 @@ Class.extend( Calculator3d, Calculator,
     out.x *= scale.x;
     out.y *= scale.y;
     out.z *= scale.z;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
+    out.z = denominator.z ? out.z / denominator.z : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)
@@ -9452,7 +9933,7 @@ Class.extend( CalculatorNumber, Calculator,
     {
       return x;
     }
-    
+
     // A number in a string or a relative number.
     if ( isString( x ) )
     {
@@ -9471,7 +9952,7 @@ Class.extend( CalculatorNumber, Calculator,
       }
     }
 
-    return defaultValue;
+    return $number( defaultValue, Defaults.calculatorNumber );
   },
   copy: function(out, copy)
   {
@@ -9485,6 +9966,10 @@ Class.extend( CalculatorNumber, Calculator,
   {
     return 0.0;
   },
+  abs: function(out)
+  {
+    return Math.abs( out );
+  },
   adds: function(out, amount, amountScale)
   {
     return out += amount * amountScale;
@@ -9492,6 +9977,10 @@ Class.extend( CalculatorNumber, Calculator,
   mul: function(out, scale)
   {
     return out *= scale;
+  },
+  div: function(out, denominator)
+  {
+    return denominator ? out / denominator : 0;
   },
   interpolate: function(out, start, end, delta)
   {
@@ -9590,24 +10079,16 @@ Class.extend( CalculatorQuaternion, Calculator,
       x = { x: x[0], y: x[1], z: x[2], angle: x[3] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorQuaternion );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0, dz = 0, da = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-        dz = defaultValue.z;
-        da = defaultValue.angle;
-      }
-      
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
-      var cz = coalesce( x.z, dz );
-      var ca = coalesce( x.angle, da );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
+      var cz = coalesce( x.z, def.z );
+      var ca = coalesce( x.angle, def.angle );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -9638,23 +10119,30 @@ Class.extend( CalculatorQuaternion, Calculator,
     }
 
     // When a relative value is given, assume it's for an angle around the Z-axis.
-    if ( this.isRelative( x ) )
+    if ( isString( x ) )
     {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
+      if ( this.isRelative( x ) )
       {
-        return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
+        }
       }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x:      $number( pair[0], def.x ),
+        y:      $number( pair[1], def.y ),
+        z:      $number( pair[2], def.z ),
+        angle:  $number( pair[3], def.angle )
+      };
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -9676,6 +10164,14 @@ Class.extend( CalculatorQuaternion, Calculator,
     out.angle = 0.0;
     return out;
   },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
+    out.z = Math.abs( out.z );
+    out.angle = Math.abs( out.angle );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.x += amount.x * amountScale;
@@ -9690,6 +10186,14 @@ Class.extend( CalculatorQuaternion, Calculator,
     out.y *= scale.y;
     out.z *= scale.z;
     out.angle *= scale.angle;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
+    out.z = denominator.z ? out.z / denominator.z : 0;
+    out.angle = denominator.angle ? out.angle / denominator.angle : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)
@@ -9806,22 +10310,15 @@ Class.extend( CalculatorRGB, Calculator,
       x = { r: x[0], g: x[1], b: x[2] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorRGB );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dr = 0, dg = 0, db = 0;
-
-      if ( defaultValue )
-      {
-        dr = defaultValue.r;
-        dg = defaultValue.g;
-        db = defaultValue.b;
-      }
-      
-      var cr = coalesce( x.r, dr );
-      var cg = coalesce( x.g, dg );
-      var cb = coalesce( x.b, db );
+      var cr = coalesce( x.r, def.r );
+      var cg = coalesce( x.g, def.g );
+      var cb = coalesce( x.b, def.b );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -9847,16 +10344,6 @@ Class.extend( CalculatorRGB, Calculator,
         return parsed;
       }
     }
-    // If only a relative value is given it will modify the R, G, & B components.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
-      {
-        return computed.relative( { r: rx, g: rx, b: rx } );
-      }
-    }
 
     // Try to parse the color.
     var parsed = Color.parse( x );
@@ -9866,13 +10353,30 @@ Class.extend( CalculatorRGB, Calculator,
       return parsed;
     }
 
-    // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
+    if ( isString( x ) )
     {
-      return this.clone( defaultValue );
+      // If only a relative value is given it will modify the R, G, & B components.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { r: rx, g: rx, b: rx } );
+        }
+      }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        r: $number( pair[0], def.r ),
+        g: $number( pair[1], def.g ),
+        b: $number( pair[2], def.b )
+      };
     }
 
-    return false;
+    // If no value was given but the default value was given, clone it.
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -9892,6 +10396,13 @@ Class.extend( CalculatorRGB, Calculator,
     out.b = 0;
     return out;
   },
+  abs: function(out)
+  {
+    out.r = Math.abs( out.r );
+    out.g = Math.abs( out.g );
+    out.b = Math.abs( out.b );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.r += amount.r * amountScale;
@@ -9904,6 +10415,13 @@ Class.extend( CalculatorRGB, Calculator,
     out.r *= scale.r;
     out.g *= scale.g;
     out.b *= scale.b;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.r = denominator.r ? out.r / denominator.r : 0;
+    out.g = denominator.g ? out.g / denominator.g : 0;
+    out.b = denominator.b ? out.b / denominator.b : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)
@@ -10014,24 +10532,16 @@ Class.extend( CalculatorRGBA, Calculator,
       x = { r: x[0], g: x[1], b: x[2], a: x[3] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorRGBA );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dr = 0, dg = 0, db = 0, da = 1;
-
-      if ( defaultValue )
-      {
-        dr = defaultValue.r;
-        dg = defaultValue.g;
-        db = defaultValue.b;
-        da = defaultValue.a;
-      }
-
-      var cr = coalesce( x.r, dr );
-      var cg = coalesce( x.g, dg );
-      var cb = coalesce( x.b, db );
-      var ca = coalesce( x.a, da );
+      var cr = coalesce( x.r, def.r );
+      var cg = coalesce( x.g, def.g );
+      var cb = coalesce( x.b, def.b );
+      var ca = coalesce( x.a, def.a );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -10061,17 +10571,6 @@ Class.extend( CalculatorRGBA, Calculator,
       }
     }
 
-    // If only a relative value is given it will modify the R, G, & B components.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
-      {
-        return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
-      }
-    }
-
     // Try to parse the color.
     var parsed = Color.parse( x );
 
@@ -10080,13 +10579,31 @@ Class.extend( CalculatorRGBA, Calculator,
       return parsed;
     }
 
-    // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
+    if ( isString( x ) )
     {
-      return this.clone( defaultValue );
+      // If only a relative value is given it will modify the R, G, & B components.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
+        }
+      }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        r: $number( pair[0], def.r ),
+        g: $number( pair[1], def.g ),
+        b: $number( pair[2], def.b ),
+        a: $number( pair[3], def.a )
+      };
     }
 
-    return false;
+    // If no value was given but the default value was given, clone it.
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -10108,6 +10625,14 @@ Class.extend( CalculatorRGBA, Calculator,
     out.a = 0;
     return out;
   },
+  abs: function(out)
+  {
+    out.r = Math.abs( out.r );
+    out.g = Math.abs( out.g );
+    out.b = Math.abs( out.b );
+    out.a = Math.abs( out.a );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.r += amount.r * amountScale;
@@ -10122,6 +10647,14 @@ Class.extend( CalculatorRGBA, Calculator,
     out.g *= scale.g;
     out.b *= scale.b;
     out.a *= scale.a;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.r = denominator.r ? out.r / denominator.r : 0;
+    out.g = denominator.g ? out.g / denominator.g : 0;
+    out.b = denominator.b ? out.b / denominator.b : 0;
+    out.a = denominator.a ? out.a / denominator.a : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)
@@ -10225,7 +10758,7 @@ Class.extend( CalculatorString, Calculator,
       return x;
     }
 
-    return defaultValue;
+    return coalesce( defaultValue, Defaults.calculatorString );
   },
   copy: function(out, copy)
   {
@@ -10239,6 +10772,10 @@ Class.extend( CalculatorString, Calculator,
   {
     return '';
   },
+  abs: function(out)
+  {
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     return amount;
@@ -10246,6 +10783,10 @@ Class.extend( CalculatorString, Calculator,
   mul: function(out, scale)
   {
     return scale;
+  },
+  div: function(out, denominator)
+  {
+    return out;
   },
   interpolate: function(out, start, end, delta)
   {
@@ -10728,15 +11269,16 @@ Class.extend( BuilderKeyframe, Builder,
     // create events & paths
     for (var attr in deltas)
     {
-      var duration  = helper.parseDuration( attr );
-      var delay     = helper.parseDelay( attr );
-      var sleep     = helper.parseSleep( attr );
-      var offset    = helper.parseOffset( attr );
-      var repeat    = helper.parseRepeat( attr );
-      var scale     = helper.parseScale( attr );
-      var scaleBase = helper.parseScaleBase( attr );
-      var path      = new PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
-      var event     = new Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, true, this, null, animation );
+      var duration    = helper.parseDuration( attr );
+      var delay       = helper.parseDelay( attr );
+      var sleep       = helper.parseSleep( attr );
+      var offset      = helper.parseOffset( attr );
+      var repeat      = helper.parseRepeat( attr );
+      var scale       = helper.parseScale( attr );
+      var scaleBase   = helper.parseScaleBase( attr );
+      var parameters  = helper.parseParameters();
+      var path        = new PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
+      var event       = new Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, parameters, true, this, null, animation );
 
       attrimatorMap.put( attr, event );
     }
@@ -10953,50 +11495,6 @@ Class.extend( BuilderTravel, Builder,
     var factory    = $factory( animation.factory );
     var travel     = animation.travel;
 
-    /**
-     * The computed function which returns a function which returns a value pointing
-     * to a given target given the current position of the animator.
-     *
-     * @param  {Number}
-     * @param  {any}
-     * @param  {Number}
-     * @return {Function}
-     */
-    var pointing = function(amount, target, epsilon, subtractVelocity)
-    {
-      return computed(function pointingFunction(attrimator, animator)
-      {
-        var attribute = animator.getAttribute( attrimator.attribute );
-        var calc = attribute.calculator;
-        var targetValue = isComputed( target ) ? target( attrimator, animator ) : target;
-        var temp = calc.create();
-
-        return function()
-        {
-          var position   = attrimator.position;
-          var current    = calc.copy( temp, resolve( targetValue ) );
-          var difference = calc.sub( current, position );
-          var distance   = calc.distance( difference, calc.ZERO );
-
-          if ( distance < epsilon )
-          {
-            attrimator.stopIn( 0 );
-          }
-          else
-          {
-            difference = calc.scale( difference, amount / distance );
-          }
-
-          if ( subtractVelocity )
-          {
-            difference = calc.sub( difference, attrimator.resolveVelocity() );
-          }
-
-          return difference;
-        };
-      });
-    };
-
     for (var attr in travel)
     {
       var traveling     = travel[ attr ];
@@ -11010,12 +11508,12 @@ Class.extend( BuilderTravel, Builder,
 
       if ( acceleration !== 0 )
       {
-        acceleration = pointing( acceleration, toParsed, epsilon, true );
+        acceleration = computed.pointing( acceleration, toParsed, epsilon, true );
       }
 
       if ( velocity !== 0 )
       {
-        velocity = pointing( velocity, toParsed, epsilon, false );
+        velocity = computed.pointing( velocity, toParsed, epsilon, false );
       }
 
       var traveler = new Physics(
@@ -11033,6 +11531,52 @@ Class.extend( BuilderTravel, Builder,
   },
 
   merge: false
+});
+
+/**
+ * The computed function which returns a function which returns a value pointing
+ * to a given target given the current position of the animator.
+ *
+ * @param  {Number}
+ * @param  {any}
+ * @param  {Number}
+ * @return {Function}
+ */
+computed('pointing', function(amount, target, epsilon, subtractVelocity)
+{
+  function pointingFunction(attrimator, animator)
+  {
+    var attribute = animator.getAttribute( attrimator.attribute );
+    var calc = attribute.calculator;
+    var targetValue = isComputed( target ) ? target( attrimator, animator ) : target;
+    var temp = calc.create();
+
+    return function()
+    {
+      var position   = attrimator.position;
+      var current    = calc.copy( temp, resolve( targetValue ) );
+      var difference = calc.sub( current, position );
+      var distance   = calc.distance( difference, calc.ZERO );
+
+      if ( distance < epsilon )
+      {
+        attrimator.stopIn( 0 );
+      }
+      else
+      {
+        difference = calc.scale( difference, amount / distance );
+      }
+
+      if ( subtractVelocity )
+      {
+        difference = calc.sub( difference, attrimator.resolveVelocity() );
+      }
+
+      return difference;
+    };
+  }
+
+  return computed( pointingFunction );
 });
 
 
@@ -14008,9 +14552,23 @@ function $options(options, cache)
     {
       var part = options[i];
       var first = part.charAt( 0 );
+      var paramSplit = part.indexOf( '=' );
 
+      // Parameters
+      if ( paramSplit !== -1 )
+      {
+        var paramName = part.substring( 0, paramSplit );
+        var paramValue = part.substring( paramSplit + 1 );
+
+        if ( !parsed.parameters )
+        {
+          parsed.parameters = {};
+        }
+
+        parsed.parameters[ paramName ] = paramValue;
+      }
       // Repeats
-      if ( first === 'x' )
+      else if ( first === 'x' )
       {
         parseOptionProperty( part.substring(1), parsed, $repeat, 'repeat', 'repeatAdd', 'repeatScale' );
       }
@@ -14580,6 +15138,12 @@ function $transition(transition, cache)
   anim8.SaveOptions = SaveOptions;
   // - translate.js
   anim8.translate = translate;
+  // - param.js
+  anim8.param = param;
+  anim8.paramFactory = paramFactory;
+  anim8.paramCalculator = paramCalculator;
+  anim8.paramResolve = paramResolve;
+  anim8.Parameters = Parameters;
 
   // Classes
   anim8.Aninmation = Animation;

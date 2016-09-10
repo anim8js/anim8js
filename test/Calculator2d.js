@@ -121,6 +121,16 @@ module.exports = {
       test.done();
     },
 
+    strings: function(test)
+    {
+      test.deepEqual( this.calc.parse('3 2'), {x: 3, y: 2} );
+      test.deepEqual( this.calc.parse('3,2'), {x: 3, y: 2} );
+      test.deepEqual( this.calc.parse('3|2'), {x: 3, y: 2} );
+      test.deepEqual( this.calc.parse('3'), {x: 3, y: 3} );
+      test.deepEqual( this.calc.parse('-3,-2'), {x: -3, y: -2} );
+      test.done();
+    },
+
     defaultValue: function(test)
     {
       test.deepEqual( this.calc.parse( undefined, this.calc.ZERO ), {x: 0, y: 0} );
@@ -130,7 +140,8 @@ module.exports = {
 
     nothing: function(test)
     {
-      test.strictEqual( this.calc.parse(), false );
+      test.deepEqual( this.calc.parse(), {x: 0, y: 0} );
+      test.notStrictEqual( this.calc.parse(), anim8.Defaults.calculator2d );
       test.done();
     }
   },

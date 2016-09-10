@@ -20,50 +20,6 @@ Class.extend( BuilderTravel, Builder,
     var factory    = $factory( animation.factory );
     var travel     = animation.travel;
 
-    /**
-     * The computed function which returns a function which returns a value pointing
-     * to a given target given the current position of the animator.
-     *
-     * @param  {Number}
-     * @param  {any}
-     * @param  {Number}
-     * @return {Function}
-     */
-    var pointing = function(amount, target, epsilon, subtractVelocity)
-    {
-      return computed(function pointingFunction(attrimator, animator)
-      {
-        var attribute = animator.getAttribute( attrimator.attribute );
-        var calc = attribute.calculator;
-        var targetValue = isComputed( target ) ? target( attrimator, animator ) : target;
-        var temp = calc.create();
-
-        return function()
-        {
-          var position   = attrimator.position;
-          var current    = calc.copy( temp, resolve( targetValue ) );
-          var difference = calc.sub( current, position );
-          var distance   = calc.distance( difference, calc.ZERO );
-
-          if ( distance < epsilon )
-          {
-            attrimator.stopIn( 0 );
-          }
-          else
-          {
-            difference = calc.scale( difference, amount / distance );
-          }
-
-          if ( subtractVelocity )
-          {
-            difference = calc.sub( difference, attrimator.resolveVelocity() );
-          }
-
-          return difference;
-        };
-      });
-    };
-
     for (var attr in travel)
     {
       var traveling     = travel[ attr ];
@@ -77,12 +33,12 @@ Class.extend( BuilderTravel, Builder,
 
       if ( acceleration !== 0 )
       {
-        acceleration = pointing( acceleration, toParsed, epsilon, true );
+        acceleration = computed.pointing( acceleration, toParsed, epsilon, true );
       }
 
       if ( velocity !== 0 )
       {
-        velocity = pointing( velocity, toParsed, epsilon, false );
+        velocity = computed.pointing( velocity, toParsed, epsilon, false );
       }
 
       var traveler = new Physics(
@@ -100,4 +56,50 @@ Class.extend( BuilderTravel, Builder,
   },
 
   merge: false
+});
+
+/**
+ * The computed function which returns a function which returns a value pointing
+ * to a given target given the current position of the animator.
+ *
+ * @param  {Number}
+ * @param  {any}
+ * @param  {Number}
+ * @return {Function}
+ */
+computed('pointing', function(amount, target, epsilon, subtractVelocity)
+{
+  function pointingFunction(attrimator, animator)
+  {
+    var attribute = animator.getAttribute( attrimator.attribute );
+    var calc = attribute.calculator;
+    var targetValue = isComputed( target ) ? target( attrimator, animator ) : target;
+    var temp = calc.create();
+
+    return function()
+    {
+      var position   = attrimator.position;
+      var current    = calc.copy( temp, resolve( targetValue ) );
+      var difference = calc.sub( current, position );
+      var distance   = calc.distance( difference, calc.ZERO );
+
+      if ( distance < epsilon )
+      {
+        attrimator.stopIn( 0 );
+      }
+      else
+      {
+        difference = calc.scale( difference, amount / distance );
+      }
+
+      if ( subtractVelocity )
+      {
+        difference = calc.sub( difference, attrimator.resolveVelocity() );
+      }
+
+      return difference;
+    };
+  }
+
+  return computed( pointingFunction );
 });

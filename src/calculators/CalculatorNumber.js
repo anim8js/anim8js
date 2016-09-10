@@ -33,7 +33,7 @@ Class.extend( CalculatorNumber, Calculator,
     {
       return x;
     }
-    
+
     // A number in a string or a relative number.
     if ( isString( x ) )
     {
@@ -52,7 +52,7 @@ Class.extend( CalculatorNumber, Calculator,
       }
     }
 
-    return defaultValue;
+    return $number( defaultValue, Defaults.calculatorNumber );
   },
   copy: function(out, copy)
   {
@@ -66,6 +66,10 @@ Class.extend( CalculatorNumber, Calculator,
   {
     return 0.0;
   },
+  abs: function(out)
+  {
+    return Math.abs( out );
+  },
   adds: function(out, amount, amountScale)
   {
     return out += amount * amountScale;
@@ -73,6 +77,10 @@ Class.extend( CalculatorNumber, Calculator,
   mul: function(out, scale)
   {
     return out *= scale;
+  },
+  div: function(out, denominator)
+  {
+    return denominator ? out / denominator : 0;
   },
   interpolate: function(out, start, end, delta)
   {

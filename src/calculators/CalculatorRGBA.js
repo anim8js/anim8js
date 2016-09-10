@@ -45,24 +45,16 @@ Class.extend( CalculatorRGBA, Calculator,
       x = { r: x[0], g: x[1], b: x[2], a: x[3] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorRGBA );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dr = 0, dg = 0, db = 0, da = 1;
-
-      if ( defaultValue )
-      {
-        dr = defaultValue.r;
-        dg = defaultValue.g;
-        db = defaultValue.b;
-        da = defaultValue.a;
-      }
-
-      var cr = coalesce( x.r, dr );
-      var cg = coalesce( x.g, dg );
-      var cb = coalesce( x.b, db );
-      var ca = coalesce( x.a, da );
+      var cr = coalesce( x.r, def.r );
+      var cg = coalesce( x.g, def.g );
+      var cb = coalesce( x.b, def.b );
+      var ca = coalesce( x.a, def.a );
       var rr = this.getRelativeAmount( cr );
       var rg = this.getRelativeAmount( cg );
       var rb = this.getRelativeAmount( cb );
@@ -92,17 +84,6 @@ Class.extend( CalculatorRGBA, Calculator,
       }
     }
 
-    // If only a relative value is given it will modify the R, G, & B components.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
-      {
-        return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
-      }
-    }
-
     // Try to parse the color.
     var parsed = Color.parse( x );
 
@@ -111,13 +92,31 @@ Class.extend( CalculatorRGBA, Calculator,
       return parsed;
     }
 
-    // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
+    if ( isString( x ) )
     {
-      return this.clone( defaultValue );
+      // If only a relative value is given it will modify the R, G, & B components.
+      if ( this.isRelative( x ) )
+      {
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
+        }
+      }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        r: $number( pair[0], def.r ),
+        g: $number( pair[1], def.g ),
+        b: $number( pair[2], def.b ),
+        a: $number( pair[3], def.a )
+      };
     }
 
-    return false;
+    // If no value was given but the default value was given, clone it.
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -139,6 +138,14 @@ Class.extend( CalculatorRGBA, Calculator,
     out.a = 0;
     return out;
   },
+  abs: function(out)
+  {
+    out.r = Math.abs( out.r );
+    out.g = Math.abs( out.g );
+    out.b = Math.abs( out.b );
+    out.a = Math.abs( out.a );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.r += amount.r * amountScale;
@@ -153,6 +160,14 @@ Class.extend( CalculatorRGBA, Calculator,
     out.g *= scale.g;
     out.b *= scale.b;
     out.a *= scale.a;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.r = denominator.r ? out.r / denominator.r : 0;
+    out.g = denominator.g ? out.g / denominator.g : 0;
+    out.b = denominator.b ? out.b / denominator.b : 0;
+    out.a = denominator.a ? out.a / denominator.a : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)

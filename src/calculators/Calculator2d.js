@@ -13,6 +13,14 @@ function Calculator2d()
 
 Class.extend( Calculator2d, Calculator,
 {
+  aliases: {
+    'left':   0,
+    'right':  100,
+    'middle': 50,
+    'center': 50,
+    'top':    0,
+    'bottom': 100
+  },
   parse: function(x, defaultValue)
   {
     // Values computed live.
@@ -42,20 +50,14 @@ Class.extend( Calculator2d, Calculator,
       x = { x: x[0], y: x[1] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculator2d );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-      }
-
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
 
@@ -93,50 +95,20 @@ Class.extend( Calculator2d, Calculator,
         }
       }
 
-      var aliases = {
-        'left':   0,
-        'right':  100,
-        'middle': 50,
-        'center': 50,
-        'top':    0,
-        'bottom': 100
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x: this.parseString( pair[0], def.x ),
+        y: this.parseString( coalesce(pair[1], pair[0]), def.y )
       };
-
-      if ( x.indexOf(' ') === -1 )
-      {
-        var _x = parseFloat( x );
-
-        if ( !isNaN(_x) || x in aliases )
-        {
-          return {
-            x: x in aliases ? aliases[x] : _x,
-            y: x in aliases ? aliases[x] : _x
-          };
-        }
-      }
-      else
-      {
-        var pair = x.split(' ');
-        var _x = parseFloat( pair[0] );
-        var _y = parseFloat( pair[1] );
-
-        if ((!isNaN(_x) || pair[0] in aliases) && (!isNaN(_y) || pair[1] in aliases))
-        {
-          return {
-            x: pair[0] in aliases ? aliases[pair[0]] : _x,
-            y: pair[1] in aliases ? aliases[pair[1]] : _y
-          };
-        }
-      }
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
+  },
+  parseString: function(x, defaultValue)
+  {
+    return x in this.aliases ? this.aliases[ x ] : $number( x, defaultValue );
   },
   copy: function(out, copy)
   {
@@ -146,12 +118,18 @@ Class.extend( Calculator2d, Calculator,
   },
   create: function()
   {
-    return {x: 0.0, y:0.0};
+    return {x: 0.0, y: 0.0};
   },
   zero: function(out)
   {
     out.x = 0.0;
     out.y = 0.0;
+    return out;
+  },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
     return out;
   },
   adds: function(out, amount, amountScale)
@@ -164,6 +142,12 @@ Class.extend( Calculator2d, Calculator,
   {
     out.x *= scale.x;
     out.y *= scale.y;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)

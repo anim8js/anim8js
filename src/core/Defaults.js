@@ -223,6 +223,19 @@ var Defaults =
    * @default 100
    */
 
-  comboPathUniformGranularity: 100
+  comboPathUniformGranularity: 100,
 
+  calculatorNumber: 0,
+
+  calculator2d: {x: 0, y: 0},
+
+  calculator3d: {x: 0, y: 0, z: 0},
+
+  calculatorQuaternion: {x: 0, y: 0, z: 0, angle: 0},
+
+  calculatorRGB: {r: 0, g: 0, b: 0},
+
+  calculatorRGBA: {r: 0, g: 0, b: 0, a: 1},
+
+  calculatorString: ''
 };

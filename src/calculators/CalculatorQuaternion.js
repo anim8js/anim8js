@@ -44,24 +44,16 @@ Class.extend( CalculatorQuaternion, Calculator,
       x = { x: x[0], y: x[1], z: x[2], angle: x[3] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculatorQuaternion );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0, dz = 0, da = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-        dz = defaultValue.z;
-        da = defaultValue.angle;
-      }
-      
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
-      var cz = coalesce( x.z, dz );
-      var ca = coalesce( x.angle, da );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
+      var cz = coalesce( x.z, def.z );
+      var ca = coalesce( x.angle, def.angle );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -92,23 +84,30 @@ Class.extend( CalculatorQuaternion, Calculator,
     }
 
     // When a relative value is given, assume it's for an angle around the Z-axis.
-    if ( this.isRelative( x ) )
+    if ( isString( x ) )
     {
-      var rx = this.getRelativeAmount( x );
-
-      if ( rx !== false )
+      if ( this.isRelative( x ) )
       {
-        return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
+        }
       }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x:      $number( pair[0], def.x ),
+        y:      $number( pair[1], def.y ),
+        z:      $number( pair[2], def.z ),
+        angle:  $number( pair[3], def.angle )
+      };
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -130,6 +129,14 @@ Class.extend( CalculatorQuaternion, Calculator,
     out.angle = 0.0;
     return out;
   },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
+    out.z = Math.abs( out.z );
+    out.angle = Math.abs( out.angle );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.x += amount.x * amountScale;
@@ -144,6 +151,14 @@ Class.extend( CalculatorQuaternion, Calculator,
     out.y *= scale.y;
     out.z *= scale.z;
     out.angle *= scale.angle;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
+    out.z = denominator.z ? out.z / denominator.z : 0;
+    out.angle = denominator.angle ? out.angle / denominator.angle : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)

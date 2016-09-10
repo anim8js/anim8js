@@ -101,6 +101,12 @@
   anim8.SaveOptions = SaveOptions;
   // - translate.js
   anim8.translate = translate;
+  // - param.js
+  anim8.param = param;
+  anim8.paramFactory = paramFactory;
+  anim8.paramCalculator = paramCalculator;
+  anim8.paramResolve = paramResolve;
+  anim8.Parameters = Parameters;
 
   // Classes
   anim8.Aninmation = Animation;

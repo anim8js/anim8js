@@ -22,6 +22,7 @@ function BuilderHelper( input, oldOptions, newOptions )
   this.prepareSpecifics( 'offsets' );
   this.prepareSpecifics( 'scales' );
   this.prepareSpecifics( 'scaleBases' );
+  this.prepareSpecifics( 'parameters' );
 }
 
 Class.define( BuilderHelper,
@@ -173,7 +174,8 @@ Class.define( BuilderHelper,
     var offset     = this.parseOffset( attr );
     var scale      = this.parseScale( attr );
     var scaleBase  = this.parseScaleBase( attr );
-    var event      = new Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, builder, null, this.input );
+    var parameters = this.parseParameters();
+    var event      = new Event( attr, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, parameters, hasInitialState, builder, null, this.input );
 
     return event;
   },
@@ -199,6 +201,17 @@ Class.define( BuilderHelper,
     var scale = coalesce( this.oldOptions[ optionScale ], 1 );
 
     return (add === 0 && scale === 1) ? baseRaw : (base + add) * scale;
+  },
+
+  /**
+   * Parses parameters from input and the given options.
+   *
+   * @method parseParameters
+   * @return {Object}
+   */
+  parseParameters: function()
+  {
+    return extend( {}, this.input.parameters, this.oldOptions );
   },
 
   /* MERGING */
@@ -313,6 +326,18 @@ Class.define( BuilderHelper,
     };
 
     return this.mergeFirst( attr, current, parseFunction, 'scaleBase', 'scaleBases' );
+  },
+
+  /**
+   * Merges parameters from across the input and options.
+   *
+   * @method mergeParameters
+   * @param {Object} current
+   * @return {Object}
+   */
+  mergeParameters: function(current)
+  {
+    return extend( {}, this.newOptions.parameters, current );
   },
 
   /**

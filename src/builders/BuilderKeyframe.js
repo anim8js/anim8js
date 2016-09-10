@@ -146,15 +146,16 @@ Class.extend( BuilderKeyframe, Builder,
     // create events & paths
     for (var attr in deltas)
     {
-      var duration  = helper.parseDuration( attr );
-      var delay     = helper.parseDelay( attr );
-      var sleep     = helper.parseSleep( attr );
-      var offset    = helper.parseOffset( attr );
-      var repeat    = helper.parseRepeat( attr );
-      var scale     = helper.parseScale( attr );
-      var scaleBase = helper.parseScaleBase( attr );
-      var path      = new PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
-      var event     = new Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, true, this, null, animation );
+      var duration    = helper.parseDuration( attr );
+      var delay       = helper.parseDelay( attr );
+      var sleep       = helper.parseSleep( attr );
+      var offset      = helper.parseOffset( attr );
+      var repeat      = helper.parseRepeat( attr );
+      var scale       = helper.parseScale( attr );
+      var scaleBase   = helper.parseScaleBase( attr );
+      var parameters  = helper.parseParameters();
+      var path        = new PathKeyframe( attr, attributes[attr].calculator, values[attr], deltas[attr], pathEasings[attr] );
+      var event       = new Event( attr, path, duration, teasing, delay, sleep, offset, repeat, scale, scaleBase, parameters, true, this, null, animation );
 
       attrimatorMap.put( attr, event );
     }

@@ -43,22 +43,15 @@ Class.extend( Calculator3d, Calculator,
       x = { x: x[0], y: x[1], z: x[2] };
     }
 
+    // Default when there is none given
+    var def = coalesce( defaultValue, Defaults.calculator3d );
+
     // When an object is given, check for relative values.
     if ( isObject( x ) )
     {
-      // Default when there is none given
-      var dx = 0, dy = 0, dz = 0;
-
-      if ( defaultValue )
-      {
-        dx = defaultValue.x;
-        dy = defaultValue.y;
-        dz = defaultValue.z;
-      }
-
-      var cx = coalesce( x.x, dx );
-      var cy = coalesce( x.y, dy );
-      var cz = coalesce( x.z, dz );
+      var cx = coalesce( x.x, def.x );
+      var cy = coalesce( x.y, def.y );
+      var cz = coalesce( x.z, def.z );
       var rx = this.getRelativeAmount( cx );
       var ry = this.getRelativeAmount( cy );
       var rz = this.getRelativeAmount( cz );
@@ -84,24 +77,31 @@ Class.extend( Calculator3d, Calculator,
         return parsed;
       }
     }
-    // If only a relative value is given it will modify the X, Y, & Z components evenly.
-    if ( this.isRelative( x ) )
-    {
-      var rx = this.getRelativeAmount( x );
 
-      if ( rx !== false )
+    if ( isString( x ) )
+    {
+      // If only a relative value is given it will modify the X, Y, & Z components evenly.
+      if ( this.isRelative( x ) )
       {
-        return computed.relative( { x: rx, y: rx, z: rx } );
+        var rx = this.getRelativeAmount( x );
+
+        if ( rx !== false )
+        {
+          return computed.relative( { x: rx, y: rx, z: rx } );
+        }
       }
+
+      var pair = x.split(/[\s,|]/);
+
+      return {
+        x: $number( pair[0], def.x ),
+        y: $number( pair[1], def.y ),
+        z: $number( pair[2], def.z )
+      };
     }
 
     // If no value was given but the default value was given, clone it.
-    if ( isDefined( defaultValue ) )
-    {
-      return this.clone( defaultValue );
-    }
-
-    return false;
+    return this.clone( def );
   },
   copy: function(out, copy)
   {
@@ -121,6 +121,13 @@ Class.extend( Calculator3d, Calculator,
     out.z = 0.0;
     return out;
   },
+  abs: function(out)
+  {
+    out.x = Math.abs( out.x );
+    out.y = Math.abs( out.y );
+    out.z = Math.abs( out.z );
+    return out;
+  },
   adds: function(out, amount, amountScale)
   {
     out.x += amount.x * amountScale;
@@ -133,6 +140,13 @@ Class.extend( Calculator3d, Calculator,
     out.x *= scale.x;
     out.y *= scale.y;
     out.z *= scale.z;
+    return out;
+  },
+  div: function(out, denominator)
+  {
+    out.x = denominator.x ? out.x / denominator.x : 0;
+    out.y = denominator.y ? out.y / denominator.y : 0;
+    out.z = denominator.z ? out.z / denominator.z : 0;
     return out;
   },
   interpolate: function(out, start, end, delta)

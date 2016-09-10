@@ -92,14 +92,15 @@ Class.define( Builder,
    */
   mergeAttrimator: function( e, attr, helper, factory )
   {
-    e.easing    = helper.mergeEasing( attr, e.easing );
-    e.repeat    = helper.mergeRepeat( attr, e.repeat );
-    e.delay     = helper.mergeDelay( attr, e.delay );
-    e.sleep     = helper.mergeSleep( attr, e.sleep );
-    e.duration  = helper.mergeDuration( attr, e.duration );
-    e.offset    = helper.mergeOffset( attr, e.offset );
-    e.scale     = helper.mergeScale( attr, e.scale );
-    e.scaleBase = helper.mergeScaleBase( attr, e.scaleBase, factory );
+    e.easing      = helper.mergeEasing( attr, e.easing );
+    e.repeat      = helper.mergeRepeat( attr, e.repeat );
+    e.delay       = helper.mergeDelay( attr, e.delay );
+    e.sleep       = helper.mergeSleep( attr, e.sleep );
+    e.duration    = helper.mergeDuration( attr, e.duration );
+    e.offset      = helper.mergeOffset( attr, e.offset );
+    e.scale       = helper.mergeScale( attr, e.scale );
+    e.scaleBase   = helper.mergeScaleBase( attr, e.scaleBase, factory );
+    e.parameters  = helper.mergeParameters( e.parameters );
   },
 
   /**

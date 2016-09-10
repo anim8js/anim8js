@@ -34,7 +34,7 @@ var EventState =
  * @constructor
  * @extends Attrimator
  */
-function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, hasInitialState, builder, next, input, mergeId)
+function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, scale, scaleBase, parameters, hasInitialState, builder, next, input, mergeId)
 {
   this.reset( attribute, builder, next );
 
@@ -97,6 +97,13 @@ function Event(attribute, path, duration, easing, delay, sleep, offset, repeat, 
    * @property {T} scaleBase
    */
   this.scaleBase        = path.calculator.parse( scaleBase, path.calculator.ZERO );
+
+  /**
+   * The properties on the attrimator.
+   *
+   * @property {Object} parameters
+   */
+  this.parameters       = parameters;
 
   /**
    * Whether or not this event has an initial value which can be applied at the
@@ -294,7 +301,7 @@ Class.extend( Event, Attrimator,
   },
   clone: function()
   {
-    return new Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.hasInitialState, this.builder, this.next ? this.next.clone() : null, this.input );
+    return new Event( this.attribute, this.path, this.duration, this.easing, this.delay, this.sleep, this.offset, this.repeat, this.scale, this.scaleBase, this.parameters, this.hasInitialState, this.builder, this.next ? this.next.clone() : null, this.input );
   },
   hasComputed: function()
   {
@@ -325,5 +332,5 @@ Class.extend( Event, Attrimator,
  */
 Event.fromOptions = function(attr, path, options)
 {
-  return new Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.offset, options.repeat, options.scale, options.scaleBase );
+  return new Event( attr, path, options.duration, options.easing, options.delay, options.sleep, options.offset, options.repeat, options.scale, options.scaleBase, options.parameters );
 };
