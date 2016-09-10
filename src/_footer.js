@@ -46,8 +46,12 @@
 
   // Math
   anim8.clamp = clamp;
+  anim8.clamper = clamper;
   anim8.gcd = gcd;
   anim8.choose = choose;
+  anim8.toDegrees = toDegrees;
+  anim8.toRadians = toRadians;
+  anim8.modder = modder;
 
   // Registries
   anim8.Animations = Animations;
@@ -89,6 +93,7 @@
   // - computed.js
   anim8.computed = computed;
   anim8.isComputed = isComputed;
+  anim8.resolveComputed = resolveComputed;
   // - dynamic.js
   anim8.composite = composite;
   anim8.partial = partial;
@@ -105,7 +110,6 @@
   anim8.param = param;
   anim8.paramFactory = paramFactory;
   anim8.paramCalculator = paramCalculator;
-  anim8.paramResolve = paramResolve;
   anim8.Parameters = Parameters;
 
   // Classes

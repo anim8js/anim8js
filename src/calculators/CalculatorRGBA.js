@@ -138,12 +138,12 @@ Class.extend( CalculatorRGBA, Calculator,
     out.a = 0;
     return out;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    out.r = Math.abs( out.r );
-    out.g = Math.abs( out.g );
-    out.b = Math.abs( out.b );
-    out.a = Math.abs( out.a );
+    out.r = converter( out.r );
+    out.g = converter( out.g );
+    out.b = converter( out.b );
+    out.a = converter( out.a );
     return out;
   },
   adds: function(out, amount, amountScale)

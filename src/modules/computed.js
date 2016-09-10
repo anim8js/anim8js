@@ -187,6 +187,41 @@ computed('random', function(randomSelection)
 });
 
 /**
+ * Returns a computed function which builds a value for the given calculator
+ * given an array of data points.
+ *
+ * **Examples:**
+ *
+ *     anim8.computed.combined( [1, 2, 3] ); // returns function which returns a 1, 2, or 3
+ *
+ * @method combined
+ * @param  {Array} numbers
+ * @return {Function}
+ */
+computed('combined', function(numbers)
+{
+  var numberCalculator = $calculator('number');
+
+  var combinerFunction = function(attrimator, animator)
+  {
+    var attribute = animator.getAttribute( attrimator.attribute );
+    var combined = [];
+
+    for (var i = 0; i < numbers.length; i++)
+    {
+      combined.push( resolveComputed( attrimator, animator, numbers[ i ], numberCalculator ) );
+    }
+
+    return attribute.parse( combined );
+  };
+
+  // Place the input on the function if the user wants to modify it live
+  combinerFunction.numbers = numbers;
+
+  return computed( combinerFunction );
+});
+
+/**
  * Determines whether the given value is a computed value. A computed value is
  * function with a variable 'computed' set to a true value.
  *
@@ -196,4 +231,23 @@ computed('random', function(randomSelection)
 function isComputed(x)
 {
   return isFunction( x ) && x.computed;
+}
+
+function resolveComputed(attrimator, animator, value, parser)
+{
+  if ( parser instanceof Calculator )
+  {
+    value = parser.parse( value );
+  }
+  else if ( isFunction( parser ) )
+  {
+    value = parser( attrimator, animator, value );
+  }
+
+  if ( isComputed( value ) )
+  {
+    return value( attrimator, animator );
+  }
+
+  return resolve( value );
 }

@@ -28,6 +28,12 @@ Class.extend( CalculatorNumber, Calculator,
       return computed.current;
     }
 
+    // An array
+    if ( isArray( x ) )
+    {
+      x = x[ 0 ];
+    }
+
     // A raw number
     if ( isNumber( x ) )
     {
@@ -66,9 +72,9 @@ Class.extend( CalculatorNumber, Calculator,
   {
     return 0.0;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    return Math.abs( out );
+    return converter( out );
   },
   adds: function(out, amount, amountScale)
   {

@@ -91,15 +91,12 @@ Class.define( Calculator,
   },
 
   /**
-   * Modifies out into the absolute value of it self.
-   *
-   * @method abs
-   * @param {T} out
-   * @return {T}
+   * Converts each component in the given value using a converter function and
+   * returns the result.
    */
-  abs: function(out)
+  convert: function(out, converter)
   {
-    throw 'Calculator.abs not implemented';
+    throw 'Calculator.convert not implemented';
   },
 
   /**

@@ -347,6 +347,26 @@ module.exports = {
     test.done();
   },
 
+  vector: function(test)
+  {
+    var $param = anim8.param( 'angle' ).vector().round();
+
+    this.attrimator.parameters.angle = Math.PI;
+
+    test.deepEqual( $param(this.attrimator, this.animator), {x: -1, y: 0} );
+    test.done();
+  },
+
+  vectorDegrees: function(test)
+  {
+    var $param = anim8.param( 'angle' ).vectorDegrees().round();
+
+    this.attrimator.parameters.angle = 90;
+
+    test.deepEqual( $param(this.attrimator, this.animator), {x: 0, y: 1} );
+    test.done();
+  },
+
   combo1: function(test)
   {
     var $param = anim8.param( 'angle' ).sub( 10 ).add( 5 );

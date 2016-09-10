@@ -41,6 +41,7 @@ Here's a comprehensive list of features in anim8js:
 - An easy to understand format for specifying how an animation should play
 - Smoothly transition from current animation to next animation
 - Create movies (animation sequences involving any number of subjects) and play them at any speed, in reverse, or jump to a specific time
+- Create parametrized animations for procedurally generating animations
 - Sequentially animate a set of subjects
 - Event based system for listening when animations start or finish
 - Defer calling methods on an animator until an animation event has occurred

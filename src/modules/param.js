@@ -31,7 +31,7 @@ function param(paramName, paramCalculator, paramDefaultValue)
 
   return paramFactory(getCalculator, parseValue, function(attrimator, animator)
   {
-    return paramResolve( attrimator, animator, attrimator.parameters[ paramName ], parseValue );
+    return resolveComputed( attrimator, animator, attrimator.parameters[ paramName ], parseValue );
   });
 }
 
@@ -45,33 +45,32 @@ function paramFactory(getCalculator, parseValue, computer)
   return computed( computer );
 }
 
-function paramCalculator(parent, handleCalculation)
+function paramCalculator(parent, handleCalculation, newCalculator)
 {
-  return paramFactory(parent.getCalculator, parent.parseValue, function(attrimator, animator)
+  var getCalculator = parent.getCalculator;
+  var parseValue = parent.parseValue;
+
+  if ( newCalculator )
   {
-    var calc = parent.getCalculator( attrimator, animator );
+    newCalculator = $calculator( newCalculator );
+
+    getCalculator = function(attrimator, animator)
+    {
+      return newCalculator;
+    };
+
+    parseValue = function(attrimator, animator, value)
+    {
+      return newCalculator.parse( value );
+    };
+  }
+
+  return paramFactory(getCalculator, parseValue, function(attrimator, animator)
+  {
+    var calc = getCalculator( attrimator, animator );
 
     return handleCalculation( attrimator, animator, parent, calc );
   });
-}
-
-function paramResolve(attrimator, animator, value, parser)
-{
-  if ( parser instanceof Calculator )
-  {
-    value = parser.parse( value );
-  }
-  else if ( isFunction( parser ) )
-  {
-    value = parser( attrimator, animator, value );
-  }
-
-  if ( isComputed( value ) )
-  {
-    return value( attrimator, animator );
-  }
-
-  return resolve( value );
 }
 
 var Parameters =
@@ -81,7 +80,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.add( out, valueResolve );
     };
@@ -94,7 +93,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.sub( out, valueResolve );
     };
@@ -107,7 +106,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.mul( out, valueResolve );
     };
@@ -120,7 +119,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.div( out, valueResolve );
     };
@@ -135,7 +134,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var scalarResolve = paramResolve( attrimator, animator, scalar, calcScalar );
+      var scalarResolve = resolveComputed( attrimator, animator, scalar, calcScalar );
 
       return calc.scale( out, scalarResolve );
     };
@@ -150,22 +149,10 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
-      var scalarResolve = paramResolve( attrimator, animator, scalar, calcScalar );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
+      var scalarResolve = resolveComputed( attrimator, animator, scalar, calcScalar );
 
       return calc.adds( out, valueResolve, scalarResolve );
-    };
-
-    return paramCalculator( this, handleCalculation );
-  },
-
-  abs: function()
-  {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return calc.abs( out );
     };
 
     return paramCalculator( this, handleCalculation );
@@ -183,24 +170,12 @@ var Parameters =
     return paramCalculator( this, handleCalculation );
   },
 
-  sqrt: function()
-  {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.sqrt( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
-  },
-
   min: function(value)
   {
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.min( out, out, valueResolve );
     };
@@ -213,45 +188,9 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.max( out, out, valueResolve );
-    };
-
-    return paramCalculator( this, handleCalculation );
-  },
-
-  floor: function()
-  {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.floor( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
-  },
-
-  ceil: function()
-  {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.ceil( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
-  },
-
-  round: function()
-  {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.round( out );
     };
 
     return paramCalculator( this, handleCalculation );
@@ -264,7 +203,7 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var denominatorResolve = paramResolve( attrimator, animator, denominator, calcDenominator );
+      var denominatorResolve = resolveComputed( attrimator, animator, denominator, calcDenominator );
 
       return Math.floor( out * denominatorResolve ) / denominatorResolve;
     };
@@ -279,108 +218,105 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var divisorResolve = paramResolve( attrimator, animator, divisor, calcDivisor );
+      var divisorResolve = resolveComputed( attrimator, animator, divisor, calcDivisor );
 
-      return out % divisorResolve;
+      return calc.convert( out, modder( divisor ) );
     };
 
     return paramCalculator( this, handleCalculation );
+  },
+
+  clamp: function(min, max)
+  {
+    var calcClamp = $calculator('number');
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+      var minResolve = resolveComputed( attrimator, animator, min, calcClamp );
+      var maxResolve = resolveComputed( attrimator, animator, max, calcClamp );
+
+      return calc.convert( out, clamper( minResolve, maxResolve ) );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  convert: function(converter)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return calc.convert( out, converter );
+    };
+
+    return paramCalculator( this, handleCalculation );
+  },
+
+  abs: function()
+  {
+    return this.convert( Math.abs );
+  },
+
+  sqrt: function()
+  {
+    return this.convert( Math.sqrt );
+  },
+
+  floor: function()
+  {
+    return this.convert( Math.floor );
+  },
+
+  ceil: function()
+  {
+    return this.convert( Math.ceil );
+  },
+
+  round: function()
+  {
+    return this.convert( Math.round );
   },
 
   toDegrees: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return out * 180 / Math.PI;
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.convert( toDegrees );
   },
 
   toRadians: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return out / 180 * Math.PI;
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.convert( toRadians );
   },
 
   cos: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.cos( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.convert( Math.cos );
   },
 
   sin: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.sin( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.convert( Math.sin );
   },
 
   tan: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.tan( out );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.convert( Math.tan );
   },
 
   cosDegrees: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.cos( out / 180 * Math.PI );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.toRadians().cos();
   },
 
   sinDegrees: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.sin( out / 180 * Math.PI );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.toRadians().sin();
   },
 
   tanDegrees: function()
   {
-    var handleCalculation = function(attrimator, animator, parent, calc)
-    {
-      var out = parent( attrimator, animator );
-
-      return Math.tan( out / 180 * Math.PI );
-    };
-
-    return paramCalculator( this, handleCalculation );
+    return this.toRadians().tan();
   },
 
   distance: function(value)
@@ -388,12 +324,12 @@ var Parameters =
     var handleCalculation = function(attrimator, animator, parent, calc)
     {
       var out = parent( attrimator, animator );
-      var valueResolve = paramResolve( attrimator, animator, value, parent.parseValue );
+      var valueResolve = resolveComputed( attrimator, animator, value, parent.parseValue );
 
       return calc.distance( out, valueResolve );
     };
 
-    return paramCalculator( this, handleCalculation );
+    return paramCalculator( this, handleCalculation, 'number' );
   },
 
   property: function(propertyName, defaultValue)
@@ -405,7 +341,42 @@ var Parameters =
       return isObject( out ) ? out[ propertyName ] : defaultValue;
     };
 
-    return paramCalculator( this, handleCalculation );
+    return paramCalculator( this, handleCalculation, 'number' );
+  },
+
+  vector: function(calculator)
+  {
+    var vectorCalculator = coalesce( calculator, '2d' );
+
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var angle = parent( attrimator, animator );
+
+      switch (vectorCalculator) {
+        case '2d':
+          return {
+            x: Math.cos( angle ),
+            y: Math.sin( angle )
+          };
+        case '3d':
+          var yaw = angle.x;
+          var pitch = angle.y;
+          return {
+            x: Math.cos( yaw ) * Math.cos( pitch ),
+            y: Math.sin( yaw ) * Math.cos( pitch ),
+            z: Math.sin( pitch )
+          };
+      }
+
+      return angle;
+    };
+
+    return paramCalculator( this, handleCalculation, vectorCalculator );
+  },
+
+  vectorDegrees: function(type)
+  {
+    return this.toRadians().vector( type );
   }
 
 };

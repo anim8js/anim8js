@@ -126,10 +126,10 @@ Class.extend( Calculator2d, Calculator,
     out.y = 0.0;
     return out;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    out.x = Math.abs( out.x );
-    out.y = Math.abs( out.y );
+    out.x = converter( out.x );
+    out.y = converter( out.y );
     return out;
   },
   adds: function(out, amount, amountScale)

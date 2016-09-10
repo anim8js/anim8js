@@ -130,11 +130,11 @@ Class.extend( CalculatorRGB, Calculator,
     out.b = 0;
     return out;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    out.r = Math.abs( out.r );
-    out.g = Math.abs( out.g );
-    out.b = Math.abs( out.b );
+    out.r = converter( out.r );
+    out.g = converter( out.g );
+    out.b = converter( out.b );
     return out;
   },
   adds: function(out, amount, amountScale)

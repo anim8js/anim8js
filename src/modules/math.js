@@ -74,3 +74,32 @@ function clamp(v, min, max)
 {
   return (v < min) ? min : (v > max ? max : v);
 }
+
+function clamper(min, max)
+{
+  return function(v)
+  {
+    return clamp( v, min, max );
+  };
+}
+
+var RADIANS_TO_DEGREES = 180 / Math.PI;
+var DEGREES_TO_RADIANS = Math.PI / 180;
+
+function toDegrees(radians)
+{
+  return radians * RADIANS_TO_DEGREES;
+}
+
+function toRadians(degrees)
+{
+  return degrees * DEGREES_TO_RADIANS;
+}
+
+function modder(divisor)
+{
+  return function(v)
+  {
+    return v % divisor;
+  };
+}

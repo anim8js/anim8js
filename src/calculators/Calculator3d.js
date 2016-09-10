@@ -121,11 +121,11 @@ Class.extend( Calculator3d, Calculator,
     out.z = 0.0;
     return out;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    out.x = Math.abs( out.x );
-    out.y = Math.abs( out.y );
-    out.z = Math.abs( out.z );
+    out.x = converter( out.x );
+    out.y = converter( out.y );
+    out.z = converter( out.z );
     return out;
   },
   adds: function(out, amount, amountScale)

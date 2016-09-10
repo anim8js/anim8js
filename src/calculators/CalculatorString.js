@@ -20,11 +20,19 @@ Class.extend( CalculatorString, Calculator,
     {
       return x;
     }
+
     // Value computed from current value on animator.
     if ( x === true )
     {
       return computed.current;
     }
+
+    // An array
+    if ( isArray( x ) )
+    {
+      x = x[ 0 ];
+    }
+
     // A raw string
     if ( isString( x ) )
     {
@@ -45,9 +53,9 @@ Class.extend( CalculatorString, Calculator,
   {
     return '';
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    return out;
+    return converter( out );
   },
   adds: function(out, amount, amountScale)
   {

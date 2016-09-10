@@ -129,12 +129,12 @@ Class.extend( CalculatorQuaternion, Calculator,
     out.angle = 0.0;
     return out;
   },
-  abs: function(out)
+  convert: function(out, converter)
   {
-    out.x = Math.abs( out.x );
-    out.y = Math.abs( out.y );
-    out.z = Math.abs( out.z );
-    out.angle = Math.abs( out.angle );
+    out.x = converter( out.x );
+    out.y = converter( out.y );
+    out.z = converter( out.z );
+    out.angle = converter( out.angle );
     return out;
   },
   adds: function(out, amount, amountScale)
