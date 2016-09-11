@@ -14,4 +14,5 @@
 12. [Animator](Animator.md)
 13. [Animators](Animators.md)
 14. [Sequential Animations](Sequential-Animations.md)
-15. [Movies](Movies.md)
+15. [Parametrized Animations](Parametrized-Animations.md)
+16. [Movies](Movies.md)

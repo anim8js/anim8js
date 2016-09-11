@@ -1,3 +1,3 @@
 # Sequential Animations
 
-< [Animators](Animators.md) | [Movies](Movies.md) >
+< [Animators](Animators.md) | [Parametrized Animations](Parametrized-Animations.md) >
