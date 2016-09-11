@@ -115,6 +115,11 @@ computed('relative', function(relativeAmount, mask)
   return relativeFunction;
 });
 
+function isRelative(x)
+{
+  return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
+}
+
 /**
  * Returns a random value based on the given random selection.
  *

@@ -14,7 +14,7 @@ function CalculatorNumber()
 
 Class.extend( CalculatorNumber, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -43,11 +43,11 @@ Class.extend( CalculatorNumber, Calculator,
     // A number in a string or a relative number.
     if ( isString( x ) )
     {
-      var amount = this.getRelativeAmount( x );
+      var amount = $number( x, false );
 
       if ( amount !== false )
       {
-        if ( this.isRelative( x ) )
+        if ( !ignoreRelative && isRelative( x ) )
         {
           return computed.relative( amount );
         }

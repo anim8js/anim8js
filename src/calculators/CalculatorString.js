@@ -13,7 +13,7 @@ function CalculatorString()
 
 Class.extend( CalculatorString, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )

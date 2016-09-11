@@ -52,8 +52,8 @@ Class.extend( FactoryObject, Factory,
       attribute.calculator = calculator;
       attribute.defaultValue = defaultValue;
       attribute.name = attr;
-      attribute.parse = function(value) {
-        return this.calculator.parse( value, this.defaultValue );
+      attribute.parse = function(value, ignoreRelative) {
+        return this.calculator.parse( value, this.defaultValue, ignoreRelative );
       };
       attribute.cloneDefault = function() {
         return this.calculator.clone( this.defaultValue );

@@ -4701,11 +4701,12 @@ Class.define( Calculator,
    * Parses the given input for a value this calculator understands.
    *
    * @method parse
-   * @param  {T} x
-   * @param  {T} defaultValue
+   * @param {T} x
+   * @param {T} defaultValue
+   * @param {Boolean} ignoreRelative
    * @return {T|Function|False}
    */
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     throw 'Calculator.parse not implemented';
   },
@@ -5091,37 +5092,6 @@ Class.define( Calculator,
     }
 
     return out;
-  },
-
-  /**
-   * Determines whether the given value appears to be a relative value. Relative
-   * values are stored as strings starting with a plus or minus for positive or
-   * negative respectively.
-   *
-   * @method isRelative
-   * @param {Any} x
-   * @return {Boolean}
-   * @protected
-   */
-  isRelative: function(x)
-  {
-    return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
-  },
-
-  /**
-   * Returns the relative amount of the given relative value. If the value is
-   * not a valid relative value false is returned.
-   *
-   * @method getRelativeAmount
-   * @param {String} x
-   * @return {Number}
-   * @protected
-   */
-  getRelativeAmount: function(x)
-  {
-    var z = parseFloat( x );
-
-    return isNaN(z) ? false : z;
   }
 
 });
@@ -8412,6 +8382,11 @@ computed('relative', function(relativeAmount, mask)
   return relativeFunction;
 });
 
+function isRelative(x)
+{
+  return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
+}
+
 /**
  * Returns a random value based on the given random selection.
  *
@@ -9050,7 +9025,7 @@ function param(paramName, paramCalculator, paramDefaultValue)
     };
     parseValue = function(attrimator, animator, value)
     {
-      return calculator.parse( value, defaultValue );
+      return calculator.parse( value, defaultValue, true );
     };
   }
   else
@@ -9061,7 +9036,7 @@ function param(paramName, paramCalculator, paramDefaultValue)
     };
     parseValue = function(attrimator, animator, value)
     {
-      return animator.getAttribute( attrimator.attribute ).parse( value );
+      return animator.getAttribute( attrimator.attribute ).parse( value, true );
     };
   }
 
@@ -9097,7 +9072,7 @@ function paramCalculator(parent, handleCalculation, newCalculator)
 
     parseValue = function(attrimator, animator, value)
     {
-      return newCalculator.parse( value );
+      return newCalculator.parse( value, undefined, true );
     };
   }
 
@@ -9413,6 +9388,18 @@ var Parameters =
   vectorDegrees: function(type)
   {
     return this.toRadians().vector( type );
+  },
+
+  relative: function(mask)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return computed.relative( out, mask )( attrimator, animator );
+    };
+
+    return paramCalculator( this, handleCalculation );
   }
 
 };
@@ -9555,7 +9542,7 @@ Class.extend( Calculator2d, Calculator,
     'top':    0,
     'bottom': 100
   },
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -9592,16 +9579,16 @@ Class.extend( Calculator2d, Calculator,
     {
       var cx = coalesce( x.x, def.x );
       var cy = coalesce( x.y, def.y );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
 
       if ( rx !== false && ry !== false )
       {
         var parsed = { x: rx, y: ry };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
 
-        if ( ix || iy )
+        if ( !ignoreRelative && (ix || iy) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -9619,9 +9606,9 @@ Class.extend( Calculator2d, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the X & Y components evenly.
-      if ( this.isRelative( x ) )
+      if ( !ignoreRelative && isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
         if ( rx !== false )
         {
@@ -9753,7 +9740,7 @@ function Calculator3d()
 
 Class.extend( Calculator3d, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -9792,18 +9779,18 @@ Class.extend( Calculator3d, Calculator,
       var cx = coalesce( x.x, def.x );
       var cy = coalesce( x.y, def.y );
       var cz = coalesce( x.z, def.z );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
-      var rz = this.getRelativeAmount( cz );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
+      var rz = $number( cz, false );
 
       if ( rx !== false && ry !== false && rz !== false )
       {
         var parsed = { x: rx, y: ry, z: rz };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
-        var iz = this.isRelative( cz );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
+        var iz = isRelative( cz );
 
-        if ( ix || iy || iz )
+        if ( !ignoreRelative && (ix || iy || iz) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -9821,9 +9808,9 @@ Class.extend( Calculator3d, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the X, Y, & Z components evenly.
-      if ( this.isRelative( x ) )
+      if ( !ignoreRelative && isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
         if ( rx !== false )
         {
@@ -9965,7 +9952,7 @@ function CalculatorNumber()
 
 Class.extend( CalculatorNumber, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -9994,11 +9981,11 @@ Class.extend( CalculatorNumber, Calculator,
     // A number in a string or a relative number.
     if ( isString( x ) )
     {
-      var amount = this.getRelativeAmount( x );
+      var amount = $number( x, false );
 
       if ( amount !== false )
       {
-        if ( this.isRelative( x ) )
+        if ( !ignoreRelative && isRelative( x ) )
         {
           return computed.relative( amount );
         }
@@ -10105,7 +10092,7 @@ function CalculatorQuaternion()
 
 Class.extend( CalculatorQuaternion, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -10146,20 +10133,20 @@ Class.extend( CalculatorQuaternion, Calculator,
       var cy = coalesce( x.y, def.y );
       var cz = coalesce( x.z, def.z );
       var ca = coalesce( x.angle, def.angle );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
-      var rz = this.getRelativeAmount( cz );
-      var ra = this.getRelativeAmount( ca );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
+      var rz = $number( cz, false );
+      var ra = $number( ca, false );
 
       if ( rx !== false && ry !== false && rz !== false && ra !== false )
       {
         var parsed = { x: rx, y: ry, z: rz, angle: ra };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
-        var iz = this.isRelative( cz );
-        var ia = this.isRelative( ca );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
+        var iz = isRelative( cz );
+        var ia = isRelative( ca );
 
-        if ( ix || iy || iz || ia )
+        if ( !ignoreRelative && (ix || iy || iz || ia) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -10178,11 +10165,11 @@ Class.extend( CalculatorQuaternion, Calculator,
     // When a relative value is given, assume it's for an angle around the Z-axis.
     if ( isString( x ) )
     {
-      if ( this.isRelative( x ) )
+      if ( isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
-        if ( rx !== false )
+        if ( !ignoreRelative && rx !== false )
         {
           return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
         }
@@ -10337,7 +10324,7 @@ function CalculatorRGB()
 
 Class.extend( CalculatorRGB, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -10376,18 +10363,18 @@ Class.extend( CalculatorRGB, Calculator,
       var cr = coalesce( x.r, def.r );
       var cg = coalesce( x.g, def.g );
       var cb = coalesce( x.b, def.b );
-      var rr = this.getRelativeAmount( cr );
-      var rg = this.getRelativeAmount( cg );
-      var rb = this.getRelativeAmount( cb );
+      var rr = $number( cr, false );
+      var rg = $number( cg, false );
+      var rb = $number( cb, false );
 
       if ( rr !== false && rg !== false && rb !== false )
       {
         var parsed = { r: rr, g: rg, b: rb };
-        var ir = this.isRelative( cr );
-        var ig = this.isRelative( cg );
-        var ib = this.isRelative( cb );
+        var ir = isRelative( cr );
+        var ig = isRelative( cg );
+        var ib = isRelative( cb );
 
-        if ( ir || ig || ib )
+        if ( !ignoreRelative && (ir || ig || ib) )
         {
           var mask = {
             r: ir ? 1 : 0,
@@ -10413,11 +10400,11 @@ Class.extend( CalculatorRGB, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the R, G, & B components.
-      if ( this.isRelative( x ) )
+      if ( isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
-        if ( rx !== false )
+        if ( !ignoreRelative && rx !== false )
         {
           return computed.relative( { r: rx, g: rx, b: rx } );
         }
@@ -10558,7 +10545,7 @@ function CalculatorRGBA()
 
 Class.extend( CalculatorRGBA, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -10599,20 +10586,20 @@ Class.extend( CalculatorRGBA, Calculator,
       var cg = coalesce( x.g, def.g );
       var cb = coalesce( x.b, def.b );
       var ca = coalesce( x.a, def.a );
-      var rr = this.getRelativeAmount( cr );
-      var rg = this.getRelativeAmount( cg );
-      var rb = this.getRelativeAmount( cb );
-      var ra = this.getRelativeAmount( ca );
+      var rr = $number( cr, false );
+      var rg = $number( cg, false );
+      var rb = $number( cb, false );
+      var ra = $number( ca, false );
 
       if ( rr !== false && rg !== false && rb !== false && ra !== false )
       {
         var parsed = { r: rr, g: rg, b: rb, a: ra };
-        var ir = this.isRelative( cr );
-        var ig = this.isRelative( cg );
-        var ib = this.isRelative( cb );
-        var ia = this.isRelative( ca );
+        var ir = isRelative( cr );
+        var ig = isRelative( cg );
+        var ib = isRelative( cb );
+        var ia = isRelative( ca );
 
-        if ( ir || ig || ib || ia )
+        if ( !ignoreRelative && (ir || ig || ib || ia) )
         {
           var mask = {
             r: ir ? 1 : 0,
@@ -10639,11 +10626,11 @@ Class.extend( CalculatorRGBA, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the R, G, & B components.
-      if ( this.isRelative( x ) )
+      if ( isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
-        if ( rx !== false )
+        if ( !ignoreRelative && rx !== false )
         {
           return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
         }
@@ -10797,7 +10784,7 @@ function CalculatorString()
 
 Class.extend( CalculatorString, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -10958,8 +10945,8 @@ Class.extend( FactoryObject, Factory,
       attribute.calculator = calculator;
       attribute.defaultValue = defaultValue;
       attribute.name = attr;
-      attribute.parse = function(value) {
-        return this.calculator.parse( value, this.defaultValue );
+      attribute.parse = function(value, ignoreRelative) {
+        return this.calculator.parse( value, this.defaultValue, ignoreRelative );
       };
       attribute.cloneDefault = function() {
         return this.calculator.clone( this.defaultValue );

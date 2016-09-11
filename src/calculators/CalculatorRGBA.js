@@ -14,7 +14,7 @@ function CalculatorRGBA()
 
 Class.extend( CalculatorRGBA, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -55,20 +55,20 @@ Class.extend( CalculatorRGBA, Calculator,
       var cg = coalesce( x.g, def.g );
       var cb = coalesce( x.b, def.b );
       var ca = coalesce( x.a, def.a );
-      var rr = this.getRelativeAmount( cr );
-      var rg = this.getRelativeAmount( cg );
-      var rb = this.getRelativeAmount( cb );
-      var ra = this.getRelativeAmount( ca );
+      var rr = $number( cr, false );
+      var rg = $number( cg, false );
+      var rb = $number( cb, false );
+      var ra = $number( ca, false );
 
       if ( rr !== false && rg !== false && rb !== false && ra !== false )
       {
         var parsed = { r: rr, g: rg, b: rb, a: ra };
-        var ir = this.isRelative( cr );
-        var ig = this.isRelative( cg );
-        var ib = this.isRelative( cb );
-        var ia = this.isRelative( ca );
+        var ir = isRelative( cr );
+        var ig = isRelative( cg );
+        var ib = isRelative( cb );
+        var ia = isRelative( ca );
 
-        if ( ir || ig || ib || ia )
+        if ( !ignoreRelative && (ir || ig || ib || ia) )
         {
           var mask = {
             r: ir ? 1 : 0,
@@ -95,11 +95,11 @@ Class.extend( CalculatorRGBA, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the R, G, & B components.
-      if ( this.isRelative( x ) )
+      if ( isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
-        if ( rx !== false )
+        if ( !ignoreRelative && rx !== false )
         {
           return computed.relative( { r: rx, g: rx, b: rx, a: 0 } );
         }

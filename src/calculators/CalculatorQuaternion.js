@@ -13,7 +13,7 @@ function CalculatorQuaternion()
 
 Class.extend( CalculatorQuaternion, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -54,20 +54,20 @@ Class.extend( CalculatorQuaternion, Calculator,
       var cy = coalesce( x.y, def.y );
       var cz = coalesce( x.z, def.z );
       var ca = coalesce( x.angle, def.angle );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
-      var rz = this.getRelativeAmount( cz );
-      var ra = this.getRelativeAmount( ca );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
+      var rz = $number( cz, false );
+      var ra = $number( ca, false );
 
       if ( rx !== false && ry !== false && rz !== false && ra !== false )
       {
         var parsed = { x: rx, y: ry, z: rz, angle: ra };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
-        var iz = this.isRelative( cz );
-        var ia = this.isRelative( ca );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
+        var iz = isRelative( cz );
+        var ia = isRelative( ca );
 
-        if ( ix || iy || iz || ia )
+        if ( !ignoreRelative && (ix || iy || iz || ia) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -86,11 +86,11 @@ Class.extend( CalculatorQuaternion, Calculator,
     // When a relative value is given, assume it's for an angle around the Z-axis.
     if ( isString( x ) )
     {
-      if ( this.isRelative( x ) )
+      if ( isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
-        if ( rx !== false )
+        if ( !ignoreRelative && rx !== false )
         {
           return computed.relative( { x:0, y:0, z:1, angle: rx }, { x:0, y:0, z:0, angle:1 } );
         }

@@ -13,7 +13,7 @@ function Calculator3d()
 
 Class.extend( Calculator3d, Calculator,
 {
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -52,18 +52,18 @@ Class.extend( Calculator3d, Calculator,
       var cx = coalesce( x.x, def.x );
       var cy = coalesce( x.y, def.y );
       var cz = coalesce( x.z, def.z );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
-      var rz = this.getRelativeAmount( cz );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
+      var rz = $number( cz, false );
 
       if ( rx !== false && ry !== false && rz !== false )
       {
         var parsed = { x: rx, y: ry, z: rz };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
-        var iz = this.isRelative( cz );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
+        var iz = isRelative( cz );
 
-        if ( ix || iy || iz )
+        if ( !ignoreRelative && (ix || iy || iz) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -81,9 +81,9 @@ Class.extend( Calculator3d, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the X, Y, & Z components evenly.
-      if ( this.isRelative( x ) )
+      if ( !ignoreRelative && isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
         if ( rx !== false )
         {

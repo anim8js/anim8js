@@ -14,7 +14,7 @@ function param(paramName, paramCalculator, paramDefaultValue)
     };
     parseValue = function(attrimator, animator, value)
     {
-      return calculator.parse( value, defaultValue );
+      return calculator.parse( value, defaultValue, true );
     };
   }
   else
@@ -25,7 +25,7 @@ function param(paramName, paramCalculator, paramDefaultValue)
     };
     parseValue = function(attrimator, animator, value)
     {
-      return animator.getAttribute( attrimator.attribute ).parse( value );
+      return animator.getAttribute( attrimator.attribute ).parse( value, true );
     };
   }
 
@@ -61,7 +61,7 @@ function paramCalculator(parent, handleCalculation, newCalculator)
 
     parseValue = function(attrimator, animator, value)
     {
-      return newCalculator.parse( value );
+      return newCalculator.parse( value, undefined, true );
     };
   }
 
@@ -377,6 +377,18 @@ var Parameters =
   vectorDegrees: function(type)
   {
     return this.toRadians().vector( type );
+  },
+
+  relative: function(mask)
+  {
+    var handleCalculation = function(attrimator, animator, parent, calc)
+    {
+      var out = parent( attrimator, animator );
+
+      return computed.relative( out, mask )( attrimator, animator );
+    };
+
+    return paramCalculator( this, handleCalculation );
   }
 
 };

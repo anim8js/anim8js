@@ -31,11 +31,12 @@ Class.define( Calculator,
    * Parses the given input for a value this calculator understands.
    *
    * @method parse
-   * @param  {T} x
-   * @param  {T} defaultValue
+   * @param {T} x
+   * @param {T} defaultValue
+   * @param {Boolean} ignoreRelative
    * @return {T|Function|False}
    */
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     throw 'Calculator.parse not implemented';
   },
@@ -421,37 +422,6 @@ Class.define( Calculator,
     }
 
     return out;
-  },
-
-  /**
-   * Determines whether the given value appears to be a relative value. Relative
-   * values are stored as strings starting with a plus or minus for positive or
-   * negative respectively.
-   *
-   * @method isRelative
-   * @param {Any} x
-   * @return {Boolean}
-   * @protected
-   */
-  isRelative: function(x)
-  {
-    return isString( x ) && /^[+-]\d*\.?\d+$/.test( x );
-  },
-
-  /**
-   * Returns the relative amount of the given relative value. If the value is
-   * not a valid relative value false is returned.
-   *
-   * @method getRelativeAmount
-   * @param {String} x
-   * @return {Number}
-   * @protected
-   */
-  getRelativeAmount: function(x)
-  {
-    var z = parseFloat( x );
-
-    return isNaN(z) ? false : z;
   }
 
 });

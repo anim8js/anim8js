@@ -21,7 +21,7 @@ Class.extend( Calculator2d, Calculator,
     'top':    0,
     'bottom': 100
   },
-  parse: function(x, defaultValue)
+  parse: function(x, defaultValue, ignoreRelative)
   {
     // Values computed live.
     if ( isFunction( x ) )
@@ -58,16 +58,16 @@ Class.extend( Calculator2d, Calculator,
     {
       var cx = coalesce( x.x, def.x );
       var cy = coalesce( x.y, def.y );
-      var rx = this.getRelativeAmount( cx );
-      var ry = this.getRelativeAmount( cy );
+      var rx = $number( cx, false );
+      var ry = $number( cy, false );
 
       if ( rx !== false && ry !== false )
       {
         var parsed = { x: rx, y: ry };
-        var ix = this.isRelative( cx );
-        var iy = this.isRelative( cy );
+        var ix = isRelative( cx );
+        var iy = isRelative( cy );
 
-        if ( ix || iy )
+        if ( !ignoreRelative && (ix || iy) )
         {
           var mask = {
             x: ix ? 1 : 0,
@@ -85,9 +85,9 @@ Class.extend( Calculator2d, Calculator,
     if ( isString( x ) )
     {
       // If only a relative value is given it will modify the X & Y components evenly.
-      if ( this.isRelative( x ) )
+      if ( !ignoreRelative && isRelative( x ) )
       {
-        var rx = this.getRelativeAmount( x );
+        var rx = $number( x, false );
 
         if ( rx !== false )
         {
