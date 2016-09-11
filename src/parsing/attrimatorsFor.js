@@ -90,17 +90,17 @@ function $attrimatorsFor( animation, options, cache )
     }
     else
     {
-      var animationsQueued = animation.split( ',' );
+      var animationsQueued = animation.split( /\s*,\s*/ );
 
       for (var k = 0; k < animationsQueued.length; k++)
       {
-        var animationsMerged = animationsQueued[ k ].split( '&' );
+        var animationsMerged = animationsQueued[ k ].split( /\s*&\s*/ );
         var base = new AttrimatorMap();
 
         for (var j = 0; j < animationsMerged.length; j++)
         {
           var animationString = trim( animationsMerged[ j ].toLowerCase() );
-          var animationSplit = animationString.split( ' ' );
+          var animationSplit = animationString.split( /\s+/ );
           var parsedAnimation = Animations[ animationSplit[ 0 ] ];
 
           if ( parsedAnimation )
