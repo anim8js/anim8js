@@ -38,6 +38,7 @@
         <a href="examples/pixi.html" target="example">pixi</a>
         <a href="examples/jquery.html" target="example">jquery</a>
         <a href="examples/movie.html" target="example">movie</a>
+        <a href="examples/param.html" target="example">parametrized animation</a>
         <a href="examples/reference.html" target="example" class="active">reference</a>
         <a href="examples/travel.html" target="example">travel</a>
         <a href="examples/sequence.html" target="example">sequence</a>
@@ -85,6 +86,29 @@
       <div data-for="examples/unplay.html">
         <p>This example shows using the <code>Animator.unplay</code> function which transitions to the starting values of a given animation.</p>
         <pre>anim8( window.box1 ).unplay( 'fadeIn', '2s >500ms /100' );</pre>
+      </div>
+      <div data-for="examples/param.html">
+        <p>This example shows using parametrized animations to create procedurally generated animations.</p>
+        <pre>anim8.save('headTo', {
+  tweenTo: {
+    translate: anim8
+      .param('angle', 'number')
+      .vectorDegrees() // convert angle to 2d vector
+      .scale( anim8.param('distance', 'number') )
+      .relative()
+  }
+});
+
+var m8or = m8( window.box1 );
+
+m8or.play('headTo angle=0 distance=100, headTo angle=-45 distance=50, headTo angle=90 distance=200');
+
+m8or.queue('headTo', {
+  parameters: {
+    angle: -180,
+    distance: 150
+  }
+});</pre>
       </div>
       <div data-for="examples/movie.html">
         <p>This example shows using the <code>Movie</code> and <code>MoviePlayer</code> classes. You can setup any number of animation sequences with any number &amp; type of subjects and you can play through the sequences at any speed and direction and jump to any point in the movie.</p>

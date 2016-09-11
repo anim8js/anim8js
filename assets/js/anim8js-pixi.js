@@ -313,8 +313,8 @@ Class.extend( FactoryPixi, Factory,
       attribute.name = attr;
       attribute.dynamicName = dynamicName;
       attribute.dynamic = dynamic;
-      attribute.parse = function(value) {
-        return this.calculator.parse( value, this.defaultValue );
+      attribute.parse = function(value, ignoreRelative) {
+        return this.calculator.parse( value, this.defaultValue, ignoreRelative );
       };
       attribute.cloneDefault = function() {
         return this.calculator.clone( this.defaultValue );

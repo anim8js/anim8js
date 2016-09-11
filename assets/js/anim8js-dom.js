@@ -2560,8 +2560,8 @@ Class.extend( FactoryDom, Factory,
       attribute.propertyName = propertyName;
       attribute.property = property;
       attribute.defaultUnit = defaultUnit;
-      attribute.parse = function(value) {
-        return this.calculator.parse( value, this.defaultValue );
+      attribute.parse = function(value, ignoreRelative) {
+        return this.calculator.parse( value, this.defaultValue, ignoreRelative );
       };
       attribute.cloneDefault = function() {
         return this.calculator.clone( this.defaultValue );
