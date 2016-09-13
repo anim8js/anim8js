@@ -22,11 +22,11 @@ There are different types of points:
 
 > The definition for `Calculator.parse` is `( input, defaultValue, ignoreRelative )` where `input` is one of the values below, `defaultValue` is an already parsed value to use if input is missing a value, and `ignoreRelative` ensures strings with signs that should be parsed as numbers aren't converted to a relative number.
 
-#### Constant
+### Constant
 
 Constant values typically use raw numbers. Here are examples based on each calculator:
 
-###### number
+#### number
 `var Parsed = anim8.calculator('number').parse( Input );`
 
 | Input | Parsed |
@@ -35,7 +35,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | [1.0] | 1.0 |
 | '3.5' | 3.5 |
 
-###### 2d
+#### 2d
 `var Parsed = anim8.calculator('2d').parse( Input );`
 
 | Input | Parsed |
@@ -49,7 +49,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | '-4&#124;5' | {x: -4, y: 5} |
 | '3,4.5' | {x: 3, y: 4.5} |
 
-###### 3d
+#### 3d
 `var Parsed = anim8.calculator('3d').parse( Input );`
 
 | Input | Parsed |
@@ -63,7 +63,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | '-4&#124;5&#124;1' | {x: -4, y: 5, z: 1} |
 | '3,4.5,-2' | {x: 3, y: 4.5, z:-2} |
 
-###### quaternion
+#### quaternion
 `var Parsed = anim8.calculator('quaternion').parse( Input );`
 
 | Input | Parsed |
@@ -77,7 +77,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | '-4&#124;5&#124;1&#124;180' | {x: -4, y: 5, z: 1, angle: 180} |
 | '3,4.5,-2,-15' | {x: 3, y: 4.5, z:-2, angle: -15} |
 
-###### rgb
+#### rgb
 `var Parsed = anim8.calculator('rgb').parse( Input );`
 
 | Input | Parsed |
@@ -96,7 +96,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | 'rgb(1,34,120)' | {r: 1, g: 34, b: 120} |
 | 'rgba(1,34,120, 0.5)' | {r: 1, g: 34, b: 120} |
 
-###### rgba
+#### rgba
 `var Parsed = anim8.calculator('rgba').parse( Input );`
 
 | Input | Parsed |
@@ -115,7 +115,7 @@ Constant values typically use raw numbers. Here are examples based on each calcu
 | 'rgb(1,34,120)' | {r: 1, g: 34, b: 120, a: 1.0} |
 | 'rgba(1,34,120, 0.5)' | {r: 1, g: 34, b: 120, a: 0.5} |
 
-#### Computed Function
+### Computed Function
 
 A computed function is a special function that is only evaluated at the start of playing an attrimator on an animator. What makes it distinguished from a normal function is the presence of a `computed` property set to `true`. A computed function is also passed `(attrimator, animator)` arguments. The result of the function is placed in the attrimator overwriting the computed function. You can create your own computed function using `anim8.computed` like so:
 
@@ -139,17 +139,17 @@ There are 4 built-in computed functions:
 - [Random Value](#random-value)
 - [Parameter Value](#parameter-value)
 
-##### Current Value
+#### Current Value
 
 The current value on the subject/animator can be used in animation. This is represented by passing `true` or `anim8.computed.current` to an animation. This is useful for tweening from the current point to a new point.
 
-##### Relative Value
+#### Relative Value
 
 A relative value adds a given value to the current value on the subject/animator. A relative value can also be partially constant - as in not moving relative to the current value. A mask is passed to the function to handle this - where a value of `1` means relative and `0` means not relative.
 
 A relative value is specified as a string prefixed with `+` or `-`. Here are examples based on each calculator:
 
-###### number
+#### number
 `var Parsed = anim8.calculator('number').parse( Input );`
 
 | Input | Parsed |
@@ -158,7 +158,7 @@ A relative value is specified as a string prefixed with `+` or `-`. Here are exa
 | '-1.5' | anim8.computed.relative(1.5) |
 | ['+1.0'] | anim8.computed.relative(1.0) |
 
-###### 2d
+#### 2d
 `var Parsed = anim8.calculator('2d').parse( Input );`
 
 | Input | Parsed |
@@ -169,20 +169,20 @@ A relative value is specified as a string prefixed with `+` or `-`. Here are exa
 | {x: '+4.5', y: -3.4} | anim8.computed.relative({x: 4.5, y: -3.4}, {x: 1, y: 0}) |
 | {x: '+4.5', y: '-3.4'} | anim8.computed.relative({x: 4.5, y: -3.4}) |
 
-###### 3d
+#### 3d
 `var Parsed = anim8.calculator('3d').parse( Input );`
 
 | Input | Parsed |
 | ----- | ------ |
 | '+2.0' | anim8.computed.relative({x: 2.0, y: 2.0, z: 2.0}) |
-| ['+2.0', 1.0, '-4'] | anim8.computed.relative({x: 2.0, y: 1.0, z: -4}, {x: 1, y: 0, z: 1}) // partially relative |
+| ['+2.0', 1.0, '-4'] | anim8.computed.relative({x: 2.0, y: 1.0, z: -4}, {x: 1, y: 0, z: 1}) |
 | ['+1', '-1', '-34'] | anim8.computed.relative({x: 1.0, y: -1.0, z: -34}) |
 | {x: '+4.5', y: -3.4, z: '+1'} | anim8.computed.relative({x: 4.5, y: -3.4, z: 1}, {x: 1, y: 0, z: 1}) |
 | {x: '+4.5', y: '-3.4', z: '+1'} | anim8.computed.relative({x: 4.5, y: -3.4, z: 1}) |
 
 The remaining calculators behave similarly, input must be a single string, an array of mixed values, or an object of mixed values.
 
-##### Random Value
+#### Random Value
 
 A random value can be generated from a few different types of inputs using `anim8.computed.random`:
 
@@ -190,7 +190,7 @@ A random value can be generated from a few different types of inputs using `anim
 - Path: Choose a random point on the path
 - Object: An object with a min and max value
 
-###### Examples
+#### Examples
 
 ```javascript
 // number with array
@@ -208,11 +208,11 @@ anim8.computed.random({
 });
 ```
 
-##### Parameter Value
+#### Parameter Value
 
 You can learn more about these computed functions [here](Parametrized-Animations.md).
 
-#### Live Function
+### Live Function
 
 A live function is a normal function which is evaluated on every animation frame. The result of the function must be a valid parsed data type. This is the most expensive point - the implementation should be as simple as possible. For example:
 
