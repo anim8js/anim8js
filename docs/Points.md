@@ -1,6 +1,6 @@
 # Points
 
-< [Concepts](Getting-Started.md) | [Data Types](Data-Types.md) >
+< [Data Types](Data-Types.md) | [Paths](Paths.md) >
 
 A point is a value that can be used in an animation and be parsed by a calculator.
 
@@ -225,4 +225,4 @@ function getMouse() {
 // use getMouse as point to make an animation use your mouse position
 ```
 
-< [Concepts](Getting-Started.md) | [Data Types](Data-Types.md) >
+< [Data Types](Data-Types.md) | [Paths](Paths.md) >

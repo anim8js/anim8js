@@ -2,8 +2,8 @@
 
 1. [Getting Started & Installation](Getting-Started.md)
 2. [Concepts](Concepts.md)
-3. [Points](Points.md)
-4. [Data Types](Data-Types.md)
+3. [Data Types](Data-Types.md)
+4. [Points](Points.md)
 5. [Paths](Paths.md)
 6. [Events](Events.md)
 7. [Springs](Springs.md)
