@@ -26,11 +26,11 @@ Animations can be repeated, they can be delayed, eased, and played over any dura
 
 By default anim8js can animate simple objects. Extensions exist to animate other types of objects.
 
-- [anim8js-dom](http://github.com/ClickerMonkey/anim8js-dom) - animate HTML elements
-- [anim8js-jquery](http://github.com/ClickerMonkey/anim8js-jquery) - animate HTML elements with [jQuery](http://jquery.com/)
-- [anim8js-animate.css](http://github.com/ClickerMonkey/anim8js-animate.css) - [animate.css](https://daneden.github.io/animate.css/) inspired animations for HTML elements
-- [anim8js-pixi](http://github.com/ClickerMonkey/anim8js-pixi) - animate [PixiJS](http://www.pixijs.com) display objects & shaders
-- [anim8js-easel](http://github.com/ClickerMonkey/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
+- [anim8js-dom](http://github.com/anim8js/anim8js-dom) - animate HTML elements
+- [anim8js-jquery](http://github.com/anim8js/anim8js-jquery) - animate HTML elements with [jQuery](http://jquery.com/)
+- [anim8js-animate.css](http://github.com/anim8js/anim8js-animate.css) - [animate.css](https://daneden.github.io/animate.css/) inspired animations for HTML elements
+- [anim8js-pixi](http://github.com/anim8js/anim8js-pixi) - animate [PixiJS](http://www.pixijs.com) display objects & shaders
+- [anim8js-easel](http://github.com/anim8js/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
 
 **Features**
 
@@ -71,16 +71,16 @@ anim8js is built to work in the browser (AMD or global `anim8`) and with node.
 
 - Bower: `bower install anim8js`
 - Node: `npm install anim8js`
-- Download: [anim8js](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.js) or [anim8js minified](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.min.js)
+- Download: [anim8js](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.js) or [anim8js minified](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.min.js)
 
 **Installing Extensions**
 
 Here's a list of the extensions you can install via `bower` or `npm`:
 
-- [anim8js-dom](http://github.com/ClickerMonkey/anim8js-dom)
-- [anim8js-jquery](http://github.com/ClickerMonkey/anim8js-jquery)
-- [anim8js-animate.css](http://github.com/ClickerMonkey/anim8js-animate.css)
-- [anim8js-pixi](http://github.com/ClickerMonkey/anim8js-pixi)
-- [anim8js-easel](http://github.com/ClickerMonkey/anim8js-easel)
+- [anim8js-dom](http://github.com/anim8js/anim8js-dom)
+- [anim8js-jquery](http://github.com/anim8js/anim8js-jquery)
+- [anim8js-animate.css](http://github.com/anim8js/anim8js-animate.css)
+- [anim8js-pixi](http://github.com/anim8js/anim8js-pixi)
+- [anim8js-easel](http://github.com/anim8js/anim8js-easel)
 
 < [Index](README.md) | [Concepts](Concepts.md) >
