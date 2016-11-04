@@ -5,7 +5,7 @@
   "authors": [
     "Philip Diffenderfer <pdiffenderfer@gmail.com>"
   ],
-  "description": "A javascript REST ORM that is offline and real-time capable http://rekord.github.io/rekord/",
+  "description": "anim8js - Anim8 Everything",
   "main": "build/anim8js.js",
   "keywords": [
     "javascript",

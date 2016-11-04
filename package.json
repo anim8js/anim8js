@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ClickerMonkey/anim8js.git"
+    "url": "git://github.com/anim8js/anim8js.git"
   },
   "scripts": {
     "test": "nodeunit test"

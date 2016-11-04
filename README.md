@@ -12,21 +12,21 @@ The values that define the paths, spring, and physical forces can be a constant 
 ### Documentation
 
 - [Developer Guide](docs/README.md)
-- [Examples](http://clickermonkey.github.io/anim8js/examples.html)
+- [Examples](http://anim8js.github.io/anim8js/examples.html)
 
 ### Installation
 
 - Bower: `bower install anim8js`
 - Node: `npm install anim8js`
-- Download: [anim8js](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.js) or [anim8js minified](https://raw.githubusercontent.com/ClickerMonkey/anim8js/master/build/anim8js.min.js)
+- Download: [anim8js](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.js) or [anim8js minified](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.min.js)
 
 ### Extensions
 
-- [anim8js-dom](http://github.com/ClickerMonkey/anim8js-dom) - animate HTML elements
-- [anim8js-jquery](http://github.com/ClickerMonkey/anim8js-jquery) - animate HTML elements with [jQuery](http://jquery.com/)
-- [anim8js-animate.css](http://github.com/ClickerMonkey/anim8js-animate.css) - [animate.css](https://daneden.github.io/animate.css/) inspired animations for HTML elements
-- [anim8js-pixi](http://github.com/ClickerMonkey/anim8js-pixi) - animate [PixiJS](http://www.pixijs.com) display objects & shaders
-- [anim8js-easel](http://github.com/ClickerMonkey/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
+- [anim8js-dom](http://github.com/anim8js/anim8js-dom) - animate HTML elements
+- [anim8js-jquery](http://github.com/anim8js/anim8js-jquery) - animate HTML elements with [jQuery](http://jquery.com/)
+- [anim8js-animate.css](http://github.com/anim8js/anim8js-animate.css) - [animate.css](https://daneden.github.io/animate.css/) inspired animations for HTML elements
+- [anim8js-pixi](http://github.com/anim8js/anim8js-pixi) - animate [PixiJS](http://www.pixijs.com) display objects & shaders
+- [anim8js-easel](http://github.com/anim8js/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
 
 ### Features  
 - Create your own animations
