@@ -1,6 +1,6 @@
 # anim8js
 
-![logo](images/anim8js.png =64x)
+![logo](images/anim8js.png)
 
 The ultimate javascript animation library. Animate everything - from HTML elements to objects like circles, sprites, or skeletons.
 
