@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/ClickerMonkey/anim8js.git#gh-pages"
+    "url": "git://github.com/anim8js/anim8js.git#gh-pages"
   },
   "devDependencies": {
     "gulp": "^3.8.10",
