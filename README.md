@@ -1,5 +1,7 @@
 # anim8js
 
+![logo](images/anim8js.png =64x)
+
 The ultimate javascript animation library. Animate everything - from HTML elements to objects like circles, sprites, or skeletons.
 
 It's as easy as `anim8( button ).play('tada ~0.5s 1.5s x4 z100ms ease-inout')` - which plays the `tada` animation
