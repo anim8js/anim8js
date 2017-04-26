@@ -9,6 +9,10 @@ Attributes can be animated along a path, by using spring forces, or physical for
 Attributes can be animated together or separately.
 The values that define the paths, spring, and physical forces can be a constant value (ex: 0, {x:2, y:5}), a function which is evaluated during animation, a function which is evaluated at the beginning of an animation, the current value, or a value relative to the current value.
 
+### Download Stats
+
+- [NPM](http://npmcharts.com/compare/anim8js,anim8js-pixi,anim8js-jquery,anim8js-animate.css,anim8js-easel,anim8js-dom)
+
 ### Documentation
 
 - [Developer Guide](docs/README.md)
