@@ -185,6 +185,8 @@ anim8( subject ).transition( 'myJump' );
 
 ## Delta
 
+A delta is a "linear" path which moves a value between a set of points that can be varying `delta`s apart. The points to interpolate between is chosen based on an array of delta values. So if the points are defined as `[4, 2, 7]` and the deltas are defined as `[0, 0.1, 1]`
+
 <hr>
 
 ## Linear

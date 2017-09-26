@@ -210,7 +210,7 @@ function isEmpty(x)
 {
   if ( isArray( x ) || isString( x ) )
   {
-    return x.length > 0;
+    return x.length === 0;
   }
   else if ( x === null )
   {

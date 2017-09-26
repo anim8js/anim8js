@@ -1,4 +1,4 @@
-/* anim8js 1.0.5 - anim8js - Anim8 Everything by Philip Diffenderfer */
+/* anim8js 1.0.6 - anim8js - Anim8 Everything by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
@@ -569,7 +569,7 @@ function isEmpty(x)
 {
   if ( isArray( x ) || isString( x ) )
   {
-    return x.length > 0;
+    return x.length === 0;
   }
   else if ( x === null )
   {
@@ -7978,7 +7978,7 @@ Color.parsers =
   },
   { /* colorname */
     names: {
-      transparent:{r:255,g:256,b:255,a:0.0},
+      transparent:{r:255,g:255,b:255,a:0.0},
       aliceblue:{r:240,g:248,b:255,a:1.0},
       antiquewhite:{r:250,g:235,b:215,a:1.0},
       aqua:{r:0,g:255,b:255,a:1.0},
