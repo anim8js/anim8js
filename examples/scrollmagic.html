@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body, html {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      section {
+        position: relative;
+      }
+
+      section .abs {
+        position: absolute;
+      }
+
+      section .seq * {
+        display: inline-block;
+        position: relative;
+      }
+
+      section.full {
+        height: 100vh;
+      }
+
+      section.half {
+        height: 50vh;
+      }
+
+      section .centered.hor {
+        text-align: center;
+      }
+
+      section .centered.hor.abs {
+        text-align: inherit;
+        width: 0;
+        left: 50%;
+        position: absolute;
+      }
+
+      section .centered.ver {
+        height: 0;
+        top: 50%;
+        position: relative;
+      }
+
+      section .centered.ver > * {
+        margin-top: -50%;
+      }
+
+      section:nth-child(even) {
+        background-color: #eee;
+      }
+
+      .overflow.hide {
+        overflow: hidden;
+      }
+
+      .overflow.show {
+        overflow: visible;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div>
+      <section class="full" id="s1">
+        <div class="centered hor ver">
+          Scroll Down
+        </div>
+      </section>
+      <section class="half" id="s2">
+        <div id="s2_a" class="abs" style="left:100px; top:100px; width:100px; height:100px; background-color:red"></div>
+        <div id="s2_b" class="abs" style="left:300px; top:100px; width:100px; height:100px; background-color:blue; opacity:0"></div>
+        <div id="s2_c" class="abs seq" style="left:100px; top:0px; height:100px; line-height:100px; font-size:40px; font-weight:bold"><!--
+        --><span>a</span><!--
+        --><span>n</span><!--
+        --><span>i</span><!--
+        --><span>m</span><!--
+        --><span>8</span><!--
+        --><span>j</span><!--
+        --><span>s</span><!--
+        --><span>&nbsp;</span><!--
+        --><span>&amp;</span><!--
+        --><span>&nbsp;</span><!--
+        --><span>S</span><!--
+        --><span>C</span><!--
+        --><span>R</span><!--
+        --><span>O</span><!--
+        --><span>L</span><!--
+        --><span>L</span><!--
+        --><span>&nbsp;</span><!--
+        --><span>M</span><!--
+        --><span>A</span><!--
+        --><span>G</span><!--
+        --><span>I</span><!--
+        --><span>C</span>
+        </div>
+      </section>
+      <section class="full" id="s3">
+        <div class="centered hor ver">
+          Scroll Down
+        </div>
+      </section>
+      <section class="full overflow hide" id="s4">
+        <div class="centered hor ver abs" id="s4_particles"></div>
+      </section>
+      <section class="full" id="s5">
+        <div class="centered hor ver abs">
+          <div>Scroll Down</div>
+        </div>
+      </section>
+      <section class="full overflow hide" id="s6">
+        <div class="centered hor ver abs" id="s6_particles"></div>
+      </section>
+      <section class="full" id="s7">
+        <div class="centered hor ver abs">
+          <div>Scroll Down</div>
+        </div>
+      </section>
+      <section class="full" id="s8">
+        <div id="s8_a" class="abs" style="width:50px; height:50px; background-color:green; border-radius:50%"></div>
+      </section>
+      <section class="full" id="se">
+        <div class="centered hor ver">
+          Scroll Up!
+        </div>
+      </section>
+    </div>
+
+    <script src="../assets/js/anim8js.js"></script>
+    <script src="../assets/js/anim8js-dom.js"></script>
+    <script src="../assets/js/anim8js-animate.css.js"></script>
+    <script src="../assets/js/ScrollMagic.js"></script>
+    <script src="../assets/js/anim8js-scrollmagic.js"></script>
+
+    <script>
+      var controller = new ScrollMagic.Controller();
+
+      new ScrollMagic.Scene({triggerElement: '#s2', duration: '50%'})
+        .addTo( controller )
+        .during(function() {
+          this.animator('#s2_a', function() {
+            this.play('tada');
+          });
+          this.animators('#s2_c span', function() {
+            this.sequence(100, 'linear').play('fadeInDown & rollIn, fadeOut ~2s');
+          });
+        })
+        .animate('enter', 'animator', '#s2_b', 'transition', '', 'fadeIn')
+        .animate('exit', 'animator', '#s2_b', 'transition', '', 'fadeOut')
+      ;
+
+      new ScrollMagic.Scene({triggerElement: '#s3', duration: '100%'})
+        .addTo( controller )
+        .animate('enter', 'animator', '#s3 div', 'play', 'slideInLeft')
+      ;
+
+      var s4_movie = getParticleMovie( window.s4_particles );
+      new ScrollMagic.Scene({triggerElement: '#s4', duration: '100%'})
+        .addTo( controller )
+        .animate('during', 'movie', s4_movie );
+      ;
+
+      new ScrollMagic.Scene({triggerElement: '#s5', duration: '100%'})
+        .addTo( controller )
+        .animate('enter', 'animator', '#s5>div>div', 'play', 'fadeInDown')
+      ;
+
+      var s6_movie = getParticleMovie( window.s6_particles );
+      var s6_player = new anim8.MoviePlayer( s6_movie );
+      new ScrollMagic.Scene({triggerElement: '#s6', duration: '100%'})
+        .addTo( controller )
+        .enter(function() {
+          this.player( s6_player, function() {
+            if (!this.playing) {
+              this.start();
+            }
+            this.forward();
+            this.play();
+          });
+        })
+        .animate('exit', 'player', s6_player, 'backward')
+      ;
+
+      var s8_path = anim8.path({
+        type: 'catmull-rom',
+        calculator: '2d',
+        points: [[0, 0], [500, 100], [100, 500], [500, 500]]
+      });
+      new ScrollMagic.Scene({triggerElement: '#s8', duration: '100%'})
+        .addTo( controller )
+        .animate('during', 'animator', '#s8_a', 'follow', 'center', s8_path, 'linear')
+      ;
+
+      function rndf(range) {
+        return Math.random() * (range.max - range.min) + range.min;
+      }
+
+      function rndi(range) {
+        return Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+      }
+
+      function getParticleMovie(addTo) {
+        var BURST_COUNT = 64;
+        var BURST_DELAY = 20;
+        var SIZE = {min: 10, max: 10};
+        var VELOCITY_X = {min: -300, max: 300};
+        var VELOCITY_Y = {min: -900, max: -600};
+        var ROTATE = {min: 0, max: 360};
+        var SCALE = {min: 0.5, max: 4};
+
+        var movie = new anim8.Movie();
+
+        for (var i = 0; i < BURST_COUNT; i++) {
+          var p = document.createElement('DIV');
+          var s = rndi( SIZE );
+          p.style.width = p.style.height = s + 'px';
+          p.style.position = 'absolute';
+          addTo.appendChild(p);
+
+          movie.intro( p );
+          movie.at( i * BURST_DELAY );
+          movie.play({
+            physics: {
+              center: {
+                position: 0,
+                velocity: [rndf(VELOCITY_X), rndf(VELOCITY_Y)],
+                acceleration: [0, 600]
+              }
+            },
+            keyframe: {
+              '0': {
+                backgroundColor: 'red',
+                opacity: 0,
+                rotate: rndf(ROTATE),
+                scale: 1,
+              },
+              '0.0001': {
+                opacity: 1
+              },
+              '50': {
+                backgroundColor: 'blue',
+              },
+              '75': {
+                opacity: 1,
+                backgroundColor: 'green'
+              },
+              '100': {
+                opacity: 0,
+                rotate: rndf(ROTATE),
+                scale: rndf(SCALE)
+              }
+            }
+          }, {
+            duration: '3s'
+          });
+        }
+
+        return movie;
+      }
+    </script>
+  </body>
+</html>

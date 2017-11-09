@@ -34,7 +34,8 @@
     "anim8js-animate.css": "master",
     "anim8js-jquery": "master",
     "anim8js-easel": "master",
-    "anim8js-pixi": "master"
+    "anim8js-pixi": "master",
+    "anim8js-scrollmagic": "master"
   },
   "resolutions": {
     "anim8js": "master",
@@ -42,6 +43,7 @@
     "anim8js-animate.css": "master",
     "anim8js-jquery": "master",
     "anim8js-easel": "master",
-    "anim8js-pixi": "master"
+    "anim8js-pixi": "master",
+    "anim8js-scrollmagic": "master"
   }
 }
