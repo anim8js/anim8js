@@ -31,6 +31,7 @@ The values that define the paths, spring, and physical forces can be a constant 
 - [anim8js-animate.css](http://github.com/anim8js/anim8js-animate.css) - [animate.css](https://daneden.github.io/animate.css/) inspired animations for HTML elements
 - [anim8js-pixi](http://github.com/anim8js/anim8js-pixi) - animate [PixiJS](http://www.pixijs.com) display objects & shaders
 - [anim8js-easel](http://github.com/anim8js/anim8js-easel) - animate [EaselJS](http://www.createjs.com/easeljs) objects
+- [anim8js-scrollmagic](http://github.com/anim8js/anim8js-scrollmagic) - animate [ScrollMagic](http://scrollmagic.io)
 
 ### Features  
 - Create your own animations
