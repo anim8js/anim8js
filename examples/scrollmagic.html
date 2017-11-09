@@ -100,7 +100,7 @@
         </div>
       </section>
       <section class="full" id="s3">
-        <div class="centered hor ver">
+        <div class="centered hor ver" style="font-size:80px; font-weight:bold">
           Scroll Down
         </div>
       </section>
@@ -146,7 +146,7 @@
             this.play('tada');
           });
           this.animators('#s2_c span', function() {
-            this.sequence(100, 'linear').play('fadeInDown & rollIn, fadeOut ~2s');
+            this.sequence(100, 'linear').play('fadeInDown & rollIn, rollOut ~2s 1s');
           });
         })
         .animate('enter', 'animator', '#s2_b', 'transition', '', 'fadeIn')
@@ -155,7 +155,8 @@
 
       new ScrollMagic.Scene({triggerElement: '#s3', duration: '100%'})
         .addTo( controller )
-        .animate('enter', 'animator', '#s3 div', 'play', 'slideInLeft')
+        .animate('intro', 'animator', '#s3 div', 'play', 'slideInLeft')
+        .animate('outro', 'animator', '#s3 div', 'play', 'slideOutRight')
       ;
 
       var s4_movie = getParticleMovie( window.s4_particles );

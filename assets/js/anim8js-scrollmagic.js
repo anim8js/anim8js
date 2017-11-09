@@ -1,4 +1,4 @@
-/* anim8js-scrollmagic 1.0.0 - anim8 ScrollMagic by Philip Diffenderfer */
+/* anim8js-scrollmagic 1.0.3 - anim8 ScrollMagic by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
@@ -36,7 +36,9 @@
 var Events = {
   BEFORE: 'BEFORE',
   DURING: 'DURING',
-  AFTER: 'AFTER'
+  AFTER: 'AFTER',
+  ANY: '*',
+  INITIAL: ''
 };
 
 Scene.setBackwards = function(backwards)
@@ -56,10 +58,46 @@ Scene.getBefore = function()
   return this.backwards ? Events.AFTER : Events.BEFORE;
 };
 
+Scene.isEventMatch = function(actual, expected)
+{
+  switch (expected)
+  {
+    case Events.ANY:
+      return true;
+    case Events.BEFORE:
+      return actual === this.getBefore();
+    case Events.AFTER:
+      return actual === this.getAfter();
+    default:
+      return actual === expected;
+  }
+};
+
 Scene.onProgress = function(callback)
 {
+  var invokeCallback = this.getInvokeCallback( callback );
+
+  this.on( 'progress.anim8js', invokeCallback );
+
+  anim8.requestRun( invokeCallback );
+
+  return this;
+};
+
+Scene.onStart = function(callback)
+{
+  var invokeCallback = this.getInvokeCallback( callback );
+
+  anim8.requestRun( invokeCallback );
+
+  return this;
+};
+
+Scene.getInvokeCallback = function(callback)
+{
   var instance = this;
-  var invokeCallback = function()
+
+  return function()
   {
     var state = instance.state();
     var progress = instance.progress();
@@ -71,79 +109,122 @@ Scene.onProgress = function(callback)
 
     callback.call( instance, state, progress );
   };
-
-  instance.on( 'progress.anim8js', invokeCallback );
-
-  anim8.requestRun( invokeCallback );
-
-  return this;
 };
 
 
-Scene.after = function(getCalls)
+// .transition('*', 'DURING')     "enter"
+// .transition('*', 'AFTER')     "enter"
+// .transition(null, 'DURING')    "start on during"
+// .transition('AFTER', 'DURING') "enter from after"
+Scene.transition = function(expectedPrevious, expectedCurrent, getCalls, onStateChange)
 {
   var builder = new CallEventBuilder(getCalls);
-  var last = null;
+  var previous = Events.INITIAL;
+  var listener = expectedPrevious === Events.INITIAL ? 'onStart' : 'onProgress';
 
-  return this.onProgress(function(state, progress)
+  return this[ listener ](function(current, progress)
   {
-    if (state !== last) {
-      if (state === this.getAfter()) {
-        builder.execute( state, last );
+    if (previous !== current)
+    {
+      if (onStateChange)
+      {
+        onStateChange.call( this, current, previous, progress, builder );
       }
-      last = state;
+
+      if (this.isEventMatch( previous, expectedPrevious ) &&
+          this.isEventMatch( current, expectedCurrent ))
+      {
+        builder.execute( current, progress );
+      }
+
+      previous = current;
     }
   });
+};
+
+Scene.after = function(getCalls)
+{
+  return this.transition( Events.ANY, Events.AFTER, getCalls );
+};
+
+Scene.fromAfter = function(getCalls)
+{
+  return this.transition( Events.AFTER, Events.ANY, getCalls );
 };
 
 Scene.before = function(getCalls)
 {
-  var builder = new CallEventBuilder(getCalls);
-  var last = null;
+  return this.transition( Events.ANY, Events.BEFORE, getCalls );
+};
 
-  return this.onProgress(function(state, progress)
-  {
-    if (state !== last) {
-      if (state === this.getBefore()) {
-        builder.execute( state, last );
-      }
-      last = state;
-    }
-  });
+Scene.fromBefore = function(getCalls)
+{
+  return this.transition( Events.BEFORE, Events.ANY, getCalls );
 };
 
 Scene.enter = function(getCalls)
 {
-  var builder = new CallEventBuilder(getCalls);
-  var last = null;
-
-  return this.onProgress(function(state, progress)
-  {
-    if (state !== last) {
-      if (state === Events.DURING) {
-        builder.execute( state, last );
-      }
-      last = state;
-    }
-  });
+  return this.transition( Events.ANY, Events.DURING, getCalls );
 };
 
 Scene.exit = function(getCalls)
 {
-  var builder = new CallEventBuilder(getCalls);
-  var last = null;
-
-  return this.onProgress(function(state, progress)
-  {
-    if (state !== last) {
-      if (last && state !== Events.DURING) {
-        builder.execute( state, last );
-      }
-      last = state;
-    }
-  });
+  return this.transition( Events.DURING, Events.ANY, getCalls );
 };
 
+Scene.any = function(getCalls)
+{
+  return this.transition( Events.ANY, Events.ANY, getCalls );
+};
+
+Scene.start = function(getCalls)
+{
+  return this.transition( Events.INITIAL, Events.ANY, getCalls );
+};
+
+Scene.startBefore = function(getCalls)
+{
+  return this.transition( Events.INITIAL, Events.BEFORE, getCalls );
+};
+
+Scene.startAfter = function(getCalls)
+{
+  return this.transition( Events.INITIAL, Events.AFTER, getCalls );
+};
+
+Scene.startDuring = function(getCalls)
+{
+  return this.transition( Events.INITIAL, Events.DURING, getCalls );
+};
+
+// Special Enter / Exit Events
+Scene.intro = function(getCalls)
+{
+  var onStateChange = function(current, previous, progress, builder)
+  {
+    if ((previous === Events.INITIAL && current === this.getBefore()) || current === Events.DURING)
+    {
+      builder.executeInitials( current, progress );
+    }
+  };
+
+  return this.transition( Events.ANY, Events.DURING, getCalls, onStateChange );
+};
+
+Scene.outro = function(getCalls)
+{
+  var onStateChange = function(current, previous, progress, builder)
+  {
+    if (previous === Events.INITIAL && current === this.getAfter())
+    {
+      builder.executeFinals( current, progress );
+    }
+  };
+
+  return this.transition( Events.DURING, Events.ANY, getCalls, onStateChange );
+};
+
+// Special During Event
 Scene.during = function(getCalls)
 {
   var builder = new CallDuringBuilder(getCalls);
@@ -154,6 +235,39 @@ Scene.during = function(getCalls)
     builder.execute( progress, callCount );
     callCount++;
   });
+};
+
+// Multiple Events
+Scene.REGEX_SPLIT = /\s+/g;
+Scene.REGEX_TRANSITION = /(|DURING|AFTER|\*)>(|DURING|AFTER|\*)/i;
+
+Scene.listen = function(events, getCalls)
+{
+  if (events.split)
+  {
+    events = events.split( this.REGEX_SPLIT );
+  }
+
+  for (var i = 0; i < events.length; i++)
+  {
+    var eventMethod = events[ i ];
+
+    if (eventMethod in this)
+    {
+      this[ eventMethod ]( getCalls );
+    }
+    else
+    {
+      var matches = this.REGEX_TRANSITION.exec( eventMethod.toUpperCase() );
+
+      if (matches)
+      {
+        this.transition( matches[1], matches[2], getCalls );
+      }
+    }
+  }
+
+  return this;
 };
 
 
@@ -229,16 +343,28 @@ Class.define( CallBuilder,
   init: function(getCalls)
   {
     this.calls = [];
+    this.initials = [];
+    this.finals = [];
 
-    getCalls.call( this );
+    getCalls.call( this, this );
   },
   execute: function()
   {
-    var calls = this.calls;
-
-    for (var i = 0; i < calls.length; i++)
+    this.executeList( this.calls, arguments );
+  },
+  executeInitials: function()
+  {
+    this.executeList( this.initials, arguments );
+  },
+  executeFinals: function()
+  {
+    this.executeList( this.finals, arguments );
+  },
+  executeList: function(list, args)
+  {
+    for (var i = 0; i < list.length; i++)
     {
-      calls[ i ].apply( this, arguments );
+      list[ i ].apply( this, args );
     }
   },
   call: function(callback)
@@ -247,7 +373,19 @@ Class.define( CallBuilder,
 
     return this;
   },
-  callWith: function(context, getCalls)
+  initial: function(callback)
+  {
+    this.initials.push( callback );
+
+    return this;
+  },
+  final: function(callback)
+  {
+    this.finals.push( callback );
+
+    return this;
+  },
+  callWith: function(context, getCalls, getInitial, getFinal)
   {
     if (context)
     {
@@ -255,6 +393,22 @@ Class.define( CallBuilder,
       {
         getCalls.apply( context, arguments );
       });
+
+      if (getInitial)
+      {
+        this.initial(function()
+        {
+          getInitial.apply( context, arguments );
+        });
+      }
+
+      if (getFinal)
+      {
+        this.final(function()
+        {
+          getFinal.apply( context, arguments );
+        });
+      }
     }
 
     return this;
@@ -271,21 +425,60 @@ Class.extend( CallEventBuilder, CallBuilder,
 {
   animator: function(query, getCalls)
   {
-    return this.callWith( ScrollMagic.getAnimator( query ), getCalls );
+    return this.callWith( ScrollMagic.getAnimator( query ), getCalls, createAnimatorInitial( getCalls ), createAnimatorFinal( getCalls ) );
   },
   animators: function(query, getCalls)
   {
-    return this.callWith( ScrollMagic.getAnimators( query ), getCalls );
+    return this.callWith( ScrollMagic.getAnimators( query ), getCalls, createAnimatorInitial( getCalls ), createAnimatorFinal( getCalls ) );
   },
   player: function(player, getCalls)
   {
-    return this.callWith( player, getCalls );
+    return this.callWith( player, getCalls, createMovieInitial( getCalls ), createMovieFinal() );
   },
   movie: function(movie, getCalls)
   {
     return this.player( new anim8.MoviePlayer( movie ), getCalls );
   }
 });
+
+
+function createAnimatorInitial(getCalls)
+{
+  return function()
+  {
+    this.stop().restore();
+    getCalls.apply( this, arguments );
+    this.preupdate( 0 ).update( 0 ).apply().stop();
+  };
+}
+
+function createAnimatorFinal(getCalls)
+{
+  return function()
+  {
+    this.stop().restore();
+    getCalls.apply( this, arguments );
+    this.preupdate( 0 ).update( 0 ).end().apply();
+  };
+}
+
+function createMovieInitial(getCalls)
+{
+  return function()
+  {
+    getCalls.apply( this, arguments );
+
+    this.pause().apply( this.time, true );
+  };
+}
+
+function createMovieFinal()
+{
+  return function()
+  {
+    this.end( true, true );
+  };
+}
 
 
 function CallDuringBuilder(getCalls)
@@ -327,6 +520,15 @@ Class.extend( CallDuringBuilder, CallBuilder,
         var attrimator = attrimators[ i ];
         var prop = properties[ i ];
         var value = attrimator.valueAtSearch( now, animator.frame[ prop ] );
+        if (value === false) {
+          var last = attrimator;
+          var lastTime = now;
+          while (last.next) {
+            lastTime -= last.totalTime();
+            last = last.next;
+          }
+          value = last.valueAt( lastTime, animator.frame[ prop ] );
+        }
         if (value !== false) {
           animator.updated[ prop ] = true;
           animator.frame[ prop ] = value;
