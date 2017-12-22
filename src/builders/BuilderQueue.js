@@ -19,7 +19,7 @@ Class.extend( BuilderQueue, Builder,
 
     queue.factory = coalesce( queue.factory, animation.factory );
 
-    attrimatorMap.queueMap( $attrimatorsFor( queue, options ) );
+    attrimatorMap.queueMap( $attrimatorsFor( queue, options, false, helper.forObject ) );
   },
 
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )

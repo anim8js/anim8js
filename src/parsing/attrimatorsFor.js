@@ -44,7 +44,7 @@
  * @param {Boolean} [cache=false]
  * @return {AttrimatorMap}
  */
-function $attrimatorsFor( animation, options, cache )
+function $attrimatorsFor( animation, options, cache, forObject )
 {
   var parsedOptions = $options( options, cache );
   var hasOptions = !isEmpty( parsedOptions );
@@ -61,7 +61,7 @@ function $attrimatorsFor( animation, options, cache )
   }
   else if ( isObject( animation ) )
   {
-    var helper = new BuilderHelper( animation, parsedOptions );
+    var helper = new BuilderHelper( animation, parsedOptions, {}, forObject );
 
     for (var builderName in animation)
     {

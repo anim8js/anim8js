@@ -2,6 +2,24 @@
 var Paths = {};
 
 /**
+ * Parses an object for a point path.
+ *
+ * @param {Object} path
+ * @return {PathCombo}
+ */
+Paths['point'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathPoint(
+    path.name,
+    calc,
+    calc.parse( path.point, defaultValue )
+  );
+};
+
+/**
  * Parses an object for a combo path.
  *
  * @param {Object} path
@@ -86,7 +104,7 @@ Paths['delta'] = function(path)
   return new PathDelta(
     path.name,
     calc,
-    calc.parseArry( path.points, path.points, path.defaultValue ),
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.deltas
   );
 };
@@ -104,7 +122,7 @@ Paths['jump'] = function(path)
   return new PathJump(
     path.name,
     calc,
-    calc.parseArry( path.points, path.points, path.defaultValue )
+    calc.parseArray( path.points, path.points, path.defaultValue )
   );
 };
 

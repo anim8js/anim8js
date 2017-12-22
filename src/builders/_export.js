@@ -30,11 +30,15 @@ Builders['and'] = new BuilderAnd();
  */
 Builders['final'] = new BuilderFinal();
 
-
 /**
  * Register the builder.
  */
 Builders['initial'] = new BuilderInitial();
+
+/**
+ * Register the builder.
+ */
+Builders['point'] = new BuilderPoint();
 
 /**
  * Registers the builder.

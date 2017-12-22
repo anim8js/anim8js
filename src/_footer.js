@@ -86,6 +86,7 @@
   anim8.spring = $spring;
   anim8.time = $time;
   anim8.transition = $transition;
+  anim8.deltas = $deltas;
 
   // Modules
   // - color.js
@@ -183,6 +184,7 @@
   anim8.PathSub = PathSub;
   anim8.PathUniform = PathUniform;
   anim8.PathTween = Tween;
+  anim8.PathPoint = PathPoint;
 
   // Springs
   anim8.SpringDistance = SpringDistance;

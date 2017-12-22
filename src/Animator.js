@@ -578,7 +578,7 @@ Class.define( Animator,
    */
   play: function(animation, options, all, cache)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.playAttrimators( attrimatorMap, all );
@@ -636,7 +636,7 @@ Class.define( Animator,
   unplay: function(animation, transition, options, all, cache)
   {
     var transition = $transition( transition );
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.unplayAttrimators( attrimatorMap, transition, all );
 
@@ -697,7 +697,7 @@ Class.define( Animator,
    */
   queue: function(animation, options, cache)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.queueAttrimators( attrimatorMap );
@@ -719,6 +719,54 @@ Class.define( Animator,
   queueAttrimators: function(attrimatorMap)
   {
     this.attrimators.queueMap( attrimatorMap, 0, this.placeAttrimator, this );
+
+    return this;
+  },
+
+  /**
+   * Inserts an animation. The attrimators generated from the given animation
+   * will play now and any existing attrimators will be queued behind it. If
+   * the given animation has an infinite attrimator for an existing attribute
+   * it will be stopped in time for the current animation to finish playing. If
+   * the given animation has an infinite attrimator for an attribute which is
+   * not animating then the attrimator will continue to play infinitely.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
+   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   *
+   * @method insert
+   * @param {Animation|String|Object} animation
+   * @param {String|Object} [options]
+   * @param {Boolean} [cache]
+   * @chainable
+   */
+  insert: function(animation, options, cache)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
+
+    this.newCycle( attrimatorMap );
+    this.insertAttrimators( attrimatorMap );
+
+    return this.activate();
+  },
+
+  /**
+   * Inserts a map of attrimators. The attrimators generated from the given
+   * animation will play now and any existing attrimators will be queued behind
+   * it. If the given animation has an infinite attrimator for an existing
+   * attribute it will be stopped in time for the current animation to finish
+   * playing. If the given animation has an infinite attrimator for an attribute
+   * which is not animating then the attrimator will continue to play
+   * infinitely.
+   *
+   * @method insertAttrimators
+   * @param {AttrimatorMap} attrimatorMap
+   * @chainable
+   * @protected
+   */
+  insertAttrimators: function(attrimatorMap)
+  {
+    this.attrimators.insertMap( attrimatorMap, this.placeAttrimator, this );
 
     return this;
   },
@@ -752,7 +800,7 @@ Class.define( Animator,
   transition: function(transition, animation, options, all, cache)
   {
     var transition = $transition( transition );
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.transitionAttrimators( transition, attrimatorMap, all );

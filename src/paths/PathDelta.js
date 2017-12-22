@@ -21,7 +21,7 @@ Class.extend( PathDelta, Path,
   set: function(calculator, points, deltas)
   {
     this.reset( calculator, points );
-    this.deltas = deltas;
+    this.deltas = $deltas( deltas );
   },
 
   compute: function(out, delta)

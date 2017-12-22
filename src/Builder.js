@@ -70,7 +70,7 @@ Class.define( Builder,
   merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
     var builder = this;
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
 
     attrimatorMap.iterate(function(e)
     {
@@ -115,7 +115,7 @@ Class.define( Builder,
    */
   submerge: function( animation, newOptions, oldOptions, attrimatorMap )
   {
-    var helper = new BuilderHelper( animation, oldOptions, newOptions );
+    var helper = new BuilderHelper( animation, oldOptions, newOptions, this.forObject );
 
     for (var builderName in animation)
     {

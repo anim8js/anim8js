@@ -125,6 +125,21 @@ DeferAnimator.prototype = new Defer( DeferAnimator,
   'queueAttrimators',
 
   /**
+   * Defers the {{#crossLink "Animator/insert:method"}}{{/crossLink}} method until the deferred event has occurred.
+   *
+   * @method insert
+   */
+  'insert',
+
+  /**
+   * Defers the {{#crossLink "Animator/insertAttrimators:method"}}{{/crossLink}} method until the deferred event has occurred.
+   *
+   * @method insertAttrimators
+   * @protected
+   */
+  'insertAttrimators',
+
+  /**
    * Defers the {{#crossLink "Animator/transition:method"}}{{/crossLink}} method until the deferred event has occurred.
    *
    * @method transition

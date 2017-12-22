@@ -17,7 +17,7 @@ Class.extend( BuilderInitial, Builder,
   {
     // 1. Generate the attrimators, only caring about the delays & scales
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var values     = animation.initial;
 
     for (var attr in values)

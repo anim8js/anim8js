@@ -35,16 +35,26 @@ function $easing(easing, returnOnInvalid)
   }
   if ( isString( easing ) )
   {
-    if ( easing in Easings )
+    var result = null;
+    var scale = 1;
+
+    var scaleIndex = easing.indexOf('*');
+
+    if ( scaleIndex !== -1 )
     {
-      return Easings[ easing ];
-    }
-    if ( easing in EasingTypes )
-    {
-      return EasingTypes[ easing ]( $easing( Defaults.easing ) );
+      scale = parseFloat( easing.substring( scaleIndex + 1 ) );
+      easing = easing.substring( 0, scaleIndex );
     }
 
-    if ( easing.indexOf('-') !== -1 )
+    if ( easing in Easings )
+    {
+      result = Easings[ easing ];
+    }
+    else if ( easing in EasingTypes )
+    {
+      result = EasingTypes[ easing ]( $easing( Defaults.easing ) );
+    }
+    else if ( easing.indexOf('-') !== -1 )
     {
       var pair = easing.split('-');
       var e = pair[0];
@@ -52,8 +62,18 @@ function $easing(easing, returnOnInvalid)
 
       if ( pair.length >= 2 && e in Easings && t in EasingTypes )
       {
-        return EasingTypes[ t ]( Easings[ e ] );
+        result = EasingTypes[ t ]( Easings[ e ] );
       }
+    }
+
+    if ( result !== null && isFinite( scale ) && scale !== 1 )
+    {
+      result = Easings.scale( scale, result );
+    }
+
+    if ( result !== null )
+    {
+      return result;
     }
   }
   if ( isArray( easing ) && easing.length === 4 && isNumber( easing[0] ) && isNumber( easing[1] ) && isNumber( easing[2] ) && isNumber( easing[3] ) )

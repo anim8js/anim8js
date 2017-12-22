@@ -20,7 +20,7 @@ Class.extend( BuilderDeltas, Builder,
     // 3. Generate the attrimators
 
     var mergeId = Builder.nextMergeId();
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var deltas = animation.deltas;
     var values = animation.values;
 

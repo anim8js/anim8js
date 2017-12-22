@@ -7,7 +7,7 @@
  * @param {String|Factory} [factory]
  * @return {Factory}
  */
-function $factory(factoryInput)
+function $factory(factoryInput, forObject)
 {
   if ( factoryInput instanceof Factory )
   {
@@ -16,6 +16,28 @@ function $factory(factoryInput)
   if ( isString( factoryInput ) && factoryInput in Factories )
   {
     return Factories[ factoryInput ];
+  }
+  if ( forObject )
+  {
+    if ( forObject instanceof Factory )
+    {
+      return forObject;
+    }
+
+    if ( forObject instanceof Sequence )
+    {
+      forObject = forObject.animators;
+    }
+
+    if ( forObject instanceof Animators )
+    {
+      forObject = forObject.$[0];
+    }
+
+    if ( forObject instanceof Animator && forObject.factory )
+    {
+      return forObject.factory;
+    }
   }
 
   return Factories['default'];

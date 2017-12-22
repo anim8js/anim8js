@@ -34,7 +34,7 @@ Class.extend( BuilderKeyframe, Builder,
     // 5. Expand frames to generate delta arrays, value arrays, and easing arrays
     // 6. Generate the attrimators
 
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var kframes = animation.keyframe;
     var easings = animation.easings || {};
     var teasing = $easing( coalesce( options.teasing, Defaults.teasing ) );

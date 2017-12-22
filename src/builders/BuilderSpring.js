@@ -15,7 +15,7 @@ Class.extend( BuilderSpring, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var springs    = animation.springs;
 
     for (var attr in springs)

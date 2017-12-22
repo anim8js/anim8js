@@ -15,7 +15,7 @@ Class.extend( BuilderPhysics, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var physics    = animation.physics;
 
     for (var attr in physics)

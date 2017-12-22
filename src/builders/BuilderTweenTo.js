@@ -17,7 +17,7 @@ Class.extend( BuilderTweenTo, Builder,
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var tweenTo    = animation.tweenTo;
 
     for (var attr in tweenTo)

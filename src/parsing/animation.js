@@ -33,7 +33,7 @@
  * @throws {String} The animation string has an invalid animation name or the
  *    animation fails to create attrimators from the animation definition.
  */
-function $animation(animation, options, cache)
+function $animation(animation, options, cache, forObject)
 {
   var options = $options( options, cache );
   var hasOptions = !isEmpty( options );
@@ -71,7 +71,7 @@ function $animation(animation, options, cache)
   }
   if ( isObject( animation ) )
   {
-    var attrimators = $attrimatorsFor( animation, options, cache );
+    var attrimators = $attrimatorsFor( animation, options, cache, forObject );
 
     return new Animation( false, animation, options, attrimators );
   }

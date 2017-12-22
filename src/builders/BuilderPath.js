@@ -15,7 +15,7 @@ Class.extend( BuilderPath, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var path    = animation.path;
 
     for (var attr in path)

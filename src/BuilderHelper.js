@@ -8,11 +8,12 @@
  * @class BuilderHelper
  * @constructor
  */
-function BuilderHelper( input, oldOptions, newOptions )
+function BuilderHelper( input, oldOptions, newOptions, forObject )
 {
   this.input = input;
   this.oldOptions = oldOptions || {};
   this.newOptions = newOptions || {};
+  this.forObject = forObject;
 
   this.prepareSpecifics( 'easings' );
   this.prepareSpecifics( 'repeats' );

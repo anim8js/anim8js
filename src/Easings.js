@@ -319,6 +319,23 @@ Easings['gentle'] = function(x)
 };
 
 /**
+ * Scales an existing easing by a given factor
+ *
+ * @method scale
+ * @for anim8.easing
+ */
+Easings['scale'] = function(scale, easing)
+{
+  var inner = $easing( easing );
+
+  return function (x)
+  {
+    var i = inner( x );
+    return scale * i + (1 - scale) * x;
+  };
+};
+
+/**
  * Generates a bezier easing function given the two middle control points. The
  * first point is {0,0} and the last point is {1, 1}.
  *

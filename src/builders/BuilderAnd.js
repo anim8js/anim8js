@@ -19,9 +19,9 @@ Class.extend( BuilderAnd, Builder,
 
     and.factory = coalesce( and.factory, animation.factory );
 
-    attrimatorMap.putMap( $attrimatorsFor( and, options ) );
+    attrimatorMap.putMap( $attrimatorsFor( and, options, false, helper.forObject ) );
   },
-  
+
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
   {
     this.submerge( input.and, newOptions, oldOptions, attrimatorMap );

@@ -430,6 +430,25 @@ Class.define( Animators,
   queueAttrimators      : delegate( 'queueAttrimators', DelegateTypes.THIS ),
 
   /**
+   * Calls {{#crossLink "Animator/insert:method"}}{{/crossLink}} on
+   * each animator in the array and returns this.
+   *
+   * @method insert
+   * @chainable
+   */
+  insert                : delegate( 'insert', DelegateTypes.THIS ),
+
+  /**
+   * Calls {{#crossLink "Animator/insertAttrimators:method"}}{{/crossLink}} on
+   * each animator in the array and returns this.
+   *
+   * @method insertAttrimators
+   * @chainable
+   * @protected
+   */
+  insertAttrimators     : delegate( 'insertAttrimators', DelegateTypes.THIS ),
+
+  /**
    * Calls {{#crossLink "Animator/transition:method"}}{{/crossLink}} on
    * each animator in the array and returns this.
    *

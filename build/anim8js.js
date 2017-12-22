@@ -1,4 +1,4 @@
-/* anim8js 1.0.6 - anim8js - Anim8 Everything by Philip Diffenderfer */
+/* anim8js 1.1.0 - anim8js - Anim8 Everything by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
@@ -1449,7 +1449,7 @@ Class.define( Animator,
    */
   play: function(animation, options, all, cache)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.playAttrimators( attrimatorMap, all );
@@ -1507,7 +1507,7 @@ Class.define( Animator,
   unplay: function(animation, transition, options, all, cache)
   {
     var transition = $transition( transition );
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.unplayAttrimators( attrimatorMap, transition, all );
 
@@ -1568,7 +1568,7 @@ Class.define( Animator,
    */
   queue: function(animation, options, cache)
   {
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.queueAttrimators( attrimatorMap );
@@ -1590,6 +1590,54 @@ Class.define( Animator,
   queueAttrimators: function(attrimatorMap)
   {
     this.attrimators.queueMap( attrimatorMap, 0, this.placeAttrimator, this );
+
+    return this;
+  },
+
+  /**
+   * Inserts an animation. The attrimators generated from the given animation
+   * will play now and any existing attrimators will be queued behind it. If
+   * the given animation has an infinite attrimator for an existing attribute
+   * it will be stopped in time for the current animation to finish playing. If
+   * the given animation has an infinite attrimator for an attribute which is
+   * not animating then the attrimator will continue to play infinitely.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
+   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}}
+   *
+   * @method insert
+   * @param {Animation|String|Object} animation
+   * @param {String|Object} [options]
+   * @param {Boolean} [cache]
+   * @chainable
+   */
+  insert: function(animation, options, cache)
+  {
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
+
+    this.newCycle( attrimatorMap );
+    this.insertAttrimators( attrimatorMap );
+
+    return this.activate();
+  },
+
+  /**
+   * Inserts a map of attrimators. The attrimators generated from the given
+   * animation will play now and any existing attrimators will be queued behind
+   * it. If the given animation has an infinite attrimator for an existing
+   * attribute it will be stopped in time for the current animation to finish
+   * playing. If the given animation has an infinite attrimator for an attribute
+   * which is not animating then the attrimator will continue to play
+   * infinitely.
+   *
+   * @method insertAttrimators
+   * @param {AttrimatorMap} attrimatorMap
+   * @chainable
+   * @protected
+   */
+  insertAttrimators: function(attrimatorMap)
+  {
+    this.attrimators.insertMap( attrimatorMap, this.placeAttrimator, this );
 
     return this;
   },
@@ -1623,7 +1671,7 @@ Class.define( Animator,
   transition: function(transition, animation, options, all, cache)
   {
     var transition = $transition( transition );
-    var attrimatorMap = $attrimatorsFor( animation, options, cache );
+    var attrimatorMap = $attrimatorsFor( animation, options, cache, this );
 
     this.newCycle( attrimatorMap );
     this.transitionAttrimators( transition, attrimatorMap, all );
@@ -2750,6 +2798,25 @@ Class.define( Animators,
   queueAttrimators      : delegate( 'queueAttrimators', DelegateTypes.THIS ),
 
   /**
+   * Calls {{#crossLink "Animator/insert:method"}}{{/crossLink}} on
+   * each animator in the array and returns this.
+   *
+   * @method insert
+   * @chainable
+   */
+  insert                : delegate( 'insert', DelegateTypes.THIS ),
+
+  /**
+   * Calls {{#crossLink "Animator/insertAttrimators:method"}}{{/crossLink}} on
+   * each animator in the array and returns this.
+   *
+   * @method insertAttrimators
+   * @chainable
+   * @protected
+   */
+  insertAttrimators     : delegate( 'insertAttrimators', DelegateTypes.THIS ),
+
+  /**
    * Calls {{#crossLink "Animator/transition:method"}}{{/crossLink}} on
    * each animator in the array and returns this.
    *
@@ -3679,9 +3746,10 @@ Class.extend( AttrimatorMap, FastMap,
    *
    * @method queueMap
    * @param {AttrimatorMap} map
+   * @param {Number} offset
    * @param {Function} [onNewAttribute]
    * @param {Object} [context]
-   * @chainable   188703090
+   * @chainable
    */
   queueMap: function(map, offset, onNewAttribute, context)
   {
@@ -3720,6 +3788,54 @@ Class.extend( AttrimatorMap, FastMap,
         {
           onNewAttribute.call( context || this, attrimator );
         }
+      }
+    }
+
+    return this;
+  },
+
+  /**
+   * Inserts the given map into the beginning of this map. If a function is
+   * provided as the second argument it is invoked whenever an attrimator in
+   * the given map is new & added to this map.
+   *
+   * @method insertMap
+   * @param {AttrimatorMap} map
+   * @param {Function} [onNewAttribute]
+   * @param {Object} [context]
+   * @chainable
+   */
+  insertMap: function(map, onNewAttribute, context)
+  {
+    var attrimators = map.values;
+    var duration = map.timeRemaining();
+    var hasCallback = isFunction( onNewAttribute );
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var existing = this.get( attr );
+
+      this.put( attr, attrimator );
+
+      if ( existing )
+      {
+        if ( attrimator.isInfinite() )
+        {
+          attrimator.stopIn( duration );
+        }
+        else
+        {
+          existing.delay += (duration - attrimator.timeRemaining());
+        }
+
+        attrimator.queue( existing );
+      }
+
+      if ( hasCallback )
+      {
+        onNewAttribute.call( context || this, attrimator );
       }
     }
 
@@ -4221,7 +4337,7 @@ Class.define( Builder,
   merge: function( animation, newOptions, oldOptions, attrimatorMap, helper )
   {
     var builder = this;
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
 
     attrimatorMap.iterate(function(e)
     {
@@ -4266,7 +4382,7 @@ Class.define( Builder,
    */
   submerge: function( animation, newOptions, oldOptions, attrimatorMap )
   {
-    var helper = new BuilderHelper( animation, oldOptions, newOptions );
+    var helper = new BuilderHelper( animation, oldOptions, newOptions, this.forObject );
 
     for (var builderName in animation)
     {
@@ -4290,11 +4406,12 @@ Class.define( Builder,
  * @class BuilderHelper
  * @constructor
  */
-function BuilderHelper( input, oldOptions, newOptions )
+function BuilderHelper( input, oldOptions, newOptions, forObject )
 {
   this.input = input;
   this.oldOptions = oldOptions || {};
   this.newOptions = newOptions || {};
+  this.forObject = forObject;
 
   this.prepareSpecifics( 'easings' );
   this.prepareSpecifics( 'repeats' );
@@ -5371,6 +5488,21 @@ DeferAnimator.prototype = new Defer( DeferAnimator,
   'queueAttrimators',
 
   /**
+   * Defers the {{#crossLink "Animator/insert:method"}}{{/crossLink}} method until the deferred event has occurred.
+   *
+   * @method insert
+   */
+  'insert',
+
+  /**
+   * Defers the {{#crossLink "Animator/insertAttrimators:method"}}{{/crossLink}} method until the deferred event has occurred.
+   *
+   * @method insertAttrimators
+   * @protected
+   */
+  'insertAttrimators',
+
+  /**
    * Defers the {{#crossLink "Animator/transition:method"}}{{/crossLink}} method until the deferred event has occurred.
    *
    * @method transition
@@ -5996,6 +6128,23 @@ Easings['circular'] = function(x)
 Easings['gentle'] = function(x)
 {
   return (3.0 * (1.0 - x) * x * x) + (x * x * x);
+};
+
+/**
+ * Scales an existing easing by a given factor
+ *
+ * @method scale
+ * @for anim8.easing
+ */
+Easings['scale'] = function(scale, easing)
+{
+  var inner = $easing( easing );
+
+  return function (x)
+  {
+    var i = inner( x );
+    return scale * i + (1 - scale) * x;
+  };
 };
 
 /**
@@ -7329,7 +7478,7 @@ Class.define( Sequence,
    */
   play: function(animation, options, all, cache)
   {
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
 
     this.animators.each(function(animator, i)
@@ -7358,7 +7507,7 @@ Class.define( Sequence,
    */
   queue: function(animation, options, cache)
   {
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
     var maxRemaining = 0;
     var remaining = [];
@@ -7388,6 +7537,35 @@ Class.define( Sequence,
   },
 
   /**
+   * Inserts the animation across the animators in this sequence.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
+   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}},
+   *          {{#crossLink "Animator/insert:method"}}Animator.insert{{/crossLink}}
+   *
+   * @method insert
+   * @param {Animation|String|Object} animation
+   * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
+   * @chainable
+   */
+  insert: function(animation, options, cache)
+  {
+    var template = $attrimatorsFor( animation, options, cache, this );
+    var sequence = this;
+
+    this.animators.each(function(animator, i)
+    {
+      var attrimators = sequence.createAttrimators( template, i );
+
+      animator.newCycle( attrimators );
+      animator.insertAttrimators( attrimators );
+    });
+
+    return this.add();
+  },
+
+  /**
    * Transitions into the animation across the animators in this sequence.
    *
    * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}},
@@ -7406,7 +7584,7 @@ Class.define( Sequence,
   transition: function(transition, animation, options, all, cache)
   {
     var transition = $transition( transition );
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
 
     this.animators.each(function(animator, i)
@@ -9414,7 +9592,8 @@ var SaveOptions =
 {
   prefix: '',
   options: {},
-  cache: false
+  cache: false,
+  forObject: null
 };
 
 /**
@@ -9433,7 +9612,7 @@ var SaveOptions =
  */
 function save( name, animation, options )
 {
-  var animation = $animation( animation, coalesce( options, SaveOptions.options ), SaveOptions.cache );
+  var animation = $animation( animation, coalesce( options, SaveOptions.options ), SaveOptions.cache, SaveOptions.forObject );
   var qualifiedName = SaveOptions.prefix + name;
   var key = qualifiedName.toLowerCase();
 
@@ -9476,6 +9655,19 @@ function saveGroup( prefixOrOptions, animations )
       if ( parsedOptions !== Defaults.noOptions )
       {
         extend( SaveOptions.options, parsedOptions );
+      }
+    }
+    if ( isDefined( prefixOrOptions.forObject ) )
+    {
+      SaveOptions.forObject = prefixOrOptions.forObject;
+    }
+    if ( isDefined( prefixOrOptions.factory ) )
+    {
+      var parsedFactory = $factory( prefixOrOptions.factory );
+
+      if ( parsedFactory )
+      {
+        SaveOptions.forObject = parsedFactory;
       }
     }
   }
@@ -11012,9 +11204,9 @@ Class.extend( BuilderAnd, Builder,
 
     and.factory = coalesce( and.factory, animation.factory );
 
-    attrimatorMap.putMap( $attrimatorsFor( and, options ) );
+    attrimatorMap.putMap( $attrimatorsFor( and, options, false, helper.forObject ) );
   },
-  
+
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
   {
     this.submerge( input.and, newOptions, oldOptions, attrimatorMap );
@@ -11043,7 +11235,7 @@ Class.extend( BuilderDeltas, Builder,
     // 3. Generate the attrimators
 
     var mergeId = Builder.nextMergeId();
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var deltas = animation.deltas;
     var values = animation.values;
 
@@ -11114,7 +11306,7 @@ Class.extend( BuilderFinal, Builder,
   {
     // 1. Generate the attrimators, only caring about the delays and durations
 
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var values = animation.final;
 
     for (var attr in values)
@@ -11154,7 +11346,7 @@ Class.extend( BuilderInitial, Builder,
   {
     // 1. Generate the attrimators, only caring about the delays & scales
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var values     = animation.initial;
 
     for (var attr in values)
@@ -11209,7 +11401,7 @@ Class.extend( BuilderKeyframe, Builder,
     // 5. Expand frames to generate delta arrays, value arrays, and easing arrays
     // 6. Generate the attrimators
 
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var kframes = animation.keyframe;
     var easings = animation.easings || {};
     var teasing = $easing( coalesce( options.teasing, Defaults.teasing ) );
@@ -11356,7 +11548,7 @@ Class.extend( BuilderMove, Builder,
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var move       = animation.move;
 
     for (var attr in move)
@@ -11388,7 +11580,7 @@ Class.extend( BuilderPath, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory = $factory( animation.factory );
+    var factory = $factory( animation.factory, helper.forObject );
     var path    = animation.path;
 
     for (var attr in path)
@@ -11427,7 +11619,7 @@ Class.extend( BuilderPhysics, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var physics    = animation.physics;
 
     for (var attr in physics)
@@ -11454,6 +11646,38 @@ Class.extend( BuilderPhysics, Builder,
 
 
 /**
+ * Instantiates a new parser for the 'point' animation type.
+ *
+ * @class BuilderPoint
+ * @constructor
+ * @extends Builder
+ */
+function BuilderPoint()
+{
+
+}
+
+Class.extend( BuilderPoint, Builder,
+{
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    var factory    = $factory( animation.factory, helper.forObject );
+    var values     = animation.point;
+
+    for (var attr in values)
+    {
+      var attribute  = factory.attribute( attr );
+      var value      = attribute.parse( values[ attr ] );
+      var path       = new PathPoint( attr, attribute.calculator, value );
+      var event      = helper.parseEvent( attr, path, this, true );
+
+      attrimatorMap.put( attr, event );
+    }
+  }
+});
+
+
+/**
  * Instantiates a new parser for the 'and' animation type.
  *
  * @class BuilderQueue
@@ -11473,7 +11697,7 @@ Class.extend( BuilderQueue, Builder,
 
     queue.factory = coalesce( queue.factory, animation.factory );
 
-    attrimatorMap.queueMap( $attrimatorsFor( queue, options ) );
+    attrimatorMap.queueMap( $attrimatorsFor( queue, options, false, helper.forObject ) );
   },
 
   merge: function( input, newOptions, oldOptions, attrimatorMap, helper )
@@ -11499,7 +11723,7 @@ Class.extend( BuilderSpring, Builder,
 {
   parse: function( animation, options, attrimatorMap, helper )
   {
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var springs    = animation.springs;
 
     for (var attr in springs)
@@ -11544,7 +11768,7 @@ Class.extend( BuilderTravel, Builder,
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var travel     = animation.travel;
 
     for (var attr in travel)
@@ -11650,7 +11874,7 @@ Class.extend( BuilderTweenFrom, Builder,
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var tweenFrom  = animation.tweenFrom;
 
     for (var attr in tweenFrom)
@@ -11684,7 +11908,7 @@ Class.extend( BuilderTweenTo, Builder,
   {
     // 1. Starting values are all true which signals to Animator to replace those points with the animator's current values.
 
-    var factory    = $factory( animation.factory );
+    var factory    = $factory( animation.factory, helper.forObject );
     var tweenTo    = animation.tweenTo;
 
     for (var attr in tweenTo)
@@ -11722,7 +11946,7 @@ Class.extend( PathDelta, Path,
   set: function(calculator, points, deltas)
   {
     this.reset( calculator, points );
-    this.deltas = deltas;
+    this.deltas = $deltas( deltas );
   },
 
   compute: function(out, delta)
@@ -12376,7 +12600,7 @@ Class.extend( PathKeyframe, Path,
   set: function(calculator, points, deltas, easings)
   {
     this.reset( calculator, points );
-    this.deltas = deltas;
+    this.deltas = $deltas( deltas );
     this.easings = easings;
   },
 
@@ -12467,6 +12691,41 @@ PathLinear.getTimes = function(calc, points)
 
 	return distances;
 };
+
+
+/**
+ * Instantiates a new PathPoint.
+ *
+ * @param {String|false} name
+ * @param {Calculator} calculator
+ * @param {T} point
+ * @class PathPoint
+ * @constructor
+ * @extends Path
+ */
+function PathPoint(name, calculator, point)
+{
+  this.name = name;
+  this.set( calculator, point );
+}
+
+Class.extend( PathPoint, Path,
+{
+  set: function(calculator, point)
+  {
+    this.reset( calculator, [point] );
+  },
+
+  compute: function(out, delta)
+  {
+    return this.calculator.copy( out, this.resolvePoint( 0 ) );
+  },
+
+  copy: function()
+  {
+    return new PathPoint( this.name, this.calculator, this.points[0] );
+  }
+});
 
 
 /**
@@ -13423,11 +13682,15 @@ Builders['and'] = new BuilderAnd();
  */
 Builders['final'] = new BuilderFinal();
 
-
 /**
  * Register the builder.
  */
 Builders['initial'] = new BuilderInitial();
+
+/**
+ * Register the builder.
+ */
+Builders['point'] = new BuilderPoint();
 
 /**
  * Registers the builder.
@@ -13609,6 +13872,24 @@ Factories['default'] = Factories['object'];
 var Paths = {};
 
 /**
+ * Parses an object for a point path.
+ *
+ * @param {Object} path
+ * @return {PathCombo}
+ */
+Paths['point'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+  var defaultValue = calc.parse( path.defaultValue, calc.ZERO );
+
+  return new PathPoint(
+    path.name,
+    calc,
+    calc.parse( path.point, defaultValue )
+  );
+};
+
+/**
  * Parses an object for a combo path.
  *
  * @param {Object} path
@@ -13693,7 +13974,7 @@ Paths['delta'] = function(path)
   return new PathDelta(
     path.name,
     calc,
-    calc.parseArry( path.points, path.points, path.defaultValue ),
+    calc.parseArray( path.points, path.points, path.defaultValue ),
     path.deltas
   );
 };
@@ -13711,7 +13992,7 @@ Paths['jump'] = function(path)
   return new PathJump(
     path.name,
     calc,
-    calc.parseArry( path.points, path.points, path.defaultValue )
+    calc.parseArray( path.points, path.points, path.defaultValue )
   );
 };
 
@@ -14049,7 +14330,7 @@ Springs['linear'] = function(spring)
  * @throws {String} The animation string has an invalid animation name or the
  *    animation fails to create attrimators from the animation definition.
  */
-function $animation(animation, options, cache)
+function $animation(animation, options, cache, forObject)
 {
   var options = $options( options, cache );
   var hasOptions = !isEmpty( options );
@@ -14087,7 +14368,7 @@ function $animation(animation, options, cache)
   }
   if ( isObject( animation ) )
   {
-    var attrimators = $attrimatorsFor( animation, options, cache );
+    var attrimators = $attrimatorsFor( animation, options, cache, forObject );
 
     return new Animation( false, animation, options, attrimators );
   }
@@ -14141,7 +14422,7 @@ function $animation(animation, options, cache)
  * @param {Boolean} [cache=false]
  * @return {AttrimatorMap}
  */
-function $attrimatorsFor( animation, options, cache )
+function $attrimatorsFor( animation, options, cache, forObject )
 {
   var parsedOptions = $options( options, cache );
   var hasOptions = !isEmpty( parsedOptions );
@@ -14158,7 +14439,7 @@ function $attrimatorsFor( animation, options, cache )
   }
   else if ( isObject( animation ) )
   {
-    var helper = new BuilderHelper( animation, parsedOptions );
+    var helper = new BuilderHelper( animation, parsedOptions, {}, forObject );
 
     for (var builderName in animation)
     {
@@ -14319,6 +14600,36 @@ function $delay(time)
 }
 
 
+
+/**
+ * Parses an array of delta values and normalizes them between the range of
+ * 0 and 1. Optionally the array can be cloned.
+ *
+ * @method anim8.deltas
+ * @param {Number[]} deltas
+ * @param {Boolean} clone
+ */
+function $deltas(deltas, clone)
+{
+  var max = deltas[ 0 ];
+
+  for (var i = 1; i < deltas.length; i++)
+  {
+    max = Math.max( max, deltas[ i ] );
+  }
+
+  var target = clone ? [] : deltas;
+  var invertMax = 1.0 / max;
+
+  for (var i = 0; i < deltas.length; i++)
+  {
+    target[ i ] = deltas[ i ] * invertMax;
+  }
+
+  return target;
+}
+
+
 /**
  * Parses duration from a string or number. If the input is not a valid time then
  * {{#crossLink "anim8.defaults/duration:property"}}anim8.defaults.duration{{/crossLink}}
@@ -14371,16 +14682,26 @@ function $easing(easing, returnOnInvalid)
   }
   if ( isString( easing ) )
   {
-    if ( easing in Easings )
+    var result = null;
+    var scale = 1;
+
+    var scaleIndex = easing.indexOf('*');
+
+    if ( scaleIndex !== -1 )
     {
-      return Easings[ easing ];
-    }
-    if ( easing in EasingTypes )
-    {
-      return EasingTypes[ easing ]( $easing( Defaults.easing ) );
+      scale = parseFloat( easing.substring( scaleIndex + 1 ) );
+      easing = easing.substring( 0, scaleIndex );
     }
 
-    if ( easing.indexOf('-') !== -1 )
+    if ( easing in Easings )
+    {
+      result = Easings[ easing ];
+    }
+    else if ( easing in EasingTypes )
+    {
+      result = EasingTypes[ easing ]( $easing( Defaults.easing ) );
+    }
+    else if ( easing.indexOf('-') !== -1 )
     {
       var pair = easing.split('-');
       var e = pair[0];
@@ -14388,8 +14709,18 @@ function $easing(easing, returnOnInvalid)
 
       if ( pair.length >= 2 && e in Easings && t in EasingTypes )
       {
-        return EasingTypes[ t ]( Easings[ e ] );
+        result = EasingTypes[ t ]( Easings[ e ] );
       }
+    }
+
+    if ( result !== null && isFinite( scale ) && scale !== 1 )
+    {
+      result = Easings.scale( scale, result );
+    }
+
+    if ( result !== null )
+    {
+      return result;
     }
   }
   if ( isArray( easing ) && easing.length === 4 && isNumber( easing[0] ) && isNumber( easing[1] ) && isNumber( easing[2] ) && isNumber( easing[3] ) )
@@ -14448,7 +14779,7 @@ function $easingType(easingType, optional)
  * @param {String|Factory} [factory]
  * @return {Factory}
  */
-function $factory(factoryInput)
+function $factory(factoryInput, forObject)
 {
   if ( factoryInput instanceof Factory )
   {
@@ -14457,6 +14788,28 @@ function $factory(factoryInput)
   if ( isString( factoryInput ) && factoryInput in Factories )
   {
     return Factories[ factoryInput ];
+  }
+  if ( forObject )
+  {
+    if ( forObject instanceof Factory )
+    {
+      return forObject;
+    }
+
+    if ( forObject instanceof Sequence )
+    {
+      forObject = forObject.animators;
+    }
+
+    if ( forObject instanceof Animators )
+    {
+      forObject = forObject.$[0];
+    }
+
+    if ( forObject instanceof Animator && forObject.factory )
+    {
+      return forObject.factory;
+    }
   }
 
   return Factories['default'];
@@ -15175,6 +15528,7 @@ function $transition(transition, cache)
   anim8.spring = $spring;
   anim8.time = $time;
   anim8.transition = $transition;
+  anim8.deltas = $deltas;
 
   // Modules
   // - color.js
@@ -15272,6 +15626,7 @@ function $transition(transition, cache)
   anim8.PathSub = PathSub;
   anim8.PathUniform = PathUniform;
   anim8.PathTween = Tween;
+  anim8.PathPoint = PathPoint;
 
   // Springs
   anim8.SpringDistance = SpringDistance;

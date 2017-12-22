@@ -100,7 +100,7 @@ Class.define( Sequence,
    */
   play: function(animation, options, all, cache)
   {
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
 
     this.animators.each(function(animator, i)
@@ -129,7 +129,7 @@ Class.define( Sequence,
    */
   queue: function(animation, options, cache)
   {
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
     var maxRemaining = 0;
     var remaining = [];
@@ -159,6 +159,35 @@ Class.define( Sequence,
   },
 
   /**
+   * Inserts the animation across the animators in this sequence.
+   *
+   * **See:** {{#crossLink "Core/anim8.animation:method"}}{{/crossLink}},
+   *          {{#crossLink "Core/anim8.options:method"}}{{/crossLink}},
+   *          {{#crossLink "Animator/insert:method"}}Animator.insert{{/crossLink}}
+   *
+   * @method insert
+   * @param {Animation|String|Object} animation
+   * @param {String|Array|Object} [options]
+   * @param {Boolean} [cache=false]
+   * @chainable
+   */
+  insert: function(animation, options, cache)
+  {
+    var template = $attrimatorsFor( animation, options, cache, this );
+    var sequence = this;
+
+    this.animators.each(function(animator, i)
+    {
+      var attrimators = sequence.createAttrimators( template, i );
+
+      animator.newCycle( attrimators );
+      animator.insertAttrimators( attrimators );
+    });
+
+    return this.add();
+  },
+
+  /**
    * Transitions into the animation across the animators in this sequence.
    *
    * **See:** {{#crossLink "Core/anim8.transition:method"}}{{/crossLink}},
@@ -177,7 +206,7 @@ Class.define( Sequence,
   transition: function(transition, animation, options, all, cache)
   {
     var transition = $transition( transition );
-    var template = $attrimatorsFor( animation, options, cache );
+    var template = $attrimatorsFor( animation, options, cache, this );
     var sequence = this;
 
     this.animators.each(function(animator, i)

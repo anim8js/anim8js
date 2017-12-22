@@ -22,7 +22,7 @@ Class.extend( PathKeyframe, Path,
   set: function(calculator, points, deltas, easings)
   {
     this.reset( calculator, points );
-    this.deltas = deltas;
+    this.deltas = $deltas( deltas );
     this.easings = easings;
   },
 

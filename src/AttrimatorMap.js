@@ -100,9 +100,10 @@ Class.extend( AttrimatorMap, FastMap,
    *
    * @method queueMap
    * @param {AttrimatorMap} map
+   * @param {Number} offset
    * @param {Function} [onNewAttribute]
    * @param {Object} [context]
-   * @chainable   188703090
+   * @chainable
    */
   queueMap: function(map, offset, onNewAttribute, context)
   {
@@ -141,6 +142,54 @@ Class.extend( AttrimatorMap, FastMap,
         {
           onNewAttribute.call( context || this, attrimator );
         }
+      }
+    }
+
+    return this;
+  },
+
+  /**
+   * Inserts the given map into the beginning of this map. If a function is
+   * provided as the second argument it is invoked whenever an attrimator in
+   * the given map is new & added to this map.
+   *
+   * @method insertMap
+   * @param {AttrimatorMap} map
+   * @param {Function} [onNewAttribute]
+   * @param {Object} [context]
+   * @chainable
+   */
+  insertMap: function(map, onNewAttribute, context)
+  {
+    var attrimators = map.values;
+    var duration = map.timeRemaining();
+    var hasCallback = isFunction( onNewAttribute );
+
+    for (var i = attrimators.length - 1; i >= 0; i--)
+    {
+      var attrimator = attrimators[ i ];
+      var attr = attrimator.attribute;
+      var existing = this.get( attr );
+
+      this.put( attr, attrimator );
+
+      if ( existing )
+      {
+        if ( attrimator.isInfinite() )
+        {
+          attrimator.stopIn( duration );
+        }
+        else
+        {
+          existing.delay += (duration - attrimator.timeRemaining());
+        }
+
+        attrimator.queue( existing );
+      }
+
+      if ( hasCallback )
+      {
+        onNewAttribute.call( context || this, attrimator );
       }
     }
 

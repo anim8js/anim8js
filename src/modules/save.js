@@ -8,7 +8,8 @@ var SaveOptions =
 {
   prefix: '',
   options: {},
-  cache: false
+  cache: false,
+  forObject: null
 };
 
 /**
@@ -27,7 +28,7 @@ var SaveOptions =
  */
 function save( name, animation, options )
 {
-  var animation = $animation( animation, coalesce( options, SaveOptions.options ), SaveOptions.cache );
+  var animation = $animation( animation, coalesce( options, SaveOptions.options ), SaveOptions.cache, SaveOptions.forObject );
   var qualifiedName = SaveOptions.prefix + name;
   var key = qualifiedName.toLowerCase();
 
@@ -70,6 +71,19 @@ function saveGroup( prefixOrOptions, animations )
       if ( parsedOptions !== Defaults.noOptions )
       {
         extend( SaveOptions.options, parsedOptions );
+      }
+    }
+    if ( isDefined( prefixOrOptions.forObject ) )
+    {
+      SaveOptions.forObject = prefixOrOptions.forObject;
+    }
+    if ( isDefined( prefixOrOptions.factory ) )
+    {
+      var parsedFactory = $factory( prefixOrOptions.factory );
+
+      if ( parsedFactory )
+      {
+        SaveOptions.forObject = parsedFactory;
       }
     }
   }
