@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Class: PathKeyframe</title>
+    <title>Source: builders/BuilderPoint.js</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -2205,527 +2205,48 @@
     </ul>
 </div>
     <div class="main">
-        <h1 class="page-title" data-filename="PathKeyframe.html">Class: PathKeyframe</h1>
+        <h1 class="page-title" data-filename="builders_BuilderPoint.js.html">Source: builders/BuilderPoint.js</h1>
         
 
 
+    
+    <section>
+        <article>
+            <pre id="source-code" class="prettyprint source linenums"><code>
+/**
+ * Instantiates a new parser for the 'point' animation type.
+ *
+ * @class BuilderPoint
+ * @constructor
+ * @extends Builder
+ */
+function BuilderPoint()
+{
 
-<section>
-    
-<header>
-    <h2>
-    PathKeyframe
-    </h2>
-    
-        <div class="class-description"><p>PathKeyframe</p></div>
-    
-</header>  
+}
 
-<article>
-    <div class="container-overview">
-    
-    
-    
-        
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="PathKeyframe">
-            
-            new PathKeyframe<span class="signature">(name, calculator, points, deltas, easings)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="paths_PathKeyframe.js.html">paths/PathKeyframe.js</a>, <a href="paths_PathKeyframe.js.html#line14">line 14</a>
-        </div>
-        
-    </div>
+Class.extend( BuilderPoint, Builder,
+{
+  parse: function( animation, options, attrimatorMap, helper )
+  {
+    var factory    = $factory( animation.factory, helper.forObject );
+    var values     = animation.point;
 
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Instantiates a new PathKeyframe.</p>
-    </div>
-    
+    for (var attr in values)
+    {
+      var attribute  = factory.attribute( attr );
+      var value      = attribute.parse( values[ attr ] );
+      var path       = new PathPoint( attr, attribute.calculator, value );
+      var event      = helper.parseEvent( attr, path, this, true );
 
-    
-    
-    
-    
-    
-        
+      attrimatorMap.put( attr, event );
+    }
+  }
+});
+</code></pre>
+        </article>
+    </section>
 
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-|
-
-<span class="param-type">false</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>calculator</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Calculator.html">Calculator</a></span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>points</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>deltas</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>easings</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-    
-    </div>
-    
-    
-        <h3 class="subsection-title">Extends</h3>
-        
-        <ul>
-            <li><a href="Path.html">Path</a></li>
-        </ul>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</article>
-
-</section>  
-
-
-
-
-
-
-<section>
-    
-<header>
-    <h2>
-    PathKeyframe
-    </h2>
-    
-        <div class="class-description"><p>PathKeyframe</p></div>
-    
-</header>  
-
-<article>
-    <div class="container-overview">
-    
-    
-    
-        
-<dt>
-    <div class="nameContainer">
-        <h4 class="name" id="PathKeyframe">
-            
-            new PathKeyframe<span class="signature">(name, calculator, points, deltas, easings)</span>
-        </h4>
-    
-        
-        <div class="tag-source">
-            <a href="paths_PathKeyframe.js.html">paths/PathKeyframe.js</a>, <a href="paths_PathKeyframe.js.html#line14">line 14</a>
-        </div>
-        
-    </div>
-
-    
-</dt>
-<dd>
-    
-    
-    <div class="description">
-        <p>Instantiates a new PathKeyframe.</p>
-    </div>
-    
-
-    
-    
-    
-    
-    
-        
-
-<table class="params">
-    <thead>
-	<tr>
-		
-		<th>Name</th>
-		
-		
-		<th>Type</th>
-		
-		
-		
-		<th class="last">Description</th>
-	</tr>
-	</thead>
-	
-	<tbody>
-	
-	
-        <tr>
-            
-                <td class="name"><code>name</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-|
-
-<span class="param-type">false</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>calculator</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Calculator.html">Calculator</a></span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>points</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>deltas</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>easings</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Array</span>
-
-
-            
-            </td>
-            
-            
-            
-            <td class="description last">
-                
-                </td>
-        </tr>
-	
-	
-	</tbody>
-</table>
-    
-    
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-
-    
-
-    
-    
-    
-    
-    
-    
-    
-</dd>
-
-    
-    </div>
-    
-    
-        <h3 class="subsection-title">Extends</h3>
-        
-        <ul>
-            <li><a href="Path.html">Path</a></li>
-        </ul>
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-</article>
-
-</section>  
 
 
 
@@ -2734,7 +2255,7 @@
         
 
         <footer>
-            Documentation generated by <a target="_blank" href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Dec 22 2017 01:35:15 GMT-0500 (EST)
+            Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Dec 22 2017 01:35:15 GMT-0500 (EST)
         </footer>
     </div>
 </div>
