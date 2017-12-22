@@ -27,7 +27,7 @@ Class.extend( PathJump, Path,
     var a = Math.floor( delta * this.points.length );
     var index = Math.min( a, this.points.length - 1 );
 
-    return this.calculator.copy( out, this.resolvePoint( index ) );
+    return this.calculator.copy( out, this.resolvePoint( index, delta ) );
   },
 
   copy: function()

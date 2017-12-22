@@ -25,7 +25,7 @@ Class.extend( Tween, Path,
 
   compute: function(out, delta)
   {
-    return this.calculator.interpolate( out, this.resolvePoint( 0 ), this.resolvePoint( 1 ), delta );
+    return this.calculator.interpolate( out, this.resolvePoint( 0, delta ), this.resolvePoint( 1, delta ), delta );
   },
 
   copy: function()

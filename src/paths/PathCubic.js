@@ -34,11 +34,11 @@ Class.extend( PathCubic, Path,
     var i2 = i1 * i1;
     var i3 = i1 * i2;
 
-    out = calc.copy( out, this.resolvePoint( 0 ) );
+    out = calc.copy( out, this.resolvePoint( 0, d1 ) );
     out = calc.scale( out, i3 );
-    out = calc.adds( out, this.resolvePoint( 1 ), 3 * i2 * d1 );
-    out = calc.adds( out, this.resolvePoint( 2 ), 3 * i1 * d2 );
-    out = calc.adds( out, this.resolvePoint( 3 ), d3 );
+    out = calc.adds( out, this.resolvePoint( 1, d1 ), 3 * i2 * d1 );
+    out = calc.adds( out, this.resolvePoint( 2, d1 ), 3 * i1 * d2 );
+    out = calc.adds( out, this.resolvePoint( 3, d1 ), d3 );
 
     return out;
   },

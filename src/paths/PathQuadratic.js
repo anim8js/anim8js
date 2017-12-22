@@ -31,10 +31,10 @@ Class.extend( PathQuadratic, Path,
     var i1 = 1 - d1;
     var i2 = i1 * i1;
 
-    out = calc.copy( out, this.resolvePoint( 0 ) );
+    out = calc.copy( out, this.resolvePoint( 0, d1 ) );
     out = calc.scale( out, i2 );
-    out = calc.adds( out, this.resolvePoint( 1 ), 2 * i1 * d1 );
-    out = calc.adds( out, this.resolvePoint( 2 ), d2 );
+    out = calc.adds( out, this.resolvePoint( 1, d1 ), 2 * i1 * d1 );
+    out = calc.adds( out, this.resolvePoint( 2, d1 ), d2 );
 
     return out;
   },

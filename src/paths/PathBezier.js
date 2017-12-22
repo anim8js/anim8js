@@ -43,7 +43,7 @@ Class.extend( PathBezier, Path,
 
     for (var i = 0; i < n; i++)
     {
-      out = calc.adds( out, this.resolvePoint( i ), weights[ i ] * inverses[ i ] * x );
+      out = calc.adds( out, this.resolvePoint( i, delta ), weights[ i ] * inverses[ i ] * x );
 
       x *= delta;
     }

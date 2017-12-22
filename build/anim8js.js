@@ -1,4 +1,4 @@
-/* anim8js 1.1.0 - anim8js - Anim8 Everything by Philip Diffenderfer */
+/* anim8js 1.1.1 - anim8js - Anim8 Everything by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
@@ -759,11 +759,12 @@ function constant(variable)
  *
  * @method anim8.resolve
  * @param  {Function|E} variable
+ * @param  {Any[]} [args]
  * @return {E}
  */
-function resolve(variable)
+function resolve(variable, args)
 {
-  return isFunction( variable ) ? variable() : variable;
+  return isFunction( variable ) ? ( args ? variable.apply(this, args) : variable() ) : variable;
 }
 
 /**
@@ -7128,9 +7129,9 @@ Class.define( Path,
    * @param {Number} i
    * @return {T}
    */
-  resolvePoint: function(i)
+  resolvePoint: function(i, dt)
   {
-    return resolve( this.points[ i ] );
+    return resolve( this.points[ i ], arguments );
   },
 
   /**
@@ -7164,11 +7165,12 @@ Class.define( Path,
 
     if ( this.isLinear() )
     {
-      var prev = this.resolvePoint( 0 );
+      var prev = this.resolvePoint( 0, 0 );
+      var n = this.points.length - 1;
 
-      for (var i = 1; i < this.points.length; i++)
+      for (var i = 1; i <= n; i++)
       {
-        var next = this.resolvePoint( i );
+        var next = this.resolvePoint( i, i / n );
 
         distance += calc.distance( prev, next );
 
@@ -7179,7 +7181,7 @@ Class.define( Path,
     {
       var deltadelta = 1.0 / granularity;
       var delta = deltadelta;
-      var prev = calc.clone( this.resolvePoint( 0 ) );
+      var prev = calc.clone( this.resolvePoint( 0, 0 ) );
       var temp = calc.create();
 
       for (var i = 1; i <= granularity; i++)
@@ -11960,8 +11962,8 @@ Class.extend( PathDelta, Path,
     var d0 = ds[i];
     var d1 = ds[i + 1];
     var pd = (delta - d0) / (d1 - d0);
-    var p0 = this.resolvePoint( i );
-    var p1 = this.resolvePoint( i + 1 );
+    var p0 = this.resolvePoint( i, delta );
+    var p1 = this.resolvePoint( i + 1, delta );
 
     return this.calculator.interpolate( out, p0, p1, pd );
   },
@@ -12014,10 +12016,10 @@ Class.extend( PathParametric, Path,
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;
 
-    var p0 = this.resolvePoint( i - 1 );
-    var p1 = this.resolvePoint( i );
-    var p2 = this.resolvePoint( i + 1 );
-    var p3 = this.resolvePoint( i + 2 );
+    var p0 = this.resolvePoint( i - 1, delta );
+    var p1 = this.resolvePoint( i, delta );
+    var p2 = this.resolvePoint( i + 1, delta );
+    var p3 = this.resolvePoint( i + 2, delta );
 
     var d0, d1, d2, d3;
     if (this.invert) {
@@ -12179,7 +12181,7 @@ Class.extend( PathBezier, Path,
 
     for (var i = 0; i < n; i++)
     {
-      out = calc.adds( out, this.resolvePoint( i ), weights[ i ] * inverses[ i ] * x );
+      out = calc.adds( out, this.resolvePoint( i, delta ), weights[ i ] * inverses[ i ] * x );
 
       x *= delta;
     }
@@ -12401,7 +12403,7 @@ Class.extend( PathCompiled, Path,
     var a = Math.floor( delta * n );
     var index = clamp( a, 0, n - 1 );
 
-    return this.calculator.copy( out, this.resolvePoint( index ) );
+    return this.calculator.copy( out, this.resolvePoint( index, delta ) );
   },
 
   copy: function()
@@ -12463,11 +12465,11 @@ Class.extend( PathCubic, Path,
     var i2 = i1 * i1;
     var i3 = i1 * i2;
 
-    out = calc.copy( out, this.resolvePoint( 0 ) );
+    out = calc.copy( out, this.resolvePoint( 0, d1 ) );
     out = calc.scale( out, i3 );
-    out = calc.adds( out, this.resolvePoint( 1 ), 3 * i2 * d1 );
-    out = calc.adds( out, this.resolvePoint( 2 ), 3 * i1 * d2 );
-    out = calc.adds( out, this.resolvePoint( 3 ), d3 );
+    out = calc.adds( out, this.resolvePoint( 1, d1 ), 3 * i2 * d1 );
+    out = calc.adds( out, this.resolvePoint( 2, d1 ), 3 * i1 * d2 );
+    out = calc.adds( out, this.resolvePoint( 3, d1 ), d3 );
 
     return out;
   },
@@ -12519,8 +12521,8 @@ Class.extend( PathHermite, Path,
     var d3 = d2 * d;
 
     out = calc.zero( out );
-    out = calc.adds( out, this.resolvePoint( 0 ), 2 * d3 - 3 * d2 + 1 );
-    out = calc.adds( out, this.resolvePoint( 1 ), -2 * d3 + 3 * d2 );
+    out = calc.adds( out, this.resolvePoint( 0, d ), 2 * d3 - 3 * d2 + 1 );
+    out = calc.adds( out, this.resolvePoint( 1, d ), -2 * d3 + 3 * d2 );
     out = calc.adds( out, resolve( this.startTangent ), d3 - 2 * d2 + d );
     out = calc.adds( out, resolve( this.endTangent ), d3 - d2 );
 
@@ -12567,7 +12569,7 @@ Class.extend( PathJump, Path,
     var a = Math.floor( delta * this.points.length );
     var index = Math.min( a, this.points.length - 1 );
 
-    return this.calculator.copy( out, this.resolvePoint( index ) );
+    return this.calculator.copy( out, this.resolvePoint( index, delta ) );
   },
 
   copy: function()
@@ -12624,8 +12626,8 @@ Class.extend( PathKeyframe, Path,
     var d0 = ds[i];
     var d1 = ds[i + 1];
     var pd = (delta - d0) / (d1 - d0);
-    var p0 = this.resolvePoint( i );
-    var p1 = this.resolvePoint( i + 1 );
+    var p0 = this.resolvePoint( i, delta );
+    var p1 = this.resolvePoint( i + 1, delta );
     var ea = this.easings[i];
 
     return this.calculator.interpolate( out, p0, p1, ea( pd ) );
@@ -12718,7 +12720,7 @@ Class.extend( PathPoint, Path,
 
   compute: function(out, delta)
   {
-    return this.calculator.copy( out, this.resolvePoint( 0 ) );
+    return this.calculator.copy( out, this.resolvePoint( 0, delta ) );
   },
 
   copy: function()
@@ -12760,10 +12762,10 @@ Class.extend( PathQuadratic, Path,
     var i1 = 1 - d1;
     var i2 = i1 * i1;
 
-    out = calc.copy( out, this.resolvePoint( 0 ) );
+    out = calc.copy( out, this.resolvePoint( 0, d1 ) );
     out = calc.scale( out, i2 );
-    out = calc.adds( out, this.resolvePoint( 1 ), 2 * i1 * d1 );
-    out = calc.adds( out, this.resolvePoint( 2 ), d2 );
+    out = calc.adds( out, this.resolvePoint( 1, d1 ), 2 * i1 * d1 );
+    out = calc.adds( out, this.resolvePoint( 2, d1 ), d2 );
 
     return out;
   },
@@ -12822,10 +12824,10 @@ Class.extend( PathQuadraticCorner, Path,
     var i = clamp( Math.floor( a ), 0, n - 1 );
     var d = a - i;
 
-    var p0 = this.resolvePoint( i - 1 );
-    var p1 = this.resolvePoint( i );
-    var p2 = this.resolvePoint( i + 1 );
-    var p3 = this.resolvePoint( i + 2 );
+    var p0 = this.resolvePoint( i - 1, delta );
+    var p1 = this.resolvePoint( i, delta );
+    var p2 = this.resolvePoint( i + 1, delta );
+    var p3 = this.resolvePoint( i + 2, delta );
 
     if ( d < midpoint )
     {
@@ -12973,7 +12975,7 @@ Class.extend( Tween, Path,
 
   compute: function(out, delta)
   {
-    return this.calculator.interpolate( out, this.resolvePoint( 0 ), this.resolvePoint( 1 ), delta );
+    return this.calculator.interpolate( out, this.resolvePoint( 0, delta ), this.resolvePoint( 1, delta ), delta );
   },
 
   copy: function()

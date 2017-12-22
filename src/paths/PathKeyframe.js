@@ -46,8 +46,8 @@ Class.extend( PathKeyframe, Path,
     var d0 = ds[i];
     var d1 = ds[i + 1];
     var pd = (delta - d0) / (d1 - d0);
-    var p0 = this.resolvePoint( i );
-    var p1 = this.resolvePoint( i + 1 );
+    var p0 = this.resolvePoint( i, delta );
+    var p1 = this.resolvePoint( i + 1, delta );
     var ea = this.easings[i];
 
     return this.calculator.interpolate( out, p0, p1, ea( pd ) );

@@ -400,11 +400,12 @@ function constant(variable)
  *
  * @method anim8.resolve
  * @param  {Function|E} variable
+ * @param  {Any[]} [args]
  * @return {E}
  */
-function resolve(variable)
+function resolve(variable, args)
 {
-  return isFunction( variable ) ? variable() : variable;
+  return isFunction( variable ) ? ( args ? variable.apply(this, args) : variable() ) : variable;
 }
 
 /**

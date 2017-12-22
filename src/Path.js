@@ -123,9 +123,9 @@ Class.define( Path,
    * @param {Number} i
    * @return {T}
    */
-  resolvePoint: function(i)
+  resolvePoint: function(i, dt)
   {
-    return resolve( this.points[ i ] );
+    return resolve( this.points[ i ], arguments );
   },
 
   /**
@@ -159,11 +159,12 @@ Class.define( Path,
 
     if ( this.isLinear() )
     {
-      var prev = this.resolvePoint( 0 );
+      var prev = this.resolvePoint( 0, 0 );
+      var n = this.points.length - 1;
 
-      for (var i = 1; i < this.points.length; i++)
+      for (var i = 1; i <= n; i++)
       {
-        var next = this.resolvePoint( i );
+        var next = this.resolvePoint( i, i / n );
 
         distance += calc.distance( prev, next );
 
@@ -174,7 +175,7 @@ Class.define( Path,
     {
       var deltadelta = 1.0 / granularity;
       var delta = deltadelta;
-      var prev = calc.clone( this.resolvePoint( 0 ) );
+      var prev = calc.clone( this.resolvePoint( 0, 0 ) );
       var temp = calc.create();
 
       for (var i = 1; i <= granularity; i++)

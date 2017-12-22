@@ -24,7 +24,7 @@ Class.extend( PathPoint, Path,
 
   compute: function(out, delta)
   {
-    return this.calculator.copy( out, this.resolvePoint( 0 ) );
+    return this.calculator.copy( out, this.resolvePoint( 0, delta ) );
   },
 
   copy: function()

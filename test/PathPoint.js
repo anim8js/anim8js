@@ -22,6 +22,20 @@ module.exports = {
     test.strictEqual( path.resolvePoint(0), 5 );
 
     test.done();
+  },
+
+  live: function(test)
+  {
+    var path = anim8.path({
+      type: 'point',
+      point: function(i, dt) {
+        return dt;
+      }
+    });
+
+    test.strictEqual( path.compute(0, 0.25), 0.25 );
+    
+    test.done();
   }
 
 };

@@ -33,7 +33,7 @@ Class.extend( PathCompiled, Path,
     var a = Math.floor( delta * n );
     var index = clamp( a, 0, n - 1 );
 
-    return this.calculator.copy( out, this.resolvePoint( index ) );
+    return this.calculator.copy( out, this.resolvePoint( index, delta ) );
   },
 
   copy: function()
