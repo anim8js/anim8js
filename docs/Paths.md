@@ -4,6 +4,9 @@
 
 A path is essentially a function which returns a point given a value between 0 and 1 (`compute( 0.5 )` returns a value halfway along the path). Paths are the main animation structure in anim8 - they define how an attribute animates over time. A simple example of a Path is what is referred to as a "tween". A tween is a path with a starting and ending point. With tweening, you can change the background color from blue to purple in a linear fashion. There are many path implementations available and are useful for different types of animation:
 
+### Point
+- [point](#point)
+
 ### Linear
 - [tween](#tween)
 - [jump](#jump)
@@ -66,6 +69,59 @@ var myAnimationInstance = anim8.animation( animationDefinition );
 
 // Play an animation. For best efficiency - you should avoid sending definitions directly to animation functions.
 anim8( subject ).play( animationDefinition );
+```
+
+<hr>
+
+## Point
+
+A point is a path with a single point. This type of path is especially useful when you want a path which has a user-defined function for generating a value live. Over the duration of an animation the point value is applied to the subject each frame.
+
+You can use the point paths in several ways:
+
+#### Return a Path instance
+```javascript
+// myPoint is instanceof anim8.Path
+var myPoint = anim8.path({
+  type: 'point',
+  calculator: 'rgb',
+  point: '#450067'
+});
+```
+
+#### Create an Animation
+```javascript
+// Generate the position based on some function
+var myPointDynamic = {
+  path: {
+    position: {
+      type: 'point',
+      calculator: '2d',
+      // A live function is passed the current point index (0 for point paths) and the delta value along the animation playback.
+      point: function(i, dt) {
+        return { // generated for each frame
+          x: 0,
+          y: 0
+        };
+      }
+    }
+  }
+};
+// You can pass anim8.Path instances to the definition as well
+var myPointInstance = {
+  path: {
+    position: myPoint
+  }
+};
+
+// Save the animation (the name can be passed to animation functions)
+anim8.save( 'myPointDynamic', myPointDynamic );
+// Build an animation and get the object (which can be passed to animation functions)
+var myPointAnimation = anim8.animation( myPointInstance );
+// Play or queue the animation on the subject
+anim8( subject ).play( myPointDynamic );
+anim8( subject ).queue( myPointAnimation );
+anim8( subject ).transition( 'myPointDynamic' );
 ```
 
 <hr>
