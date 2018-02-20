@@ -110,6 +110,34 @@ Paths['delta'] = function(path)
 };
 
 /**
+ * Parses an object for a series path.
+ *
+ * @param {Object} path
+ * @return {PathSeries}
+ */
+Paths['series'] = function(path)
+{
+  var calc = $calculator( path.calculator );
+
+  if (!path.series)
+  {
+    path.series = [];
+
+    for (var i = 0; i < path.points.length; i++)
+    {
+      path.series[ i ] = i / ( path.points.length - 1 );
+    }
+  }
+
+  return new PathSeries(
+    path.name,
+    calc,
+    calc.parseArray( path.points, path.points, path.defaultValue ),
+    path.series
+  );
+};
+
+/**
  * Parses an object for a jump path.
  *
  * @param {Object} path

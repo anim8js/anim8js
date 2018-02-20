@@ -185,6 +185,7 @@
   anim8.PathUniform = PathUniform;
   anim8.PathTween = Tween;
   anim8.PathPoint = PathPoint;
+  anim8.PathSeries = PathSeries;
 
   // Springs
   anim8.SpringDistance = SpringDistance;
