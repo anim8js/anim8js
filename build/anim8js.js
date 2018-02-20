@@ -14614,18 +14614,21 @@ function $delay(time)
 function $deltas(deltas, clone)
 {
   var max = deltas[ 0 ];
+  var min = deltas[ 0 ];
 
   for (var i = 1; i < deltas.length; i++)
   {
     max = Math.max( max, deltas[ i ] );
+    min = Math.min( min, deltas[ i ] );
   }
 
   var target = clone ? [] : deltas;
-  var invertMax = 1.0 / max;
+  var gap = max - min;
+  var invertGap = 1.0 / gap;
 
   for (var i = 0; i < deltas.length; i++)
   {
-    target[ i ] = deltas[ i ] * invertMax;
+    target[ i ] = (deltas[ i ] - min) * invertGap;
   }
 
   return target;
