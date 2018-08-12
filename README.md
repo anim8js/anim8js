@@ -22,6 +22,7 @@ The values that define the paths, spring, and physical forces can be a constant 
 
 - Bower: `bower install anim8js`
 - Node: `npm install anim8js`
+- CDN: `<script src="https://cdn.jsdelivr.net/npm/anim8js@1/build/anim8js.min.js"></script>`
 - Download: [anim8js](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.js) or [anim8js minified](https://raw.githubusercontent.com/anim8js/anim8js/master/build/anim8js.min.js)
 
 ### Extensions
