@@ -1,7 +1,11 @@
 {
   "name": "anim8js",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "description": "anim8js - Anim8 Everything",
+  "main": "umd/anim8.js",
+  "module": "lib/index.js",
+  "es2015": "lib-esm/index.js",
+  "typings": "typings/index.d.ts",
   "author": "Philip Diffenderfer",
   "license": "MIT",
   "repository": {
@@ -9,26 +13,100 @@
     "url": "git://github.com/anim8js/anim8js.git"
   },
   "scripts": {
-    "test": "nodeunit test"
+    "cleanup": "shx rm -rf umd lib lib-esm lib-fesm typings coverage ../paintspace-pages/docs",
+    "prebuild": "npm run cleanup && npm run verify",
+    "build": "tsc && tsc -p tsconfig.esm.json && webpack && webpack --env.prod",
+    "build:fesm:min": "uglifyjs lib-fesm/index.js --compress --mangle --source-map --output lib-fesm/index.min.js",
+    "docs": "typedoc -p . --readme README.md --theme minimal --mode file --target 'es5' --excludeNotExported --excludePrivate --ignoreCompilerErrors --exclude \"**/ts/**/__tests__/*.*\" --out ../paintspace-pages/docs ts/ && cp tester.html ../paintspace-pages/tester.html && cp -R umd ../paintspace-pages/",
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage",
+    "test:only-changed": "npm test -- --bail --onlyChanged",
+    "verify": "npm test",
+    "cz": "git-cz",
+    "release:npm": "npm publish",
+    "release:preflight": "irish-pub",
+    "release:preflight:package": "npm pack",
+    "size": "shx echo \"Gzipped Size:\" && cross-var strip-json-comments --no-whitespace $npm_package_main | gzip-size"
+  },
+  "engines": {
+    "node": ">=6.9"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "validate-commit-msg": {
+      "types": "conventional-commit-types",
+      "maxSubjectLength": 120
+    }
+  },
+  "lint-staged": {
+    "ts/**/*.{ts,tsx}": [
+      "npm run prettier:ts -- --write",
+      "ts:lint:fix",
+      "git add"
+    ]
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/ts"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "mapCoverage": true,
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/lib-esm/",
+      "<rootDir>/umd/",
+      "<rootDir>/ts/.*(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 85
+      }
+    }
+  },
+  "dependencies": {
+    "jest-cli": "22.4.3"
   },
   "devDependencies": {
-    "gulp": "^3.8.10",
-    "gulp-check-filesize": "^2.0.1",
-    "gulp-concat": "^2.4.3",
-    "gulp-insert": "^0.5.0",
-    "gulp-jshint": "^2.0.1",
-    "gulp-load-plugins": "^0.8.0",
-    "gulp-qunit": "^1.4.0",
-    "gulp-rename": "^1.2.2",
-    "gulp-shell": "^0.2.11",
-    "gulp-sourcemaps": "^1.3.0",
-    "gulp-uglify": "^1.0.2",
-    "gulp-util": "^3.0.4",
-    "gulp-watch": "^3.0.0",
-    "jaguarjs-jsdoc": "^1.0.1",
-    "jsdoc": "^3.4.0",
-    "jshint": "^2.9.2",
-    "merge-stream": "^1.0.0",
-    "nodeunit": "^0.10.2"
+    "@types/jest": "20.0.2",
+    "@types/node": "7.0.31",
+    "awesome-typescript-loader": "3.2.1",
+    "commitizen": "2.9.6",
+    "cross-var": "1.0.3",
+    "cz-conventional-changelog": "2.0.0",
+    "gzip-size-cli": "2.0.0",
+    "irish-pub": "0.2.0",
+    "jest": "20.0.4",
+    "lint-staged": "4.0.0",
+    "prettier": "1.5.2",
+    "shx": "0.2.2",
+    "standard-version": "4.2.0",
+    "strip-json-comments-cli": "1.0.1",
+    "ts-jest": "20.0.6",
+    "tslint": "5.4.3",
+    "tslint-config-prettier": "1.1.0",
+    "tslint-config-standard": "6.0.1",
+    "tslint-react": "3.0.0",
+    "typedoc": "0.7.1",
+    "typescript": "2.4.1",
+    "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony-v2.8.22",
+    "uglifyjs-webpack-plugin": "0.4.5",
+    "validate-commit-msg": "2.12.2",
+    "webpack": "3.0.0",
+    "webpack-config-utils": "2.3.0"
   }
 }
