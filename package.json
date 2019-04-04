@@ -1,6 +1,6 @@
 {
   "name": "anim8js",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "anim8js - Anim8 Everything",
   "main": "build/anim8js.js",
   "author": "Philip Diffenderfer",
@@ -13,7 +13,7 @@
     "test": "nodeunit test"
   },
   "devDependencies": {
-    "gulp": "^3.8.10",
+    "gulp": "^3.9.1",
     "gulp-check-filesize": "^2.0.1",
     "gulp-concat": "^2.4.3",
     "gulp-insert": "^0.5.0",
