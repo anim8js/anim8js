@@ -165,7 +165,8 @@ function activate()
 var requestRun = (function()
 {
   var vendors = ['ms', 'moz', 'webkit', 'o'];
-  var requestor = global.requestAnimationFrame;
+  var requestor = this.requestAnimationFrame || global.requestAnimationFrame;
+  var setTimeout = this.setTimeout || global.setTimeout || setTimeout;
 
   for (var x = 0; x < vendors.length && !requestor; ++x)
   {
@@ -180,7 +181,7 @@ var requestRun = (function()
     {
       var currentTime = now();
       var timeToCall = Math.max( Defaults.pauseTime, Defaults.frameRate - (currentTime - lastTime) );
-      var id = global.setTimeout( function() { callback( currentTime + timeToCall ); }, timeToCall );
+      var id = setTimeout( function() { callback( currentTime + timeToCall ); }, timeToCall );
       lastTime = currentTime + timeToCall;
       return id;
     };
