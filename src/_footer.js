@@ -57,7 +57,7 @@
   anim8.Animations = Animations;
   anim8.Calculators = Calculators;
   anim8.Factories = Factories;
-  anim8.Builders = Builder;
+  anim8.Builders = Builders;
   anim8.Paths = Paths;
   anim8.Springs = Springs;
   anim8.Easings = Easings;
