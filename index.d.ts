@@ -202,7 +202,8 @@ declare module 'anim8js'
     public activate (): this;
     public deactivate (): this;
     public destroy (): this;
-    public spring<K extends keyof A> (spring: SpringInput<A, K>): Spring<A, K>;
+    public spring<K extends keyof A> (spring: SpringLinearDefinition<A, K>): SpringLinear<A, K>;
+    public spring<K extends keyof A> (spring: SpringDistanceDefinition<A, K>): SpringDistance<A, K>;
     public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
     public playAttrimators (attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
     public unplay (animation: AnimationInput<A>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
@@ -275,7 +276,8 @@ declare module 'anim8js'
     public trimAttrimators (): this;
     public deactivate (): this;
     public destroy (): this;
-    public spring<K extends keyof A> (spring: SpringInput<A, K>): Spring<A, K>;
+    public spring<K extends keyof A> (spring: SpringLinearDefinition<A, K>): SpringLinear<A, K>;
+    public spring<K extends keyof A> (spring: SpringDistanceDefinition<A, K>): SpringDistance<A, K>;
     public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
     public playAttrimators (attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
     public unplay (animation: AnimationInput<A>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
