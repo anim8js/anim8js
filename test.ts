@@ -1,13 +1,8 @@
-import { param, PathPointDefinition, resolve, path, DomAnimator, m8 } from 'anim8js';
-
-let el: Element = document.createElement('DIV');
-let an: DomAnimator = m8(el);
-
-an.tween('opacity', 0, '+43');
+import { Input, Value2d, path, param, resolve } from 'anim8js';
 
 path({
   type: 'point',
-  
+  point: 3
 })
 
 const x = 43;
@@ -23,16 +18,9 @@ let e = (x: number, y: boolean) => x * 3;
 let f = resolve(e, [45, false]);
 
 let g = (x: number, y: boolean) => x * 3;;
-let h = resolve(g);
+// let h = resolve(g); // supposed to error
 
-// param('meow').abs().scale(54);
+param('meow').abs().scale(54);
 
-let dom = {} as DomAnimator;
-
-dom
-.defer('once', 'finished')
-  .play('wiggle')
-  .defer('once', 'finished')
-    .stop('opacity')
-  .undefer()
-.undefer();
+let z: Input<Value2d> = { x: 0 };
+let w: Input<string> = ['{ y: 5, x: 9 }'];

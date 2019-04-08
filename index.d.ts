@@ -4,13 +4,9 @@ declare module "anim8js"
 {
   // S = Subject
   // A = Attributes with strict type
-  // I = Attributes with input types
-  // T = Any
   // V = A "primitive" data type (2d, 3d, color, number, quaternion, string)
 
-  export type Input<A> = { [P in keyof A]: any };
-
-  export type AttributesInput<A> = keyof A | (keyof A)[] | { [P in keyof A]: any };
+  export type AttributesInput<A> = keyof A | (keyof A)[] | { [P in keyof A]?: any };
 
   export type AttributesValues<A> = Partial<A>;
 
@@ -35,59 +31,59 @@ declare module "anim8js"
     public clear (): this;
   }
 
-  export class AttrimatorMap<A, I extends Input<A>> extends FastMap<Attrimator<A, I, keyof A>>
+  export class AttrimatorMap<A> extends FastMap<Attrimator<A, keyof A>>
   {
     public setGroup (groupId: number, force?: boolean, deep?: boolean): void;
     public delay (time: number): this;
-    public queue<K extends keyof A> (attrimator: Attrimator<A, I, K>): Attrimator<A, I, K> | undefined;
-    public queueMap (map: AttrimatorMap<A, I>, offset: number, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, I, K>) => void, context?: object): this;
-    public insertMap (map: AttrimatorMap<A, I>, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, I, K>) => any, context?: object): this;
+    public queue<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
+    public queueMap (map: AttrimatorMap<A>, offset: number, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => void, context?: object): this;
+    public insertMap (map: AttrimatorMap<A>, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => any, context?: object): this;
     public unqueueAt (index: number): this;
-    public playMapAt (attrimatorMap: AttrimatorMap<A, I>, all: boolean, time: number): this;
-    public playAttrimatorAt (attrimator: Attrimator<A, I, keyof A>, time: number): void;
-    public transitionMap (transition: Transition, attrimatorMap: AttrimatorMap<A, I>, getValue: <K extends keyof A>(attr: K) => A[K], getAttribute: <K extends keyof A>(attr: K) => Attribute<A, I, K> | undefined, placeAttrimator: <K extends keyof A>(attrimator: Attrimator<A, I, K>) => Attrimator<A, I, K> | undefined, getValueAt: <K extends keyof A>(attrimator: Attrimator<A, I, K>, relativeTime: number, out: AttributesValues<A>) => A[K], stopAttrimator: <K extends keyof A>(attrimator: Attrimator<A, I, K>, relativeTime: number) => void, context: object): this;
-    public finishNotPresent (attrimatorMap: AttrimatorMap<A, I>, delay?: number): this;
-    public stopNotPresentAt (attrimatorMap: AttrimatorMap<A, I>, time: number): this;
-    public clone (): AttrimatorMap<A, I>;
+    public playMapAt (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number): this;
+    public playAttrimatorAt (attrimator: Attrimator<A, keyof A>, time: number): void;
+    public transitionMap (transition: Transition, attrimatorMap: AttrimatorMap<A>, getValue: <K extends keyof A>(attr: K) => A[K], getAttribute: <K extends keyof A>(attr: K) => Attribute<A, K> | undefined, placeAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>) => Attrimator<A, K> | undefined, getValueAt: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number, out: AttributesValues<A>) => A[K], stopAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number) => void, context: object): this;
+    public finishNotPresent (attrimatorMap: AttrimatorMap<A>, delay?: number): this;
+    public stopNotPresentAt (attrimatorMap: AttrimatorMap<A>, time: number): this;
+    public clone (): AttrimatorMap<A>;
     public timeRemaining (returnInfinity?: boolean): number;
     public applyCycle (nextCycle: number): number;
-    public iterate (callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, depth: number, previous?: Attrimator<A, I, K>) => void): this;
+    public iterate (callback: <K extends keyof A>(attrimator: Attrimator<A, K>, depth: number, previous?: Attrimator<A, K>) => void): this;
   }
 
-  export interface Attribute<A, I extends Input<A>, K extends keyof A>
+  export interface Attribute<A, K extends keyof A>
   {
     name: K;
     calculatorName: keyof CalculatorMap;
-    calculator: Calculator<A[K], I[K]>;
+    calculator: Calculator<A[K]>;
     defaultValue: A[K];
-    parse (input: I[K], defaultValue?: A[K]): Value<A[K]>;
+    parse (input: Input<A[K]>, defaultValue?: A[K]): Value<A[K]>;
     cloneDefault (): A[K];
   }
 
-  export type Dynamic<V> = 
+  export type Dynamic<V> =
     (() => V) |
     ((index: number, delta: number) => V);
 
-  export interface Computed<V> 
+  export interface Computed<V>
   {
-    (attrimator: Attrimator<any, any, any>, animator: Animator<any, any, any>): (V | Dynamic<V>);
+    (attrimator: Attrimator<any, any>, animator: Animator<any, any>): (V | Dynamic<V>);
     computed: true;
   }
 
-  export type Value<V> = 
-    V | 
-    Dynamic<V> | 
+  export type Value<V> =
+    V |
+    Dynamic<V> |
     Computed<V>;
 
-  export class Calculator<V, I>
+  export class Calculator<V>
   {
     public readonly ZERO: V;
     public readonly ONE: V;
     public readonly INFINITY: V;
 
     public createConstants (): void;
-    public parse (input: I, defaultValue?: V, ignoreRelative?: boolean): Value<V>;
-    public parseArray (input: I[], output: Value<V>[], defaultValue?: I): Value<V>;
+    public parse (input: Input<V>, defaultValue?: V, ignoreRelative?: boolean): Value<V>;
+    public parseArray (input: Input<V>[], output: Value<V>[], defaultValue?: Input<V>): Value<V>;
     public copy (out: V, copy: V): V;
     public zero (out: V): V;
     public clone (clone: V): V;
@@ -115,74 +111,74 @@ declare module "anim8js"
     public setLength (out: V, length: number): V;
   }
 
-  export type CalculatorInput<V, I> = keyof CalculatorMap | Calculator<V, I>;
+  export type CalculatorInput<V> = keyof CalculatorMap | Calculator<V>;
 
   export interface CalculatorMap
   {
-    'number':     Calculator<ValueNumber, InputNumber>;
-    '2d':         Calculator<Value2d, Input2d>;
-    '3d':         Calculator<Value3d, Input3d>;
-    'quat':       Calculator<ValueQuat, InputQuat>;
-    'quaternion': Calculator<ValueQuat, InputQuat>;
-    'rgb':        Calculator<ValueRGB, InputRGB>;
-    'rgba':       Calculator<ValueRGBA, InputRGBA>;
-    'color':      Calculator<ValueRGBA, InputRGBA>;
-    'string':     Calculator<ValueString, InputString>;
-    'default':    Calculator<ValueNumber, InputNumber>;
+    'number':     Calculator<ValueNumber>;
+    '2d':         Calculator<Value2d>;
+    '3d':         Calculator<Value3d>;
+    'quat':       Calculator<ValueQuat>;
+    'quaternion': Calculator<ValueQuat>;
+    'rgb':        Calculator<ValueRGB>;
+    'rgba':       Calculator<ValueRGBA>;
+    'color':      Calculator<ValueRGBA>;
+    'string':     Calculator<ValueString>;
+    'default':    Calculator<ValueNumber>;
   }
 
   export const Calculators: CalculatorMap;
+  export const Calculator2d: Calculator<Value2d>;
+  export const Calculator3d: Calculator<Value3d>;
+  export const CalculatorNumber: Calculator<ValueNumber>;
+  export const CalculatorQuaternion: Calculator<ValueQuat>;
+  export const CalculatorRGB: Calculator<ValueRGB>;
+  export const CalculatorRGBA: Calculator<ValueRGBA>;
+  export const CalculatorString: Calculator<ValueString>;
 
   export type InputScalar<V> =
     number |
-    string | 
-    true | 
+    string |
+    true |
     Dynamic<V> |
     Computed<V> |
     (number | string)[];
 
-  export type InputObject<V> =  
+  export type InputObject<V> =
     InputScalar<V> |
     { [P in keyof V]?: number | string };
 
-  export type Value2d = { x: number, y: number };
+  export type Input<V> = 
+    V extends object ? InputObject<V> : InputScalar<V>;
 
-  export type Input2d = InputObject<Value2d>;
+  export type Inputs<A> =
+    { [K in keyof A]?: Input<A[K]> };
+
+  export type Value2d = { x: number, y: number };
 
   export type Value3d = { x: number, y: number, z: number };
 
-  export type Input3d = InputObject<Value3d>;
-
   export type ValueNumber = number;
-
-  export type InputNumber = InputScalar<ValueNumber>;
 
   export type ValueRGB = { r: number, g: number, b: number };
 
-  export type InputRGB = InputObject<ValueRGB>;
-
   export type ValueRGBA = { r: number, g: number, b: number, a: number };
-
-  export type InputRGBA = InputObject<ValueRGBA>;
 
   export type ValueString = string;
 
-  export type InputString = InputScalar<string>;
-
   export type ValueQuat = { x: number, y: number, z: number, angle: number };
 
-  export type InputQuat = InputObject<ValueQuat>
 
 
-  export class Animator<S, A, I extends Input<A>> extends EventSource implements Animatable<S, A, I>
+  export class Animator<A = any, S = any> extends EventSource implements Animatable<A, S>
   {
     public subject: S;
-    public attrimators: AttrimatorMap<A, I>;
+    public attrimators: AttrimatorMap<A>;
     public attrimatorsAdded: string[];
     public frame: AttributesValues<A>;
     public updated: AttributesValues<A>;
     public finished: boolean;
-    public factory: Factory<S, A, I>;
+    public factory: Factory<A, S>;
     public active: boolean;
     public cycleCurrent: number;
     public cycleNext: number;
@@ -190,50 +186,50 @@ declare module "anim8js"
 
     public constructor (subject: S);
     public reset (subject: S): this;
-    public newCycle<K extends keyof A> (attrimators: AttrimatorMap<A, I> | Attrimator<A, I, K>): this;
+    public newCycle<K extends keyof A> (attrimators: AttrimatorMap<A> | Attrimator<A, K>): this;
     public applyCurrentCycle (): this;
     public endCurrentCycle (): this;
-    public getAttribute<K extends keyof A> (attr: K): Attribute<A, I, K> | undefined;
+    public getAttribute<K extends keyof A> (attr: K): Attribute<A, K> | undefined;
     public restore (): this;
     public applyInitialState (): this;
     public preupdate (now: number): this;
     public setDefault (attr: keyof A): void;
     public update (now: number): this;
-    public placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, I, K>): Attrimator<A, I, K> | undefined;
+    public placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
     public apply (): this;
     public trimAttrimators (): this;
     public value (attr: keyof A): any;
     public activate (): this;
     public deactivate (): this;
     public destroy (): this;
-    public spring<K extends keyof A> (spring: SpringInput<A, I, K>): Spring<A, I, K>;
-    public play (animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public playAttrimators (attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
-    public unplay (animation: AnimationInput<A, I>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public unplayAttrimators (attrimatorMap: AttrimatorMap<A, I>, transition?: Transition, all?: boolean): this;
-    public queue (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    public queueAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    public insert (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    public insertAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    public transition (transition: TransitionInput, animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
+    public spring<K extends keyof A> (spring: SpringInput<A, K>): Spring<A, K>;
+    public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public playAttrimators (attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
+    public unplay (animation: AnimationInput<A>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public unplayAttrimators (attrimatorMap: AttrimatorMap<A>, transition?: Transition, all?: boolean): this;
+    public queue (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public queueAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    public insert (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public insertAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    public transition (transition: TransitionInput, animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
     private transitionGetValue <K extends keyof A>(attr: K): A[K];
-    private transitionGetValueAt <K extends keyof A>(attrimator: Attrimator<A, I, K>, relativeTime: number, out: AttributesValues<A>): A[K];
-    private transitionStopAttrimator <K extends keyof A>(attrimator: Attrimator<A, I, K>, relativeTime: number): void;
-    public tweenTo<K extends keyof A> (attr: K, target: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenManyTo (targets: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public tweenFrom<K extends keyof A> (attr: K, starting: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenManyFrom (startings: { [P in keyof A]: I[P] }, options?: OptionsInput): this;
-    public tween<K extends keyof A> (attr: K, starts: I[K], ends: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenMany (starts: { [P in keyof A]: I[P] }, ends: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public move<K extends keyof A> (attr: K, amount: I[K], options?: OptionsInput, cache?: boolean): this;
-    public moveMany (amounts: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public ref<K extends keyof A> (attr: K): () => A[K];
-    public follow<K extends keyof A> (attr: K, path: PathInput<A[K], I[K]>, options?: OptionsInput, cache?: boolean): this;
-    public attrimatorsFor (): Attrimator<A, I, keyof A>[];
-    public attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, I, keyof A>[];
-    public attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
-    public attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
+    private transitionGetValueAt <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number, out: AttributesValues<A>): A[K];
+    private transitionStopAttrimator <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number): void;
+    public tweenTo<K extends keyof A> (attr: K, target: Input<A[K]>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public tweenManyTo (targets: Inputs<A>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public tweenFrom<K extends keyof A> (attr: K, starting: Input<A[K]>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public tweenManyFrom (startings: Inputs<A>, options?: OptionsInput, placeholder1?: any): this;
+    public tween<K extends keyof A> (attr: K, starts: Input<A[K]>, ends: Input<A[K]>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public tweenMany (starts: Inputs<A>, ends: Inputs<A>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public move<K extends keyof A> (attr: K, amount: Input<A[K]>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public moveMany (amounts: Inputs<A>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public ref<K extends keyof A> (attr: K, placeholder1?: any, placeholder2?: any): () => A[K];
+    public follow<K extends keyof A> (attr: K, path: PathInput<A[K]>, options?: OptionsInput, cache?: boolean, placeholder1?: any): this;
+    public attrimatorsFor (): Attrimator<A, keyof A>[];
+    public attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, keyof A>[];
+    public attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
+    public attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
     public stop (attributes?: AttributesInput<A>): this;
     public end (attributes?: AttributesInput<A>): this;
     public finish (attributes?: AttributesInput<A>): this;
@@ -247,62 +243,62 @@ declare module "anim8js"
     public hasAttrimators (): boolean;
     public getSubject<T> (wrapper?: (subject: S) => T): T;
     public invoke (func: EventCallback, context?: object, args?: any[]): this;
-    public defer (eventType: 'on' | 'once', event: string, callback?: EventCallback): Defer<Animator<S, A, I>, Animator<S, A, I>>;
+    public defer (eventType: 'on' | 'once', event: string, callback?: EventCallback): Defer<Animator<A, S>, Animator<A, S>>;
     public onCycleStart (callback: EventCallback, context?: object): this;
     public onCycleEnd (callback: EventCallback, context?: object): this;
   }
 
-  export class Animators<S, A, I extends Input<A>> implements Animatable<S, A, I>
+  export class Animators<A = any, S = any> implements Animatable<A, S>
   {
-    public $: Animator<S, A, I>[];
+    public $: Animator<A, S>[];
 
-    public constructor (input?: Animator<S, A, I>[]);
-    public push (animator: Animator<S, A, I>): this;
+    public constructor (input?: Animator<A, S>[]);
+    public push (animator: Animator<A, S>): this;
     public length (): number;
-    public at (index: number): Animator<S, A, I>;
-    public each (iterator: (animator: Animator<S, A, I>, index: number) => void, context?: object): this;
-    public fill (animators: Animator<S, A, I>[]): this;
-    public filter (filterer: (animator: Animator<S, A, I>) => boolean): this;
+    public at (index: number): Animator<A, S>;
+    public each (iterator: (animator: Animator<A, S>, index: number) => void, context?: object): this;
+    public fill (animators: Animator<A, S>[]): this;
+    public filter (filterer: (animator: Animator<A, S>) => boolean): this;
     public getSubjects<T> (wrapper?: (subject: S) => T): T[];
-    public first (): Animator<S, A, I>;
+    public first (): Animator<A, S>;
     public reverse (): this;
     public activate (): this;
-    public sequence (delay?: number, easing?: Easing): Sequence<S, A, I>;
+    public sequence (delay?: number, easing?: Easing): Sequence<A, S>;
     public timeRemaining (): number;
     public preupdate (now: number, max?: number): this;
     public update (now: number, max?: number): this;
     public apply (max?: number): this;
-    public handleFinished (animator: Animator<S, A, I>): boolean;
+    public handleFinished (animator: Animator<A, S>): boolean;
     public restore (): this;
-    public placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, I, K>): Attrimator<A, I, K> | undefined;
+    public placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
     public applyInitialState (): this;
     public trimAttrimators (): this;
     public deactivate (): this;
     public destroy (): this;
-    public spring<K extends keyof A> (spring: SpringInput<A, I, K>): Spring<A, I, K>;
-    public play (animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public playAttrimators (attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
-    public unplay (animation: AnimationInput<A, I>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public unplayAttrimators (attrimatorMap: AttrimatorMap<A, I>, transition?: Transition, all?: boolean): this;
-    public queue (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    public queueAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    public insert (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    public insertAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    public transition (transition: TransitionInput, animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    public transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
-    public tweenTo<K extends keyof A> (attr: K, target: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenManyTo (targets: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public tweenFrom<K extends keyof A> (attr: K, starting: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenManyFrom (startings: { [P in keyof A]: I[P] }, options?: OptionsInput): this;
-    public tween<K extends keyof A> (attr: K, starts: I[K], ends: I[K], options?: OptionsInput, cache?: boolean): this;
-    public tweenMany (starts: { [P in keyof A]: I[P] }, ends: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public move<K extends keyof A> (attr: K, amount: I[K], options?: OptionsInput, cache?: boolean): this;
-    public moveMany (amounts: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    public follow<K extends keyof A> (attr: K, path: PathInput<A[K], I[K]>, options?: OptionsInput, cache?: boolean): this;
-    public attrimatorsFor (): Attrimator<A, I, keyof A>[];
-    public attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, I, keyof A>[];
-    public attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
-    public attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
+    public spring<K extends keyof A> (spring: SpringInput<A, K>): Spring<A, K>;
+    public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public playAttrimators (attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
+    public unplay (animation: AnimationInput<A>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public unplayAttrimators (attrimatorMap: AttrimatorMap<A>, transition?: Transition, all?: boolean): this;
+    public queue (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public queueAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    public insert (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public insertAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    public transition (transition: TransitionInput, animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
+    public tweenTo<K extends keyof A> (attr: K, target: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    public tweenManyTo (targets: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    public tweenFrom<K extends keyof A> (attr: K, starting: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    public tweenManyFrom (startings: Inputs<A>, options?: OptionsInput): this;
+    public tween<K extends keyof A> (attr: K, starts: Input<A[K]>, ends: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    public tweenMany (starts: Inputs<A>, ends: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    public move<K extends keyof A> (attr: K, amount: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    public moveMany (amounts: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    public follow<K extends keyof A> (attr: K, path: PathInput<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    public attrimatorsFor (): Attrimator<A, keyof A>[];
+    public attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, keyof A>[];
+    public attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
+    public attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
     public stop (attributes?: AttributesInput<A>): this;
     public end (attributes?: AttributesInput<A>): this;
     public finish (attributes?: AttributesInput<A>): this;
@@ -318,7 +314,7 @@ declare module "anim8js"
     public onCycleEnd (callback: EventCallback, context?: object): this;
   }
 
-  export interface Animatable<S, A, I extends Input<A>>
+  export interface Animatable<A = any, S = any>
   {
     activate (): this;
     timeRemaining (): number;
@@ -326,35 +322,35 @@ declare module "anim8js"
     update (now: number, max?: number): this;
     apply (max?: number): this;
     restore (): this;
-    placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, I, K>): Attrimator<A, I, K> | undefined;
+    placeAttrimator<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
     applyInitialState (): this;
     trimAttrimators (): this;
     deactivate (): this;
     destroy (): this;
-    spring<K extends keyof A> (spring: SpringInput<A, I, K>): Spring<A, I, K>;
-    play (animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    playAttrimators (attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
-    unplay (animation: AnimationInput<A, I>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    unplayAttrimators (attrimatorMap: AttrimatorMap<A, I>, transition?: Transition, all?: boolean): this;
-    queue (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    queueAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    insert (animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): this;
-    insertAttrimators (attrimatorMap: AttrimatorMap<A, I>): this;
-    transition (transition: TransitionInput, animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
-    transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A, I>, all?: boolean): this;
-    tweenTo<K extends keyof A> (attr: K, target: I[K], options?: OptionsInput, cache?: boolean): this;
-    tweenManyTo (targets: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    tweenFrom<K extends keyof A> (attr: K, starting: I[K], options?: OptionsInput, cache?: boolean): this;
-    tweenManyFrom (startings: { [P in keyof A]: I[P] }, options?: OptionsInput): this;
-    tween<K extends keyof A> (attr: K, starts: I[K], ends: I[K], options?: OptionsInput, cache?: boolean): this;
-    tweenMany (starts: { [P in keyof A]: I[P] }, ends: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    move<K extends keyof A> (attr: K, amount: I[K], options?: OptionsInput, cache?: boolean): this;
-    moveMany (amounts: { [P in keyof A]: I[P] }, options?: OptionsInput, cache?: boolean): this;
-    follow<K extends keyof A> (attr: K, path: PathInput<A[K], I[K]>, options?: OptionsInput, cache?: boolean): this;
-    attrimatorsFor (): Attrimator<A, I, keyof A>[];
-    attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, I, keyof A>[];
-    attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
-    attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, I, K>, attr: K) => void): this;
+    spring<K extends keyof A> (spring: SpringInput<A, K>): Spring<A, K>;
+    play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    playAttrimators (attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
+    unplay (animation: AnimationInput<A>, transition?: TransitionInput, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    unplayAttrimators (attrimatorMap: AttrimatorMap<A>, transition?: Transition, all?: boolean): this;
+    queue (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    queueAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    insert (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    insertAttrimators (attrimatorMap: AttrimatorMap<A>): this;
+    transition (transition: TransitionInput, animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    transitionAttrimators (transition: Transition, attrimatorMap: AttrimatorMap<A>, all?: boolean): this;
+    tweenTo<K extends keyof A> (attr: K, target: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    tweenManyTo (targets: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    tweenFrom<K extends keyof A> (attr: K, starting: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    tweenManyFrom (startings: Inputs<A>, options?: OptionsInput): this;
+    tween<K extends keyof A> (attr: K, starts: Input<A[K]>, ends: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    tweenMany (starts: Inputs<A>, ends: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    move<K extends keyof A> (attr: K, amount: Input<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    moveMany (amounts: Inputs<A>, options?: OptionsInput, cache?: boolean): this;
+    follow<K extends keyof A> (attr: K, path: PathInput<A[K]>, options?: OptionsInput, cache?: boolean): this;
+    attrimatorsFor (): Attrimator<A, keyof A>[];
+    attrimatorsFor (attributes: AttributesInput<A>): Attrimator<A, keyof A>[];
+    attrimatorsFor (attributes: AttributesInput<A>, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
+    attrimatorsFor (attributes: undefined, callback: <K extends keyof A>(attrimator: Attrimator<A, K>, attr: K) => void): this;
     stop (attributes?: AttributesInput<A>): this;
     end (attributes?: AttributesInput<A>): this;
     finish (attributes?: AttributesInput<A>): this;
@@ -370,9 +366,21 @@ declare module "anim8js"
     onCycleEnd (callback: EventCallback, context?: object): this;
   }
 
-  export class Sequence<S, A, I>
+  export class Sequence<A = any, S = any>
   {
+    public animators: Animators<A, S>;
+    public delay: number;
+    public easing: Easing;
 
+    public constructor (animators: Animators<A, S>, delay?: Delay, easing?: EasingInput);
+    public maxDelay (): number;
+    public createAttrimators (template: Animation<A>, i: number): AttrimatorMap<A>;
+    public reverse (): this;
+    public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean, cache?: boolean): this;
+    public queue (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public insert (animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): this;
+    public transition (transition: TransitionInput, animation: AnimationInput<A>, all?: boolean, options?: OptionsInput, cache?: boolean): this;
+    public add (): this;
   }
 
   export class EventSource
@@ -387,21 +395,35 @@ declare module "anim8js"
 
   export type EventsInput = string | string[] | { [event: string]: any };
 
-  export type BuilderInput<A, I extends Input<A>> = string | Builder<A, I>;
+  export type BuilderInput<A> = string | Builder<A>;
 
-  export class Builder<A, I extends Input<A>>
+  export class Builder<A>
   {
-    public parse (animation: AnimationDefinition<A, I>, options: Options, attrimatorMap: AttrimatorMap<A, I>, helper: BuilderHelper<A, I>): void;
-    public merge (animation: AnimationDefinition<A, I>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A, I>, helper: BuilderHelper<A, I>): void;
-    public mergeAttrimator<K extends keyof A> (e: Attrimator<A, I, K>, attr: K, helper: BuilderHelper<A, I>, factory: Factory<any, A, I>): void;
-    public submerge (animation: AnimationDefinition<A, I>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A, I>): void;
+    public parse (animation: AnimationDefinition<A>, options: Options, attrimatorMap: AttrimatorMap<A>, helper: BuilderHelper<A>): void;
+    public merge (animation: AnimationDefinition<A>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A>, helper: BuilderHelper<A>): void;
+    public mergeAttrimator<K extends keyof A> (e: Attrimator<A, K>, attr: K, helper: BuilderHelper<A>, factory: Factory<any, A>): void;
+    public submerge (animation: AnimationDefinition<A>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A>): void;
 
     public static nextMergeId (): number;
   }
 
-  export class BuilderHelper<A, I extends Input<A>>
+  export const BuilderAnd: Builder<any>;
+  export const BuilderDeltas: Builder<any>;
+  export const BuilderFinal: Builder<any>;
+  export const BuilderInitial: Builder<any>;
+  export const BuilderKeyframe: Builder<any>;
+  export const BuilderMove: Builder<any>;
+  export const BuilderPath: Builder<any>;
+  export const BuilderPhysics: Builder<any>;
+  export const BuilderQueue: Builder<any>;
+  export const BuilderSpring: Builder<any>;
+  export const BuilderTravel: Builder<any>;
+  export const BuilderTweenFrom: Builder<any>;
+  export const BuilderTweenTo: Builder<any>;
+
+  export class BuilderHelper<A>
   {
-    public input: AnimationDefinition<A, I>;
+    public input: AnimationDefinition<A>;
     public oldOptions: Options;
     public newOptions: Options;
     public forObject: any;
@@ -416,7 +438,7 @@ declare module "anim8js"
     public parseScale (attr: keyof A): number;
     public parseScaleBase<K extends keyof A> (attr: K): A[K];
     public parseFirst (attr: keyof A, option: keyof A, specifics: keyof A): any;
-    public parseEvent<K extends keyof A> (attr: K, path: Path<A[K], I[K]>, builder: Builder<A, I>, hasInitialState: boolean, mergeId: number): Event<A, I, K>
+    public parseEvent<K extends keyof A> (attr: K, path: Path<A[K]>, builder: Builder<A>, hasInitialState: boolean, mergeId: number): Event<A, K>
     public parseNumber (attr: keyof A,  parseFunction: (input: any) => any, parseOptionsFunction: (options: Options) => Options, option: string, optionAdd: string, optionScale: string, specifics: string): number;
     public parseParameters (): object;
     public mergeEasing (attr: keyof A, current?: Easing): Easing;
@@ -432,41 +454,41 @@ declare module "anim8js"
     public mergeNumber (attr: keyof A, current: number, parseOptionFunction: (value: number, current: number) => number, option: string, optionAdd: string, optionScale: string, specifics: string): number;
   }
 
-  export type FactoryInput<S, A, I extends Input<A>> = string | Factory<S, A, I>;
+  export type FactoryInput<A, S> = string | Factory<A, S>;
 
-  export class Factory<S, A, I extends Input<A>>
+  export class Factory<A, S>
   {
     public priority: number;
 
     public is (subject: any): subject is S;
-    public animatorFor (subject: S): Animator<S, A, I>;
-    public animatorsFor (subject: S, animators: Animators<S, A, I>): void;
-    public destroy (animator: Animator<S, A, I>): void;
-    public attribute<K extends keyof A> (attr: K): Attribute<A, I, K>  | undefined;
+    public animatorFor (subject: S): Animator<A, S>;
+    public animatorsFor (subject: S, animators: Animators<A, S>): void;
+    public destroy (animator: Animator<A, S>): void;
+    public attribute<K extends keyof A> (attr: K): Attribute<A, K>  | undefined;
   }
 
-  export class FactoryObject extends Factory<any, any, any>
+  export class FactoryObject extends Factory<any, any>
   {
     public attributes: {
-      [attr: string]: Attribute<any, any, any>
+      [attr: string]: Attribute<any, any>
     };
   }
 
   export const Factories:
   {
-    [factoryName: string]: Factory<any, any, any>
+    [factoryName: string]: Factory<any, any>
   }
 
   export const object:
   {
-    [custom: string]: Partial<Attribute<any, any, any>>
+    [custom: string]: Partial<Attribute<any, any>>
   }
 
-  export class Attrimator<A, I extends Input<A>, K extends keyof A>
+  export class Attrimator<A = any, K extends keyof A = any>
   {
     public attribute: K;
-    public builder: Builder<A, I>;
-    public next: Attrimator<A, I, K> | undefined;
+    public builder: Builder<A>;
+    public next: Attrimator<A, K> | undefined;
     public startTime: number;
     public pauseTime: number;
     public elapsed: number;
@@ -476,10 +498,10 @@ declare module "anim8js"
     public delay: Delay;
     public offset: Offset;
 
-    public reset (attribute: K, builder: Builder<A, I>, next?: Attrimator<A, I, K>): void;
+    public reset (attribute: K, builder: Builder<A>, next?: Attrimator<A, K>): void;
     public prestart (now: number): void;
     public prestartNext (overrideNext?: boolean): void;
-    public start (now: number, animator: Animator<any, A, I>): void;
+    public start (now: number, animator: Animator<any, A>): void;
     public startCycle (frame: AttributesValues<A>): boolean;
     public setTime (now: number, frame: AttributesValues<A>): boolean;
     public update (elapsed: number, frame: AttributesValues<A>): boolean;
@@ -489,10 +511,10 @@ declare module "anim8js"
     public nopeat (): this;
     public valueAt (time: number, out: A[K]): A[K];
     public valueAtSearch (time: number, out: A[K]): A[K] | false;
-    public attrimatorAt (time: number): Attrimator<A, I, K>;
+    public attrimatorAt (time: number): Attrimator<A, K>;
     public totalTime (): number;
     public timeRemaining (): number;
-    public clone (): Attrimator<A, I, K>;
+    public clone (): Attrimator<A, K>;
     public hasComputed (): boolean;
     public isInfinite (): boolean;
     public pause (): this;
@@ -500,53 +522,53 @@ declare module "anim8js"
     public isPaused (): boolean;
     public finish (frame: AttributesValues<A>): boolean;
     public isFinished (): boolean;
-    public getBuilder (): Builder<A, I>
-    public queue (next: Attrimator<A, I, K>): this;
-    public nextAt (next: Attrimator<A, I, K>, time: number): this;
-    public parseValue (animator: Animator<any, A, I>, value: I[K], defaultValue?: A[K]): A[K];
+    public getBuilder (): Builder<A>
+    public queue (next: Attrimator<A, K>): this;
+    public nextAt (next: Attrimator<A, K>, time: number): this;
+    public parseValue (animator: Animator<any, A>, value: Input<A[K]>, defaultValue?: A[K]): A[K];
   }
 
-  export type SpringInput<A, I extends Input<A>, K extends keyof A> = 
-    string | 
-    Spring<A, I, K> | 
-    SpringDefinition<A, I, K>
+  export type SpringInput<A = any, K extends keyof A = any> =
+    string |
+    Spring<A, K> |
+    SpringDefinition<A, K>
 
-  export interface SpringDefinition<A, I extends Input<A>, K extends keyof A>
+  export interface SpringDefinition<A = any, K extends keyof A = any>
   {
     type: keyof SpringMap;
     attribute?: K;
-    calculator?: CalculatorInput<A[K], I[K]>;
-    position: I[K];
-    rest: I[K];
-    velocity: I[K];
-    gravity: I[K];
+    calculator?: CalculatorInput<A[K]>;
+    position: Input<A[K]>;
+    rest: Input<A[K]>;
+    velocity: Input<A[K]>;
+    gravity: Input<A[K]>;
     finishOnRest: boolean;
   }
 
-  export class Spring<A, I extends Input<A>, K extends keyof A> extends Attrimator<A, I, K>
+  export class Spring<A = any, K extends keyof A = any> extends Attrimator<A, K>
   {
-    public calculator: Calculator<A[K], I[K]>;
+    public calculator: Calculator<A[K]>;
     public rest: Value<A[K]>;
     public position: Value<A[K]>;
     public gravity: Value<A[K]>;
     public velocity: Value<A[K]>;
     public finishOnRest: boolean;
 
-    public set (attribute: K, calculator: CalculatorInput<A[K], I[K]>, rest: I[K], position: I[K], velocity?: I[K], gravity?: I[K], finishOnRest?: boolean): void;
+    public set (attribute: K, calculator: CalculatorInput<A[K]>, rest: Input<A[K]>, position: Input<A[K]>, velocity?: Input<A[K]>, gravity?: Input<A[K]>, finishOnRest?: boolean): void;
     public resolveRest (): A[K];
     public updateVelocity (dt: number): void;
-    
+
     public static MAX_DT: number;
     public static EPSILON: number;
   }
 
   export interface SpringMap
   {
-    'distance': <A, I extends Input<A>, K extends keyof A>(def: SpringDistanceDefinition<A, I, K>) => SpringDistance<A, I, K>;
-    'linear': <A, I extends Input<A>, K extends keyof A>(def: SpringLinearDefinition<A, I, K>) => SpringLinear<A, I, K>;
+    'distance': <A, K extends keyof A>(def: SpringDistanceDefinition<A, K>) => SpringDistance<A, K>;
+    'linear': <A, K extends keyof A>(def: SpringLinearDefinition<A, K>) => SpringLinear<A, K>;
   }
 
-  export interface SpringDistanceDefinition<A, I extends Input<A>, K extends keyof A> extends SpringDefinition<A, I, K>
+  export interface SpringDistanceDefinition<A = any, K extends keyof A = any> extends SpringDefinition<A, K>
   {
     type: 'distance';
     distance: number;
@@ -554,31 +576,31 @@ declare module "anim8js"
     stiffness: number;
   }
 
-  export class SpringDistance<A, I extends Input<A>, K extends keyof A> extends Spring<A, I, K>
+  export class SpringDistance<A = any, K extends keyof A = any> extends Spring<A, K>
   {
     public distance: number;
     public damping: number;
     public stiffness: number;
 
-    public constructor (attribute: K, calculator: Calculator<A[K], I[K]>, position: I[K], rest: I[K], distance: number, damping: number, stiffness: number, velocity?: I[K], gravity?: I[K], finishOnRest?: boolean);
+    public constructor (attribute: K, calculator: Calculator<A[K]>, position: Input<A[K]>, rest: Input<A[K]>, distance: number, damping: number, stiffness: number, velocity?: Input<A[K]>, gravity?: Input<A[K]>, finishOnRest?: boolean);
   }
 
-  export interface SpringLinearDefinition<A, I extends Input<A>, K extends keyof A> extends SpringDefinition<A, I, K>
+  export interface SpringLinearDefinition<A = any, K extends keyof A = any> extends SpringDefinition<A, K>
   {
     type: 'linear';
-    damping: I[K];
-    stiffness: I[K];
+    damping: Input<A[K]>;
+    stiffness: Input<A[K]>;
   }
 
-  export class SpringLinear<A, I extends Input<A>, K extends keyof A> extends Spring<A, I, K>
+  export class SpringLinear<A = any, K extends keyof A = any> extends Spring<A, K>
   {
     public damping: Value<A[K]>;
     public stiffness: Value<A[K]>;
 
-    public constructor (attribute: K, calculator: Calculator<A[K], I[K]>, position: I[K], rest: I[K], damping: I[K], stiffness: I[K], velocity?: I[K], gravity?: I[K], finishOnRest?: boolean);
+    public constructor (attribute: K, calculator: Calculator<A[K]>, position: Input<A[K]>, rest: Input<A[K]>, damping: Input<A[K]>, stiffness: Input<A[K]>, velocity?: Input<A[K]>, gravity?: Input<A[K]>, finishOnRest?: boolean);
   }
 
-  export const enum EventState 
+  export const enum EventState
   {
     DELAYED = 1,
     ANIMATING = 2,
@@ -586,9 +608,9 @@ declare module "anim8js"
     FINISHED = 8
   }
 
-  export class Event<A, I extends Input<A>, K extends keyof A> extends Attrimator<A, I, K>
+  export class Event<A = any, K extends keyof A = any> extends Attrimator<A, K>
   {
-    public path: Path<A[K], I[K]>;
+    public path: Path<A[K]>;
     public duration: Duration;
     public easing: EasingInput;
     public sleep: Sleep;
@@ -596,59 +618,59 @@ declare module "anim8js"
     public scale: Scale;
     public scaleBase: ScaleBase<A[K]>;
     public hasInitialState: boolean;
-    public input: AnimationDefinition<A, I> | undefined;
+    public input: AnimationDefinition<A> | undefined;
     public mergeId: number | undefined;
     public state: EventState;
 
-    public constructor (attribute: K, path: Path<A[K], I[K]>, duration: Duration, easing: EasingInput, delay: Delay, sleep: Sleep, offset: Offset, repeat: Repeat, scale: Scale, scaleBase: ScaleBase<A[K]>, parameters: object, hasInitialState: boolean, builder: Builder<A, I>, next?: Attrimator<A, I, K>, input?: AnimationDefinition<A, I>, mergeId?: number);
+    public constructor (attribute: K, path: Path<A[K]>, duration: Duration, easing: EasingInput, delay: Delay, sleep: Sleep, offset: Offset, repeat: Repeat, scale: Scale, scaleBase: ScaleBase<A[K]>, parameters: object, hasInitialState: boolean, builder: Builder<A>, next?: Attrimator<A, K>, input?: AnimationDefinition<A>, mergeId?: number);
     public computeValue (baseValue: A[K], delta: number): A[K];
     public applyValue (frame: AttributesValues<A>, baseValue: A[K], delta: number): A[K];
 
-    public static fromOptions <A, I extends Input<A>, K extends keyof A>(attr: K, path: Path<A[K], I[K]>, options?: Options): Event<A, I, K>;
+    public static fromOptions <A, K extends keyof A>(attr: K, path: Path<A[K]>, options?: Options): Event<A, K>;
   }
 
-  export class Oncer<A, I extends Input<A>, K extends keyof A> extends Attrimator<A, I, K>
+  export class Oncer<A = any, K extends keyof A = any> extends Attrimator<A, K>
   {
     public value: Value<A[K]>;
     public delay: number;
     public applied: boolean;
-    public input: AnimationInput<A, I>;
+    public input: AnimationInput<A>;
 
-    public constructor (attribute: K, value: I[K], delay: Delay, hasInitialState: boolean, builder: Builder<A, I>, next?: Attrimator<A, I, K>, input?: AnimationInput<A, I>);
+    public constructor (attribute: K, value: Input<A[K]>, delay: Delay, hasInitialState: boolean, builder: Builder<A>, next?: Attrimator<A, K>, input?: AnimationInput<A>);
     public getValue (): A[K];
   }
 
-  export class Physics<A, I extends Input<A>, K extends keyof A> extends Attrimator<A, I, K>
+  export class Physics<A = any, K extends keyof A = any> extends Attrimator<A, K>
   {
     public value: Value<A[K]>;
     public delay: number;
     public applied: boolean;
-    public input: AnimationInput<A, I>;
+    public input: AnimationInput<A>;
 
-    public constructor (attribute: K, value: I[K], delay: Delay, hasInitialState: boolean, builder: Builder<A, I>, next?: Attrimator<A, I, K>, input?: AnimationInput<A, I>);
+    public constructor (attribute: K, value: Input<A[K]>, delay: Delay, hasInitialState: boolean, builder: Builder<A>, next?: Attrimator<A, K>, input?: AnimationInput<A>);
     public getValue (): A[K];
   }
 
-  export type AnimationInput<A, I extends Input<A>> = string | Animation<A, I> | AnimationDefinition<A, I>;
+  export type AnimationInput<A = any> = string | Animation<A> | AnimationDefinition<A>;
 
-  export interface AnimationDefinition<A, I extends Input<A>>
+  export interface AnimationDefinition<A = any>
   {
-    factory?: FactoryInput<any, A, I>;
-    initial?: BuilderInitialInputs<A, I>;
-    values?: BuilderDeltasValuesInputs<A, I>;
-    deltas?: BuilderDeltasDeltasInputs<A, I>;
-    point?: BuilderPointInput<A, I>;
-    keyframe?: BuilderKeyframeInputs<A, I>;
-    move?: BuilderMoveInputs<A, I>;
-    path?: BuilderPathInputs<A, I>;
-    physics?: BuilderPhysicsInput<A, I>;
-    springs?: BuilderSpringsInputs<A, I>;
-    travel?: BuilderTravelInputs<A, I>;
-    tweenFrom?: BuildeTweenFromInputs<A, I>;
-    tweenTo?: BuildeTweenToInputs<A, I>,
-    final?: BuilderFinalInputs<A, I>;
-    and?: AnimationDefinition<A, I>;
-    queue?: AnimationDefinition<A, I>;
+    factory?: FactoryInput<any, A>;
+    initial?: BuilderInitialInputs<A>;
+    values?: BuilderDeltasValuesInputs<A>;
+    deltas?: BuilderDeltasDeltasInputs<A>;
+    point?: BuilderPointInput<A>;
+    keyframe?: BuilderKeyframeInputs<A>;
+    move?: BuilderMoveInputs<A>;
+    path?: BuilderPathInputs<A>;
+    physics?: BuilderPhysicsInput<A>;
+    springs?: BuilderSpringsInputs<A>;
+    travel?: BuilderTravelInputs<A>;
+    tweenFrom?: BuildeTweenFromInputs<A>;
+    tweenTo?: BuildeTweenToInputs<A>,
+    final?: BuilderFinalInputs<A>;
+    and?: AnimationDefinition<A>;
+    queue?: AnimationDefinition<A>;
     easings?: AnimationOptions<A, EasingInput>;
     repeats?: AnimationOptions<A, Repeat>;
     delays?: AnimationOptions<A, Delay>;
@@ -656,56 +678,57 @@ declare module "anim8js"
     durations?: AnimationOptions<A, Duration>;
     offsets?: AnimationOptions<A, Offset>;
     scales?: AnimationOptions<A, number>;
-    scaleBases?: { [P in keyof A]?: I[P] };
+    scaleBases?: Inputs<A>;
     parameters?: AnimationOptions<A, object>;
   }
 
-  export type AnimationOptions<A, T> = T | { [P in keyof A]?: T };
+  export type AnimationOptions<A, T> =
+    T | { [P in keyof A]?: T };
 
-  export type BuilderDeltasValuesInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P][]; }
+  export type BuilderDeltasValuesInputs<A> =
+    { [P in keyof A]?: Input<A[P]>[]; }
 
-  export type BuilderDeltasDeltasInputs<A, I extends Input<A>> =
-    { [P in keyof A]: number[]; } | number[];
+  export type BuilderDeltasDeltasInputs<A> =
+    { [P in keyof A]?: number[]; } | number[];
 
-  export type BuilderFinalInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
-  
-  export type BuilderInitialInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
+  export type BuilderFinalInputs<A> =
+    Inputs<A>;
 
-  export type BuilderKeyframeInputs<A, I extends Input<A>> =
-    { [frame: string]: { [P in keyof A]: I[P]; } };
+  export type BuilderInitialInputs<A> =
+    Inputs<A>;
 
-  export type BuilderMoveInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
+  export type BuilderKeyframeInputs<A> =
+    { [frame: string]: Inputs<A> };
 
-  export type BuilderPathInputs<A, I extends Input<A>> =
-    { [P in keyof A]: PathInput<A[P], I[P]>; };
+  export type BuilderMoveInputs<A> =
+    Inputs<A>;
 
-  export type BuilderPhysicsInput<A, I extends Input<A>> =
-  { 
-    [P in keyof A]: {
-      calculator?: CalculatorInput<A[P], I[P]>;
-      position?: I[P];
-      velocity?: I[P];
-      acceleration?: I[P];
+  export type BuilderPathInputs<A> =
+    { [P in keyof A]?: PathInput<A[P]>; };
+
+  export type BuilderPhysicsInput<A> =
+  {
+    [P in keyof A]?: {
+      calculator?: CalculatorInput<A[P]>;
+      position?: Input<A[P]>;
+      velocity?: Input<A[P]>;
+      acceleration?: Input<A[P]>;
       terminal?: number;
       stopAt?: number | string;
     }
   };
 
-  export type BuilderPointInput<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
+  export type BuilderPointInput<A> =
+    Inputs<A>;
 
-  export type BuilderSpringsInputs<A, I extends Input<A>> =
-    { [P in keyof A]: SpringInput<A, I, P>; };
+  export type BuilderSpringsInputs<A> =
+    { [P in keyof A]?: SpringInput<A, P>; };
 
-  export type BuilderTravelInputs<A, I extends Input<A>> =
-  { 
-    [P in keyof A]: {
-      from?: I[P];
-      to?: I[P];
+  export type BuilderTravelInputs<A> =
+  {
+    [P in keyof A]?: {
+      from?: Input<A[P]>;
+      to?: Input<A[P]>;
       velocity?: number;
       acceleration?: number;
       terminal?: number;
@@ -713,27 +736,27 @@ declare module "anim8js"
     }
   };
 
-  export type BuildeTweenFromInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
+  export type BuildeTweenFromInputs<A> =
+    Inputs<A>;
 
-  export type BuildeTweenToInputs<A, I extends Input<A>> =
-    { [P in keyof A]: I[P]; };
+  export type BuildeTweenToInputs<A> =
+    Inputs<A>;
 
 
-  export class Animation<A, I extends Input<A>>
+  export class Animation<A = any>
   {
     public name: string | undefined;
-    public input: AnimationDefinition<A, I>;
+    public input: AnimationDefinition<A>;
     public options: Options | undefined;
-    public attrimators: AttrimatorMap<A, I>;
+    public attrimators: AttrimatorMap<A>;
 
-    public newAttrimators (): AttrimatorMap<A, I>;
-    public merge (options: Options | undefined, attrimatorMap: AttrimatorMap<A, I>): void;
+    public newAttrimators (): AttrimatorMap<A>;
+    public merge (options: Options | undefined, attrimatorMap: AttrimatorMap<A>): void;
   }
 
-  export const Animations: 
+  export const Animations:
   {
-    [animationName: string]: Animation<any, any>
+    [animationName: string]: Animation<any>
   }
 
   export type OptionsInput = string | string[] | Options;
@@ -780,7 +803,7 @@ declare module "anim8js"
     [name: string]: Transition
   };
 
-  export type PathInput<V, I> = keyof PathMap | Path<V, I> | PathDefinition;
+  export type PathInput<V> = keyof PathMap | Path<V> | PathDefinition;
 
   export interface PathDefinition
   {
@@ -788,20 +811,20 @@ declare module "anim8js"
     name?: string;
   }
 
-  export class Path<V, I>
+  export class Path<V>
   {
     public name: string | undefined;
     public points: Value<V>[];
-    public calculator: Calculator<V, I>;
+    public calculator: Calculator<V>;
     public computed: boolean;
     public deterministic: boolean;
 
-    public reset (calculator: Calculator<V, I>, points: Value<V>[]): void;
+    public reset (calculator: Calculator<V>, points: Value<V>[]): void;
     public compute (out: V, delta: number): V;
     public hasComputed (): boolean;
     public isDeterministic (): boolean;
     public examinePoints<T> (examiner: (point: V) => boolean, returnOnTrue: T, returnOnFalse: T): T;
-    public replaceComputed<A, I extends Input<A>> (attrimator: Attrimator<A, I, keyof A>, animator: Animator<any, A, I>): (V | Dynamic<V>)[]
+    public replaceComputed<A> (attrimator: Attrimator<A, keyof A>, animator: Animator<any, A>): (V | Dynamic<V>)[]
     public resolvePoint (i: number, dt: number): V;
     public isLinear (): boolean;
     public length (granularity: number): number;
@@ -809,305 +832,305 @@ declare module "anim8js"
 
   export interface PathMap
   {
-    'point': <V, I>(def: PathPointDefinition<V, I>) => PathPoint<V, I>;
-    'combo': <V, I>(def: PathComboDefinition<V, I>) => PathCombo<V, I>;
-    'compiled': <V, I>(def: PathCompiledDefinition<V, I>) => PathCompiled<V, I>;
-    'cubic': <V, I>(def: PathCubicDefinition<V, I>) => PathCubic<V, I>;
-    'delta': <V, I>(def: PathDeltaDefinition<V, I>) => PathDelta<V, I>;
-    'series': <V, I>(def: PathSeriesDefinition<V, I>) => PathSeries<V, I>;
-    'jump': <V, I>(def: PathJumpDefinition<V, I>) => PathJump<V, I>;
-    'keyframe': <V, I>(def: PathKeyframeDefinition<V, I>) => PathKeyframe<V, I>;
-    'quadratic': <V, I>(def: PathQuadraticDefinition<V, I>) => PathQuadratic<V, I>;
-    'tween': <V, I>(def: PathTweenDefinition<V, I>) => Tween<V, I>;
-    'sub': <V, I>(def: PathSubDefinition<V, I>) => PathSub<V, I>;
-    'quadratic-corner': <V, I>(def: PathQuadraticCornerDefinition<V, I>) => PathQuadraticCorner<V, I>;
-    'linear': <V, I>(def: PathLinearDefinition<V, I>) => PathLinear<V, I>;
-    'uniform': <V, I>(def: PathUniformDefinition<V, I>) => PathUniform<V, I>;
-    'hermite': <V, I>(def: PathHermiteDefinition<V, I>) => PathHermite<V, I>;
-    'bezier': <V, I>(def: PathBezierDefinition<V, I>) => PathBezier<V, I>;
-    'parametric': <V, I>(def: PathParametricDefinition<V, I>) => PathParametric<V, I>;
-    'catmull-rom': <V, I>(def: PathCatmullRomDefinition<V, I>) => PathCatmullRom<V, I>;
-    'basis-spline': <V, I>(def: PathBasisSplineDefinition<V, I>) => PathBasisSpline<V, I>;
+    'point': <V>(def: PathPointDefinition<V>) => PathPoint<V>;
+    'combo': <V>(def: PathComboDefinition<V>) => PathCombo<V>;
+    'compiled': <V>(def: PathCompiledDefinition<V>) => PathCompiled<V>;
+    'cubic': <V>(def: PathCubicDefinition<V>) => PathCubic<V>;
+    'delta': <V>(def: PathDeltaDefinition<V>) => PathDelta<V>;
+    'series': <V>(def: PathSeriesDefinition<V>) => PathSeries<V>;
+    'jump': <V>(def: PathJumpDefinition<V>) => PathJump<V>;
+    'keyframe': <V>(def: PathKeyframeDefinition<V>) => PathKeyframe<V>;
+    'quadratic': <V>(def: PathQuadraticDefinition<V>) => PathQuadratic<V>;
+    'tween': <V>(def: PathTweenDefinition<V>) => PathTween<V>;
+    'sub': <V>(def: PathSubDefinition<V>) => PathSub<V>;
+    'quadratic-corner': <V>(def: PathQuadraticCornerDefinition<V>) => PathQuadraticCorner<V>;
+    'linear': <V>(def: PathLinearDefinition<V>) => PathLinear<V>;
+    'uniform': <V>(def: PathUniformDefinition<V>) => PathUniform<V>;
+    'hermite': <V>(def: PathHermiteDefinition<V>) => PathHermite<V>;
+    'bezier': <V>(def: PathBezierDefinition<V>) => PathBezier<V>;
+    'parametric': <V>(def: PathParametricDefinition<V>) => PathParametric<V>;
+    'catmull-rom': <V>(def: PathCatmullRomDefinition<V>) => PathCatmullRom<V>;
+    'basis-spline': <V>(def: PathBasisSplineDefinition<V>) => PathBasisSpline<V>;
   }
 
   export const Paths: PathMap;
 
-  export interface PathPointDefinition<V, I = any> extends PathDefinition
+  export interface PathPointDefinition<V> extends PathDefinition
   {
     type: 'point';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    point: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    point: Input<V>;
   }
 
-  export class PathPoint<V, I = any> extends Path<V, I>
+  export class PathPoint<V> extends Path<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, point: V);
-    public set (calculator: Calculator<V, I>, point: V): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, point: V);
+    public set (calculator: Calculator<V>, point: V): void;
   }
 
-  export interface PathComboDefinition<V, I = any> extends PathDefinition
+  export interface PathComboDefinition<V> extends PathDefinition
   {
     type: 'combo';
-    paths: PathInput<V, I>[];
+    paths: PathInput<V>[];
     uniform?: boolean;
     granularity?: number;
   }
 
-  export class PathCombo<V, I = any> extends Path<V, I>
+  export class PathCombo<V> extends Path<V>
   {
-    public paths: Path<V, I>[];
+    public paths: Path<V>[];
     public deltas: number[];
     public uniform: boolean;
     public granularity: number;
     public linear: boolean;
     public cachedLength: number | false;
 
-    public constructor (name: string | undefined, paths: Path<V, I>[], uniform?: boolean, granularity?: boolean);
-    public set (paths: Path<V, I>[], uniform?: boolean, granularity?: boolean): void;
+    public constructor (name: string | undefined, paths: Path<V>[], uniform?: boolean, granularity?: boolean);
+    public set (paths: Path<V>[], uniform?: boolean, granularity?: boolean): void;
   }
 
-  export interface PathCompiledDefinition<V, I = any> extends PathDefinition
+  export interface PathCompiledDefinition<V> extends PathDefinition
   {
     type: 'compiled';
-    path: PathInput<V, I>;
+    path: PathInput<V>;
     n?: number;
     pointCount?: number;
   }
 
-  export class PathCompiled<V, I = any> extends Path<V, I>
+  export class PathCompiled<V> extends Path<V>
   {
-    public path: Path<V, I>;
+    public path: Path<V>;
     public pointCount: number;
 
-    public constructor (name: string | undefined, path: Path<V, I>, pointCoint: number);
-    public set (path: Path<V, I>, pointCoint: number): void;
+    public constructor (name: string | undefined, path: Path<V>, pointCoint: number);
+    public set (path: Path<V>, pointCoint: number): void;
 
-    public static compile<V, I> (calc: Calculator<V, I>, path: Path<V, I>, pointCount: number): V[];
+    public static compile<V> (calc: Calculator<V>, path: Path<V>, pointCount: number): V[];
   }
 
-  export interface PathCubicDefinition<V, I = any> extends PathDefinition
+  export interface PathCubicDefinition<V> extends PathDefinition
   {
     type: 'cubic';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    p0: I;
-    p1: I;
-    p2: I;
-    p3: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    p0: Input<V>;
+    p1: Input<V>;
+    p2: Input<V>;
+    p3: Input<V>;
   }
 
-  export class PathCubic<V, I = any> extends Path<V, I>
+  export class PathCubic<V> extends Path<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, p0: Value<V>, p1: Value<V>, p2: Value<V>, p3: Value<V>);
-    public set (calculator: Calculator<V, I>, p0: Value<V>, p1: Value<V>, p2: Value<V>, p3: Value<V>): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, p0: Value<V>, p1: Value<V>, p2: Value<V>, p3: Value<V>);
+    public set (calculator: Calculator<V>, p0: Value<V>, p1: Value<V>, p2: Value<V>, p3: Value<V>): void;
   }
 
-  export interface PathDeltaDefinition<V, I = any> extends PathDefinition
+  export interface PathDeltaDefinition<V> extends PathDefinition
   {
     type: 'delta';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
     deltas?: number[];
-    points: I[];
+    points: Input<V>[];
   }
 
-  export class PathDelta<V, I = any> extends Path<V, I>
+  export class PathDelta<V> extends Path<V>
   {
     public deltas: number[];
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>, deltas: number[]);
-    public set (calculator: Calculator<V, I>, points: Value<V>, deltas: number[]): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>, deltas: number[]);
+    public set (calculator: Calculator<V>, points: Value<V>, deltas: number[]): void;
   }
 
-  export interface PathSeriesDefinition<V, I = any> extends PathDefinition
+  export interface PathSeriesDefinition<V> extends PathDefinition
   {
     type: 'series',
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
     series?: number[];
-    points: I[]
+    points: Input<V>[]
   }
 
-  export class PathSeries<V, I = any> extends Path<V, I>
+  export class PathSeries<V> extends Path<V>
   {
     public series: number[];
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>, series: number[]);
-    public set (calculator: Calculator<V, I>, points: Value<V>, series: number[]): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>, series: number[]);
+    public set (calculator: Calculator<V>, points: Value<V>, series: number[]): void;
     public between (i: number, delta: number): boolean;
   }
-  
-  export interface PathJumpDefinition<V, I = any> extends PathDefinition
+
+  export interface PathJumpDefinition<V> extends PathDefinition
   {
     type: 'jump',
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[]
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[]
   }
 
-  export class PathJump<V, I = any> extends Path<V, I>
+  export class PathJump<V> extends Path<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>);
-    public set (calculator: Calculator<V, I>, points: Value<V>): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>);
+    public set (calculator: Calculator<V>, points: Value<V>): void;
   }
 
-  export interface PathKeyframeDefinition<V, I = any> extends PathDefinition
+  export interface PathKeyframeDefinition<V> extends PathDefinition
   {
     type: 'keyframe',
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
     deltas?: number[];
     easings?: EasingInput | EasingInput[];
-    points: I[]
+    points: Input<V>[]
   }
 
-  export class PathKeyframe<V, I = any> extends Path<V, I>
+  export class PathKeyframe<V> extends Path<V>
   {
     public deltas: number[];
     public easings: Easing[];
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>, deltas: number[], easings: Easing[]);
-    public set (calculator: Calculator<V, I>, points: Value<V>, deltas: number[], easings: Easing[]): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>, deltas: number[], easings: Easing[]);
+    public set (calculator: Calculator<V>, points: Value<V>, deltas: number[], easings: Easing[]): void;
   }
 
-  export interface PathQuadraticDefinition<V, I = any> extends PathDefinition
+  export interface PathQuadraticDefinition<V> extends PathDefinition
   {
     type: 'quadratic';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    p0: I;
-    p1: I;
-    p2: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    p0: Input<V>;
+    p1: Input<V>;
+    p2: Input<V>;
   }
 
-  export class PathQuadratic<V, I = any> extends Path<V, I>
+  export class PathQuadratic<V> extends Path<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, p0: Value<V>, p1: Value<V>, p2: Value<V>);
-    public set (calculator: Calculator<V, I>, p0: Value<V>, p1: Value<V>, p2: Value<V>): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, p0: Value<V>, p1: Value<V>, p2: Value<V>);
+    public set (calculator: Calculator<V>, p0: Value<V>, p1: Value<V>, p2: Value<V>): void;
   }
 
-  export interface PathTweenDefinition<V, I = any> extends PathDefinition
+  export interface PathTweenDefinition<V> extends PathDefinition
   {
     type: 'tween';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    start: I;
-    end: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    start: Input<V>;
+    end: Input<V>;
   }
 
-  export class Tween<V, I = any> extends Path<V, I>
+  export class PathTween<V> extends Path<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, start: Value<V>, end: Value<V>);
-    public set (calculator: Calculator<V, I>, start: Value<V>, end: Value<V>): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, start: Value<V>, end: Value<V>);
+    public set (calculator: Calculator<V>, start: Value<V>, end: Value<V>): void;
   }
 
-  export interface PathSubDefinition<V, I = any> extends PathDefinition
+  export interface PathSubDefinition<V> extends PathDefinition
   {
     type: 'sub';
-    path: PathInput<V, I>;
+    path: PathInput<V>;
     start?: number;
     end?: number;
   }
 
-  export class PathSub<V, I = any> extends Path<V, I>
+  export class PathSub<V> extends Path<V>
   {
     public start: number;
     public end: number;
-    public path: Path<V, I>;
+    public path: Path<V>;
 
-    public constructor (name: string | undefined, path: Path<V, I>, start: number, end: number);
-    public set (path: Path<V, I>, start: number, end: number): void;
+    public constructor (name: string | undefined, path: Path<V>, start: number, end: number);
+    public set (path: Path<V>, start: number, end: number): void;
   }
 
-  export interface PathQuadraticCornerDefinition<V, I = any> extends PathDefinition
+  export interface PathQuadraticCornerDefinition<V> extends PathDefinition
   {
     type: 'quadratic-corner';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
     midpoint: number;
     loop?: boolean;
   }
 
-  export class PathQuadraticCorner<V, I = any> extends Path<V, I>
+  export class PathQuadraticCorner<V> extends Path<V>
   {
     public midpoint: number;
     public loop: boolean;
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[], midpoint: number, loop: boolean);
-    public set (calculator: Calculator<V, I>, points: Value<V>[], midpoint: number, loop: boolean): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[], midpoint: number, loop: boolean);
+    public set (calculator: Calculator<V>, points: Value<V>[], midpoint: number, loop: boolean): void;
   }
 
-  export interface PathLinearDefinition<V, I = any> extends PathDefinition
+  export interface PathLinearDefinition<V> extends PathDefinition
   {
     type: 'linear';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
   }
 
-  export class PathLinear<V, I = any> extends PathDelta<V, I>
+  export class PathLinear<V> extends PathDelta<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[]);
-    public setLinear (calculator: Calculator<V, I>, points: Value<V>[]): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[]);
+    public setLinear (calculator: Calculator<V>, points: Value<V>[]): void;
 
-    public static getTimes<V, I> (calc: Calculator<V, I>, points: V[]): number[];
+    public static getTimes<V> (calc: Calculator<V>, points: V[]): number[];
   }
 
-  export interface PathUniformDefinition<V, I = any> extends PathDefinition
+  export interface PathUniformDefinition<V> extends PathDefinition
   {
     type: 'uniform';
-    path: PathInput<V, I>;
+    path: PathInput<V>;
     n?: number;
     pointCount?: number;
   }
 
-  export class PathUniform<V, I = any> extends PathDelta<V, I>
+  export class PathUniform<V> extends PathDelta<V>
   {
-    public path: Path<V, I>;
+    public path: Path<V>;
     public pointCount: number;
 
-    public constructor (name: string | undefined, path: Path<V, I>, pointCount: number);
-    public setUniform (path: Path<V, I>, pointCount: number): void;
+    public constructor (name: string | undefined, path: Path<V>, pointCount: number);
+    public setUniform (path: Path<V>, pointCount: number): void;
   }
 
-  export interface PathHermiteDefinition<V, I = any> extends PathDefinition
+  export interface PathHermiteDefinition<V> extends PathDefinition
   {
     type: 'hermite';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    start: I;
-    startTangent: I;
-    end: I;
-    endTangent: I;
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    start: Input<V>;
+    startTangent: Input<V>;
+    end: Input<V>;
+    endTangent: Input<V>;
   }
 
-  export class PathHermite<V, I = any> extends Path<V, I>
+  export class PathHermite<V> extends Path<V>
   {
     public startTangent: Value<V>;
     public endTangent: Value<V>;
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, start: Value<V>, startTangent: Value<V>, end: Value<V>, endTangent: Value<V>);
-    public set (calculator: Calculator<V, I>, start: Value<V>, startTangent: Value<V>, end: Value<V>, endTangent: Value<V>): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, start: Value<V>, startTangent: Value<V>, end: Value<V>, endTangent: Value<V>);
+    public set (calculator: Calculator<V>, start: Value<V>, startTangent: Value<V>, end: Value<V>, endTangent: Value<V>): void;
   }
 
-  export interface PathBezierDefinition<V, I = any> extends PathDefinition
+  export interface PathBezierDefinition<V> extends PathDefinition
   {
     type: 'bezier';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
     weights?: number[]
   }
 
-  export class PathBezier<V, I = any> extends Path<V, I>
+  export class PathBezier<V> extends Path<V>
   {
     public weights: number[];
     public inverses: number[];
 
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[], weights?: number[]);
-    public set (calculator: Calculator<V, I>, points: Value<V>[], weights?: number[]): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[], weights?: number[]);
+    public set (calculator: Calculator<V>, points: Value<V>[], weights?: number[]): void;
 
     public static computeWeights (n: number): number[];
   }
@@ -1119,84 +1142,84 @@ declare module "anim8js"
     [number, number, number, number]
   ];
 
-  export interface PathParametricDefinition<V, I = any> extends PathDefinition
+  export interface PathParametricDefinition<V> extends PathDefinition
   {
     type: 'parametric';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
     loop?: boolean;
     matrix: Matrix;
     weight: number;
     invert?: boolean;
   }
 
-  export class PathParametric<V, I = any> extends Path<V, I>
+  export class PathParametric<V> extends Path<V>
   {
     public loop: boolean;
     public matrix: Matrix;
     public weight: number;
     public invert: boolean;
-    
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[], loop: boolean, matrix: Matrix, weight: number, invert: boolean);
-    public set (calculator: Calculator<V, I>, points: Value<V>[], loop: boolean, matrix: Matrix, weight: number, invert: boolean): void;
+
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[], loop: boolean, matrix: Matrix, weight: number, invert: boolean);
+    public set (calculator: Calculator<V>, points: Value<V>[], loop: boolean, matrix: Matrix, weight: number, invert: boolean): void;
   }
 
-  export interface PathCatmullRomDefinition<V, I = any> extends PathDefinition
+  export interface PathCatmullRomDefinition<V> extends PathDefinition
   {
     type: 'catmull-rom';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
     loop?: boolean;
   }
 
-  export class PathCatmullRom<V, I = any> extends PathParametric<V, I>
+  export class PathCatmullRom<V> extends PathParametric<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[], loop: boolean);
-    public setCatmullRom (calculator: Calculator<V, I>, points: Value<V>[], loop: boolean): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[], loop: boolean);
+    public setCatmullRom (calculator: Calculator<V>, points: Value<V>[], loop: boolean): void;
 
     public static WEIGHT: number;
     public static MATRIX: Matrix;
   }
 
-  export interface PathBasisSplineDefinition<V, I = any> extends PathDefinition
+  export interface PathBasisSplineDefinition<V> extends PathDefinition
   {
     type: 'basis-spline';
-    calculator?: CalculatorInput<V, I>;
-    defaultValue?: I;
-    points: I[];
+    calculator?: CalculatorInput<V>;
+    defaultValue?: Input<V>;
+    points: Input<V>[];
     loop?: boolean;
   }
 
-  export class PathBasisSpline<V, I = any> extends PathParametric<V, I>
+  export class PathBasisSpline<V> extends PathParametric<V>
   {
-    public constructor (name: string | undefined, calculator: Calculator<V, I>, points: Value<V>[], loop: boolean);
-    public setCatmullRom (calculator: Calculator<V, I>, points: Value<V>[], loop: boolean): void;
+    public constructor (name: string | undefined, calculator: Calculator<V>, points: Value<V>[], loop: boolean);
+    public setCatmullRom (calculator: Calculator<V>, points: Value<V>[], loop: boolean): void;
 
     public static WEIGHT: number;
     public static MATRIX: Matrix;
-  }  
+  }
 
   export interface DeferChain<T, P>
   {
     undefer (): P;
     defer (eventType: 'on' | 'once', event: string): Defer<T, Defer<T, P>>
   }
-  
+
   export type Defer<T, P> = DeferChain<T, P> & T
 
   export function nextTimeline (): number;
 
-  export class Movie<A, I extends Input<A>> extends EventSource
+  export class Movie<A = any> extends EventSource
   {
     public name: string | undefined;
     public currentTime: number;
-    public currentTimelines: MovieTimeline<A, I>[];
+    public currentTimelines: MovieTimeline<A>[];
     public sequenceDelay: number;
     public sequenceEasing: Easing;
     public introduce: boolean;
-    public timelines: FastMap<MovieTimeline<A, I>>;
+    public timelines: FastMap<MovieTimeline<A>>;
     public autoEnd: boolean;
 
     public constructor(name?: string);
@@ -1205,40 +1228,40 @@ declare module "anim8js"
     public intro (subjects: any[]): this;
     public with (subjects: any[]): this;
     public add (subjects: any[]): this;
-    public getTimeline (animator: Animator<any, A, I>): MovieTimeline<A, I>;
-    public getTimelines (subjects: any[]): MovieTimeline<A, I>[];
+    public getTimeline (animator: Animator<any, A>): MovieTimeline<A>;
+    public getTimelines (subjects: any[]): MovieTimeline<A>[];
     public at (time: string | number): this;
     public seek (time: string | number): this;
     public end (): this;
-    public play (animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean): this;
-    public queue (animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean): this;
-    public transition (transition: TransitionInput, animation: AnimationInput<A, I>, options?: OptionsInput, all?: boolean): this;
-    public eachCurrentTimeline (onTimeline: (timeline: MovieTimeline<A, I>, time: number) => void): this;
+    public play (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean): this;
+    public queue (animation: AnimationInput<A>, options?: OptionsInput, all?: boolean): this;
+    public transition (transition: TransitionInput, animation: AnimationInput<A>, options?: OptionsInput, all?: boolean): this;
+    public eachCurrentTimeline (onTimeline: (timeline: MovieTimeline<A>, time: number) => void): this;
     public duration (): number;
   }
 
-  export class MovieTimeline<A, I extends Input<A>>
+  export class MovieTimeline<A = any>
   {
-    public animator: Animator<any, A, I>;
-    public attrimators: AttrimatorMap<A, I>;
+    public animator: Animator<any, A>;
+    public attrimators: AttrimatorMap<A>;
     public start: number;
 
-    public constructor (animator: Animator<any, A, I>);
-    public playAttrimators (attrimatorMap: AttrimatorMap<A, I>, all: boolean, time: number, intro?: boolean): void;
-    public queueAttrimators (attrimatorMap: AttrimatorMap<A, I>, all: boolean, time: number): void;
-    public transitionAttrimators (attrimatorMap: AttrimatorMap<A, I>, all: boolean, time: number, transition: Transition): void;
+    public constructor (animator: Animator<any, A>);
+    public playAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number, intro?: boolean): void;
+    public queueAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number): void;
+    public transitionAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number, transition: Transition): void;
     public preupdate (time: number): void;
     public update (time: number): void;
     public apply (): void;
   }
 
-  export class MoviePlayer<A, I extends Input<A>> extends EventSource
+  export class MoviePlayer<A = any> extends EventSource
   {
     public speed: number;
     public time: number;
     public currentTime: number;
     public playing: boolean;
-    public movie: Movie<A, I>;
+    public movie: Movie<A>;
     public duration: number;
     public run: () => void;
 
@@ -1252,13 +1275,13 @@ declare module "anim8js"
     public goto (time: number, applyNow?: boolean, avoidApplyTrigger?: boolean): this;
     public apply (applyTime?: number, avoidApplyTrigger?: boolean): this;
     public evaluatePlaying (): this;
-    public runner (movie: Movie<A, I>, player: MoviePlayer<A, I>): () => void;
+    public runner (movie: Movie<A>, player: MoviePlayer<A>): () => void;
   }
 
-  export type EasingInput = 
-    keyof EasingMap | 
-    keyof EasingTypeMap | 
-    Easing | 
+  export type EasingInput =
+    keyof EasingMap |
+    keyof EasingTypeMap |
+    Easing |
     [number, number, number, number];
 
   export type Easing = (delta: number) => number;
@@ -1322,10 +1345,10 @@ declare module "anim8js"
   export type ScaleBase<V> = V | number;
 
 
-  export function anim8<S, A, I extends Input<A>> (subject: S): Animator<S, A, I>;
-  export function anim8s<S, A, I extends Input<A>> (subject: S[]): Animators<S, A, I>;
-  export function m8<S, A, I extends Input<A>> (subject: S): Animator<S, A, I>;
-  export function m8s<S, A, I extends Input<A>> (subject: S[]): Animators<S, A, I>;
+  export function anim8<A, S> (subject: S): Animator<A, S>;
+  export function anim8s<A, S> (subject: S[]): Animators<A, S>;
+  export function m8<A, S> (subject: S): Animator<A, S>;
+  export function m8s<A, S> (subject: S[]): Animators<A, S>;
 
   export function on (events: EventsInput, callback: EventCallback, context?: object): void;
   export function once (events: EventsInput, callback: EventCallback, context?: object): void;
@@ -1336,10 +1359,10 @@ declare module "anim8js"
   export function isLive (): boolean;
   export function setLive (newLive: boolean): void;
 
-  export const animating: Animators<any, any, any>;
+  export const animating: Animators<any, any>;
 
-  export function activitateAnimator (animator: Animator<any, any, any>): void;
-  export function pushAnimator (animator: Animator<any, any, any>): void;
+  export function activitateAnimator (animator: Animator<any, any>): void;
+  export function pushAnimator (animator: Animator<any, any>): void;
   export function activate (): void;
   export function requestRun (runner: () => void): void;
 
@@ -1378,29 +1401,50 @@ declare module "anim8js"
   export function toDegrees (radians: number): number;
   export function toRadians (degrees: number): number;
   export function modder (divisor: number): (v: number) => number;
-  
-  export function animation <A, I extends Input<A>>(animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): Animation<A, I> | undefined;
-  export function attrimatorsFor <A, I extends Input<A>>(animation: AnimationInput<A, I>, options?: OptionsInput, cache?: boolean): AttrimatorMap<A, I> | undefined;
-  export function builder<A, I extends Input<A>> (builderInput: BuilderInput<A, I>): Builder<A, I> | undefined;
-  export function calculator<V, I> (calculatorInput: CalculatorInput<V, I>): Calculator<V, I>;
+
+  export function animation <A>(animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): Animation<A> | undefined;
+  export function attrimatorsFor <A>(animation: AnimationInput<A>, options?: OptionsInput, cache?: boolean): AttrimatorMap<A> | undefined;
+  export function builder<A> (builderInput: BuilderInput<A>): Builder<A> | undefined;
+  export function calculator<V> (calculatorInput: CalculatorInput<V>): Calculator<V>;
   export function delay (time: Delay): number;
   export function deltas (deltas: number[], clone?: boolean): number[];
   export function duration (time: Duration): number;
   export function easing<E> (easing: EasingInput, returnOnInvalid?: E): Easing | E;
   export function easingType (easingType: EasingTypeInput, optional?: boolean): EasingType | undefined;
-  export function factory<S, A, I extends Input<A>> (factoryInput: Factory<S, A, I>, forObject?: Factory<S, A, I> | Sequence<S, A, I> | Animators<S, A, I> | Animator<S, A, I>): Factory<S, A, I>;
-  export function factoryFor<S, A, I extends Input<A>> (subject: S, optional?: boolean): Factory<S, A, I> | false;
+  export function factory<A, S> (factoryInput: Factory<A, S>, forObject?: Factory<A, S> | Sequence<A, S> | Animators<A, S> | Animator<A, S>): Factory<A, S>;
+  export function factoryFor<A, S> (subject: S, optional?: boolean): Factory<A, S> | false;
   export function number<E> (value: ValueNumber, returnOnInvalid?: E): number | E;
   export function offset (time: Offset): number;
   export function options (options: OptionsInput, cache?: boolean): Options;
-  export function path<V, I = any> (pathInput: PathInput<V, I>): Path<V, I>;
+  
+  // export function path<V> (pathInput: PathInput<V>): Path<V>;
+  export function path<V> (pathInput: PathPointDefinition<V>): PathPoint<V>;
+  export function path<V> (pathInput: PathComboDefinition<V>): PathCombo<V>;
+  export function path<V> (pathInput: PathCompiledDefinition<V>): PathCompiled<V>;
+  export function path<V> (pathInput: PathCubicDefinition<V>): PathCubic<V>;
+  export function path<V> (pathInput: PathDeltaDefinition<V>): PathDelta<V>;
+  export function path<V> (pathInput: PathSeriesDefinition<V>): PathSeries<V>;
+  export function path<V> (pathInput: PathJumpDefinition<V>): PathJump<V>;
+  export function path<V> (pathInput: PathKeyframeDefinition<V>): PathKeyframe<V>;
+  export function path<V> (pathInput: PathQuadraticDefinition<V>): PathQuadratic<V>;
+  export function path<V> (pathInput: PathTweenDefinition<V>): PathTween<V>;
+  export function path<V> (pathInput: PathSubDefinition<V>): PathSub<V>;
+  export function path<V> (pathInput: PathQuadraticCornerDefinition<V>): PathQuadraticCorner<V>;
+  export function path<V> (pathInput: PathLinearDefinition<V>): PathLinear<V>;
+  export function path<V> (pathInput: PathUniformDefinition<V>): PathUniform<V>;
+  export function path<V> (pathInput: PathHermiteDefinition<V>): PathHermite<V>;
+  export function path<V> (pathInput: PathBezierDefinition<V>): PathBezier<V>;
+  export function path<V> (pathInput: PathParametricDefinition<V>): PathParametric<V>;
+  export function path<V> (pathInput: PathCatmullRomDefinition<V>): PathCatmullRom<V>;
+  export function path<V> (pathInput: PathBasisSplineDefinition<V>): PathBasisSpline<V>;
+
   export function repeat<E> (repeat: Repeat, returnOnInvalid?: E): number | E;
   export function scale (scale: Scale): number;
   export function sleep (time: number): number;
-  export function spring<A, I extends Input<A>, K extends keyof A> (springInput: SpringInput<A, I, K>): Spring<A, I, K>;
+  export function spring<A, K extends keyof A> (springInput: SpringInput<A, K>): Spring<A, K>;
   export function time<E> (repeat: any, returnOnInvalid?: E): number | E;
   export function transition (transition: TransitionInput, cache?: boolean): Transition;
-  
+
   export const Color: {
     (r?: number, g?: number, b?: number, a?: number): ValueRGBA;
 
@@ -1414,7 +1458,7 @@ declare module "anim8js"
 
   export function isRelative (x: any): boolean;
   export function isComputed<V> (x: any): x is Computed<V>;
-  export function resolveComputed<A, I extends Input<A>, K extends keyof A> (attrimator: Attrimator<A, I, K>, animator: Animator<any, A, I>, value: I[K], parser: Calculator<A[K], I[K]> | ((attrimator: Attrimator<A, I, K>, animator: Animator<any, A, I>, value: I[K]) => I[K])): A[K];
+  export function resolveComputed<A, K extends keyof A> (attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>, parser: Calculator<A[K]> | ((attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>) => Input<A[K]>)): A[K];
 
   export const computed: {
      <V>(func: Computed<V>): Computed<V>;
@@ -1424,7 +1468,7 @@ declare module "anim8js"
 
     relative<V> (relativeAmount: V, mask: V): Computed<V>;
 
-    random<V, I> (randomSelection: I[] | {min: I, max: I} | Path<V, I>): Computed<V>;
+    random<V> (randomSelection: Input<V>[] | {min: Input<V>, max: Input<V>} | Path<V>): Computed<V>;
 
     combined<V> (numbers: Value<number>[]): Computed<V>;
   };
@@ -1433,20 +1477,20 @@ declare module "anim8js"
   export function partial<A, K extends keyof A> (attribute: K, subattribute: keyof A[K]): (value: AttributesValues<A>, frame: AttributesValues<A>) => void;
   export function spread<A> (attributes: (keyof A)[]): (value: AttributesValues<A>, frame: AttributesValues<A>) => void;
 
-  export function param<V, I> (paramName: string, paramCalculator?: CalculatorInput<V, I>, paramDefaultValue?: I): Parameters;
-  
+  export function param<V> (paramName: string, paramCalculator?: CalculatorInput<V>, paramDefaultValue?: Input<V>): Parameters;
+
   export interface Parameters
   {
-    add<V, I> (value: I): Computed<V> & Parameters;
-    sub<V, I> (value: I): Computed<V> & Parameters;
-    mul<V, I> (value: I): Computed<V> & Parameters;
-    scale<V, I> (scalar: number): Computed<V> & Parameters;
-    adds<V, I> (value: I, scalar: number): Computed<V> & Parameters;
-    neg<V, I> (): Computed<V> & Parameters;
-    min<V, I> (value: I): Computed<V> & Parameters;
-    max<V, I> (value: I): Computed<V> & Parameters;
-    truncate<V, I> (denominator: number): Computed<V> & Parameters;
-    mode<V, I> (divisor: number): Computed<V> & Parameters;
+    add<V> (value: Input<V>): Computed<V> & Parameters;
+    sub<V> (value: Input<V>): Computed<V> & Parameters;
+    mul<V> (value: Input<V>): Computed<V> & Parameters;
+    scale<V> (scalar: number): Computed<V> & Parameters;
+    adds<V> (value: Input<V>, scalar: number): Computed<V> & Parameters;
+    neg<V> (): Computed<V> & Parameters;
+    min<V> (value: Input<V>): Computed<V> & Parameters;
+    max<V> (value: Input<V>): Computed<V> & Parameters;
+    truncate<V> (denominator: number): Computed<V> & Parameters;
+    mode<V> (divisor: number): Computed<V> & Parameters;
     clamp<V> (min: number, max: number): Computed<V> & Parameters;
     convert<V> (converter: (x: number) => number): Computed<V> & Parameters;
     abs<V> (): Computed<V> & Parameters;
@@ -1462,12 +1506,13 @@ declare module "anim8js"
     cosDegrees<V> (): Computed<V> & Parameters;
     sinDegrees<V> (): Computed<V> & Parameters;
     tanDegrees<V> (): Computed<V> & Parameters;
-    distance<V, I> (value: I): Computed<V> & Parameters;
-    property<V, I> (propertyName: string, defaultValue: I): Computed<V> & Parameters;
-    vector<V, I> (calculator: Calculator<V, I>): Computed<V> & Parameters;
+    distance<V> (value: Input<V>): Computed<V> & Parameters;
+    property<V> (propertyName: string, defaultValue: Input<V>): Computed<V> & Parameters;
+    vector<V> (calculator: Calculator<V>): Computed<V> & Parameters;
   }
 
-  export const Defaults: {
+  export const Defaults: 
+  {
     duration: number;
     easing: Easing;
     teasing: Easing;
@@ -1507,53 +1552,18 @@ declare module "anim8js"
     forObject: any;
   }
 
-  export const SaveOptions: {
+  export const SaveOptions: 
+  {
     prefix: string;
     options: Options;
     cache: boolean;
     forObject: any;
   }
 
-  export function save<A, I extends Input<A>> (name: string, animation: AnimationInput<A, I>, options?: OptionsInput): void;
+  export function save<A> (name: string, animation: AnimationInput<A>, options?: OptionsInput): void;
 
-  export function saveGroup<A, I extends Input<A>> (prefixOrOptions: string | SaveOptionsInput, animations: (() => void) | { [name: string]: AnimationInput<A, I> }): void;
+  export function saveGroup<A> (prefixOrOptions: string | SaveOptionsInput, animations: (() => void) | { [name: string]: AnimationInput<A> }): void;
 
-  export function translate<A, I extends Input<A>> (animation: AnimationInput<A, I>, mappings: { [fromAttribute: string]: string }, saveAs?: string, options?: OptionsInput, cache?: boolean): Animation<A, I>;
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  export interface DomAttributes
-  {
-    opacity: ValueNumber;
-  }
-
-  export interface DomAttributeInputs
-  {
-    opacity: InputNumber;
-  }
-
-  export type DomSubject = HTMLElement | Element | EventTarget;
-
-  export type DomAnimator = Animator<DomSubject, DomAttributes, DomAttributeInputs>;
-
-  
-  
+  export function translate<A> (animation: AnimationInput<A>, mappings: { [fromAttribute: string]: string }, saveAs?: string, options?: OptionsInput, cache?: boolean): Animation<A>;
 
 }

@@ -3,6 +3,7 @@
   "version": "1.1.4",
   "description": "anim8js - Anim8 Everything",
   "main": "build/anim8js.js",
+  "types": "index.d.ts",
   "author": "Philip Diffenderfer",
   "license": "MIT",
   "repository": {
