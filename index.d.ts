@@ -540,11 +540,11 @@ declare module 'anim8js'
     type: keyof SpringMap;
     attribute?: K;
     calculator?: CalculatorInput<A[K]>;
-    position: Input<A[K]>;
-    rest: Input<A[K]>;
-    velocity: Input<A[K]>;
-    gravity: Input<A[K]>;
-    finishOnRest: boolean;
+    position?: Input<A[K]>;
+    rest?: Input<A[K]>;
+    velocity?: Input<A[K]>;
+    gravity?: Input<A[K]>;
+    finishOnRest?: boolean;
   }
 
   export class Spring<A = any, K extends keyof A = any> extends Attrimator<A, K>
