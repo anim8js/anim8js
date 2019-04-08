@@ -1344,12 +1344,6 @@ declare module 'anim8js'
   export type Scale = number;
   export type ScaleBase<V> = V | number;
 
-
-  export function anim8<A, S> (subject: S): Animator<A, S>;
-  export function anim8s<A, S> (subject: S[]): Animators<A, S>;
-  export function m8<A, S> (subject: S): Animator<A, S>;
-  export function m8s<A, S> (subject: S[]): Animators<A, S>;
-
   export function on (events: EventsInput, callback: EventCallback, context?: object): void;
   export function once (events: EventsInput, callback: EventCallback, context?: object): void;
   export function off (events?: EventsInput, callback?: EventCallback): void;
@@ -1441,7 +1435,10 @@ declare module 'anim8js'
   export function repeat<E> (repeat: Repeat, returnOnInvalid?: E): number | E;
   export function scale (scale: Scale): number;
   export function sleep (time: number): number;
-  export function spring<A, K extends keyof A> (springInput: SpringInput<A, K>): Spring<A, K>;
+  
+  export function spring<A, K extends keyof A> (springInput: SpringDistanceDefinition<A, K>): SpringDistance<A, K>;
+  export function spring<A, K extends keyof A> (springInput: SpringLinearDefinition<A, K>): SpringLinear<A, K>;
+
   export function time<E> (repeat: any, returnOnInvalid?: E): number | E;
   export function transition (transition: TransitionInput, cache?: boolean): Transition;
 
@@ -1567,5 +1564,10 @@ declare module 'anim8js'
   export function saveGroup<A> (prefixOrOptions: string | SaveOptionsInput, animations: (() => void) | { [name: string]: AnimationInput<A> }): void;
 
   export function translate<A> (animation: AnimationInput<A>, mappings: { [fromAttribute: string]: string }, saveAs?: string, options?: OptionsInput, cache?: boolean): Animation<A>;
+
+  export default function anim8<A, S> (subject: S): Animator<A, S>;
+  export default function anim8s<A, S> (subject: S[]): Animators<A, S>;
+  export default function m8<A, S> (subject: S): Animator<A, S>;
+  export default function m8s<A, S> (subject: S[]): Animators<A, S>;
 
 }
