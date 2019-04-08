@@ -1,4 +1,4 @@
-/* anim8js 1.1.4 - anim8js - Anim8 Everything by Philip Diffenderfer */
+/* anim8js 1.1.5 - anim8js - Anim8 Everything by Philip Diffenderfer */
 // UMD (Universal Module Definition)
 (function (root, factory)
 {
@@ -15594,7 +15594,7 @@ function $transition(transition, cache)
   anim8.Animations = Animations;
   anim8.Calculators = Calculators;
   anim8.Factories = Factories;
-  anim8.Builders = Builder;
+  anim8.Builders = Builders;
   anim8.Paths = Paths;
   anim8.Springs = Springs;
   anim8.Easings = Easings;
