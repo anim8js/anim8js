@@ -1565,9 +1565,12 @@ declare module 'anim8js'
 
   export function translate<A> (animation: AnimationInput<A>, mappings: { [fromAttribute: string]: string }, saveAs?: string, options?: OptionsInput, cache?: boolean): Animation<A>;
 
-  export default function anim8<A, S> (subject: S): Animator<A, S>;
-  export default function anim8s<A, S> (subject: S[]): Animators<A, S>;
-  export default function m8<A, S> (subject: S): Animator<A, S>;
-  export default function m8s<A, S> (subject: S[]): Animators<A, S>;
+  export function anim8<A, S> (subject: S): Animator<A, S>;
+  export function anim8s<A, S> (subject: S | S[]): Animators<A, S>;
+  export function m8<A, S> (subject: S): Animator<A, S>;
+  export function m8s<A, S> (subject: S | S[]): Animators<A, S>;
+
+  export default function<A, S> (subject: S): Animator<A, S>;
+  export default function<A, S> (subject: S[]): Animators<A, S>;
 
 }
