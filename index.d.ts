@@ -16,7 +16,7 @@ declare module 'anim8js'
 
   export interface Computed<V>
   {
-    (attrimator: Attrimator<any, any>, animator: Animator<any, any>): (V | Dynamic<V>);
+    (attrimator: Attrimator, animator: Animator): (V | Dynamic<V>);
     computed: true;
   }
 
@@ -403,7 +403,7 @@ declare module 'anim8js'
   {
     public parse (animation: AnimationDefinition<A>, options: Options, attrimatorMap: AttrimatorMap<A>, helper: BuilderHelper<A>): void;
     public merge (animation: AnimationDefinition<A>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A>, helper: BuilderHelper<A>): void;
-    public mergeAttrimator<K extends keyof A> (e: Attrimator<A, K>, attr: K, helper: BuilderHelper<A>, factory: Factory<any, A>): void;
+    public mergeAttrimator<K extends keyof A> (e: Attrimator<A, K>, attr: K, helper: BuilderHelper<A>, factory: Factory<A, any>): void;
     public submerge (animation: AnimationDefinition<A>, newOptions: Options, oldOptions: Options, attrimatorMap: AttrimatorMap<A>): void;
 
     public static nextMergeId (): number;
@@ -503,7 +503,7 @@ declare module 'anim8js'
     public reset (attribute: K, builder: Builder<A>, next?: Attrimator<A, K>): void;
     public prestart (now: number): void;
     public prestartNext (overrideNext?: boolean): void;
-    public start (now: number, animator: Animator<any, A>): void;
+    public start (now: number, animator: Animator<A>): void;
     public startCycle (frame: AttributesValues<A>): boolean;
     public setTime (now: number, frame: AttributesValues<A>): boolean;
     public update (elapsed: number, frame: AttributesValues<A>): boolean;
@@ -527,7 +527,7 @@ declare module 'anim8js'
     public getBuilder (): Builder<A>
     public queue (next: Attrimator<A, K>): this;
     public nextAt (next: Attrimator<A, K>, time: number): this;
-    public parseValue (animator: Animator<any, A>, value: Input<A[K]>, defaultValue?: A[K]): A[K];
+    public parseValue (animator: Animator<A>, value: Input<A[K]>, defaultValue?: A[K]): A[K];
   }
 
   export type SpringInput<A = any, K extends keyof A = any> =
@@ -657,7 +657,7 @@ declare module 'anim8js'
 
   export interface AnimationDefinition<A = any>
   {
-    factory?: FactoryInput<any, A>;
+    factory?: FactoryInput<A, any>;
     initial?: BuilderInitialInputs<A>;
     values?: BuilderDeltasValuesInputs<A>;
     deltas?: BuilderDeltasDeltasInputs<A>;
@@ -826,7 +826,7 @@ declare module 'anim8js'
     public hasComputed (): boolean;
     public isDeterministic (): boolean;
     public examinePoints<T> (examiner: (point: V) => boolean, returnOnTrue: T, returnOnFalse: T): T;
-    public replaceComputed<A> (attrimator: Attrimator<A, keyof A>, animator: Animator<any, A>): (V | Dynamic<V>)[]
+    public replaceComputed<A> (attrimator: Attrimator<A, keyof A>, animator: Animator<A>): (V | Dynamic<V>)[]
     public resolvePoint (i: number, dt: number): V;
     public isLinear (): boolean;
     public length (granularity: number): number;
@@ -1230,7 +1230,7 @@ declare module 'anim8js'
     public intro (subjects: any[]): this;
     public with (subjects: any[]): this;
     public add (subjects: any[]): this;
-    public getTimeline (animator: Animator<any, A>): MovieTimeline<A>;
+    public getTimeline (animator: Animator<A>): MovieTimeline<A>;
     public getTimelines (subjects: any[]): MovieTimeline<A>[];
     public at (time: string | number): this;
     public seek (time: string | number): this;
@@ -1244,11 +1244,11 @@ declare module 'anim8js'
 
   export class MovieTimeline<A = any>
   {
-    public animator: Animator<any, A>;
+    public animator: Animator<A>;
     public attrimators: AttrimatorMap<A>;
     public start: number;
 
-    public constructor (animator: Animator<any, A>);
+    public constructor (animator: Animator<A>);
     public playAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number, intro?: boolean): void;
     public queueAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number): void;
     public transitionAttrimators (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number, transition: Transition): void;
@@ -1355,10 +1355,10 @@ declare module 'anim8js'
   export function isLive (): boolean;
   export function setLive (newLive: boolean): void;
 
-  export const animating: Animators<any, any>;
+  export const animating: Animators;
 
-  export function activitateAnimator (animator: Animator<any, any>): void;
-  export function pushAnimator (animator: Animator<any, any>): void;
+  export function activitateAnimator (animator: Animator): void;
+  export function pushAnimator (animator: Animator): void;
   export function activate (): void;
   export function requestRun (runner: () => void): void;
 
@@ -1458,7 +1458,7 @@ declare module 'anim8js'
 
   export function isRelative (x: any): boolean;
   export function isComputed<V> (x: any): x is Computed<V>;
-  export function resolveComputed<A, K extends keyof A> (attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>, parser: Calculator<A[K]> | ((attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>) => Input<A[K]>)): A[K];
+  export function resolveComputed<A, K extends keyof A> (attrimator: Attrimator<A, K>, animator: Animator<A>, value: Input<A[K]>, parser: Calculator<A[K]> | ((attrimator: Attrimator<A, K>, animator: Animator<A>, value: Input<A[K]>) => Input<A[K]>)): A[K];
 
   export const computed: 
   {
