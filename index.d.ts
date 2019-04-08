@@ -1,7 +1,7 @@
-import { Animator } from "anim8js";
 
-declare module "anim8js"
+declare module 'anim8js'
 {
+
   // S = Subject
   // A = Attributes with strict type
   // V = A "primitive" data type (2d, 3d, color, number, quaternion, string)
@@ -9,56 +9,6 @@ declare module "anim8js"
   export type AttributesInput<A> = keyof A | (keyof A)[] | { [P in keyof A]?: any };
 
   export type AttributesValues<A> = Partial<A>;
-
-  export class FastMap<V>
-  {
-    public values: V[];
-    public keys: string[];
-    public indices: { [key: string]: number };
-
-    public constructor (input?: FastMap<V> | { [prop: string]: V });
-    public reset (): this;
-    public put (key: string, value: V): this;
-    public rekey (fromKey: string, toKey: string): this;
-    public putMap (map: FastMap<V>): this;
-    public get (key: string): V | undefined;
-    public remove (key: string): this;
-    public removeAt (index: number): this;
-    public indexOf (key: string): number;
-    public has (key: string): boolean;
-    public hasOverlap (map: FastMap<V>): boolean;
-    public size (): number
-    public clear (): this;
-  }
-
-  export class AttrimatorMap<A> extends FastMap<Attrimator<A, keyof A>>
-  {
-    public setGroup (groupId: number, force?: boolean, deep?: boolean): void;
-    public delay (time: number): this;
-    public queue<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
-    public queueMap (map: AttrimatorMap<A>, offset: number, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => void, context?: object): this;
-    public insertMap (map: AttrimatorMap<A>, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => any, context?: object): this;
-    public unqueueAt (index: number): this;
-    public playMapAt (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number): this;
-    public playAttrimatorAt (attrimator: Attrimator<A, keyof A>, time: number): void;
-    public transitionMap (transition: Transition, attrimatorMap: AttrimatorMap<A>, getValue: <K extends keyof A>(attr: K) => A[K], getAttribute: <K extends keyof A>(attr: K) => Attribute<A, K> | undefined, placeAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>) => Attrimator<A, K> | undefined, getValueAt: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number, out: AttributesValues<A>) => A[K], stopAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number) => void, context: object): this;
-    public finishNotPresent (attrimatorMap: AttrimatorMap<A>, delay?: number): this;
-    public stopNotPresentAt (attrimatorMap: AttrimatorMap<A>, time: number): this;
-    public clone (): AttrimatorMap<A>;
-    public timeRemaining (returnInfinity?: boolean): number;
-    public applyCycle (nextCycle: number): number;
-    public iterate (callback: <K extends keyof A>(attrimator: Attrimator<A, K>, depth: number, previous?: Attrimator<A, K>) => void): this;
-  }
-
-  export interface Attribute<A, K extends keyof A>
-  {
-    name: K;
-    calculatorName: keyof CalculatorMap;
-    calculator: Calculator<A[K]>;
-    defaultValue: A[K];
-    parse (input: Input<A[K]>, defaultValue?: A[K]): Value<A[K]>;
-    cloneDefault (): A[K];
-  }
 
   export type Dynamic<V> =
     (() => V) |
@@ -74,6 +24,40 @@ declare module "anim8js"
     V |
     Dynamic<V> |
     Computed<V>;
+
+  export type Value2d = { x: number, y: number };
+
+  export type Value3d = { x: number, y: number, z: number };
+
+  export type ValueNumber = number;
+
+  export type ValueRGB = { r: number, g: number, b: number };
+
+  export type ValueRGBA = { r: number, g: number, b: number, a: number };
+
+  export type ValueString = string;
+
+  export type ValueQuat = { x: number, y: number, z: number, angle: number };
+  
+  
+  export type InputScalar<V> =
+    number |
+    string |
+    true |
+    Dynamic<V> |
+    Computed<V> |
+    (number | string)[];
+
+  export type InputObject<V> =
+    InputScalar<V> |
+    { [P in keyof V]?: number | string };
+
+  export type Input<V> = 
+    V extends object ? InputObject<V> : InputScalar<V>;
+
+  export type Inputs<A> =
+    { [K in keyof A]?: Input<A[K]> };
+
 
   export class Calculator<V>
   {
@@ -136,39 +120,55 @@ declare module "anim8js"
   export const CalculatorRGBA: Calculator<ValueRGBA>;
   export const CalculatorString: Calculator<ValueString>;
 
-  export type InputScalar<V> =
-    number |
-    string |
-    true |
-    Dynamic<V> |
-    Computed<V> |
-    (number | string)[];
+  export class FastMap<V>
+  {
+    public values: V[];
+    public keys: string[];
+    public indices: { [key: string]: number };
 
-  export type InputObject<V> =
-    InputScalar<V> |
-    { [P in keyof V]?: number | string };
+    public constructor (input?: FastMap<V> | { [prop: string]: V });
+    public reset (): this;
+    public put (key: string, value: V): this;
+    public rekey (fromKey: string, toKey: string): this;
+    public putMap (map: FastMap<V>): this;
+    public get (key: string): V | undefined;
+    public remove (key: string): this;
+    public removeAt (index: number): this;
+    public indexOf (key: string): number;
+    public has (key: string): boolean;
+    public hasOverlap (map: FastMap<V>): boolean;
+    public size (): number
+    public clear (): this;
+  }
 
-  export type Input<V> = 
-    V extends object ? InputObject<V> : InputScalar<V>;
+  export class AttrimatorMap<A> extends FastMap<Attrimator<A, keyof A>>
+  {
+    public setGroup (groupId: number, force?: boolean, deep?: boolean): void;
+    public delay (time: number): this;
+    public queue<K extends keyof A> (attrimator: Attrimator<A, K>): Attrimator<A, K> | undefined;
+    public queueMap (map: AttrimatorMap<A>, offset: number, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => void, context?: object): this;
+    public insertMap (map: AttrimatorMap<A>, onNewAttribute?: <K extends keyof A>(attrimator: Attrimator<A, K>) => any, context?: object): this;
+    public unqueueAt (index: number): this;
+    public playMapAt (attrimatorMap: AttrimatorMap<A>, all: boolean, time: number): this;
+    public playAttrimatorAt (attrimator: Attrimator<A, keyof A>, time: number): void;
+    public transitionMap (transition: Transition, attrimatorMap: AttrimatorMap<A>, getValue: <K extends keyof A>(attr: K) => A[K], getAttribute: <K extends keyof A>(attr: K) => Attribute<A, K> | undefined, placeAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>) => Attrimator<A, K> | undefined, getValueAt: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number, out: AttributesValues<A>) => A[K], stopAttrimator: <K extends keyof A>(attrimator: Attrimator<A, K>, relativeTime: number) => void, context: object): this;
+    public finishNotPresent (attrimatorMap: AttrimatorMap<A>, delay?: number): this;
+    public stopNotPresentAt (attrimatorMap: AttrimatorMap<A>, time: number): this;
+    public clone (): AttrimatorMap<A>;
+    public timeRemaining (returnInfinity?: boolean): number;
+    public applyCycle (nextCycle: number): number;
+    public iterate (callback: <K extends keyof A>(attrimator: Attrimator<A, K>, depth: number, previous?: Attrimator<A, K>) => void): this;
+  }
 
-  export type Inputs<A> =
-    { [K in keyof A]?: Input<A[K]> };
-
-  export type Value2d = { x: number, y: number };
-
-  export type Value3d = { x: number, y: number, z: number };
-
-  export type ValueNumber = number;
-
-  export type ValueRGB = { r: number, g: number, b: number };
-
-  export type ValueRGBA = { r: number, g: number, b: number, a: number };
-
-  export type ValueString = string;
-
-  export type ValueQuat = { x: number, y: number, z: number, angle: number };
-
-
+  export interface Attribute<A, K extends keyof A>
+  {
+    name: K;
+    calculatorName: keyof CalculatorMap;
+    calculator: Calculator<A[K]>;
+    defaultValue: A[K];
+    parse (input: Input<A[K]>, defaultValue?: A[K]): Value<A[K]>;
+    cloneDefault (): A[K];
+  }
 
   export class Animator<A = any, S = any> extends EventSource implements Animatable<A, S>
   {
@@ -1417,7 +1417,7 @@ declare module "anim8js"
   export function offset (time: Offset): number;
   export function options (options: OptionsInput, cache?: boolean): Options;
   
-  // export function path<V> (pathInput: PathInput<V>): Path<V>;
+  
   export function path<V> (pathInput: PathPointDefinition<V>): PathPoint<V>;
   export function path<V> (pathInput: PathComboDefinition<V>): PathCombo<V>;
   export function path<V> (pathInput: PathCompiledDefinition<V>): PathCompiled<V>;
@@ -1445,7 +1445,8 @@ declare module "anim8js"
   export function time<E> (repeat: any, returnOnInvalid?: E): number | E;
   export function transition (transition: TransitionInput, cache?: boolean): Transition;
 
-  export const Color: {
+  export const Color: 
+  {
     (r?: number, g?: number, b?: number, a?: number): ValueRGBA;
 
     parse (input: string): ValueRGBA | false;
@@ -1460,7 +1461,8 @@ declare module "anim8js"
   export function isComputed<V> (x: any): x is Computed<V>;
   export function resolveComputed<A, K extends keyof A> (attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>, parser: Calculator<A[K]> | ((attrimator: Attrimator<A, K>, animator: Animator<any, A>, value: Input<A[K]>) => Input<A[K]>)): A[K];
 
-  export const computed: {
+  export const computed: 
+  {
      <V>(func: Computed<V>): Computed<V>;
      <V>(name: string, func: Computed<V>): Computed<V>;
 
