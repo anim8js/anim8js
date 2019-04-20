@@ -23,7 +23,8 @@ declare module 'anim8js'
   export type Value<V> =
     V |
     Dynamic<V> |
-    Computed<V>;
+    Computed<V> | 
+    Parameters<V>;
 
   export type Value2d = { x: number, y: number };
 
@@ -46,6 +47,7 @@ declare module 'anim8js'
     true |
     Dynamic<V> |
     Computed<V> |
+    Parameters<V> |
     (number | string)[];
 
   export type InputObject<V> =
@@ -1478,38 +1480,38 @@ declare module 'anim8js'
   export function partial<A, K extends keyof A> (attribute: K, subattribute: keyof A[K]): (value: AttributesValues<A>, frame: AttributesValues<A>) => void;
   export function spread<A> (attributes: (keyof A)[]): (value: AttributesValues<A>, frame: AttributesValues<A>) => void;
 
-  export function param<V> (paramName: string, paramCalculator?: CalculatorInput<V>, paramDefaultValue?: Input<V>): Parameters;
+  export function param<V> (paramName: string, paramCalculator?: CalculatorInput<V>, paramDefaultValue?: Input<V>): Parameters<V>;
 
-  export interface Parameters
+  export interface Parameters<V> extends Computed<V>
   {
-    add<V> (value: Input<V>): Computed<V> & Parameters;
-    sub<V> (value: Input<V>): Computed<V> & Parameters;
-    mul<V> (value: Input<V>): Computed<V> & Parameters;
-    scale<V> (scalar: number): Computed<V> & Parameters;
-    adds<V> (value: Input<V>, scalar: number): Computed<V> & Parameters;
-    neg<V> (): Computed<V> & Parameters;
-    min<V> (value: Input<V>): Computed<V> & Parameters;
-    max<V> (value: Input<V>): Computed<V> & Parameters;
-    truncate<V> (denominator: number): Computed<V> & Parameters;
-    mode<V> (divisor: number): Computed<V> & Parameters;
-    clamp<V> (min: number, max: number): Computed<V> & Parameters;
-    convert<V> (converter: (x: number) => number): Computed<V> & Parameters;
-    abs<V> (): Computed<V> & Parameters;
-    sqrt<V> (): Computed<V> & Parameters;
-    floor<V> (): Computed<V> & Parameters;
-    ceil<V> (): Computed<V> & Parameters;
-    round<V> (): Computed<V> & Parameters;
-    toDegrees<V> (): Computed<V> & Parameters;
-    toRadians<V> (): Computed<V> & Parameters;
-    cos<V> (): Computed<V> & Parameters;
-    sin<V> (): Computed<V> & Parameters;
-    tan<V> (): Computed<V> & Parameters;
-    cosDegrees<V> (): Computed<V> & Parameters;
-    sinDegrees<V> (): Computed<V> & Parameters;
-    tanDegrees<V> (): Computed<V> & Parameters;
-    distance<V> (value: Input<V>): Computed<V> & Parameters;
-    property<V> (propertyName: string, defaultValue: Input<V>): Computed<V> & Parameters;
-    vector<V> (calculator: Calculator<V>): Computed<V> & Parameters;
+    add (value: Input<V>): Computed<V> & Parameters<V>;
+    sub (value: Input<V>): Computed<V> & Parameters<V>;
+    mul (value: Input<V>): Computed<V> & Parameters<V>;
+    scale (scalar: number): Computed<V> & Parameters<V>;
+    adds (value: Input<V>, scalar: number): Computed<V> & Parameters<V>;
+    neg (): Computed<V> & Parameters<V>;
+    min (value: Input<V>): Computed<V> & Parameters<V>;
+    max (value: Input<V>): Computed<V> & Parameters<V>;
+    truncate (denominator: number): Computed<V> & Parameters<V>;
+    mode (divisor: number): Computed<V> & Parameters<V>;
+    clamp (min: number, max: number): Computed<V> & Parameters<V>;
+    convert (converter: (x: number) => number): Computed<V> & Parameters<V>;
+    abs (): Computed<V> & Parameters<V>;
+    sqrt (): Computed<V> & Parameters<V>;
+    floor (): Computed<V> & Parameters<V>;
+    ceil (): Computed<V> & Parameters<V>;
+    round (): Computed<V> & Parameters<V>;
+    toDegrees (): Computed<V> & Parameters<V>;
+    toRadians (): Computed<V> & Parameters<V>;
+    cos (): Computed<V> & Parameters<V>;
+    sin (): Computed<V> & Parameters<V>;
+    tan (): Computed<V> & Parameters<V>;
+    cosDegrees (): Computed<V> & Parameters<V>;
+    sinDegrees (): Computed<V> & Parameters<V>;
+    tanDegrees (): Computed<V> & Parameters<V>;
+    distance (value: Input<V>): Computed<V> & Parameters<V>;
+    property (propertyName: string, defaultValue: Input<V>): Computed<V> & Parameters<V>;
+    vector (calculator: Calculator<V>): Computed<V> & Parameters<V>;
   }
 
   export const Defaults: 
